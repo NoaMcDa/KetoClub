@@ -103,6 +103,15 @@ class Settings(BaseSettings):
     WEBSITE_HOST_RATE_LIMIT_PER_MINUTE: int = 6
     # Fetches per install in any 60 s, so the route is no open proxy.
     WEBSITE_RATE_LIMIT_PER_MINUTE: int = 10
+    # One deadline for a whole fetch, in seconds (#269): every redirect hop,
+    # its robots.txt and every body read. The 15 s read timeout bounds a
+    # single read only, so a server dripping a byte at a time could otherwise
+    # hold a request open indefinitely. Past it → 504 timeout.
+    WEBSITE_FETCH_DEADLINE_SECONDS: float = 20.0
+    # How long parsing one fetched page or robots.txt may take in its worker
+    # thread before the request answers 504 timeout (#268). The parsers are
+    # linear, so a 2 MB page takes well under a second; this is the backstop.
+    WEBSITE_PARSE_BUDGET_SECONDS: float = 10.0
 
     # --- Menu store (#310) -----------------------------------------------------
     # POST /v1/menus and GET /v1/menus/{source}/{platform_id}: an anonymous
@@ -130,6 +139,16 @@ class Settings(BaseSettings):
     # app.models.ConfirmationVoter). Set it to a long random string on any
     # shared host; changing it later makes every install countable once more.
     CONFIRMATION_PEPPER: str = ""
+
+    # --- Host header (#271) -----------------------------------------------------
+    # Comma-separated host names a request's Host header may carry (any port).
+    # Anything else is 400 invalidHost before a route runs. Without it a web
+    # page could point its own domain at 127.0.0.1 (DNS rebinding) and call
+    # this server as if it were same-origin, which CORS cannot stop. Add the
+    # machine's LAN address when phones reach it over Wi-Fi (#99), and the
+    # public host name on a hosted deploy (#171). "*.example.com" admits
+    # subdomains; "*" alone turns the check off. IPv6 literals in brackets.
+    ALLOWED_HOSTS: str = "localhost,127.0.0.1,[::1]"
 
     # --- Database -------------------------------------------------------------
     DATABASE_URL: str = "sqlite:///./ketoclub.db"
@@ -172,10 +191,25 @@ class Settings(BaseSettings):
     # never for a rules-only result.
     ANALYSIS_RATE_LIMIT_PER_MINUTE: int = 10
     ANALYSIS_RATE_LIMIT_PER_DAY: int = 60
+    # The text half of the largest POST /v1/chat body, in bytes (#269): both
+    # prompts (420,000 characters at most, which JSON may escape to six bytes
+    # each), the response schema and the JSON around them. The images'
+    # allowance (VISION_MAX_IMAGES parts of VISION_MAX_IMAGE_BYTES, base64)
+    # is added on top. Over the sum → 413 payloadTooLarge before parsing.
+    CHAT_MAX_TEXT_BODY_BYTES: int = 3 * 1024 * 1024
     # Largest POST /v1/classify body in bytes (768 KiB), checked against
     # Content-Length and the body actually read. Over it → 413
     # payloadTooLarge before any parsing.
     CLASSIFY_MAX_BODY_BYTES: int = 786_432
+
+    @property
+    def allowed_hosts(self) -> list[str]:
+        """``ALLOWED_HOSTS`` as a list, lower-cased, blanks dropped."""
+        return [
+            host.strip().lower()
+            for host in self.ALLOWED_HOSTS.split(",")
+            if host.strip()
+        ]
 
     @property
     def llm_configured(self) -> bool:

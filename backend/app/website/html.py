@@ -34,6 +34,7 @@ from typing import Any, Final
 from app.keto.dart_text import dart_lower, dart_trim, utf16_len
 from app.keto.text_menu import NOT_WS, WS, join_surrogates
 from app.keto.vocabulary import vocabulary
+from app.website.linear import PairedTags, find_tags, sub_comments, sub_tags
 
 # --- Dart's ``Uri`` -----------------------------------------------------------
 
@@ -582,18 +583,26 @@ class PageLink:
 
 
 _FLAGS: Final = re.IGNORECASE | re.ASCII
-_COMMENT: Final = re.compile("<!--.*?-->", re.DOTALL)
-_INVISIBLE: Final = re.compile(
-    rf"<(script|style|noscript|template|svg|head|nav|footer)\b[^>]*>.*?</\1{WS}*>",
-    _FLAGS | re.DOTALL,
+# The paired-tag and tag patterns the Dart reader applies, run by
+# ``app.website.linear`` in linear time with exactly the regex's results
+# (#268): ``<(names)\b[^>]*>.*?</\1\s*>`` scans to the end of the page at
+# every unclosed tag. The Dart sources, for the record:
+#   _INVISIBLE    <(script|style|noscript|template|svg|head|nav|footer)\b...
+#   _SCRIPTS_ONLY <(script|style|noscript|template|svg)\b[^>]*>.*?</\1\s*>
+#   _NOSCRIPT     <noscript\b[^>]*>(.*?)</noscript\s*>
+#   _ANCHOR       <a\b([^>]*)>(.*?)</a\s*>
+#   _JSON_LD      <script\b[^>]*type\s*=\s*["']?application/ld\+json["']?
+#                 [^>]*>(.*?)</script\s*>
+_INVISIBLE: Final = PairedTags(
+    "script|style|noscript|template|svg|head|nav|footer",
+    space=WS,
+    flags=_FLAGS,
+    same_name=True,
 )
-_SCRIPTS_ONLY: Final = re.compile(
-    rf"<(script|style|noscript|template|svg)\b[^>]*>.*?</\1{WS}*>",
-    _FLAGS | re.DOTALL,
+_SCRIPTS_ONLY: Final = PairedTags(
+    "script|style|noscript|template|svg", space=WS, flags=_FLAGS, same_name=True
 )
-_NOSCRIPT: Final = re.compile(
-    rf"<noscript\b[^>]*>(.*?)</noscript{WS}*>", _FLAGS | re.DOTALL
-)
+_NOSCRIPT: Final = PairedTags("noscript", space=WS, flags=_FLAGS, same_name=False)
 _BLOCK_TAG: Final = re.compile(
     "</?(p|div|li|ul|ol|h[1-6]|tr|table|tbody|thead|section|article|main|"
     "header|aside|br|dd|dt|dl|figure|figcaption|blockquote|pre|hr|form|"
@@ -605,20 +614,27 @@ _TAG: Final = re.compile("<[^>]+>")
 _SPACES: Final = re.compile("[ \t\f\v ‎‏]+")
 _LINE_BREAK: Final = re.compile(r"\r\n|\r|\n")
 _WHITESPACE: Final = re.compile(f"{WS}+")
-_ANCHOR: Final = re.compile(r"<a\b([^>]*)>(.*?)</a" + f"{WS}*>", _FLAGS | re.DOTALL)
+_ANCHOR: Final = PairedTags("a", space=WS, flags=_FLAGS, same_name=False)
 _META: Final = re.compile(r"<meta\b[^>]*>", _FLAGS)
 _ATTRIBUTE: Final = re.compile(
     rf"""([a-zA-Z:-]+){WS}*={WS}*(?:"([^"]*)"|'([^']*)'|({NOT_WS[:-1]}>]+))"""
 )
-_JSON_LD: Final = re.compile(
+_JSON_LD_OPEN: Final = re.compile(
     r"""<script\b[^>]*type"""
     + WS
     + r"""*="""
     + WS
-    + r"""*["']?application/ld\+json["']?[^>]*>(.*?)</script"""
-    + WS
-    + "*>",
-    _FLAGS | re.DOTALL,
+    + r"""*["']?application/ld\+json["']?[^>]*>""",
+    _FLAGS,
+)
+
+
+def _is_json_ld_open(text: str, start: int, end: int) -> bool:
+    return _JSON_LD_OPEN.fullmatch(text, start, end) is not None
+
+
+_JSON_LD: Final = PairedTags(
+    "script", space=WS, flags=_FLAGS, same_name=False, open_tag=_is_json_ld_open
 )
 _ENTITY: Final = re.compile("&(#x[0-9a-fA-F]+|#[0-9]+|[a-zA-Z]+);")
 
@@ -676,8 +692,12 @@ def lines(html: str) -> list[str]:
     and ``<footer>``; starts a new line at every block element and joins
     table cells with a space, so a row reads ``Dish 52`` as one line.
     """
-    without_hidden = _INVISIBLE.sub("\n", _COMMENT.sub(" ", html))
-    broken = _TAG.sub(" ", _CELL_TAG.sub(" ", _BLOCK_TAG.sub("\n", without_hidden)))
+    without_hidden = _INVISIBLE.sub("\n", sub_comments(" ", html))
+    broken = sub_tags(
+        _TAG,
+        " ",
+        sub_tags(_CELL_TAG, " ", sub_tags(_BLOCK_TAG, "\n", without_hidden)),
+    )
     found = (
         dart_trim(_SPACES.sub(" ", raw))
         for raw in _LINE_BREAK.split(decode_entities(broken))
@@ -691,15 +711,15 @@ def is_javascript_only(html: str) -> bool:
     JavaScript with little text left. A JSON-LD block is data, so it never
     counts."""
     website = vocabulary().website
-    without_hidden = _SCRIPTS_ONLY.sub(" ", _COMMENT.sub(" ", html))
+    without_hidden = _SCRIPTS_ONLY.sub(" ", sub_comments(" ", html))
     text = dart_trim(
-        _WHITESPACE.sub(" ", decode_entities(_TAG.sub(" ", without_hidden)))
+        _WHITESPACE.sub(" ", decode_entities(sub_tags(_TAG, " ", without_hidden)))
     )
     code = _lower(_JSON_LD.sub(" ", html))
     if "<script" in code and utf16_len(text) < website.js_only_text_chars:
         return True
-    for match in _NOSCRIPT.finditer(html):
-        if "javascript" in _lower(match.group(1)):
+    for block in _NOSCRIPT.finditer(html):
+        if "javascript" in _lower(html[block.content_start : block.content_end]):
             return utf16_len(text) < website.js_only_noscript_text_chars
     return False
 
@@ -716,7 +736,7 @@ def reserves_ai(html: str) -> bool:
     """Whether the page opts out of AI use in its own ``<meta>`` tags:
     ``robots`` (or ``ketoclubbot``) with ``noai``, or ``tdm-reservation`` = 1.
     """
-    for match in _META.finditer(html):
+    for match in find_tags(_META, html):
         attributes = _attributes_of(match.group(0))
         name = _lower(dart_trim(attributes.get("name", "")))
         content = _lower(dart_trim(attributes.get("content", "")))
@@ -744,7 +764,10 @@ def _try_decode(source: str) -> Any:
 def json_ld_blocks(html: str) -> list[Any]:
     """Every JSON-LD block on the page, decoded; a block that is not valid
     JSON (or is the JSON ``null``) is skipped."""
-    decoded = (_try_decode(match.group(1)) for match in _JSON_LD.finditer(html))
+    decoded = (
+        _try_decode(html[block.content_start : block.content_end])
+        for block in _JSON_LD.finditer(html)
+    )
     return [block for block in decoded if block is not None]
 
 
@@ -753,8 +776,9 @@ def links(html: str, base: DartUri) -> list[PageLink]:
     in page order. Fragment-only and ``javascript:``/``mailto:``/``tel:``
     links are dropped."""
     found: list[PageLink] = []
-    for match in _ANCHOR.finditer(html):
-        href = _attributes_of(f"<a {match.group(1)}>").get("href")
+    for block in _ANCHOR.finditer(html):
+        attributes = html[block.name_end : block.content_start - 1]
+        href = _attributes_of(f"<a {attributes}>").get("href")
         if href is None or not dart_trim(href) or href.startswith("#"):
             continue
         try:
@@ -763,8 +787,9 @@ def links(html: str, base: DartUri) -> list[PageLink]:
             continue
         if target.scheme not in ("http", "https"):
             continue
+        inner = html[block.content_start : block.content_end]
         text = dart_trim(
-            _WHITESPACE.sub(" ", decode_entities(_TAG.sub(" ", match.group(2))))
+            _WHITESPACE.sub(" ", decode_entities(sub_tags(_TAG, " ", inner)))
         )
         found.append(PageLink(uri=target, text=text))
     return found
