@@ -402,6 +402,37 @@ void main() {
       expect(await settings.read(), const AppSettings(helperToolSeen: true));
     });
 
+    test('a setter changes only its own field, never reverting what was '
+        'written since load (issue #287)', () async {
+      // Arrange: Settings loaded, then a venue opened and a filter chosen
+      // elsewhere, and the disclosure banner answered "Turn off".
+      await controller.load();
+      const venue = VenueRef(source: MenuSource.wolt, platformId: 'v1');
+      await settings.write(
+        const AppSettings(
+          lastVenue: venue,
+          lastFilter: MenuFilter.greenOnly,
+          estimationConsentGiven: false,
+          disclosureSeen: true,
+        ),
+      );
+
+      // Act
+      await controller.setThemeMode(AppThemeMode.dark);
+      await controller.setSeedOilFree(enabled: true);
+
+      // Assert
+      final stored = await settings.read();
+      expect(stored.lastVenue, venue);
+      expect(stored.lastFilter, MenuFilter.greenOnly);
+      expect(stored.estimationConsentGiven, isFalse);
+      expect(stored.disclosureSeen, isTrue);
+      expect(stored.themeMode, AppThemeMode.dark);
+      expect(stored.seedOilFree, isTrue);
+      // The controller now holds what was saved.
+      expect(controller.consentGiven, isFalse);
+    });
+
     group('acknowledgeDisclosure / declineDisclosure (D16, issue #167)', () {
       test('acknowledgeDisclosure persists disclosureSeen as true without '
           'changing consentGiven', () async {

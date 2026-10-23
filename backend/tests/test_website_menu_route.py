@@ -9,8 +9,10 @@ Gemini is a respx route nested inside the autouse network block from
 import base64
 import json
 import logging
+import re
 from collections.abc import Iterator
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -28,7 +30,11 @@ from app.main import create_app
 from app.models import StoredMenu
 from app.schemas import WebsiteMenuResponse
 from app.services import menu_store
-from app.website.ref import normalise_website_url, website_ref
+from app.website.ref import (
+    TRACKING_PARAMETERS,
+    normalise_website_url,
+    website_ref,
+)
 from tests.analysis_support import (
     GEMINI_URL,
     HEADERS,
@@ -164,6 +170,27 @@ def _assert_round_trips(body: dict[str, Any]) -> None:
             "https://cafe-noir.example/%D7%AA%D7%A4%D7%A8%D7%99%D7%98",
         ),
         ("https://8.8.8.8/", "https://8.8.8.8"),
+        # Tracking parameters are dropped, as the app drops them (#280).
+        (
+            "https://cafe.co.il/menu?utm_source=ig&utm_medium=social&fbclid="
+            + "A" * 200,
+            "https://cafe.co.il/menu",
+        ),
+        (
+            "https://cafe.co.il/menu?lang=he&gclid=x&utm_campaign=z&page=2",
+            "https://cafe.co.il/menu?lang=he&page=2",
+        ),
+        (
+            "https://cafe.co.il/menu?UTM_Source=ig&MSCLKID=1&id=7",
+            "https://cafe.co.il/menu?id=7",
+        ),
+        ("https://cafe.co.il/?igshid=abc", "https://cafe.co.il"),
+        (
+            "https://cafe.co.il/menu?utm=keep&utmost=keep",
+            "https://cafe.co.il/menu?utm=keep&utmost=keep",
+        ),
+        ("https://cafe.co.il/menu?", "https://cafe.co.il/menu"),
+        ("https://cafe.co.il/menu?a=1", "https://cafe.co.il/menu?a=1"),
         ("ftp://cafe-noir.example/", None),
         ("https://localhost/", None),
         ("https://cafe.local/", None),
@@ -186,6 +213,20 @@ def test_a_website_url_is_normalised_as_the_app_does(
     else:
         assert ref is not None
         assert (ref.source, ref.platform_id) == ("website", normalised)
+
+
+def test_the_tracking_parameters_are_the_apps() -> None:
+    """The list the app drops (#280), read from the Dart source, so the two
+    twins key the same paste the same way."""
+    dart = (
+        Path(__file__).resolve().parents[2]
+        / "lib"
+        / "services"
+        / "venue"
+        / "venue_ref_resolver.dart"
+    ).read_text(encoding="utf-8")
+    block = dart.split("_trackingParameters = <String>{", 1)[1].split("};", 1)[0]
+    assert frozenset(re.findall(r"'([^']+)'", block)) == TRACKING_PARAMETERS
 
 
 # --- a menu in the page itself ------------------------------------------------

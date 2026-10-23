@@ -92,6 +92,40 @@ const Duration llmRequestTimeout = Duration(seconds: 120);
 /// `user_prompt` limit; this only has to sit above any menu that fits it.
 const int maxAnalysedDishes = 1000;
 
+/// The longest `user_prompt` KetoClub's backend accepts on its chat route,
+/// in characters (issue #188). The backend enforces it as
+/// `USER_PROMPT_MAX_CHARS` in `backend/app/schemas.py` (`ChatRequest`):
+/// change both together. A longer prompt is a 422 before Gemini is ever
+/// asked, so `LlmMenuClassifier` never sends one: it splits a menu whose
+/// prompt would exceed it into batches (`MenuAnalysisPrompt.batches`).
+///
+/// Dart counts UTF-16 code units and Python counts code points, so a Dart
+/// length is never shorter than the Python one: a prompt that fits here
+/// fits there.
+const int llmUserPromptMaxChars = 400000;
+
+/// The most dishes one menu-analysis request asks about (issue #188,
+/// architecture.md D6 as D25 amends it). The Python twin is
+/// `ANALYSIS_BATCH_MAX_DISHES` in `backend/app/keto/batching.py`; the
+/// golden `batches.json` pins the two equal.
+///
+/// Sized so the reply always fits the output budget
+/// (`GEMINI_MAX_OUTPUT_TOKENS`, 65,536 tokens): the worst keto dish is a
+/// 300-character `why` and a 300-character `modification` in Hebrew, at
+/// roughly a token a character, plus its keys, id, name and hidden-carb
+/// flags — about 750 tokens, and 80 of those is 60,000. It also keeps one
+/// request inside the 120 s client timeout: the smoke test measured about
+/// 0.9 s a dish (`architecture.md` §17.1).
+const int llmBatchMaxDishes = 80;
+
+/// [llmBatchMaxDishes] when the request also asks for each dish's
+/// ingredients (Banto; ALG-03, D26 C2), whose list makes every reply
+/// larger: up to 40 ingredients (`maxIngredientsPerDish`) at about 25
+/// tokens each on top of the 750 a keto dish takes, about 1,750 tokens a
+/// dish, and 35 of those is 61,250. The Python twin is
+/// `ANALYSIS_BATCH_MAX_DISHES_EXTRACT` in `backend/app/keto/batching.py`.
+const int llmBatchMaxDishesWithExtraction = 35;
+
 /// `why` is truncated at this many characters, never rejected for length
 /// alone (architecture.md §9.4 rule 6, §9.1).
 const int maxWhyLength = 300;
@@ -100,10 +134,51 @@ const int maxWhyLength = 300;
 /// for length alone (architecture.md §9.4 rule 6, §9.1).
 const int maxModificationLength = 300;
 
-/// The minimum word length counted when the parser checks whether an
-/// LLM-returned dish name shares a word with a source dish name
+/// The minimum word length counted when the parser matches an
+/// LLM-returned dish name to a source dish name by word overlap
 /// (architecture.md §9.4 rule 3).
 const int minOverlapWordLength = 3;
+
+/// Words the parser ignores when it matches an LLM-returned dish name to a
+/// source dish name by word overlap (architecture.md §9.4 rule 3, issue
+/// #277): joining words and menu filler that say nothing about which dish
+/// is meant, so "Chef special with fries" never matches a dish because
+/// both say "with". Already normalised (`TextNormaliser.normalise`) and
+/// at least [minOverlapWordLength] letters long; shorter words never
+/// count anyway. Exported to the golden vocabulary, so the Python twin
+/// reads this very list.
+const Set<String> nameStopWords = <String>{
+  'and',
+  'the',
+  'with',
+  'without',
+  'for',
+  'from',
+  'our',
+  'your',
+  'served',
+  'plus',
+  'choice',
+  'ללא',
+  'בלי',
+  'בתוספת',
+  'מוגש',
+  'מוגשת',
+  'לבחירה',
+};
+
+/// The name-overlap match (architecture.md §9.4 rule 3, issue #277)
+/// needs the shared content words to be at least
+/// [nameOverlapNumerator]/[nameOverlapDenominator] of all the content
+/// words the two names hold between them (Jaccard). "Grilled Chicken"
+/// and "Chicken Schnitzel" share one word of three (1/3): different
+/// dishes. "Ribeye Steak, grilled" and "Grilled Ribeye Steak" share all
+/// three: the same dish, reworded.
+const int nameOverlapNumerator = 3;
+
+/// The denominator of the name-overlap threshold; see
+/// [nameOverlapNumerator].
+const int nameOverlapDenominator = 5;
 
 // ---------------------------------------------------------------------------
 // LLM prompt text (architecture.md §9.1)
@@ -288,7 +363,7 @@ const String shareYellowHeadingHe = 'עם שינויים:';
 typedef GuardWords = ({List<String> before, List<String> after});
 
 // ---------------------------------------------------------------------------
-// carbModifiers — English (62 triggers → waiter sentence)
+// carbModifiers — English (trigger → waiter sentence)
 // ---------------------------------------------------------------------------
 
 const String _sSwapPotato =
@@ -296,11 +371,18 @@ const String _sSwapPotato =
 const String _sSwapMash = 'Swap the mash for leafy greens';
 const String _sOmitBeetroot = 'Omit the beetroot from the dish';
 const String _sBbq = 'Ask for barbecue glaze to be omitted (high in sugar)';
+const String _sHashBrowns =
+    'Please swap the hash browns for a green salad or extra eggs.';
+const String _sOnionRings =
+    'Please swap the onion rings for a green salad; they are battered.';
+const String _sFlatbread = 'Please serve it on a plate, without the flatbread.';
+const String _sPortSauce =
+    'Please leave out the port wine sauce; it reduces to sugar.';
 
 /// Carb-modifier triggers (waiter-script templates) in English, from
 /// README's 13 verbatim, plus the false-green-gap additions, the D-V3
 /// bread-carrier triggers, and the D-V4 additions (`vocabulary_spec.md`
-/// "carbModifiers — English"). 62 entries.
+/// "carbModifiers — English"), the #216 drinks and the #273/#274 sides.
 const Map<String, String> carbModifiersEn = <String, String>{
   // README's 13, verbatim.
   'puree': 'Swap potato purée for green salad or steamed vegetables',
@@ -415,6 +497,31 @@ const Map<String, String> carbModifiersEn = <String, String>{
   'tamarind': 'Please leave out the tamarind sauce; it contains sugar.',
   'hoisin': 'Please leave out the hoisin sauce; it contains sugar.',
 
+  // Issue #274: sides and carriers that came back green. A side of hash
+  // browns or onion rings, or a naan or flatbread that carries a curry or
+  // a kebab, is removable like fries or a pita; named alone, the
+  // carb-only rule makes them red ([carbOnlyEligibleTriggers]).
+  'hash brown': _sHashBrowns,
+  'hash browns': _sHashBrowns,
+  'onion ring': _sOnionRings,
+  'onion rings': _sOnionRings,
+  'naan':
+      'Please serve it without the naan, with salad or vegetables '
+      'instead.',
+  'flatbread': _sFlatbread,
+  'flatbreads': _sFlatbread,
+  'cranberry sauce':
+      'Please leave out the cranberry sauce; it is mostly '
+      'sugar.',
+  // Issue #273: a port wine reduction is a sauce, not a drink, so the
+  // base no longer makes the dish red (see the guard on `port wine`);
+  // it is reduced sugar, so it is yellow like `balsamic glaze`.
+  'port wine reduction': _sPortSauce,
+  'port reduction': _sPortSauce,
+  'port wine sauce': _sPortSauce,
+  'port sauce': _sPortSauce,
+  'port wine glaze': _sPortSauce,
+
   // Drink triggers — yellow with a swap script (#216). Latte/cappuccino:
   // the dairy rule (dairyTriggersEn `milk`/`cream`) fires separately when
   // dairy-free is on, so the swap sentence here names non-dairy options only.
@@ -446,7 +553,7 @@ const Map<String, String> carbModifiersEn = <String, String>{
 };
 
 // ---------------------------------------------------------------------------
-// carbModifiers — Hebrew (80 triggers → waiter sentence)
+// carbModifiers — Hebrew (trigger → waiter sentence)
 // ---------------------------------------------------------------------------
 
 const String _sPirePotato =
@@ -480,9 +587,11 @@ const String _sLachmaniya =
 const String _sKarich = 'אפשר בבקשה את המילוי בצלחת, בלי הלחם?';
 const String _sToastHe = 'אפשר בבקשה בלי הלחם, ועם סלט או ירקות במקום?';
 const String _sTortiyaHe = 'אפשר בבקשה לקבל את המנה בקערה, בלי הטורטייה?';
+const String _sPitaHe = 'אפשר בבקשה לקבל את זה בצלחת, בלי הפיתה?';
+const String _sPortSauceHe = 'אפשר בבקשה בלי רוטב הפורט? הוא מצטמצם לסוכר.';
 
 /// Carb-modifier triggers (waiter-script templates) in Hebrew
-/// (`vocabulary_spec.md` "carbModifiers — Hebrew"). 80 entries: the
+/// (`vocabulary_spec.md` "carbModifiers — Hebrew"). The
 /// "/"-separated variants in the spec are flattened here into one map
 /// entry per variant, sharing the same sentence. Includes three #12
 /// audit additions (agent 1D): `מייפל` and `זיגוג בלסמי`, which had no
@@ -549,10 +658,14 @@ const Map<String, String> carbModifiersHe = <String, String>{
   'טוסט': _sToastHe,
   'טוסטים': _sToastHe,
   'לחם': _sToastHe,
-  'פיתה': 'אפשר בבקשה לקבל את זה בצלחת, בלי הפיתה?',
+  'פיתה': _sPitaHe,
+  // Issue #274: the plural, which the strict right boundary keeps `פיתה`
+  // from finding.
+  'פיתות': _sPitaHe,
   'לאפה': 'אפשר בבקשה לקבל את זה בצלחת, בלי הלאפה?',
   'טורטייה': _sTortiyaHe,
   'טורטיה': _sTortiyaHe,
+  'טורטיות': _sTortiyaHe,
   'באגט': 'אפשר בבקשה את המילוי בצלחת, בלי הבאגט?',
 
   // D-V4 additions.
@@ -577,6 +690,19 @@ const Map<String, String> carbModifiersHe = <String, String>{
   'בצל מטוגן': 'אפשר בבקשה בלי הבצל המטוגן? הוא מקומח.',
   'תמרינד': 'אפשר בבקשה בלי רוטב התמרינד? יש בו סוכר.',
   'הויסין': 'אפשר בבקשה בלי רוטב ההויסין? יש בו סוכר.',
+
+  // Issue #274, mirroring the English additions: removable sides and
+  // carriers, and cranberry sauce (which suppresses the bare dried
+  // `חמוציות` sentence, see [triggerSuppresses]).
+  'האש בראון': 'אפשר בבקשה להחליף את האש בראון בסלט ירוק או בביצה נוספת?',
+  'טבעות בצל': 'אפשר בבקשה להחליף את טבעות הבצל בסלט ירוק? הן מצופות בבלילה.',
+  'נאן': 'אפשר בבקשה בלי הנאן, ועם סלט או ירקות במקום?',
+  'רוטב חמוציות': 'אפשר בבקשה בלי רוטב החמוציות? הוא כמעט כולו סוכר.',
+  // Issue #273, mirroring the English port wine sauces.
+  'רוטב יין פורט': _sPortSauceHe,
+  'רוטב פורט': _sPortSauceHe,
+  'רדוקציית פורט': _sPortSauceHe,
+  'רדוקציית יין פורט': _sPortSauceHe,
 
   // #12 audit additions (agent 1D): `maple` and `balsamic glaze` had no
   // Hebrew counterpart at all, the exact silent-vocabulary-gap failure
@@ -619,8 +745,11 @@ const Map<String, String> carbModifiersHe = <String, String>{
 /// breading trigger (D-V2), so a bare `beer` here is safe — the longer
 /// trigger takes priority when both match the same text. `juice` is the
 /// generic form; `orange juice` and `apple juice` are included for
-/// display-label precision. `smoothie` lives here only (the milkshake
-/// cluster above has `milkshake`, not `smoothie`).
+/// display-label precision. Lemon or lime juice and a juice in a
+/// dressing are seasoning, not a drink, and are guarded (issue #273);
+/// so are a beer or a port cooked into a dish ("beer-braised").
+/// `smoothie` lives here only (the milkshake cluster above has
+/// `milkshake`, not `smoothie`).
 const List<String> nonKetoDrinkBasesEn = <String>[
   'cola',
   'coke',
@@ -643,14 +772,16 @@ const List<String> nonKetoDrinkBasesEn = <String>[
 ];
 
 // ---------------------------------------------------------------------------
-// nonKetoBases — English (100 triggers)
+// nonKetoBases — English
 // ---------------------------------------------------------------------------
 
 /// Non-keto-base triggers in English: any match makes a dish red with no
-/// waiter script (`vocabulary_spec.md` "nonKetoBases — English"). 100
-/// entries: README's 16, minus the three D-V3 moves (`sandwich`,
-/// `brioche bun`, `toast`, now [carbModifiersEn]), plus verified plural
-/// and spelling variants, D-V2 breading, and D-V4 families.
+/// waiter script (`vocabulary_spec.md` "nonKetoBases — English"):
+/// README's 16, minus the three D-V3 moves (`sandwich`, `brioche bun`,
+/// `toast`, now [carbModifiersEn]), plus irregular plural and spelling
+/// variants, D-V2 breading, D-V4 families and the issue #190 and #274
+/// additions. Every entry also matches its regular `s`/`es` plural
+/// (issue #274), so a regular plural is never an entry of its own.
 ///
 /// Bare `brioche` is deliberately NOT here. It reads like a red pastry, but
 /// on a real menu it almost always qualifies a bun ("beef burger on a brioche
@@ -664,13 +795,15 @@ const List<String> nonKetoBasesEn = <String>[
   // that cannot make it keto. `fish & chips` normalises to `fish chips`.
   'fish and chips',
   'fish chips',
-  // README's 16, minus sandwich / brioche bun / toast (D-V3).
+  // Issue #274: "Fish 'n' Chips" once the quote marks are deleted.
+  'fish n chips',
+  // README's 16, minus sandwich / brioche bun / toast (D-V3). Their
+  // regular plurals (`pastas`, `pizzas`, `noodles`, ...) were entries of
+  // their own until issue #274 taught every base here its `s`/`es`
+  // plural (`latinTriggerPattern`'s `allowPlural`), so they are gone.
   'pasta', 'spaghetti', 'penne', 'fettuccine', 'gnocchi',
-  'pizza', 'calzone', 'risotto', 'noodle', 'noodles', 'ramen',
+  'pizza', 'calzone', 'risotto', 'noodle', 'ramen',
   'pancake', 'waffle',
-
-  // Plurals and spelling variants, verified GREEN today without them.
-  'pastas', 'pizzas', 'calzones', 'pancakes', 'waffles',
 
   // D-V2: breading cannot be made keto by removing a side.
   'breaded', 'battered', 'crumbed', 'panko', 'tempura', 'beer batter',
@@ -694,13 +827,26 @@ const List<String> nonKetoBasesEn = <String>[
   'challah', 'bagel', 'croissant', 'doughnut', 'donut', 'latkes',
   'burrito', 'quesadilla', 'taco shell',
 
+  // Issue #274: compounds the plural rule cannot reach, and dishes that
+  // had no trigger at all. `taco` is red with `burrito` and `taco shell`
+  // rather than a D-V3 carrier; `sushi` and its forms are rice dishes
+  // (the prompt's "rice bowl"), guarded against `sushi grade`; `french
+  // toast` is a soaked, fried bread, not bread that carries a dish, so
+  // it beats the yellow `toast`; `fried chicken` is guarded against
+  // pan-, stir- and air-fried chicken, which carry no breading; `crispy
+  // chicken` is the breaded dish, now that `קריספי` alone is not red.
+  'cheesecake', 'cupcake', 'taco', 'nachos', 'lentil soup', 'tiramisu',
+  'crème brûlée', 'sushi', 'nigiri', 'maki', 'uramaki', 'french toast',
+  'fried chicken', 'popcorn chicken', 'crispy chicken',
+  // The Hebrew `חלבה` had no English twin (issue #273's `מחלבה` test).
+  'halva',
+
   // Issue #190: the pastry counter. A cinnamon danish classified green
   // on a real Aroma menu because none of these was a trigger. `danish`
   // is guarded against `danish blue`/`danish cheese` (see
   // [ketoQualifierGuardsEn]); `pastry` also covers `pastry cream` and
   // `pastry base`, both of which are red anyway.
-  'danish', 'pastry', 'pastries', 'rugelach', 'muffin', 'muffins',
-  'scone', 'scones',
+  'danish', 'pastry', 'pastries', 'rugelach', 'muffin', 'scone',
 
   // Drink bases — red (#216): see [nonKetoDrinkBasesEn].
   ...nonKetoDrinkBasesEn,
@@ -715,7 +861,9 @@ const List<String> nonKetoBasesEn = <String>[
 /// Guards in [ketoQualifierGuardsHe] rescue zero/diet variants. `בירה`
 /// catches `בירה שחורה` too (both red). `מיץ` is a bare trigger with the
 /// compound forms added for label precision; if it ever false-reds a
-/// proper name ("מיצי"), drop it and keep only the compounds.
+/// proper name ("מיצי"), drop it and keep only the compounds. Lemon or
+/// lime juice (`מיץ לימון`) and a juice in a dressing are guarded, and so
+/// is a beer cooked into a dish (issue #273).
 const List<String> nonKetoDrinkBasesHe = <String>[
   'קולה', // cola
   'קוקה קולה', // Coca-Cola (compound first — suppresses bare `קולה` match)
@@ -735,11 +883,11 @@ const List<String> nonKetoDrinkBasesHe = <String>[
 ];
 
 // ---------------------------------------------------------------------------
-// nonKetoBases — Hebrew (116 triggers)
+// nonKetoBases — Hebrew
 // ---------------------------------------------------------------------------
 
 /// Non-keto-base triggers in Hebrew (`vocabulary_spec.md` "nonKetoBases —
-/// Hebrew"). 116 entries, including 20 #12 audit additions (agent 1D)
+/// Hebrew"), including 20 #12 audit additions (agent 1D)
 /// for English triggers that had no Hebrew counterpart at all —
 /// `fish and chips`/`fish chips`, `pancake(s)`, `waffle(s)`, `katsu`,
 /// `milanese`, `macaroni`, `mac and cheese`, `polenta`, `grits`,
@@ -755,9 +903,17 @@ const List<String> nonKetoBasesHe = <String>[
   'פיצה', 'פיצות', 'קלצונה', 'קלזונה', 'ריזוטו', 'רזוטו',
   'נודלס', 'נודל', 'אטריות', 'אטריה', 'ראמן', 'רמן', 'בריוש',
 
-  // D-V2 breading.
+  // Issue #274: the construct and plural forms the strict right
+  // boundary keeps `פסטה` from finding ("פסטת פומודורו").
+  'פסטת',
+
+  // D-V2 breading. Issue #273: bare `בלילה` was here and reddened "at
+  // night" (ב + לילה); `בבלילה` ("in batter") is the breading sense.
+  // Bare `קריספי` reddened crispy skin and crispy bacon, which carry no
+  // coating, so only the coating itself is red, as `crispy coating` is.
   'שניצל', 'שניצלים', 'פאנקו', 'טמפורה', 'בציפוי פריך', 'פירורי לחם',
-  'בלילה', 'נאגטס', 'קריספי', 'בבלילת בירה', 'מטוגן בפירורים',
+  'בבלילה', 'בבלילת', 'נאגטס', 'ציפוי קריספי', 'בבלילת בירה',
+  'מטוגן בפירורים',
 
   // D-V4 families.
   'בורקס', 'בורקסים', 'מלווח', 'מלאווח', "ג'חנון", 'סמבוסק', "לחמג'ון",
@@ -768,7 +924,11 @@ const List<String> nonKetoBasesHe = <String>[
   'ריגטוני', 'אורזו',
   'אודון', 'סובה', 'פאד תאי', 'לו מיין', 'ורמישלי',
   'קרפ', 'קראפ', "בלינצ'ס", 'מלבי', 'קנאפה', 'בקלאווה', 'סופלה', 'בראוניז',
-  'עוגה', 'עוגיות', 'טארט', 'קרם ברולה', 'חלבה', 'גלידה', 'מילקשייק',
+  'עוגה', 'עוגיות', 'טארט', 'קרם ברולה', 'גלידה', 'מילקשייק',
+  // Compiled with no permissive prefix (classification_rules.dart): the
+  // prefixed form matched inside `מחלבה` ("dairy", issue #273). The
+  // two commonest particles (and, in) are spelled out instead.
+  'חלבה', 'וחלבה', 'בחלבה',
   'חלה', 'בייגל', 'קרואסון', 'דונאט', 'לביבות', 'ניוקי בטטה',
 
   // #12 audit additions (agent 1D): these English triggers had no Hebrew
@@ -808,6 +968,23 @@ const List<String> nonKetoBasesHe = <String>[
   'עוגיה', // cookie (singular; עוגיות is above)
   'מאפין', 'מאפינס', // muffin / muffins
   'סקון', // scone
+  // Issue #274: construct and plural forms (`עוגת שוקולד`, `עוגיית
+  // שוקולד צ'יפס`) and dishes that had no Hebrew trigger at all,
+  // mirroring the English additions.
+  'עוגת', 'עוגות', 'עוגיית', 'עוגייה', // cake / cookie forms
+  'בראוני', 'קרואסונים', 'בייגלים', 'דונאטס', 'אמפנדות', 'קרוקטים',
+  'קרפים',
+  'סופגנייה', 'סופגניה', 'סופגניות', // doughnut
+  'כופתאות', 'כיסונים', // dumplings
+  "צ'יזקייק", 'קאפקייק', 'קאפקייקס', // cheesecake / cupcake
+  'טאקו', "נאצ'וס", 'מרק עדשים', 'טירמיסו', // taco, nachos, lentil soup
+  'סושי', 'ניגירי', // sushi
+  "פרנץ' טוסט", 'טוסט צרפתי', // french toast
+  "פרייד צ'יקן", 'עוף פופקורן', 'פופקורן עוף', // fried / popcorn chicken
+  // Crispy chicken: with bare `קריספי` gone (issue #273), the dish name
+  // itself, which on an Israeli menu is always the breaded one.
+  "קריספי צ'יקן", "צ'יקן קריספי", 'עוף קריספי',
+  "פיש נ' צ'יפס", // fish 'n' chips
   // Drink bases — red (#216): see [nonKetoDrinkBasesHe].
   ...nonKetoDrinkBasesHe,
 ];
@@ -1184,6 +1361,10 @@ const Set<String> carbOnlyEligibleTriggers = <String>{
   // Breads.
   'bread', 'pita', 'laffa', 'bun', 'buns', 'burger bun', 'baguette',
   'tortilla',
+  // Issue #274: sides and breads that are the whole dish when named
+  // alone ("Hash browns", "Naan").
+  'hash brown', 'hash browns', 'onion ring', 'onion rings', 'naan',
+  'flatbread', 'flatbreads',
   // Hebrew starches.
   'פירה', 'מחית תפוחי אדמה', 'מחית תפו"א', 'פירה תפוחי אדמה', 'פירה תפו"א',
   "צ'יפס", 'תפוחי אדמה מטוגנים', 'קריספס', 'אורז', 'אורז יסמין',
@@ -1192,6 +1373,8 @@ const Set<String> carbOnlyEligibleTriggers = <String>{
   // Hebrew breads.
   'לחם', 'פיתה', 'לאפה', 'לחמנייה', 'לחמניה', 'לחמניות', 'לחמניית',
   'לחמנית', 'באגט', 'טורטייה', 'טורטיה',
+  // Issue #274, mirroring the English additions.
+  'פיתות', 'טורטיות', 'האש בראון', 'טבעות בצל', 'נאן',
 };
 
 /// Display labels for a carb-only red's `{base}` (issue #191), for the
@@ -1350,6 +1533,39 @@ const List<String> carbOnlyQualifiersHe = <String>[
   'עבה',
 ];
 
+/// Seasonings and toppings, English, that leave a starch or a bread the
+/// whole dish (issue #273): "Truffle parmesan fries" is fries. Each one
+/// is a carb-only qualifier in the name ([carbOnlyQualifiersEn]), and is
+/// not a filling when the description or an option names it again
+/// ("fries tossed in truffle oil and parmesan"), so
+/// `ClassificationRules.describesFilling` reads the text without them.
+/// Single words, compared after normalisation. `pepper` is left out:
+/// blanking it would hide `bell pepper`, a real filling.
+const List<String> carbOnlyToppingsEn = <String>[
+  'truffle',
+  'parmesan',
+  'garlic',
+  'rosemary',
+  'herb',
+  'herbs',
+  'paprika',
+  'cajun',
+  'salt',
+];
+
+/// Hebrew mirror of [carbOnlyToppingsEn]: "צ'יפס פרמז'ן כמהין". Matched
+/// with the permissive prefix, so the description's `ופרמז'ן` is a
+/// topping too. `פלפל` is left out for the reason `pepper` is: it would
+/// hide `פלפל קלוי`.
+const List<String> carbOnlyToppingsHe = <String>[
+  'כמהין',
+  'פרמזן',
+  'שום',
+  'רוזמרין',
+  'פפריקה',
+  'מלח',
+];
+
 /// First words that mark an option value as a *removal* rather than an
 /// ingredient, English (issue #192): "No onions", "Without the bun". A
 /// value beginning with one names something the dish can be ordered
@@ -1374,6 +1590,7 @@ const List<String> optionRemovalWordsHe = <String>['ללא', 'בלי'];
 const Map<String, String> nonKetoBaseLabelsEn = <String, String>{
   'fish and chips': 'battered fish',
   'fish chips': 'battered fish',
+  'fish n chips': 'battered fish',
   'noodle': 'noodles',
 };
 
@@ -1396,6 +1613,18 @@ const Map<String, String> nonKetoBaseLabelsHe = <String, String>{
   // not the chips.
   "פיש אנד צ'יפס": 'דג מצופה',
   "דג וצ'יפס": 'דג מצופה',
+  "פיש נ' צ'יפס": 'דג מצופה',
+  // Issue #274: a construct form needs the word after it, so the label
+  // is the absolute form (`redWhyHe` reads "מבוססת על {base}").
+  'עוגת': 'עוגה',
+  'עוגיית': 'עוגיה',
+  'פסטת': 'פסטה',
+  // Issue #273: the spelled-out particles of `חלבה` and the breading
+  // sense of `בלילה` ("in batter").
+  'וחלבה': 'חלבה',
+  'בחלבה': 'חלבה',
+  'בבלילה': 'בלילה',
+  'בבלילת': 'בלילה',
 };
 
 // ---------------------------------------------------------------------------
@@ -1403,8 +1632,13 @@ const Map<String, String> nonKetoBaseLabelsHe = <String, String>{
 // ---------------------------------------------------------------------------
 
 /// Keto-substitute guards, English (`vocabulary_spec.md` "Guards
-/// (D-V1)"). `corn` is deliberately absent: `baby corn` is a genuine
-/// trap, not a rescue, so `corn` is never guarded.
+/// (D-V1)"). `corn` is guarded only *after*, by `fed` ("corn-fed
+/// chicken", issue #273): `baby corn` is a genuine trap, not a rescue,
+/// so nothing before `corn` ever rescues it.
+///
+/// A non-keto base also matches its regular plural (issue #274), and the
+/// plural is guarded by the singular's entry: `noodle` here guards
+/// "zucchini noodles" too.
 const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'rice': (
     before: [
@@ -1415,26 +1649,13 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
       'keto',
       'cabbage',
     ],
-    after: [],
+    // Issue #273: rice vinegar is a vinegar.
+    after: ['vinegar'],
   ),
-  'noodles': (
-    before: [
-      'zucchini',
-      'courgette',
-      'cauliflower',
-      'konjac',
-      'shirataki',
-      'palmini',
-      'keto',
-      'cabbage',
-      'kelp',
-    ],
-    after: [],
-  ),
-  'noodle': (
-    before: ['zucchini', 'courgette', 'konjac', 'shirataki', 'palmini', 'keto'],
-    after: [],
-  ),
+  'corn': (before: [], after: ['fed']),
+  'noodle': (before: _vegetableNoodleWords, after: []),
+  // Issue #273: `pasta` had no guard while `noodles` did.
+  'pasta': (before: _vegetableNoodleWords, after: []),
   'spaghetti': (before: [], after: ['squash']),
   'pizza': (
     before: ['cauliflower', 'keto', 'almond', 'fathead', 'low carb', 'lowcarb'],
@@ -1463,7 +1684,6 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'danish': (before: [], after: ['blue', 'meatballs', 'rye', 'style']),
   // An egg muffin or a keto muffin is a breakfast, not a pastry.
   'muffin': (before: ['egg', 'keto', 'almond', 'coconut'], after: []),
-  'muffins': (before: ['egg', 'keto', 'almond', 'coconut'], after: []),
   // A lettuce-wrapped or keto burger already has no bun (issue #190).
   'burger': (before: _bunlessBurgerWords, after: []),
   'burgers': (before: _bunlessBurgerWords, after: []),
@@ -1479,14 +1699,78 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'pepsi': (before: _sugarFreeWords, after: _sugarFreeWords),
   'sprite': (before: _sugarFreeWords, after: _sugarFreeWords),
   'fanta': (before: _sugarFreeWords, after: _sugarFreeWords),
-  'beer': (before: _sugarFreeWords, after: _sugarFreeWords),
-  'lager': (before: _sugarFreeWords, after: _sugarFreeWords),
-  'ale': (before: _sugarFreeWords, after: _sugarFreeWords),
+  // Issue #273: a beer cooked into a dish ("beer-braised short rib",
+  // "short rib braised in stout") is an ingredient, not the drink.
+  'beer': (before: _beerCookedWords, after: _beerCookedWords),
+  'lager': (before: _beerCookedWords, after: _beerCookedWords),
+  'ale': (before: _beerCookedWords, after: _beerCookedWords),
+  'stout': (before: _cookedInWords, after: _cookedInWords),
   'tonic': (before: _sugarFreeWords, after: _sugarFreeWords),
   'tonic water': (before: _sugarFreeWords, after: _sugarFreeWords),
-  'juice': (before: _sugarFreeWords, after: _sugarFreeWords),
+  // Issue #273: lemon or lime juice, or any juice in a dressing, is a
+  // seasoning, not a glass of juice ("olive oil, lemon juice").
+  'juice': (
+    before: [..._sugarFreeWords, 'lemon', 'lime', 'yuzu'],
+    after: [..._sugarFreeWords, ..._dressingWords],
+  ),
+  'orange juice': (before: [], after: _dressingWords),
+  'apple juice': (before: [], after: _dressingWords),
   'lemonade': (before: _sugarFreeWords, after: _sugarFreeWords),
+  // Issue #273: a port wine reduction is a sauce; the yellow
+  // `port wine reduction` family in [carbModifiersEn] takes over.
+  'port wine': (before: _cookedInWords, after: _cookedInWords),
+
+  // Issue #274: sushi-grade fish is raw fish, and pan-, stir- or
+  // air-fried chicken has no breading.
+  'sushi': (before: [], after: ['grade']),
+  'fried chicken': (before: ['pan', 'stir', 'air'], after: []),
+  // Crispy chicken skin is skin, not a coating.
+  'crispy chicken': (before: [], after: ['skin']),
 };
+
+/// The keto-substitute words before `noodle` and `pasta` (issue #273):
+/// a vegetable or konjac noodle is not a wheat one.
+const List<String> _vegetableNoodleWords = <String>[
+  'zucchini',
+  'courgette',
+  'cauliflower',
+  'konjac',
+  'shirataki',
+  'palmini',
+  'keto',
+  'cabbage',
+  'kelp',
+];
+
+/// Words beside a drink base that mean it was cooked into the dish, not
+/// poured (issue #273): "beer-braised", "port wine reduction".
+const List<String> _cookedInWords = <String>[
+  'braised',
+  'braise',
+  'marinated',
+  'marinade',
+  'glaze',
+  'glazed',
+  'sauce',
+  'reduction',
+  'jus',
+  'gravy',
+  'poached',
+];
+
+/// [_sugarFreeWords] and [_cookedInWords] together, for the beers.
+const List<String> _beerCookedWords = <String>[
+  ..._sugarFreeWords,
+  ..._cookedInWords,
+];
+
+/// Words after a juice that make it a dressing (issue #273).
+const List<String> _dressingWords = <String>[
+  'dressing',
+  'vinaigrette',
+  'marinade',
+  'marinated',
+];
 
 /// Words before a burger word that mean it already comes without a bun.
 const List<String> _bunlessBurgerWords = <String>[
@@ -1512,8 +1796,9 @@ const List<String> _sugarFreeWords = <String>[
 ];
 
 /// Builds a Hebrew guard's [GuardWords] from one word list, applied on
-/// **both** sides. Unlike the English table, no Hebrew guard is
-/// `before`-only or `after`-only: Hebrew adjectives conventionally
+/// **both** sides. Unlike the English table, Hebrew guards are
+/// bidirectional (the cheeses of [_heChipsGuard] are the one exception):
+/// Hebrew adjectives conventionally
 /// follow the noun they qualify ("פיצה כרובית", pizza cauliflower-ish,
 /// not "כרובית פיצה"), the mirror image of the English word order these
 /// guards were modelled on, so checking one side only would leave that
@@ -1521,16 +1806,28 @@ const List<String> _sugarFreeWords = <String>[
 /// כרובית` must not come back red) rules out.
 GuardWords _heGuard(List<String> words) => (before: words, after: words);
 
-/// See [ketoQualifierGuardsHe] — shared by `אורז`.
+/// See [ketoQualifierGuardsHe] — shared by `אורז`. `חומץ` is issue
+/// #273's rice vinegar (`חומץ אורז`).
 final GuardWords _heCauliflowerLikeGuard = _heGuard(const [
   'כרובית',
   'קונגאק',
   'שיראטקי',
   'קטו',
   'כרוב',
+  'חומץ',
 ]);
 
-/// See [ketoQualifierGuardsHe] — shared by `נודלס` and `אטריות`.
+/// See [ketoQualifierGuardsHe] — `תירס`: corn-fed chicken (`עוף מוזן
+/// תירס`, issue #273) names the bird's feed, not a side of corn.
+final GuardWords _heCornFedGuard = _heGuard(const [
+  'מוזן',
+  'מוזנת',
+  'מוזנים',
+  'מוזנות',
+]);
+
+/// See [ketoQualifierGuardsHe] — shared by `נודלס`, `אטריות` and, since
+/// issue #273, `פסטה` and its forms.
 final GuardWords _heNoodleGuard = _heGuard(const [
   'קישואים',
   'קישוא',
@@ -1551,15 +1848,16 @@ final GuardWords _hePizzaGuard = _heGuard(const [
 /// See [ketoQualifierGuardsHe] — `ריזוטו`.
 final GuardWords _heRisottoGuard = _heGuard(const ['כרובית', 'קטו']);
 
-/// See [ketoQualifierGuardsHe] — `צ'יפס`.
-final GuardWords _heChipsGuard = _heGuard(const [
-  'קישואים',
-  'כרוב',
-  'פרמזן',
-  'גבינה',
-  'קייל',
-  'קטו',
-]);
+/// See [ketoQualifierGuardsHe] — `צ'יפס`. The one Hebrew guard that is
+/// not fully bidirectional (see [_heGuard]): a vegetable or `קטו` rescues
+/// from either side ("צ'יפס קישואים", zucchini chips), but the cheeses
+/// only *before* the chips. An Israeli menu prints "צ'יפס פרמזן כמהין"
+/// for truffle-parmesan fries, so a cheese after `צ'יפס` is a topping;
+/// "פרמזן צ'יפס" before it is the parmesan crisp.
+const GuardWords _heChipsGuard = (
+  before: <String>['קישואים', 'כרוב', 'פרמזן', 'גבינה', 'קייל', 'קטו'],
+  after: <String>['קישואים', 'כרוב', 'קייל', 'קטו'],
+);
 
 /// See [ketoQualifierGuardsHe] — shared by `לחמנייה` and `לחם`.
 final GuardWords _heBreadGuard = _heGuard(const [
@@ -1590,13 +1888,73 @@ final GuardWords _heDrinkGuard = _heGuard(const [
   'ללא סוכרים',
 ]);
 
+/// Dressing words beside `מיץ` (issue #273): juice in a dressing or a
+/// marinade is a seasoning.
+const List<String> _heDressingWords = <String>[
+  'רוטב',
+  'ברוטב',
+  'ויניגרט',
+  'בויניגרט',
+  'מרינדה',
+  'במרינדה',
+  'מרינדת',
+  'במרינדת',
+];
+
+/// Words beside a Hebrew drink base that mean it was cooked into the
+/// dish (issue #273): `צלע בקר מבושלת בבירה`, `ברוטב בירה`.
+const List<String> _heCookedInWords = <String>[
+  'מבושל',
+  'מבושלת',
+  'מבושלים',
+  'צלוי',
+  'צלויה',
+  'צלי',
+  'רוטב',
+  'ברוטב',
+  'רדוקציה',
+  'רדוקציית',
+  'זיגוג',
+  'בזיגוג',
+  'מרינדה',
+  'במרינדה',
+  'במרינדת',
+];
+
+/// See [ketoQualifierGuardsHe] — `מיץ`: the drink words, plus lemon or
+/// lime juice (`מיץ לימון`) and a dressing (issue #273).
+final GuardWords _heJuiceGuard = _heGuard(const [
+  'זירו',
+  'דיאט',
+  'ללא סוכר',
+  'ללא סוכרים',
+  'לימון',
+  'לימונים',
+  'ליים',
+  ..._heDressingWords,
+]);
+
+/// See [ketoQualifierGuardsHe] — `בירה`: the drink words, plus a beer
+/// cooked into the dish (issue #273).
+final GuardWords _heBeerGuard = _heGuard(const [
+  'זירו',
+  'דיאט',
+  'ללא סוכר',
+  'ללא סוכרים',
+  ..._heCookedInWords,
+]);
+
 /// Keto-substitute guards, Hebrew (`vocabulary_spec.md` "Guards
 /// (D-V1)"). See [_heGuard] for why every entry is bidirectional here,
 /// unlike [ketoQualifierGuardsEn].
 final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
   'אורז': _heCauliflowerLikeGuard,
+  'תירס': _heCornFedGuard,
   'נודלס': _heNoodleGuard,
   'אטריות': _heNoodleGuard,
+  'פסטה': _heNoodleGuard,
+  'פסטות': _heNoodleGuard,
+  'פסטת': _heNoodleGuard,
   'פיצה': _hePizzaGuard,
   'ריזוטו': _heRisottoGuard,
   "צ'יפס": _heChipsGuard,
@@ -1616,12 +1974,95 @@ final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
   'ספרייט': _heDrinkGuard,
   'פאנטה': _heDrinkGuard,
   'פריגת': _heDrinkGuard,
-  'מיץ': _heDrinkGuard,
-  'בירה': _heDrinkGuard,
-  'בירה שחורה': _heDrinkGuard,
+  'מיץ': _heJuiceGuard,
+  'מיץ תפוזים': _heGuard(_heDressingWords),
+  'מיץ ענבים': _heGuard(_heDressingWords),
+  'בירה': _heBeerGuard,
+  'בירה שחורה': _heBeerGuard,
   'טוניק': _heDrinkGuard,
   'לימונדה': _heDrinkGuard,
+
+  // Issue #274: sushi-grade fish (`טונה באיכות סושי`) is raw fish.
+  'סושי': _heGuard(const ['איכות', 'באיכות']),
 };
+
+// ---------------------------------------------------------------------------
+// Keto substitutes named anywhere in the dish name (issue #273)
+// ---------------------------------------------------------------------------
+
+/// Phrases that cancel a non-keto base or carb modifier when they appear
+/// **anywhere in the dish name**, not only in the two-word window of
+/// [ketoQualifierGuardsEn] (issue #273): "Pizza with cauliflower crust"
+/// names its substitute three words after `pizza`. A name containing
+/// `keto` or `low carb` means the kitchen adapted the dish.
+///
+/// Only unambiguous phrases are name-wide. A bare `cauliflower` or
+/// `zucchini` stays in the adjacent window alone, because "Chicken with
+/// rice and roasted cauliflower" or "Pasta with zucchini" names a side
+/// or a sauce, not a substitute base. Compared after normalisation, as
+/// whole words; the description is never read for these.
+const Map<String, List<String>> ketoSubstituteNameWordsEn =
+    <String, List<String>>{
+      'pizza': [
+        ..._ketoNameWordsEn,
+        'cauliflower crust',
+        'cauliflower base',
+        'almond crust',
+        'almond flour',
+        'fathead',
+      ],
+      'pasta': _konjacNameWordsEn,
+      'noodle': _konjacNameWordsEn,
+      'spaghetti': _konjacNameWordsEn,
+      'rice': _ketoNameWordsEn,
+      'risotto': _ketoNameWordsEn,
+    };
+
+/// The words that mark a whole dish name as adapted (issue #273).
+const List<String> _ketoNameWordsEn = <String>['keto', 'low carb', 'lowcarb'];
+
+/// [_ketoNameWordsEn] plus the konjac and palm substitutes, which exist
+/// only as noodle and pasta replacements (issue #273).
+const List<String> _konjacNameWordsEn = <String>[
+  ..._ketoNameWordsEn,
+  'shirataki',
+  'konjac',
+  'palmini',
+];
+
+/// [ketoSubstituteNameWordsEn] in Hebrew: `פיצה על בסיס כרובית`.
+const Map<String, List<String>> ketoSubstituteNameWordsHe =
+    <String, List<String>>{
+      'פיצה': _hePizzaNameWords,
+      'פיצות': _hePizzaNameWords,
+      'פסטה': _heKonjacNameWords,
+      'פסטות': _heKonjacNameWords,
+      'פסטת': _heKonjacNameWords,
+      'נודלס': _heKonjacNameWords,
+      'אטריות': _heKonjacNameWords,
+      'אורז': _heKetoNameWords,
+      'ריזוטו': _heKetoNameWords,
+    };
+
+/// The words that mark a whole Hebrew dish name as adapted (issue #273).
+const List<String> _heKetoNameWords = <String>['קטו', 'דלת פחמימות'];
+
+/// See [ketoSubstituteNameWordsHe] — the pizza bases.
+const List<String> _hePizzaNameWords = <String>[
+  ..._heKetoNameWords,
+  'בסיס כרובית',
+  'בצק כרובית',
+  'בסיס שקדים',
+  'בצק שקדים',
+  'קמח שקדים',
+];
+
+/// See [ketoSubstituteNameWordsHe] — the konjac noodles.
+const List<String> _heKonjacNameWords = <String>[
+  ..._heKetoNameWords,
+  'שיראטקי',
+  'קונגאק',
+];
 
 // ---------------------------------------------------------------------------
 // triggerSuppresses
@@ -1659,6 +2100,8 @@ const Map<String, List<String>> triggerSuppresses = <String, List<String>>{
   'פירה תפו"א': ['פירה', 'תפוח אדמה', 'תפוחי אדמה'],
   "צ'יפס": ['תפוח אדמה', 'תפוחי אדמה'],
   'דבש תמרים': ['דבש'],
+  // Issue #274: the sauce sentence already names the cranberries.
+  'רוטב חמוציות': ['חמוציות'],
 };
 
 // ---------------------------------------------------------------------------

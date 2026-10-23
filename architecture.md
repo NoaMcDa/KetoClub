@@ -976,6 +976,28 @@ no physical device has exercised it (`HANDOFF.md`).
 | `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6), dietary toggles (seed-oil free, dairy-free, carnivore only; all off by default, a missing key reads as off), the Banto restriction profile (`dietaryProfile`, written only when non-empty; a missing or unreadable value reads as empty; D26) and the other people's profiles and which are combined (`profileName`, `groupProfiles`, `activeProfiles`, each written only when not its default; ALG-12) | until cleared |
 | `VisitHistoryStore` | `hive` (`menu_history` box) | one `VisitEntry` per `VenueRef` opened on this device (D23): the name and city it was shown under, first and last opened, open count, and the dish count, score and green/yellow counts it last had | until the row is removed or Settings clears saved menus |
 
+**Hive keys are bounded (issue #280).** Hive writes a string key's UTF-8
+length in one byte and checks it only in an `assert`, so a longer key corrupts
+the box in a release build (the next launch truncates it at that entry, losing
+everything cached after it). Every box keyed by a venue — `menu_cache`,
+`menu_cache_pins` and `menu_history` — is keyed by `storageKeyFor(ref)`
+(`services/storage/storage_key.dart`): `VenueRef.cacheKey` itself whenever it
+fits in 255 UTF-8 bytes, so every key already on a device is unchanged, and
+`source/#sha256:<hex of platformId>` otherwise. `cacheKey` stays the in-memory
+join key and the log form. `normaliseWebsiteUrl` also drops tracking
+parameters (`utm_*`, `fbclid`, `gclid`, …), on the backend's twin too, so a
+shared link is the same entry as the bare one.
+
+**Settings are read field by field and written read-modify-write (issues
+#281, #287).** `AppSettings.fromStored` reads each field on its own; one that
+is missing or unreadable falls back to its own default and leaves the rest as
+stored. Consent fails closed: a missing key is D16's default of given, a bool
+is itself, and anything else — or a stored record that is not a JSON object
+at all — reads as withheld. `SettingsStore.update(change)` applies a change to
+the latest stored value, one update at a time, so a screen holding an older
+snapshot (the disclosure banner, `MenuController.open` after a slow fetch,
+the Settings screen) changes only its own fields and never reverts consent.
+
 The install id is unlinkable to a person (D8 stays true in spirit) and is sent
 only as `X-KetoClub-Install-Id` to KetoClub's own backend, for its per-install
 rate limiter (§6.2 rule 2 note, `backend_plan.md` §3.4) — never to a restaurant
@@ -1576,15 +1598,45 @@ tests free of a real clock.)* In order:
 1. Strip a markdown fence if present. `jsonDecode` inside `try`; any throw →
    `badResponse`.
 2. Root not a map, or `dishes` missing or not a list → `badResponse`.
-3. Per element: `id` must match a dish in `source` **or** `name` must share at least
-   one word of ≥ 3 letters with a source dish name after `text_normaliser` on both
-   sides. Otherwise the element is an invention and its name goes to `unclassified`
-   (constraint 6).
+3. Per element: an `id` that matches a dish in `source` **always wins**, whatever
+   `name` says. Only when `id` is missing or matches no source dish is `name` read,
+   and it must either normalise (`text_normaliser`) exactly to a source dish's name
+   (the first such in menu order), or overlap one source dish's name highly: the
+   *content words* of a name are its normalised words of ≥ 3 letters not in
+   `nameStopWords` ("with", "and", "ללא", …), and the shared content words must be
+   at least `nameOverlapNumerator`/`nameOverlapDenominator` (3/5) of all the
+   content words the two names hold (Jaccard), with one dish strictly best — a tie
+   is ambiguous and matches neither. Otherwise the element is an invention and its
+   name goes to `unclassified` (constraint 6). **Each source dish is judged at most
+   once:** the first element resolving to it (by id or name) is the one judged,
+   placed or demoted, and every later element resolving to the same dish is
+   dropped — never re-routed to a lookalike that is still free — so a dish is
+   never in `dishes` twice or in both `dishes` and `unclassified`. *(Issue #277:
+   the previous rule — any one shared word of ≥ 3 letters, first source dish wins —
+   gave "Grilled Chicken" with an unknown id to "Chicken Schnitzel", attached an
+   invented "Chef special with fries" to the first dish saying "with", and let two
+   elements give one dish two conflicting verdicts. A strict fallback costs only
+   a dish shown as unclassified; a loose one costs a wrong green. The model is
+   given every id, so the name path is a safety net, not the normal route. The
+   stop-words and the threshold are exported to the golden vocabulary, so the
+   Python twin reads the same values.)*
 4. `verdict` matched by string, never by ordinal; `why` non-empty. Either failing →
    `unclassified`.
 5. `verdict == modifiable` with a null, blank, or over-length `modification` →
-   `unclassified` (constraint 7). A green or red carrying a `modification` keeps the
-   verdict and drops the field.
+   `unclassified` (constraint 7), **even when it carries `hidden_carbs`** (issue
+   #277). A green or red carrying a `modification` keeps the verdict and drops the
+   field. The same holds for a green that issue #57's post-rule turns yellow (its
+   own `net_carbs_estimate` is over the limit): no usable `modification`, no yellow.
+
+   5a. *(Issue #213, written down by #277.)* A green carrying at least one
+   well-formed `hidden_carbs` flag is a wrong green (constraint 5) and becomes
+   `modifiable`. Its instruction is the model's usable `modification`, or else the
+   first flag's `waiter_question`. Only here may a waiter question stand in for an
+   instruction, because only here is the flag the dish's whole reason to be
+   yellow: the question asks the one thing that decides it. A yellow the model sent
+   is yellow for a reason the flag need not cover (a side of fries, a carb count),
+   so a question about a glaze would let the fries through as if handled — which is
+   why rule 5 holds for it as written. A red drops its flags.
 6. Caps: more than `maxAnalysedDishes` (1000; a sanity bound against a
    runaway reply, not a menu size — raised from 150, which real Israeli Wolt
    venues exceed, #188) dishes → `badResponse`; `why` truncated at 300
@@ -1707,10 +1759,10 @@ languages. Collapsing reasons is a bug.
 | `Analysis.consentWithheld` | router, consent toggle off (client-only, §11) | rules result + "Allow AI analysis in Settings to analyse this menu. Showing rule-based results." | settings |
 | `Analysis.apiKeyMissing` | phones only: `GeminiChatClient` found no key saved, so nothing was sent (D17) | rules result + "Add your Gemini API key in Settings to analyse this menu. Showing rule-based results." | settings |
 | `Analysis.apiKeyRejected` | phones only: Google answered 401, 403, or a 400 naming an invalid key (D17) | rules result + "Gemini rejected your API key. Check it in Settings. Showing rule-based results." | settings |
-| `Analysis.offline` | router / client, no route: a phone's `ClientException` calling Google, or on web the backend's own 502 (Gemini unreachable) | rules result + "Offline. Showing rule-based results." | retry |
-| `Analysis.timeout` | client, > 120 s, or the backend's 504 (Gemini did not answer within its own budget) | rules result + "The AI model was too slow. Showing rule-based results." | retry |
+| `Analysis.offline` | router / client, no route: any exception sending to or reading from Google on a phone — a `ClientException`, a TLS handshake failure or a socket closed mid-body, caught as `Exception` since `services/` cannot name `dart:io` types (#278) — or on web the backend's own 502 (Gemini unreachable) | rules result + "Offline. Showing rule-based results." | retry |
+| `Analysis.timeout` | client, > 120 s for the whole call (on a phone the schema retry shares that one deadline, #278), Google's own 504 to a phone, or the backend's 504 (Gemini did not answer within its own budget) | rules result + "The AI model was too slow. Showing rule-based results." | retry |
 | `Analysis.rateLimited` | client, 429 — on a phone, the user's own key's Gemini quota; on web, Gemini's limit or the backend's per-install limiter | rules result + "Daily AI limit reached." | wait |
-| `Analysis.backendUnreachable` | client, `ClientException` posting to `/v1/chat` (D11's "the call is the probe": nothing pre-checks the backend) | rules result + "KetoClub's server could not be reached. Showing rule-based results." | retry |
+| `Analysis.backendUnreachable` | client, any exception posting to `/v1/chat` or reading its reply (a `ClientException`, a TLS or mid-body socket error, #278) (D11's "the call is the probe": nothing pre-checks the backend) | rules result + "KetoClub's server could not be reached. Showing rule-based results." | retry |
 | `Analysis.badResponse` | client (4xx/5xx other), parser, or an unusable Gemini reply (non-`STOP` finish, no candidates, unparseable body) | rules result + "AI analysis failed ({detail}). Showing rule-based results." | retry / report |
 | `Analysis.noDishesFound` | parser | "The AI could not identify any dishes on this menu." | try rules |
 
@@ -2434,7 +2486,8 @@ often appear on neither.
   keep priority (a Wolt URL that is not a venue page is still null), and the
   bare-word guard of #169 is unchanged. `platformId` is the URL normalised by
   `normaliseWebsiteUrl` (lower-case scheme and host, no fragment, no default
-  port, no trailing `/`), and `platformUrl` returns it. The route path
+  port, no trailing `/`, no tracking parameters since issue #280), and
+  `platformUrl` returns it. The route path
   percent-encodes it (`utils/venue_route.dart`) so a URL stays one segment.
 - **Finding the menu** (`services/menu/website/`, pure, every platform).
   `WebsiteMenuLocator.locate` tries, in order: (1) JSON-LD `Menu` /
@@ -3081,6 +3134,39 @@ Dart logic; a second test suite that replays them; six new client files
 architecture-test host-string boundaries; one `AppDependencies` field for the
 estimate repository and one for `backendConfigured`; and `MenuFetched.analysis`
 now meaning "the backend answered with this" as well as "a website PDF was read".
+
+**Amendment: D6 becomes "as few requests as the prompt budget allows" (issue
+#188).** A menu is now classified in as few requests as fit, on the device
+(`LlmMenuClassifier`, over either chat client) and on the server
+(`app/services/classify.py`) alike, split by one deterministic rule with a
+twin on each side (`MenuAnalysisPrompt.batches`, `app/keto/batching.py`,
+pinned equal by the golden `batches.json`): at most `llmUserPromptMaxChars`
+characters of user prompt, the bound `/v1/chat` enforces
+(`USER_PROMPT_MAX_CHARS` in `backend/app/schemas.py`, 400,000), and at most 80
+dishes, or 35 when Banto asks for ingredients, so the worst reply (about 750
+tokens a keto dish in Hebrew, 1,750 with ingredients) fits the 65,536-token
+output budget the backend and now the phone client both set, and one request
+stays inside the 120 s timeout. The dishes are dealt out in menu order into
+balanced batches (200 dishes are 67, 67 and 66), so the same menu is always
+the same requests and the completion cache keeps working. A menu that fits
+one request (the 56-dish Wolt fixture is 24,237 characters) is that one
+request, byte for byte. The batches go one at a time and are merged in
+order. A batch whose own reply or wait fails (`badResponse`, `timeout`) puts
+its dishes under `unclassified` and the next is still sent; only when every
+batch failed is the menu a failure. Any other failure, `rateLimited` mid-menu
+included, stops the menu and is the whole menu's failure, so the router
+answers with the rules and names the reason: a `MenuAnalysed` has nowhere to
+carry one, so a partial result would show the rest as unexplained "not read"
+under an AI chip and keep that in the cache for a day. Through `/v1/chat` the
+batches already answered are completion-cache hits, which spend no quota, the
+next time. The server spends one analysis-bucket unit per batch, answers an
+empty bucket mid-menu as it would before the first (the 429, or the rules
+stamped `rateLimited`), and caches only a merge with no failed batch. What it
+costs: a large menu spends one request of the per-install limits per batch (a
+200-dish menu is three of the web build's 40 a day), and no real Gemini
+request over a large menu has been sent, so the per-dish token and latency
+figures the ceilings rest on are estimates from the 20-dish smoke test
+(§17.1).
 
 ### D26 — Banto: a profile for every restriction
 
@@ -3850,8 +3936,8 @@ only when present, so other entries are byte-identical) and a fresh answer
 replaces it. **Matching is on the device only** (`utils/allergens/
 allergen_matrix.dart`, no Python twin, no golden): a row speaks for a dish
 when one of its names normalises exactly (`TextNormaliser.normalise`, the
-key §9.4 dedups names by) to the dish's name; §9.4 rule 3's shared-word test
-is how the parser rejects inventions and is far too loose to say whose
+key §9.4 dedups names by) to the dish's name; §9.4 rule 3's word-overlap fallback
+is how the parser rejects inventions and is too loose to say whose
 allergens a dish has. A row naming no dish, or only a dish another row also
 names, is listed in `AllergenMatrixMatch.unmatched` and applied to nothing:
 never guessed. A matched row's `contains` cell is a stated concern and its

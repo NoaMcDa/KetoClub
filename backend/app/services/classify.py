@@ -25,6 +25,21 @@ classifier_router.dart``) behind the shared analysis cache:
    as ``RoutingMenuClassifier`` falls back. Only an ``llm`` analysis is
    written to the analysis cache.
 
+A menu too large for one request (#188; architecture.md D6 as D25 amends
+it) is split by ``app.keto.batching.split_batches``, the Dart split's twin,
+under ``app.schemas.USER_PROMPT_MAX_CHARS`` and the dish ceiling, and steps
+4 and 5 run once per batch, in order: one bucket unit and one Gemini call
+each. The batches are merged as ``LlmMenuClassifier`` merges them on the
+device. A batch whose own reply or wait failed (``badResponse``,
+``timeout``) puts its dishes under ``unclassified`` and the next batch is
+still sent; only when no batch answered is the menu the rules with the
+first reason. Any other failure, an empty bucket mid-menu included, stops
+the menu and answers as it would have for the first batch (the rules with
+that reason, or the 429), so a mid-menu ``rateLimited`` is named rather
+than hidden among the unclassified. A merged analysis with a failed batch
+is not cached. A menu that fits one request is exactly the one request it
+always was.
+
 Every analysis returned carries the request's options snapshot and
 ``schemaVersion`` 1 (``app.keto.parser.SCHEMA_VERSION``), so the client's
 ``tryFrom`` and options check accept it as one it made itself.
@@ -34,7 +49,7 @@ never logged, and never leaves this module except as the limiter's key.
 """
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Final, Literal
 
@@ -47,8 +62,10 @@ from starlette.concurrency import run_in_threadpool
 from app.config import Settings
 from app.errors import BackendError
 from app.keto import parser, prompt
+from app.keto.batching import batch_max_dishes, split_batches
 from app.keto.heuristic import classify_heuristic
 from app.keto.models import (
+    AnalysedDish,
     AnalysisOptionsSnapshot,
     LlmEngine,
     Menu,
@@ -57,7 +74,7 @@ from app.keto.models import (
     to_json,
 )
 from app.keto.text_menu import dart_iso8601, scrub_lone_surrogates
-from app.schemas import ChatRequest
+from app.schemas import USER_PROMPT_MAX_CHARS, ChatRequest
 from app.services import analysis_cache, gemini
 from app.services.rate_limit import RateLimiter
 
@@ -120,8 +137,9 @@ class Classified:
     """One analysis :func:`classify` returns, and where it came from.
 
     ``cache`` is ``"hit"`` for an analysis-cache hit, ``"miss"`` for a
-    fresh ``llm`` analysis (now cached) and ``"bypass"`` for a rules
-    fallback, which is never cached: the route's ``X-KetoClub-Cache``.
+    fresh ``llm`` analysis (now cached) and ``"bypass"`` for one that is
+    never cached: a rules fallback, or an ``llm`` analysis of a split menu
+    one of whose batches failed (#188). The route's ``X-KetoClub-Cache``.
     """
 
     analysis: MenuAnalysed
@@ -178,52 +196,130 @@ async def classify(
     if not settings.llm_configured:
         return _rules(menu, options, "notConfigured", analysed_at)
 
-    if not context.limiter.allow(context.install_id):
-        if when_rate_limited == "refuse":
-            logger.info("classify rate limited")
-            raise BackendError(429, "rateLimited")
-        return _rules(menu, options, "rateLimited", analysed_at)
+    batches = split_batches(
+        menu,
+        max_dishes=batch_max_dishes(extract=options.restrictions_requested),
+        max_chars=USER_PROMPT_MAX_CHARS,
+    )
+    merged = _Merged()
+    for batch in batches:
+        # One bucket unit per Gemini call, spent just before it (step 4): a
+        # menu split in three spends three, one at a time (#188).
+        if not context.limiter.allow(context.install_id):
+            if when_rate_limited == "refuse":
+                logger.info("classify rate limited")
+                raise BackendError(429, "rateLimited")
+            return _rules(menu, options, "rateLimited", analysed_at)
+        outcome = await _classify_batch(batch, options, context, analysed_at)
+        if isinstance(outcome, MenuAnalysed):
+            merged.add(outcome)
+            continue
+        if outcome not in _BATCH_REASONS:
+            # No key, no route or Google's own rate limit: every later batch
+            # would answer the same, so the whole menu is the rules.
+            return _rules(menu, options, outcome, analysed_at)
+        merged.fail(batch, outcome)
 
+    if merged.engine is None:
+        return _rules(menu, options, merged.first_failure or "badResponse", analysed_at)
+    analysis = _finished(merged.analysis(analysed_at), options)
+    if analysis is None:  # pragma: no cover - each batch already validated
+        return _rules(menu, options, "badResponse", analysed_at)
+
+    if merged.first_failure is None:
+        await run_in_threadpool(
+            analysis_cache.write_cached, context.engine, key, analysis, moment
+        )
+    logger.info(
+        "classify engine=llm dishes=%d unclassified=%d batches=%d failed=%d",
+        len(analysis.dishes),
+        len(analysis.unclassified),
+        len(batches),
+        merged.failed_batches,
+    )
+    # A partial analysis (a batch failed) is not cached: the next open asks
+    # again rather than serving the gap for a week.
+    return Classified(
+        analysis=analysis, cache="miss" if merged.first_failure is None else "bypass"
+    )
+
+
+_BATCH_REASONS: Final[frozenset[RulesReason]] = frozenset({"timeout", "badResponse"})
+"""The failures that are one batch's own (#188): its reply or its wait. The
+batch's dishes go under ``unclassified`` and the next batch is still sent,
+as ``LlmMenuClassifier`` does on the device. Any other reason stops the
+menu."""
+
+
+async def _classify_batch(
+    batch: Menu,
+    options: AnalysisOptionsSnapshot,
+    context: ClassifyContext,
+    analysed_at: str,
+) -> MenuAnalysed | RulesReason:
+    """One Gemini request for ``batch`` (a whole menu, or one batch of one)
+    and its reply parsed against ``batch``, validated; or why it failed."""
     request = ChatRequest.model_construct(
         system_prompt=prompt.system_prompt(options),
-        user_prompt=prompt.user_prompt(menu),
+        user_prompt=prompt.user_prompt(batch),
         response_schema=prompt.response_schema(extract=options.restrictions_requested),
         schema_name=prompt.SCHEMA_NAME,
         images=[],
     )
     try:
-        reply = await gemini.complete(context.http_client, settings, request)
+        reply = await gemini.complete(context.http_client, context.settings, request)
     except BackendError as error:
-        return _rules(menu, options, _rules_reason(error.reason), analysed_at)
+        return _rules_reason(error.reason)
 
     parsed = parser.parse(
         reply.content,
-        source=menu,
+        source=batch,
         engine=LlmEngine(model=reply.model),
         net_carb_limit_grams=options.net_carb_limit_grams,
         analysed_at=analysed_at,
         extract=options.restrictions_requested,
     )
     if isinstance(parsed, parser.Failed):
-        if parsed.reason == "noDishesFound":  # pragma: no cover - rule 7
-            # Unreachable with a dish in the menu (rule 7 lists every dish
-            # the reply skipped), but the client's router returns it as-is.
-            return None
-        return _rules(menu, options, "badResponse", analysed_at)
+        # ``noDishesFound`` is unreachable with a dish in the batch (rule 7
+        # lists every dish the reply skipped); either way nothing was placed.
+        return "badResponse"
+    finished = _finished(parsed.analysis, options)
+    return "badResponse" if finished is None else finished
 
-    analysis = _finished(parsed.analysis, options)
-    if analysis is None:
-        return _rules(menu, options, "badResponse", analysed_at)
 
-    await run_in_threadpool(
-        analysis_cache.write_cached, context.engine, key, analysis, moment
-    )
-    logger.info(
-        "classify engine=llm dishes=%d unclassified=%d",
-        len(analysis.dishes),
-        len(analysis.unclassified),
-    )
-    return Classified(analysis=analysis, cache="miss")
+@dataclass(slots=True)
+class _Merged:
+    """The batches of one menu merged in order, as ``LlmMenuClassifier``
+    merges them: verdicts and ``unclassified`` names in batch order, the
+    first answering batch's engine, a failed batch's dishes unclassified."""
+
+    dishes: list[AnalysedDish] = field(default_factory=list)
+    unclassified: list[str] = field(default_factory=list)
+    engine: LlmEngine | RulesEngine | None = None
+    first_failure: RulesReason | None = None
+    failed_batches: int = 0
+
+    def add(self, analysis: MenuAnalysed) -> None:
+        if self.engine is None:
+            self.engine = analysis.engine
+        self.dishes.extend(analysis.dishes)
+        self.unclassified.extend(analysis.unclassified)
+
+    def fail(self, batch: Menu, reason: RulesReason) -> None:
+        if self.first_failure is None:
+            self.first_failure = reason
+        self.failed_batches += 1
+        self.unclassified.extend(dish.name for dish in batch.all_dishes())
+
+    def analysis(self, analysed_at: str) -> MenuAnalysed:
+        return MenuAnalysed.model_construct(
+            dishes=self.dishes,
+            unclassified=self.unclassified,
+            engine=self.engine,
+            analysed_at=analysed_at,
+            options=None,
+            schema_version=parser.SCHEMA_VERSION,
+        )
 
 
 def rules_analysis(

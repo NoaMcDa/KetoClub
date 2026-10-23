@@ -330,6 +330,84 @@ const List<String> ruleTexts = <String>[
   'אורז כרובית',
   'כרובית אורז',
   'כרובית גדול שמן עסיסי אורז',
+  // Issue #273: false reds — juice as seasoning, crispy, the name-wide
+  // substitute guard, pasta's guard, מחלבה, at night, cooked-in drinks,
+  // corn-fed and rice vinegar — and the cases that must stay as they were.
+  'Grilled salmon, olive oil, lemon juice',
+  'Green salad with orange juice dressing',
+  'Fresh orange juice',
+  'דג עם מיץ לימון',
+  'סלט ירוק ברוטב מיץ תפוזים',
+  'סלמון עם עור קריספי',
+  'בייקון קריספי',
+  'עוף בציפוי קריספי',
+  "קריספי צ'יקן בלחמנייה רכה",
+  'Crispy chicken burger',
+  'Crispy chicken skin',
+  "המבורגר עם צ'יפס פרמזן",
+  "סלט עם פרמזן צ'יפס",
+  "עוף עם צ'יפס קישואים",
+  'Pizza with cauliflower crust',
+  'פיצה על בסיס כרובית',
+  'Keto margherita, thin pizza',
+  'Chicken with rice and roasted cauliflower',
+  'Zucchini pasta',
+  'Shirataki pasta',
+  'Pasta with zucchini',
+  'פסטת קישואים',
+  'פסטת פומודורו',
+  'גבינה מחלבה',
+  'גבינות מהחלבה של הכפר',
+  'פרפה חלבה',
+  'גלידת וניל וחלבה',
+  'מרק חם שמוגש בלילה',
+  'דג בבלילה',
+  'Beer-braised short rib',
+  'Short rib braised in stout',
+  'צלע בקר מבושלת בבירה',
+  'Port wine reduction',
+  'Glass of port wine',
+  'חזה ברווז ברוטב יין פורט',
+  'Corn-fed chicken',
+  'Baby corn stir fry',
+  'עוף מוזן תירס',
+  'Cucumber salad with rice vinegar dressing',
+  'סלט מלפפונים ברוטב חומץ אורז',
+  // Issue #274: false greens — plurals, compounds, construct forms and
+  // the new vocabulary.
+  'Steamed dumplings',
+  'New York cheesecake',
+  'Vanilla cupcakes',
+  'Fish tacos',
+  'Cheese blintzes',
+  'Cauliflower pizzas',
+  'Zucchini noodles',
+  'Pizzas',
+  'Grilled tartare',
+  'עוגת שוקולד',
+  "עוגיית שוקולד צ'יפס",
+  'שווארמה בפיתות',
+  'עוף בטורטיות',
+  'Lentil soup',
+  'מרק עדשים',
+  'Turkey with cranberry sauce',
+  'הודו עם רוטב חמוציות',
+  'Eggs with hash browns',
+  'Steak with onion rings',
+  'Butter chicken with naan',
+  'Lamb on flatbread',
+  'Loaded nachos',
+  'Salmon sushi',
+  'Salmon sashimi',
+  'Sushi-grade tuna tartare',
+  'טונה באיכות סושי',
+  'Crème brûlée',
+  'Korean fried chicken',
+  'Pan-fried chicken breast',
+  'French toast',
+  "פרנץ' טוסט",
+  "Fish 'n' Chips",
+  "פיש נ' צ'יפס",
 ];
 
 /// Hand-written `ClassificationRules.carbOnlyBase` inputs, lifted from
@@ -580,6 +658,38 @@ final List<Dish> ruleDishes = <Dish>[
       ),
     ],
   ),
+  // Issue #273: the name-wide substitute guard reads the name, never the
+  // description.
+  ruleDish('Pizza with cauliflower crust', description: 'Tomato, basil'),
+  ruleDish('Keto margherita', description: 'Thin pizza, basil'),
+  ruleDish('מרגריטה קטו', description: 'פיצה דקה, בזיליקום'),
+  ruleDish('Margherita', description: 'Classic pizza. Cauliflower crust'),
+  ruleDish('מרגריטה', description: 'פיצה קלאסית. בסיס כרובית לפי בקשה'),
+  ruleDish(
+    'Keto bowl',
+    options: const <DishOption>[
+      DishOption(name: 'Base', values: <String>['Rice', 'Greens']),
+    ],
+  ),
+  // Issue #273: toppings leave fries the whole dish; a real filling
+  // still makes a bread a carrier.
+  ruleDish(
+    "צ'יפס פרמז'ן כמהין",
+    description: "קריספי צ'יפס מוקפץ בשמן כמהין פלפל שחור ופרמז'ן",
+  ),
+  ruleDish(
+    'Truffle parmesan fries',
+    description: 'Crispy fries, truffle oil and parmesan',
+  ),
+  ruleDish('Pita', description: 'Grilled chicken, garlic, parmesan'),
+  ruleDish('פיתה', description: 'פלפל קלוי ושום'),
+  // Issue #274: carb-only names of the new sides and breads.
+  ruleDish('Hash browns'),
+  ruleDish('Onion rings'),
+  ruleDish('Naan'),
+  ruleDish('פיתות'),
+  ruleDish('טורטיות'),
+  ruleDish('עוגת שוקולד'),
 ];
 
 // ---------------------------------------------------------------------------
@@ -805,6 +915,58 @@ final Map<String, Menu> goldenHandBuiltMenus = <String, Menu>{
   'english': goldenEnglishMenu,
   'hebrew': goldenHebrewMenu,
   'mixed': goldenMixedMenu,
+};
+
+// ---------------------------------------------------------------------------
+// Batching (issue #188)
+// ---------------------------------------------------------------------------
+
+/// A 200-dish menu in six uneven categories, big enough that the real dish
+/// ceilings split it: English, Hebrew and an astral emoji (two UTF-16 code
+/// units, one Python code point) in its names, and every third dish with
+/// an option group, so line lengths vary.
+final Menu goldenLargeMenu = Menu(
+  venueRef: const VenueRef(source: MenuSource.wolt, platformId: 'large'),
+  currency: 'ILS',
+  fetchedAt: goldenNow,
+  venueName: 'Golden Market',
+  categories: <MenuCategory>[
+    for (final (index, size) in const <int>[50, 7, 61, 1, 45, 36].indexed)
+      MenuCategory(
+        id: 'large-c$index',
+        name: index.isEven ? 'Aisle $index' : 'מדף $index \u{1F96C}',
+        dishes: <Dish>[
+          for (var d = 0; d < size; d++)
+            menuDish(
+              'large-$index-$d',
+              d.isEven ? 'Grilled item $index-$d' : 'מנה $index-$d \u{1F356}',
+              description: 'x' * ((index * 7 + d * 13) % 40),
+              options: d % 3 == 0
+                  ? const <DishOption>[
+                      DishOption(
+                        name: 'Side',
+                        values: <String>['Salad', 'Fries', 'אורז'],
+                      ),
+                    ]
+                  : const <DishOption>[],
+            ),
+        ],
+      ),
+  ],
+);
+
+/// The `(maxDishes, maxChars)` limits the batching golden splits every
+/// menu under, by name, beside the real ones (`defaults` and `extract`,
+/// which the exporter reads from `constants.dart`, so a change to a
+/// constant changes the golden). Small enough that the hand-built menus
+/// split too, and that the character budget, not only the dish ceiling,
+/// closes batches; `chars1` puts every line, each longer than the budget,
+/// in a batch of its own.
+const Map<String, (int, int)> goldenBatchLimits = <String, (int, int)>{
+  'dishes4': (4, 400000),
+  'dishes7_chars600': (7, 600),
+  'chars300': (1000, 300),
+  'chars1': (1000, 1),
 };
 
 // ---------------------------------------------------------------------------
@@ -1271,6 +1433,7 @@ List<ReplyCase> handTextReplies() {
       ]),
     ),
     c('hand_id_beats_name', replyBody(<Object?>[replyDish(id: 'dish-salmon')])),
+    ...provenanceReplies(),
     c(
       'hand_fence_uppercase_json_tag',
       '```JSON\n${replyBody(<Object?>[replyDish()])}\n```',
@@ -1304,6 +1467,64 @@ List<ReplyCase> handTextReplies() {
     c('hand_empty_body', ''),
     c('hand_over_cap', replyBody(List<Object?>.filled(1001, null))),
     c('hand_at_cap', replyBody(List<Object?>.filled(1000, null))),
+  ];
+}
+
+/// A source menu for the provenance cases (issue #277): dishes that share
+/// words, so a loose name match would land on the wrong one.
+final Menu parserProvenanceMenu = parserMenu(<Dish>[
+  parserDish('d1', 'Chicken Schnitzel'),
+  parserDish('d2', 'Grilled Chicken'),
+  parserDish('d3', 'Steak with Fries'),
+  parserDish('d4', 'Chicken Salad'),
+  parserDish('d5', 'Grilled Chicken Breast'),
+]);
+
+/// Hand-written replies for §9.4 rule 3's name fallback, duplicates and
+/// rule 5 (issue #277), read against [parserProvenanceMenu].
+List<ReplyCase> provenanceReplies() {
+  ReplyCase c(String name, List<Object?> elements) => (
+    name: name,
+    body: replyBody(elements),
+    source: parserProvenanceMenu,
+    limit: 6,
+  );
+  return <ReplyCase>[
+    c('hand_provenance_unknown_id_exact_name', <Object?>[
+      replyDish(id: '2', name: 'Grilled Chicken'),
+    ]),
+    c('hand_provenance_stop_word_is_no_match', <Object?>[
+      replyDish(id: '', name: 'Chef special with fries'),
+    ]),
+    c('hand_provenance_reworded_name', <Object?>[
+      replyDish(id: null, name: 'Chicken, grilled'),
+    ]),
+    c('hand_provenance_one_shared_word_is_no_match', <Object?>[
+      replyDish(id: 'x', name: 'Chicken Wings'),
+    ]),
+    c('hand_provenance_tied_overlap_is_no_match', <Object?>[
+      replyDish(id: 'x', name: 'Grilled Chicken Salad'),
+    ]),
+    c('hand_provenance_id_wins_over_other_name', <Object?>[
+      replyDish(id: 'd1', name: 'Grilled Chicken'),
+    ]),
+    c('hand_duplicate_by_id_then_by_name', <Object?>[
+      replyDish(id: 'd2', name: 'Grilled Chicken'),
+      replyDish(id: '', name: 'Grilled Chicken', verdict: 'nonKeto'),
+      replyDish(id: 'd2', name: 'Grilled Chicken', verdict: 'nonKeto'),
+    ]),
+    c('hand_duplicate_demoted_then_valid', <Object?>[
+      replyDish(id: 'd3', name: 'Steak with Fries', verdict: 'green'),
+      replyDish(id: 'd3', name: 'Steak with Fries'),
+    ]),
+    c('hand_yellow_without_modification_despite_hidden_carbs', <Object?>[
+      replyDish(
+        id: 'd2',
+        name: 'Grilled Chicken',
+        verdict: 'modifiable',
+        hiddenCarbs: <Object?>[hiddenCarb('glaze')],
+      ),
+    ]),
   ];
 }
 

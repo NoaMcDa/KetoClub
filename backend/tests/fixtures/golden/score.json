@@ -1826,7 +1826,7 @@
           {
             "dishId": "f8f3f63e7d7c1505dafac3f1",
             "hiddenCarbs": [],
-            "modification": "מבין האפשרויות, בלי בירה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "מבין האפשרויות, בלי בירה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "צ׳יזבורגר המוסד,  תוספת ושתייה",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -1835,7 +1835,7 @@
           {
             "dishId": "61f01dab8a5a7858e6150890",
             "hiddenCarbs": [],
-            "modification": "מבין האפשרויות, בלי קוקה קולה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "מבין האפשרויות, בלי קוקה קולה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "המבורגר, תוספת ושתייה",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -1844,7 +1844,7 @@
           {
             "dishId": "6565ed6c086c37435435a96e",
             "hiddenCarbs": [],
-            "modification": "מבין האפשרויות, בלי קוקה קולה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "מבין האפשרויות, בלי קוקה קולה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "המבורגר האיטלקי, תוספת ושתייה",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -1857,7 +1857,7 @@
             "name": "צ׳יקן אמריקה, תוספת ושתייה",
             "netCarbsEstimate": null,
             "verdict": "nonKeto",
-            "why": "המנה מבוססת על קריספי, ואי אפשר להפוך אותה לקטוגנית."
+            "why": "המנה מבוססת על צ'יקן קריספי, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "4a532b981fdf6c34f1a84eb5",
@@ -1961,7 +1961,7 @@
           {
             "dishId": "61ecfdac853cef6ba4d5e420",
             "hiddenCarbs": [],
-            "modification": "מבין האפשרויות, בלי קוקה קולה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה שמן זית ולימון בצד במקום רוטב אלף האיים?",
+            "modification": "מבין האפשרויות, בלי קוקה קולה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה שמן זית ולימון בצד במקום רוטב אלף האיים?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "המבורגר דיל",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -1970,7 +1970,7 @@
           {
             "dishId": "633018a57a8eedd9b1dc428e",
             "hiddenCarbs": [],
-            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה שמן זית ולימון בצד במקום רוטב אלף האיים?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה שמן זית ולימון בצד במקום רוטב אלף האיים?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "ארוחת המבורגר",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -1979,7 +1979,7 @@
           {
             "dishId": "86d535be8bd049294ee6c986",
             "hiddenCarbs": [],
-            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "ארוחת צ׳יזבורגר המוסד",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -1988,7 +1988,7 @@
           {
             "dishId": "65e9804926c13c8659d6ebd6",
             "hiddenCarbs": [],
-            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "ארוחת המבורגר האיטלקי",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -1997,7 +1997,7 @@
           {
             "dishId": "61ecfdac853cef6ba4d5e3fe",
             "hiddenCarbs": [],
-            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "ארוחת ‫אל צ'אפו 🌶",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -2015,7 +2015,7 @@
           {
             "dishId": "61ecfdac853cef6ba4d5e404",
             "hiddenCarbs": [],
-            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "ארוחת המבורגר של יושע",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -2024,7 +2024,7 @@
           {
             "dishId": "61ecfdac853cef6ba4d5e415",
             "hiddenCarbs": [],
-            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "‫ארוחת ארץ הפלאות",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -2037,7 +2037,7 @@
             "name": "ארוחת הצ'יקן של אמיל",
             "netCarbsEstimate": null,
             "verdict": "nonKeto",
-            "why": "המנה מבוססת על קריספי, ואי אפשר להפוך אותה לקטוגנית."
+            "why": "המנה מבוססת על קריספי צ'יקן, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "038aaf7f3004f69283ee38b1",
@@ -2046,12 +2046,12 @@
             "name": "ארוחת צ׳יקן אמריקה",
             "netCarbsEstimate": null,
             "verdict": "nonKeto",
-            "why": "המנה מבוססת על קריספי, ואי אפשר להפוך אותה לקטוגנית."
+            "why": "המנה מבוססת על צ'יקן קריספי, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e3ef",
             "hiddenCarbs": [],
-            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "‫ארוחת צ'יזבורגר טבעוני 🌱",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -2064,7 +2064,7 @@
             "name": "צ'יקן אמריקה",
             "netCarbsEstimate": null,
             "verdict": "nonKeto",
-            "why": "המנה מבוססת על קריספי, ואי אפשר להפוך אותה לקטוגנית."
+            "why": "המנה מבוססת על צ'יקן קריספי, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e40c",
@@ -2073,7 +2073,7 @@
             "name": "הצ'יקן של אמיל",
             "netCarbsEstimate": null,
             "verdict": "nonKeto",
-            "why": "המנה מבוססת על קריספי, ואי אפשר להפוך אותה לקטוגנית."
+            "why": "המנה מבוססת על קריספי צ'יקן, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e419",
@@ -2087,7 +2087,7 @@
           {
             "dishId": "61ecfdac853cef6ba4d5e41a",
             "hiddenCarbs": [],
-            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה שמן זית ולימון בצד במקום רוטב אלף האיים?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה שמן זית ולימון בצד במקום רוטב אלף האיים?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "‫ארוחת קידבורגר | WD",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -2118,7 +2118,7 @@
             "name": "צ'יפס פרמז'ן כמהין",
             "netCarbsEstimate": null,
             "verdict": "nonKeto",
-            "why": "המנה מבוססת על קריספי, ואי אפשר להפוך אותה לקטוגנית."
+            "why": "המנה מבוססת על צ'יפס, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "664c3dfee7eb81be9272a555",
@@ -6679,110 +6679,6 @@
         "dishes": [
           {
             "dishId": "dish-steak",
-            "hiddenCarbs": [
-              {
-                "certainty": "suspected",
-                "source": "glaze",
-                "waiterQuestion": "Is the glaze sugar-free?"
-              }
-            ],
-            "modification": "Is the glaze sugar-free?",
-            "name": "Grilled Steak",
-            "netCarbsEstimate": 9.0,
-            "verdict": "modifiable",
-            "why": "Plain grilled protein."
-          }
-        ],
-        "engine": {
-          "kind": "llm",
-          "model": "golden-model"
-        },
-        "options": null,
-        "schemaVersion": 1,
-        "unclassified": [
-          "Grilled Salmon",
-          "לחם הבית",
-          "צ'יפס בטטה",
-          "An Egg"
-        ]
-      },
-      "counts": {
-        "green": 0,
-        "hiddenCarbYellow": 1,
-        "red": 0,
-        "score": 2.5,
-        "yellow": 1
-      },
-      "menu": {
-        "categories": [
-          {
-            "dishes": [
-              {
-                "description": "",
-                "id": "dish-steak",
-                "imageUrl": null,
-                "name": "Grilled Steak",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              },
-              {
-                "description": "",
-                "id": "dish-salmon",
-                "imageUrl": null,
-                "name": "Grilled Salmon",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              },
-              {
-                "description": "",
-                "id": "dish-bread",
-                "imageUrl": null,
-                "name": "לחם הבית",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              },
-              {
-                "description": "",
-                "id": "dish-chips",
-                "imageUrl": null,
-                "name": "צ'יפס בטטה",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              },
-              {
-                "description": "",
-                "id": "dish-egg",
-                "imageUrl": null,
-                "name": "An Egg",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              }
-            ],
-            "id": "cat-1",
-            "name": "Mains"
-          }
-        ],
-        "currency": "ILS",
-        "fetchedAt": "2026-01-01T00:00:00.000Z",
-        "venueName": null,
-        "venueRef": {
-          "platformId": "response-parser-test-venue",
-          "source": "wolt"
-        }
-      },
-      "name": "hand_net_carbs_over_limit_with_hidden_carb"
-    },
-    {
-      "analysis": {
-        "analysedAt": "2026-01-01T00:00:00.000Z",
-        "dishes": [
-          {
-            "dishId": "dish-steak",
             "hiddenCarbs": [],
             "modification": null,
             "name": "Grilled Steak",
@@ -7777,15 +7673,6 @@
             "netCarbsEstimate": null,
             "verdict": "orderAsIs",
             "why": "Plain grilled protein."
-          },
-          {
-            "dishId": "dish-steak",
-            "hiddenCarbs": [],
-            "modification": null,
-            "name": "Grilled Steak",
-            "netCarbsEstimate": null,
-            "verdict": "nonKeto",
-            "why": "Second opinion."
           }
         ],
         "engine": {
@@ -7804,8 +7691,8 @@
       "counts": {
         "green": 1,
         "hiddenCarbYellow": 0,
-        "red": 1,
-        "score": 5.0,
+        "red": 0,
+        "score": 10.0,
         "yellow": 0
       },
       "menu": {
@@ -7877,28 +7764,10 @@
         "analysedAt": "2026-01-01T00:00:00.000Z",
         "dishes": [
           {
-            "dishId": "dish-steak",
+            "dishId": "dish-salmon",
             "hiddenCarbs": [],
             "modification": null,
-            "name": "Grilled Steak",
-            "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "Plain grilled protein."
-          },
-          {
-            "dishId": "dish-bread",
-            "hiddenCarbs": [],
-            "modification": null,
-            "name": "לחם הבית",
-            "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "Plain grilled protein."
-          },
-          {
-            "dishId": "dish-chips",
-            "hiddenCarbs": [],
-            "modification": null,
-            "name": "צ'יפס בטטה",
+            "name": "Grilled Salmon",
             "netCarbsEstimate": null,
             "verdict": "orderAsIs",
             "why": "Plain grilled protein."
@@ -7912,15 +7781,19 @@
         "schemaVersion": 1,
         "unclassified": [
           "הלחם",
+          "לחמ",
+          "ציפס",
           "An Eg",
           "Ox",
           "Mystery dish",
-          "Grilled Salmon",
+          "Grilled Steak",
+          "לחם הבית",
+          "צ'יפס בטטה",
           "An Egg"
         ]
       },
       "counts": {
-        "green": 3,
+        "green": 1,
         "hiddenCarbYellow": 0,
         "red": 0,
         "score": 10.0,
@@ -8087,6 +7960,398 @@
         }
       },
       "name": "hand_id_beats_name"
+    },
+    {
+      "analysis": {
+        "analysedAt": "2026-01-01T00:00:00.000Z",
+        "dishes": [
+          {
+            "dishId": "d2",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Grilled Chicken",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "Plain grilled protein."
+          }
+        ],
+        "engine": {
+          "kind": "llm",
+          "model": "golden-model"
+        },
+        "options": null,
+        "schemaVersion": 1,
+        "unclassified": [
+          "Chicken Schnitzel",
+          "Steak with Fries",
+          "Chicken Salad",
+          "Grilled Chicken Breast"
+        ]
+      },
+      "counts": {
+        "green": 1,
+        "hiddenCarbYellow": 0,
+        "red": 0,
+        "score": 10.0,
+        "yellow": 0
+      },
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      },
+      "name": "hand_provenance_unknown_id_exact_name"
+    },
+    {
+      "analysis": {
+        "analysedAt": "2026-01-01T00:00:00.000Z",
+        "dishes": [
+          {
+            "dishId": "d2",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Grilled Chicken",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "Plain grilled protein."
+          }
+        ],
+        "engine": {
+          "kind": "llm",
+          "model": "golden-model"
+        },
+        "options": null,
+        "schemaVersion": 1,
+        "unclassified": [
+          "Chicken Schnitzel",
+          "Steak with Fries",
+          "Chicken Salad",
+          "Grilled Chicken Breast"
+        ]
+      },
+      "counts": {
+        "green": 1,
+        "hiddenCarbYellow": 0,
+        "red": 0,
+        "score": 10.0,
+        "yellow": 0
+      },
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      },
+      "name": "hand_provenance_reworded_name"
+    },
+    {
+      "analysis": {
+        "analysedAt": "2026-01-01T00:00:00.000Z",
+        "dishes": [
+          {
+            "dishId": "d1",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Chicken Schnitzel",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "Plain grilled protein."
+          }
+        ],
+        "engine": {
+          "kind": "llm",
+          "model": "golden-model"
+        },
+        "options": null,
+        "schemaVersion": 1,
+        "unclassified": [
+          "Grilled Chicken",
+          "Steak with Fries",
+          "Chicken Salad",
+          "Grilled Chicken Breast"
+        ]
+      },
+      "counts": {
+        "green": 1,
+        "hiddenCarbYellow": 0,
+        "red": 0,
+        "score": 10.0,
+        "yellow": 0
+      },
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      },
+      "name": "hand_provenance_id_wins_over_other_name"
+    },
+    {
+      "analysis": {
+        "analysedAt": "2026-01-01T00:00:00.000Z",
+        "dishes": [
+          {
+            "dishId": "d2",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Grilled Chicken",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "Plain grilled protein."
+          }
+        ],
+        "engine": {
+          "kind": "llm",
+          "model": "golden-model"
+        },
+        "options": null,
+        "schemaVersion": 1,
+        "unclassified": [
+          "Chicken Schnitzel",
+          "Steak with Fries",
+          "Chicken Salad",
+          "Grilled Chicken Breast"
+        ]
+      },
+      "counts": {
+        "green": 1,
+        "hiddenCarbYellow": 0,
+        "red": 0,
+        "score": 10.0,
+        "yellow": 0
+      },
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      },
+      "name": "hand_duplicate_by_id_then_by_name"
     },
     {
       "analysis": {

@@ -41,6 +41,7 @@ import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/models/visit_dish.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/storage/storage_key.dart';
 
 /// What a menu looked like for one profile when it was last opened (Banto,
 /// issue #411): the four state counts, a fingerprint of the restrictions
@@ -592,8 +593,9 @@ VisitEntry visitAfterOpening(
   workedFor: existing?.workedFor ?? const <String>[],
 );
 
-/// A [VisitHistoryStore] in a Hive box of JSON strings, one per
-/// [VenueRef.cacheKey].
+/// A [VisitHistoryStore] in a Hive box of JSON strings, one per venue,
+/// keyed by [storageKeyFor] so no key passes Hive's 255-byte limit (issue
+/// #280).
 ///
 /// The box is supplied as a lazily-invoked opener rather than a `Box`,
 /// because `di.dart` must not perform plugin I/O while constructing the
@@ -643,10 +645,10 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
     return VisitEntry.tryFrom(decoded);
   }
 
-  /// Stores [entry] under its ref's cache key; a failed write is dropped.
+  /// Stores [entry] under its ref's storage key; a failed write is dropped.
   Future<void> _put(Box<String> box, VisitEntry entry) async {
     try {
-      await box.put(entry.ref.cacheKey, jsonEncode(entry.toJson()));
+      await box.put(storageKeyFor(entry.ref), jsonEncode(entry.toJson()));
       // Drop the write; a broken box degrades instead of throwing.
       // ignore: avoid_catching_errors
     } on HiveError {
@@ -657,7 +659,7 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
   /// The entry stored in [box] for [ref], or null.
   static VisitEntry? _get(Box<String> box, VenueRef ref) {
     try {
-      return _decode(box.get(ref.cacheKey));
+      return _decode(box.get(storageKeyFor(ref)));
       // A broken box is a miss, never a throw.
       // ignore: avoid_catching_errors
     } on HiveError {
@@ -765,7 +767,7 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
     final box = await _boxOrNull();
     if (box == null) return;
     try {
-      await box.delete(ref.cacheKey);
+      await box.delete(storageKeyFor(ref));
       // An entry that cannot be deleted just stays listed.
       // ignore: avoid_catching_errors
     } on HiveError {

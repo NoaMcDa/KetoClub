@@ -106,10 +106,17 @@ D17 and D25).
 # web, backend on the same machine
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
 
-# a phone: the backend must listen beyond localhost and the phone must reach it
-cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
+# a phone: the backend must listen beyond localhost, accept the LAN address
+# as a Host (#271) and the phone must reach it; an Android emulator reaches
+# the host machine as 10.0.2.2
+cd backend && ALLOWED_HOSTS='localhost,127.0.0.1,[::1],<lan-ip>' \
+  uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 flutter run -d <device-id> --dart-define=KETOCLUB_BACKEND_URL=http://<lan-ip>:8000
 ```
+
+Without `<lan-ip>` (or `10.0.2.2` for the emulator) in `ALLOWED_HOSTS` the
+backend answers every phone request 400 `invalidHost`. `backend/README.md`
+has the full table.
 
 On a phone with the define, dish text, scan pages and venue-search positions
 go to the backend first; the Gemini key field in Settings stays and says the

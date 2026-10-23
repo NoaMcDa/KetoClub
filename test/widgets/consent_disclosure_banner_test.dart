@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
+import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
 
@@ -152,6 +154,36 @@ void main() {
       final stored = await store.read();
       expect(stored.disclosureSeen, isTrue);
       expect(stored.estimationConsentGiven, isFalse);
+      expect(find.text(_en.settingsConsentTitle), findsNothing);
+    });
+
+    testWidgets('tapping OK after consent was turned off elsewhere keeps it '
+        'off, with the venue and filter written since (issue #287)', (
+      tester,
+    ) async {
+      // Arrange: the banner shows on Explore; the user opens a venue, turns
+      // AI off in Settings, and comes back.
+      final store = await _pump(tester);
+      await tester.pumpAndSettle();
+      const venue = VenueRef(source: MenuSource.wolt, platformId: 'v1');
+      await store.write(
+        (await store.read()).copyWith(
+          lastVenue: venue,
+          lastFilter: MenuFilter.greenOnly,
+          estimationConsentGiven: false,
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text(_en.consentDisclosureOk));
+      await tester.pumpAndSettle();
+
+      // Assert: only disclosureSeen changed.
+      final stored = await store.read();
+      expect(stored.estimationConsentGiven, isFalse);
+      expect(stored.lastVenue, venue);
+      expect(stored.lastFilter, MenuFilter.greenOnly);
+      expect(stored.disclosureSeen, isTrue);
       expect(find.text(_en.settingsConsentTitle), findsNothing);
     });
   });

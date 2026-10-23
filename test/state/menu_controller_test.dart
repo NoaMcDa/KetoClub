@@ -39,6 +39,7 @@ import '../fakes/fake_menu_store_client.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_platform_menu_adapter.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_transport_exceptions.dart';
 import '../fakes/fake_visit_history_store.dart';
 
 /// The venue every test opens, unless a test builds its own.
@@ -669,6 +670,34 @@ void main() {
       expect((await settings.read()).lastVenue, equals(_ref));
     });
 
+    test('open writes lastVenue onto the latest settings, so consent turned '
+        'off during a slow load stays off (issue #287)', () async {
+      // Arrange: the fetch is held open while the user turns AI off.
+      final gate = Completer<void>();
+      repository
+        ..loadGate = gate.future
+        ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      final opening = controller.open(_ref);
+      await pumpEventQueue();
+      expect(repository.loadCalls, hasLength(1));
+      await settings.write(
+        (await settings.read()).copyWith(
+          estimationConsentGiven: false,
+          themeMode: AppThemeMode.dark,
+        ),
+      );
+
+      // Act
+      gate.complete();
+      await opening;
+
+      // Assert
+      final stored = await settings.read();
+      expect(stored.lastVenue, equals(_ref));
+      expect(stored.estimationConsentGiven, isFalse);
+      expect(stored.themeMode, AppThemeMode.dark);
+    });
+
     test(
       'open does not write lastVenue when the fetch fails outright',
       () async {
@@ -1254,6 +1283,26 @@ void main() {
         expect(repository.loadCalls, isEmpty);
         expect(classifier.calls, isEmpty);
         expect(notifyCount, 0);
+      });
+
+      test('a classifier that throws still ends the classifying phase, so '
+          'the menu is never stuck on the progress row (issue #278)', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        final gate = Completer<void>();
+        classifier.gate = gate.future;
+        final pending = controller.reanalyse();
+        await pumpEventQueue();
+        expect(controller.phase.isClassifying, isTrue);
+
+        // Act
+        gate.completeError(const FakeHandshakeException());
+
+        // Assert
+        await expectLater(pending, throwsA(isA<FakeHandshakeException>()));
+        expect(controller.phase, LoadPhase.idle);
+        expect(controller.isLoading, isFalse);
       });
 
       test('reanalyse re-runs the classifier on the loaded menu without a '

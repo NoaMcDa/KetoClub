@@ -75,7 +75,7 @@ def test_normalise_is_not_idempotent_on_y_diaeresis_as_in_dart() -> None:
 def test_the_corpus_is_the_size_the_exporter_wrote() -> None:
     # The edge cases, the twelve quote marks, all of U+00A0–U+00FF and the
     # vocabulary: a truncated file would replay "green" with fewer cases.
-    assert len(_ENTRIES) == 1210
+    assert len(_ENTRIES) == 1329
     assert len({entry["in"] for entry in _ENTRIES}) == len(_ENTRIES)
 
 

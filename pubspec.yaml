@@ -14,6 +14,9 @@ dependencies:
   # LLM request (architecture.md §8, D10). A hint, never a verdict: a request
   # that fails anyway still maps to `offline`.
   connectivity_plus: ^7.3.1
+  # SHA-256 for a Hive key that would pass Hive's 255-byte limit (issue
+  # #280): services/storage/storage_key.dart hashes a long website URL.
+  crypto: ^3.0.6
   cupertino_icons: ^1.0.8
   # The Scan tab's "Choose a PDF" (architecture.md D15, issue #82). Only
   # services/platform/device_page_picker.dart imports it.

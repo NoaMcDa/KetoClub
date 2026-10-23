@@ -38,6 +38,15 @@ const Set<ChatFailureReason> _wireReasons = <ChatFailureReason>{
 /// [ChatFailureReason.offline] — the server's own `offline` means *it*
 /// could not reach the model provider.
 ///
+/// **Never throws.** `post` both sends the request and reads the whole
+/// reply body; exceeding [timeout] is [ChatFailureReason.timeout], and
+/// **any other exception from either** — an [http.ClientException], but
+/// also a TLS handshake failure or a socket closed mid-body, which
+/// `IOClient` throws unwrapped — is [ChatFailureReason.backendUnreachable]:
+/// no usable reply came back from the server, so a fallback chain can try
+/// the device (issue #278). It is caught as [Exception] because
+/// `services/` may not import `dart:io` to name those types.
+///
 /// **Pages ride along only when there are any.** A call with images
 /// adds an `images` list of `{mime_type, data}` (base64) to the body
 /// (architecture.md D15); a call without them sends no `images` key at
@@ -130,7 +139,10 @@ final class BackendChatClient implements LlmChatClient {
           .timeout(timeout);
     } on TimeoutException {
       return const ChatFailed(reason: ChatFailureReason.timeout);
-    } on http.ClientException {
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278). See the class doc.
       return const ChatFailed(reason: ChatFailureReason.backendUnreachable);
     }
 

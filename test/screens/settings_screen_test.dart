@@ -57,6 +57,14 @@ final class _GatedSettingsStore implements SettingsStore {
 
   @override
   Future<void> write(AppSettings settings) => release.future;
+
+  @override
+  Future<AppSettings> update(
+    AppSettings Function(AppSettings latest) change,
+  ) async {
+    await release.future;
+    return change(const AppSettings());
+  }
 }
 
 /// Builds the [SettingsController] the widget under test is pumped over,

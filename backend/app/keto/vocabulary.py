@@ -213,6 +213,17 @@ class Caps:
 
 
 @dataclass(frozen=True, slots=True)
+class Provenance:
+    """§9.4 rule 3's name fallback (``constants.dart``, issue #277): the
+    normalised stop-words a name match ignores, and the Jaccard threshold
+    ``name_overlap_numerator / name_overlap_denominator``."""
+
+    name_stop_words: tuple[str, ...]
+    name_overlap_numerator: int
+    name_overlap_denominator: int
+
+
+@dataclass(frozen=True, slots=True)
 class ScannedConstants:
     """The shape a scanned menu is built in (D15)."""
 
@@ -276,6 +287,7 @@ class LatinPatternExample:
 
     trigger: str
     pattern: str
+    with_plural: str
     case_sensitive: bool
     unicode: bool
 
@@ -296,6 +308,8 @@ class Vocabulary:
     carb_only_eligible_triggers: tuple[str, ...]
     carb_only_qualifiers_en: tuple[str, ...]
     carb_only_qualifiers_he: tuple[str, ...]
+    carb_only_toppings_en: tuple[str, ...]
+    carb_only_toppings_he: tuple[str, ...]
     filling_protein_triggers_en: tuple[str, ...]
     filling_protein_triggers_he: tuple[str, ...]
     seed_oil_triggers_en: tuple[str, ...]
@@ -307,6 +321,8 @@ class Vocabulary:
     trigger_suppresses: Mapping[str, tuple[str, ...]]
     keto_qualifier_guards_en: Mapping[str, GuardWords]
     keto_qualifier_guards_he: Mapping[str, GuardWords]
+    keto_substitute_name_words_en: Mapping[str, tuple[str, ...]]
+    keto_substitute_name_words_he: Mapping[str, tuple[str, ...]]
     dairy_guards_en: Mapping[str, GuardWords]
     dairy_guards_he: Mapping[str, GuardWords]
     option_removal_words_en: tuple[str, ...]
@@ -318,6 +334,7 @@ class Vocabulary:
     templates: Templates
     prompt: PromptText
     caps: Caps
+    provenance: Provenance
     scanned: ScannedConstants
     pasted: PastedConstants
     website: WebsiteConstants
@@ -336,6 +353,7 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
     templates = _obj(root["templates"], "templates")
     prompt = _obj(root["prompt"], "prompt")
     caps = _obj(root["caps"], "caps")
+    provenance = _obj(root["provenance"], "provenance")
     scanned = _obj(root["scanned"], "scanned")
     pasted = _obj(root["pasted"], "pasted")
     suffix = _obj(pasted["pastedPriceSuffix"], "pastedPriceSuffix")
@@ -372,6 +390,8 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         carb_only_eligible_triggers=strs("carbOnlyEligibleTriggers"),
         carb_only_qualifiers_en=strs("carbOnlyQualifiersEn"),
         carb_only_qualifiers_he=strs("carbOnlyQualifiersHe"),
+        carb_only_toppings_en=strs("carbOnlyToppingsEn"),
+        carb_only_toppings_he=strs("carbOnlyToppingsHe"),
         filling_protein_triggers_en=strs("fillingProteinTriggersEn"),
         filling_protein_triggers_he=strs("fillingProteinTriggersHe"),
         seed_oil_triggers_en=strs("seedOilTriggersEn"),
@@ -383,6 +403,12 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         trigger_suppresses=_strs_map(root["triggerSuppresses"], "triggerSuppresses"),
         keto_qualifier_guards_en=_guards(root["ketoQualifierGuardsEn"], "kqgEn"),
         keto_qualifier_guards_he=_guards(root["ketoQualifierGuardsHe"], "kqgHe"),
+        keto_substitute_name_words_en=_strs_map(
+            root["ketoSubstituteNameWordsEn"], "ketoSubstituteNameWordsEn"
+        ),
+        keto_substitute_name_words_he=_strs_map(
+            root["ketoSubstituteNameWordsHe"], "ketoSubstituteNameWordsHe"
+        ),
         dairy_guards_en=_guards(root["dairyGuardsEn"], "dairyGuardsEn"),
         dairy_guards_he=_guards(root["dairyGuardsHe"], "dairyGuardsHe"),
         option_removal_words_en=strs("optionRemovalWordsEn"),
@@ -397,6 +423,7 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         latin_trigger_pattern_example=LatinPatternExample(
             trigger=_str(latin_example["trigger"], "trigger"),
             pattern=_str(latin_example["pattern"], "pattern"),
+            with_plural=_str(latin_example["withPlural"], "withPlural"),
             case_sensitive=_bool(latin_example["caseSensitive"], "caseSensitive"),
             unicode=_bool(latin_example["unicode"], "unicode"),
         ),
@@ -470,6 +497,15 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
             parser_schema_version=cap("parserSchemaVersion"),
             max_scan_pages=cap("maxScanPages"),
             max_scan_page_bytes=cap("maxScanPageBytes"),
+        ),
+        provenance=Provenance(
+            name_stop_words=_strs(provenance["nameStopWords"], "nameStopWords"),
+            name_overlap_numerator=_int(
+                provenance["nameOverlapNumerator"], "nameOverlapNumerator"
+            ),
+            name_overlap_denominator=_int(
+                provenance["nameOverlapDenominator"], "nameOverlapDenominator"
+            ),
         ),
         scanned=ScannedConstants(
             scanned_category_id=_str(scanned["scannedCategoryId"], "id"),

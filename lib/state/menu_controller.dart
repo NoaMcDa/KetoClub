@@ -1289,7 +1289,9 @@ final class MenuController extends ChangeNotifier {
         _fetchStatusCode = null;
         // A successful open is remembered so the Explore screen can offer
         // to resume it (issue #55); a failed one is not.
-        await _settings.write(appSettings.copyWith(lastVenue: ref));
+        // Onto the latest stored settings, not the ones read before the
+        // fetch, so a change made during a slow load survives (#287).
+        await _settings.update((latest) => latest.copyWith(lastVenue: ref));
 
         final options = _optionsFrom(appSettings);
         final reusable = _reusableAnalysis(
@@ -1611,6 +1613,11 @@ final class MenuController extends ChangeNotifier {
   /// unjudged under a progress row while the engine runs, rather than
   /// the previous analysis — which may describe other dish text — or
   /// nothing at all.
+  ///
+  /// The classifier never throws by contract, but should anything below
+  /// it break that, [phase] is put back to [LoadPhase.idle] on the way
+  /// out, so the screen is never left on the progress row forever (issue
+  /// #278). On a normal return the caller ends the phase, as before.
   Future<void> _classify(
     VenueRef ref,
     Menu menu,
@@ -1621,12 +1628,27 @@ final class MenuController extends ChangeNotifier {
     notifyListeners();
 
     final generation = _generation;
-    final analysis = await _classifier.classify(menu, options: options);
-    // Superseded or disposed while the engine ran (issue #287).
-    if (!_isCurrent(generation)) return;
-    _analysis = analysis;
-    if (analysis is MenuAnalysed) {
-      await _repository.saveAnalysis(ref, analysis);
+    var returned = false;
+    try {
+      final analysis = await _classifier.classify(menu, options: options);
+      // Superseded or disposed while the engine ran (issue #287): apply
+      // nothing, and leave [phase] to the load that superseded this one.
+      if (!_isCurrent(generation)) {
+        returned = true;
+        return;
+      }
+      _analysis = analysis;
+      if (analysis is MenuAnalysed) {
+        await _repository.saveAnalysis(ref, analysis);
+      }
+      returned = true;
+    } finally {
+      // Only a throw from below reaches here unreturned (issue #278); a
+      // superseded load still never touches the newer load's [phase].
+      if (!returned && _isCurrent(generation)) {
+        _phase = LoadPhase.idle;
+        notifyListeners();
+      }
     }
   }
 
@@ -1804,8 +1826,7 @@ final class MenuController extends ChangeNotifier {
   Future<void> setFilter(MenuFilter filter) async {
     _filter = filter;
     notifyListeners();
-    final appSettings = await _settings.read();
-    await _settings.write(appSettings.copyWith(lastFilter: filter));
+    await _settings.update((latest) => latest.copyWith(lastFilter: filter));
   }
 
   /// Changes [query] and notifies listeners (issue #51). Does not refetch

@@ -273,7 +273,7 @@ def _judge(
     unclassified: list[str],
 ) -> None:
     """Dart ``_judge``: rules 4-6, #57's net-carb post-rule and #213's
-    hidden-carb rule; places ``raw_dish`` under ``matched``'s id and name or
+    hidden-carb rule (rule 5a); places ``raw_dish`` under ``matched``'s id and name or
     demotes ``matched``'s name to ``unclassified``. With ``extract`` the
     placed dish carries :func:`_parse_ingredients` of its ``ingredients``,
     whatever its verdict."""
@@ -315,14 +315,18 @@ def _judge(
         if verdict == "nonKeto"
         else _parse_hidden_carbs(raw_dish.get("hidden_carbs"))
     )
-    if final_verdict == "orderAsIs" and hidden_carbs:
+    # Rule 5a only for a dish still green: the flag is then its only reason
+    # to be yellow. A yellow the model sent (or #57 made) keeps rule 5 as
+    # written, hidden carbs or not (#277).
+    hidden_carb_yellow = final_verdict == "orderAsIs" and bool(hidden_carbs)
+    if hidden_carb_yellow:
         final_verdict = "modifiable"
 
     final_modification: str | None = None
     if final_verdict == "modifiable":
         if has_usable_modification:
             final_modification = modification
-        elif hidden_carbs:
+        elif hidden_carb_yellow:
             final_modification = hidden_carbs[0].waiter_question
         else:
             unclassified.append(matched.name)
@@ -353,25 +357,59 @@ def _judge(
     )
 
 
+def _content_words(name: str) -> set[str]:
+    """Dart ``_contentWords``: the distinct normalised words of
+    ``minOverlapWordLength``+ UTF-16 units not in ``nameStopWords``."""
+    stop_words = vocabulary().provenance.name_stop_words
+    return {
+        word
+        for word in words(name, vocabulary().caps.min_overlap_word_length)
+        if word not in stop_words
+    }
+
+
 def _find_source_dish(source: Menu, *, dish_id: str, name: str) -> Dish | None:
-    """Dart ``_findSourceDish`` (rule 3): an exact id match first, else the
-    first source dish sharing a normalised word of ``minOverlapWordLength``+
-    UTF-16 units with ``name``."""
+    """Dart ``_findSourceDish`` (rule 3, #277): a matching id always wins;
+    only a missing or unknown id falls back to ``name``, first by an exact
+    normalised name (the first in menu order), then by the unique best
+    Jaccard overlap of content words at or over the threshold, in integers
+    as Dart counts it. A tie for the best is ambiguous: no match."""
     all_dishes = source.all_dishes()
     if dish_id:
         for dish in all_dishes:
             if dish.id == dish_id:
                 return dish
-    if not name:
-        return None
-    min_length = vocabulary().caps.min_overlap_word_length
-    name_words = set(words(name, min_length))
-    if not name_words:
+    normalised_name = normalise(name)
+    if not normalised_name:
         return None
     for dish in all_dishes:
-        if any(word in name_words for word in words(dish.name, min_length)):
+        if normalise(dish.name) == normalised_name:
             return dish
-    return None
+    name_words = _content_words(name)
+    if not name_words:
+        return None
+    provenance = vocabulary().provenance
+    best: Dish | None = None
+    best_shared = 0
+    best_union = 1
+    tied = False
+    for dish in all_dishes:
+        dish_words = _content_words(dish.name)
+        shared = len(dish_words & name_words)
+        if shared == 0:
+            continue
+        union = len(name_words) + len(dish_words) - shared
+        if (
+            shared * provenance.name_overlap_denominator
+            < union * provenance.name_overlap_numerator
+        ):
+            continue
+        compare = shared * best_union - best_shared * union
+        if best is None or compare > 0:
+            best, best_shared, best_union, tied = dish, shared, union, False
+        elif compare == 0:
+            tied = True
+    return None if tied else best
 
 
 def _analysis(
@@ -414,7 +452,7 @@ def parse(
     if raw_dishes is None:
         return Failed("badResponse")
 
-    placed_source_ids: set[str] = set()
+    resolved_source_ids: set[str] = set()
     dishes: list[AnalysedDish] = []
     unclassified: list[str] = []
     for raw_dish in raw_dishes:
@@ -432,7 +470,10 @@ def parse(
             if model_name:
                 unclassified.append(model_name)
             continue
-        placed_source_ids.add(matched.id)
+        # A second element for a dish already judged is dropped (#277).
+        if matched.id in resolved_source_ids:
+            continue
+        resolved_source_ids.add(matched.id)
         _judge(
             raw_dish,
             matched,
@@ -444,7 +485,7 @@ def parse(
 
     # Rule 7: a source dish no element matched was skipped by the model.
     for dish in source.all_dishes():
-        if dish.id not in placed_source_ids:
+        if dish.id not in resolved_source_ids:
             unclassified.append(dish.name)
 
     if not dishes and not unclassified:

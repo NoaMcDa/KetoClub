@@ -83,10 +83,14 @@ Object? _copy(Object? value) => switch (value) {
 /// **One retry, and only one kind.** Mirroring the backend's client: a
 /// request carrying a schema that Gemini answers 400, for any reason
 /// other than an invalid key, is re-sent exactly once with
-/// `responseMimeType` only. 401, 403, 429 and 5xx are answers about the
-/// key, the quota or the provider and are never re-sent; neither is a
-/// second 400. Nothing pre-checks whether Google is reachable: the call is
-/// the probe (architecture.md §14 D10).
+/// `responseMimeType` only — no `responseSchema` and no `thinkingConfig`,
+/// since a 400 can be about either and a retry that keeps the culprit can
+/// never recover (issue #278). 401, 403, 429 and 5xx are answers about
+/// the key, the quota or the provider and are never re-sent; neither is a
+/// second 400. Both attempts share one [timeout]: the retry gets only what
+/// the first attempt left, so a call never takes longer than [timeout].
+/// Nothing pre-checks whether Google is reachable: the call is the probe
+/// (architecture.md §14 D10).
 ///
 /// **Pages follow the prompt.** Each of [complete]'s images is an
 /// `inline_data` part (`{mime_type, data}`, base64) after the user
@@ -101,17 +105,25 @@ Object? _copy(Object? value) => switch (value) {
 /// no such value can travel in a header and no Google key contains one.
 /// 401, 403 or a 400 naming an invalid key is
 /// [ChatFailureReason.apiKeyRejected] too; 429 is
-/// [ChatFailureReason.rateLimited] (the user's own key's quota); any other
-/// status, or a reply with no usable text, is
-/// [ChatFailureReason.badResponse]. A socket or DNS error is
-/// [ChatFailureReason.offline] — there is no KetoClub server in between to
-/// be unreachable — and exceeding [timeout] is
-/// [ChatFailureReason.timeout].
+/// [ChatFailureReason.rateLimited] (the user's own key's quota); 504 is
+/// [ChatFailureReason.timeout] (Google gave up waiting on the model,
+/// architecture.md §10); any other status, or a reply with no usable text,
+/// is [ChatFailureReason.badResponse]. Exceeding [timeout] is
+/// [ChatFailureReason.timeout]. **Any other exception while sending the
+/// request or reading its reply** — a socket or DNS error
+/// ([http.ClientException]), but also a TLS handshake failure (a captive
+/// portal, a wrong device clock) or a socket closed mid-body, which
+/// `IOClient` throws unwrapped — is [ChatFailureReason.offline]: no usable
+/// reply arrived, and there is no KetoClub server in between to be
+/// unreachable (issue #278). It is caught as [Exception] because
+/// `services/` may not import `dart:io` to name those types, so [complete]
+/// never throws.
 final class GeminiChatClient implements LlmChatClient {
   /// Creates a client that posts to Gemini's `generateContent` for
   /// [model] through [client], with the key [apiKeyStore] holds.
   ///
-  /// [timeout] bounds each HTTP request, the one retry included.
+  /// [timeout] bounds the whole call: the first request and the one retry
+  /// share it.
   ///
   /// `client` and `apiKeyStore` are named without their leading
   /// underscore so they cannot be initializing formals, and are assigned
@@ -138,8 +150,10 @@ final class GeminiChatClient implements LlmChatClient {
   /// The header Gemini reads the API key from.
   static const String apiKeyHeader = 'x-goog-api-key';
 
-  /// The reply budget, matching the backend's `GEMINI_MAX_OUTPUT_TOKENS`.
-  static const int maxOutputTokens = 8192;
+  /// The reply budget, matching the backend's `GEMINI_MAX_OUTPUT_TOKENS`
+  /// (raised there from 8192 for issue #188; this stayed behind until the
+  /// batch sizes in `constants.dart`, which assume it, were set).
+  static const int maxOutputTokens = 65536;
 
   /// The reasoning budget, matching the backend's
   /// `GEMINI_THINKING_BUDGET`: zero, so the whole output budget is spent
@@ -149,7 +163,8 @@ final class GeminiChatClient implements LlmChatClient {
   /// The Gemini model id every request names.
   final String model;
 
-  /// How long each HTTP request is given before it is abandoned.
+  /// How long a [complete] call's requests are given, together, before
+  /// the call is abandoned as [ChatFailureReason.timeout].
   final Duration timeout;
 
   final http.Client _client;
@@ -192,13 +207,15 @@ final class GeminiChatClient implements LlmChatClient {
         },
     ];
 
-    var outcome = await _post(key, _body(systemPrompt, userParts, schema));
-    if (outcome case _Answered(:final response)
-        when schema != null &&
-            response.statusCode == 400 &&
-            !_isInvalidKey(response)) {
-      outcome = await _post(key, _body(systemPrompt, userParts, null));
-    }
+    // One deadline over both attempts (issue #278): the retry gets only
+    // what the first attempt left.
+    final outcome = await _attempts(key, systemPrompt, userParts, schema)
+        .timeout(
+          timeout,
+          onTimeout: () => const _TransportFailed(
+            ChatFailed(reason: ChatFailureReason.timeout),
+          ),
+        );
 
     return switch (outcome) {
       _Answered(:final response) => _read(response),
@@ -206,11 +223,41 @@ final class GeminiChatClient implements LlmChatClient {
     };
   }
 
-  Map<String, Object?> _body(
+  /// The first request and, after a 400 to a schema that is not about
+  /// the key, the one retry — which drops both the schema and the
+  /// `thinkingConfig`, since the 400 can be about either (issue #278).
+  Future<_Outcome> _attempts(
+    String key,
     String systemPrompt,
     List<Object?> userParts,
     Map<String, Object?>? schema,
-  ) => <String, Object?>{
+  ) async {
+    final outcome = await _post(
+      key,
+      _body(systemPrompt, userParts, schema: schema, thinking: true),
+    );
+    if (outcome case _Answered(:final response)
+        when schema != null &&
+            response.statusCode == 400 &&
+            !_isInvalidKey(response)) {
+      final retried = await _post(
+        key,
+        _body(systemPrompt, userParts, schema: null, thinking: false),
+      );
+      return retried;
+    }
+    return outcome;
+  }
+
+  /// The request body: [schema] as `responseSchema` when given, and the
+  /// zero-budget `thinkingConfig` only when [thinking] — the schema retry
+  /// sends neither.
+  Map<String, Object?> _body(
+    String systemPrompt,
+    List<Object?> userParts, {
+    required Map<String, Object?>? schema,
+    required bool thinking,
+  }) => <String, Object?>{
     'system_instruction': <String, Object?>{
       'parts': <Object?>[
         <String, Object?>{'text': systemPrompt},
@@ -223,29 +270,34 @@ final class GeminiChatClient implements LlmChatClient {
       'responseMimeType': 'application/json',
       'maxOutputTokens': maxOutputTokens,
       'temperature': 0,
-      'thinkingConfig': <String, Object?>{'thinkingBudget': thinkingBudget},
+      if (thinking)
+        'thinkingConfig': <String, Object?>{'thinkingBudget': thinkingBudget},
       'responseSchema': ?schema,
     },
   };
 
+  /// One attempt; never throws. `post` both sends the request and reads
+  /// the whole reply body, so an exception from either surfaces here. The
+  /// time limit is [complete]'s, over both attempts.
   Future<_Outcome> _post(String key, Map<String, Object?> body) async {
     try {
-      final response = await _client
-          .post(
-            endpoint,
-            headers: <String, String>{
-              'Content-Type': 'application/json',
-              apiKeyHeader: key,
-            },
-            body: jsonEncode(body),
-          )
-          .timeout(timeout);
+      final response = await _client.post(
+        endpoint,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          apiKeyHeader: key,
+        },
+        body: jsonEncode(body),
+      );
       return _Answered(response);
     } on TimeoutException {
       return const _TransportFailed(
         ChatFailed(reason: ChatFailureReason.timeout),
       );
-    } on http.ClientException {
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278). See the class doc.
       return const _TransportFailed(
         ChatFailed(reason: ChatFailureReason.offline),
       );
@@ -267,6 +319,9 @@ final class GeminiChatClient implements LlmChatClient {
         reason: ChatFailureReason.rateLimited,
         statusCode: status,
       );
+    }
+    if (status == 504) {
+      return ChatFailed(reason: ChatFailureReason.timeout, statusCode: status);
     }
     final decoded = status == 200 ? _decode(response) : null;
     final content = decoded is Map<String, Object?>
@@ -372,7 +427,8 @@ final class _Answered extends _Outcome {
   final http.Response response;
 }
 
-/// No status was received: a timeout or a socket/DNS error.
+/// No status was received: a timeout, or any exception while sending or
+/// reading (a socket, DNS or TLS error).
 final class _TransportFailed extends _Outcome {
   const new(this.result);
 

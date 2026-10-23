@@ -167,5 +167,46 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
 
       await expectLater(store.write(const AppSettings()), completes);
     });
+
+    test('update applies the change to the latest stored settings, not to '
+        'an older snapshot (issue #287)', () async {
+      // Arrange: a snapshot is read, then consent is withdrawn elsewhere.
+      final store = build();
+      final snapshot = await store.read();
+      await store.write(snapshot.copyWith(estimationConsentGiven: false));
+
+      // Act: the snapshot's holder changes only its own field.
+      final saved = await store.update(
+        (latest) => latest.copyWith(disclosureSeen: true),
+      );
+
+      // Assert: the withdrawal survives, and update answers what it saved.
+      final result = await store.read();
+      expect(result.estimationConsentGiven, isFalse);
+      expect(result.disclosureSeen, isTrue);
+      expect(saved, equals(result));
+    });
+
+    test('two overlapping updates both land (issue #287)', () async {
+      final store = build();
+      const venue = VenueRef(source: MenuSource.wolt, platformId: 'v1');
+
+      await Future.wait(<Future<AppSettings>>[
+        store.update((latest) => latest.copyWith(lastVenue: venue)),
+        store.update(
+          (latest) => latest.copyWith(lastFilter: MenuFilter.greenOnly),
+        ),
+      ]);
+
+      final result = await store.read();
+      expect(result.lastVenue, equals(venue));
+      expect(result.lastFilter, equals(MenuFilter.greenOnly));
+    });
+
+    test('update never throws when the change does not', () async {
+      final store = build();
+
+      await expectLater(store.update((latest) => latest), completes);
+    });
   });
 }

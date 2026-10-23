@@ -25,6 +25,7 @@ import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_qr_scanner.dart';
 import '../fakes/fake_scanned_menu_classifier.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_transport_exceptions.dart';
 
 final DateTime _epoch = DateTime.utc(2026, 9, 29, 12);
 
@@ -560,6 +561,28 @@ void main() {
       expect(await pending, isNotNull);
       expect(controller.analysing, isFalse);
       expect(classifier.calls, hasLength(1));
+    });
+
+    test('a classifier that throws still clears analysing, so the Scan tab '
+        'is never stuck (issue #278)', () async {
+      // Arrange
+      final gate = Completer<void>();
+      classifier.gate = gate.future;
+      controller.addPages(distinct(1));
+      var notified = 0;
+      controller.addListener(() => notified++);
+      final pending = controller.analysePages();
+      await pumpEventQueue();
+      expect(controller.analysing, isTrue);
+
+      // Act
+      gate.completeError(const FakeHandshakeException());
+
+      // Assert
+      await expectLater(pending, throwsA(isA<FakeHandshakeException>()));
+      expect(controller.analysing, isFalse);
+      expect(controller.canAnalysePages, isTrue);
+      expect(notified, 2);
     });
 
     test(
