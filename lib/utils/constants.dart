@@ -932,16 +932,6 @@ const HiddenCarbTrigger _hcBechamel = (
   questionHe: 'רוטב בשמל עשוי מקמח. אפשר את המנה בלעדיו?',
   concern: 'flour',
 );
-const HiddenCarbTrigger _hcSweetAndSour = (
-  sourceEn: 'sweet and sour sauce',
-  sourceHe: 'רוטב חמוץ־מתוק',
-  certainty: 'likely',
-  questionEn:
-      'Sweet and sour sauce has sugar and cornstarch. Can it be left '
-      'off?',
-  questionHe: 'ברוטב חמוץ־מתוק יש סוכר ועמילן. אפשר בלעדיו?',
-  concern: 'sugarOrFlour',
-);
 const HiddenCarbTrigger _hcKungPao = (
   sourceEn: 'kung pao sauce',
   sourceHe: 'רוטב קונג פאו',
@@ -1012,14 +1002,6 @@ const HiddenCarbTrigger _hcRub = (
   questionHe: 'יש סוכר בתערובת התבלינים (הראב)?',
   concern: 'sugar',
 );
-const HiddenCarbTrigger _hcAmba = (
-  sourceEn: 'amba',
-  sourceHe: 'עמבה',
-  certainty: 'suspected',
-  questionEn: 'Is there sugar in the amba? Can it come on the side?',
-  questionHe: 'יש סוכר בעמבה? אפשר אותה בצד?',
-  concern: 'sugar',
-);
 const HiddenCarbTrigger _hcGarlicSauce = (
   sourceEn: 'garlic sauce',
   sourceHe: 'רוטב שום',
@@ -1077,9 +1059,8 @@ const Map<String, HiddenCarbTrigger> hiddenCarbTriggersEn =
       'brown sauce': _hcBrownSauce,
       'demi-glace': _hcDemiGlace,
       'béchamel': _hcBechamel,
-      // Cornstarch-thickened, sweetened Asian sauces (`hoisin` and
-      // `sweet chili` are carb modifiers already).
-      'sweet and sour': _hcSweetAndSour,
+      // Cornstarch-thickened, sweetened Asian sauces (`hoisin`,
+      // `sweet chili` and `sweet and sour` are carb modifiers already).
       'kung pao': _hcKungPao,
       'general tso': _hcGeneralTso,
       "general tso's": _hcGeneralTso,
@@ -1098,7 +1079,6 @@ const Map<String, HiddenCarbTrigger> hiddenCarbTriggersEn =
       // Rubs, condiments and dressings that may carry sugar.
       'rub': _hcRub,
       'rubbed': _hcRub,
-      'amba': _hcAmba,
       'garlic sauce': _hcGarlicSauce,
       'dressing of the day': _hcDressingOfTheDay,
       'caramelized': _hcCaramelized,
@@ -1128,7 +1108,6 @@ const Map<String, HiddenCarbTrigger> hiddenCarbTriggersHe =
       'גרייבי': _hcGravy,
       'דמי גלאס': _hcDemiGlace,
       'בשמל': _hcBechamel,
-      'חמוץ מתוק': _hcSweetAndSour,
       'קונג פאו': _hcKungPao,
       'גנרל טסו': _hcGeneralTso,
       'רוטב צדפות': _hcOysterSauce,
@@ -1137,11 +1116,11 @@ const Map<String, HiddenCarbTrigger> hiddenCarbTriggersHe =
       'סויה מתוק': _hcSweetSoy,
       'רוטב ווק': _hcWokSauce,
       'רוטב מתוק': _hcSweetSauce,
+      'רוטב מתקתק': _hcSweetSauce,
       'קריספי': _hcCrispy,
       'קריספית': _hcCrispy,
       'קריספיים': _hcCrispy,
       'ראב': _hcRub,
-      'עמבה': _hcAmba,
       'רוטב שום': _hcGarlicSauce,
       'רוטב היום': _hcDressingOfTheDay,
       'רוטב של היום': _hcDressingOfTheDay,

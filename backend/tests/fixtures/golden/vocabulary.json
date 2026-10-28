@@ -2260,17 +2260,6 @@
       }
     ],
     [
-      "sweet and sour",
-      {
-        "certainty": "likely",
-        "concern": "sugarOrFlour",
-        "questionEn": "Sweet and sour sauce has sugar and cornstarch. Can it be left off?",
-        "questionHe": "ברוטב חמוץ־מתוק יש סוכר ועמילן. אפשר בלעדיו?",
-        "sourceEn": "sweet and sour sauce",
-        "sourceHe": "רוטב חמוץ־מתוק"
-      }
-    ],
-    [
       "kung pao",
       {
         "certainty": "likely",
@@ -2400,17 +2389,6 @@
         "questionHe": "יש סוכר בתערובת התבלינים (הראב)?",
         "sourceEn": "spice rub",
         "sourceHe": "ראב תבלינים"
-      }
-    ],
-    [
-      "amba",
-      {
-        "certainty": "suspected",
-        "concern": "sugar",
-        "questionEn": "Is there sugar in the amba? Can it come on the side?",
-        "questionHe": "יש סוכר בעמבה? אפשר אותה בצד?",
-        "sourceEn": "amba",
-        "sourceHe": "עמבה"
       }
     ],
     [
@@ -2647,17 +2625,6 @@
       }
     ],
     [
-      "חמוץ מתוק",
-      {
-        "certainty": "likely",
-        "concern": "sugarOrFlour",
-        "questionEn": "Sweet and sour sauce has sugar and cornstarch. Can it be left off?",
-        "questionHe": "ברוטב חמוץ־מתוק יש סוכר ועמילן. אפשר בלעדיו?",
-        "sourceEn": "sweet and sour sauce",
-        "sourceHe": "רוטב חמוץ־מתוק"
-      }
-    ],
-    [
       "קונג פאו",
       {
         "certainty": "likely",
@@ -2746,6 +2713,17 @@
       }
     ],
     [
+      "רוטב מתקתק",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the sauce sweetened with sugar? Can it be left off?",
+        "questionHe": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
+        "sourceEn": "sweet sauce",
+        "sourceHe": "רוטב מתוק"
+      }
+    ],
+    [
       "קריספי",
       {
         "certainty": "suspected",
@@ -2787,17 +2765,6 @@
         "questionHe": "יש סוכר בתערובת התבלינים (הראב)?",
         "sourceEn": "spice rub",
         "sourceHe": "ראב תבלינים"
-      }
-    ],
-    [
-      "עמבה",
-      {
-        "certainty": "suspected",
-        "concern": "sugar",
-        "questionEn": "Is there sugar in the amba? Can it come on the side?",
-        "questionHe": "יש סוכר בעמבה? אפשר אותה בצד?",
-        "sourceEn": "amba",
-        "sourceHe": "עמבה"
       }
     ],
     [

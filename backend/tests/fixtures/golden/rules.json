@@ -83688,68 +83688,6 @@
     {
       "match": {
         "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Please leave out the sweet and sour sauce; it is mostly sugar."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with sweet and sour, sugar free for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Please leave out the sweet and sour sauce; it is mostly sugar."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with no flour sweet and sour for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Please leave out the sweet and sour sauce; it is mostly sugar."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with keto sweet and sour for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Ask for the dish to be prepared without honey",
-          "Please leave out the sweet and sour sauce; it is mostly sugar."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with honey sweet and sour for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Please leave out the sweet and sour sauce; it is mostly sugar.",
-          "Replace French fries with a fresh green salad or a fried egg"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with sweet and sour and fries for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
         "hiddenCarbs": [
           {
             "certainty": "likely",
@@ -85120,68 +85058,6 @@
         "kind": "yellow"
       },
       "text": "Grilled salmon with rubbed and fries for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Please leave out the amba; the mango pickle is sweetened."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with amba, sugar free for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Please leave out the amba; the mango pickle is sweetened."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with no flour amba for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Please leave out the amba; the mango pickle is sweetened."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with keto amba for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Ask for the dish to be prepared without honey",
-          "Please leave out the amba; the mango pickle is sweetened."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with honey amba for dinner"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "Please leave out the amba; the mango pickle is sweetened.",
-          "Replace French fries with a fresh green salad or a fried egg"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "Grilled salmon with amba and fries for dinner"
     },
     {
       "match": {
@@ -87856,80 +87732,6 @@
     {
       "match": {
         "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם בחמוץ מתוק להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם והחמוץ מתוק להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם חמוץ מתוק ללא תוספת סוכר להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם ללא קמח חמוץ מתוק להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר.",
-          "אפשר בבקשה להכין את המנה בלי דבש?"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם חמוץ מתוק בדבש להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר.",
-          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם חמוץ מתוק וצ'יפס להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
         "hiddenCarbs": [
           {
             "certainty": "likely",
@@ -88972,6 +88774,136 @@
         "baseLabel": null,
         "hiddenCarbs": [
           {
+            "certainty": "likely",
+            "source": "רוטב מתוק",
+            "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "רוטב מתקתק"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "רוטב מתוק",
+            "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם רוטב מתקתק להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "רוטב מתוק",
+            "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ברוטב מתקתק להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "רוטב מתוק",
+            "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם והרוטב מתקתק להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם רוטב מתקתקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם רוטב מתקתק ללא תוספת סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "רוטב מתוק",
+            "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא קמח רוטב מתקתק להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [],
+        "instructions": [
+          "אפשר בבקשה להכין את המנה בלי דבש?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "סלמון על הגריל עם רוטב מתקתק בדבש להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "רוטב מתוק",
+            "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+          }
+        ],
+        "instructions": [
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "סלמון על הגריל עם רוטב מתקתק וצ'יפס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
             "certainty": "suspected",
             "source": "ציפוי קריספי",
             "waiterQuestion": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?"
@@ -89504,80 +89436,6 @@
         "kind": "yellow"
       },
       "text": "סלמון על הגריל עם ראב וצ'יפס להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי העמבה? יש בה סוכר."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם בעמבה להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי העמבה? יש בה סוכר."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם והעמבה להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי העמבה? יש בה סוכר."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם עמבה ללא תוספת סוכר להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי העמבה? יש בה סוכר."
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם ללא קמח עמבה להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי העמבה? יש בה סוכר.",
-          "אפשר בבקשה להכין את המנה בלי דבש?"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם עמבה בדבש להיום"
-    },
-    {
-      "match": {
-        "baseLabel": null,
-        "hiddenCarbs": [],
-        "instructions": [
-          "אפשר בבקשה בלי העמבה? יש בה סוכר.",
-          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
-      },
-      "text": "סלמון על הגריל עם עמבה וצ'יפס להיום"
     },
     {
       "match": {

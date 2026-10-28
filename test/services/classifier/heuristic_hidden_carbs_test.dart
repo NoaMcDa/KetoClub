@@ -95,14 +95,14 @@ void main() {
         _dish(
           'd1',
           'Ribeye',
-          description: 'Glazed, amba, house sauce, gravy and garlic sauce',
+          description: 'Glazed, marinated, house sauce, gravy and garlic sauce',
         ),
       );
 
       // Assert
       expect(dish.hiddenCarbs.map((flag) => flag.source), [
         'glaze',
-        'amba',
+        'marinade',
         'house sauce',
       ]);
       expect(dish.modification, dish.hiddenCarbs.first.waiterQuestion);

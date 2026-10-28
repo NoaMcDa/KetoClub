@@ -19094,6 +19094,20 @@
   },
   {
     "containsHebrew": true,
+    "in": "רוטב מתקתק",
+    "isRemovalOptionValue": false,
+    "normalised": "רוטב מתקתק",
+    "words": [
+      "רוטב",
+      "מתקתק"
+    ],
+    "wordsMin3": [
+      "רוטב",
+      "מתקתק"
+    ]
+  },
+  {
+    "containsHebrew": true,
     "in": "קריספי",
     "isRemovalOptionValue": false,
     "normalised": "קריספי",

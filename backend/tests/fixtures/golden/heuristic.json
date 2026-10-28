@@ -347,12 +347,18 @@
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e421",
-          "hiddenCarbs": [],
-          "modification": null,
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב מתוק",
+              "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+            }
+          ],
+          "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
           "name": "כנפיים | 8 יח׳",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
         },
         {
           "dishId": "6316e6412cc1aad2be5ed2c9",
@@ -3246,12 +3252,18 @@
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e421",
-          "hiddenCarbs": [],
-          "modification": null,
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב מתוק",
+              "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+            }
+          ],
+          "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
           "name": "כנפיים | 8 יח׳",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
         },
         {
           "dishId": "6316e6412cc1aad2be5ed2c9",
@@ -6151,12 +6163,18 @@
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e421",
-          "hiddenCarbs": [],
-          "modification": null,
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב מתוק",
+              "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+            }
+          ],
+          "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
           "name": "כנפיים | 8 יח׳",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
         },
         {
           "dishId": "6316e6412cc1aad2be5ed2c9",
@@ -9054,12 +9072,18 @@
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e421",
-          "hiddenCarbs": [],
-          "modification": null,
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב מתוק",
+              "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+            }
+          ],
+          "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
           "name": "כנפיים | 8 יח׳",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
         },
         {
           "dishId": "6316e6412cc1aad2be5ed2c9",

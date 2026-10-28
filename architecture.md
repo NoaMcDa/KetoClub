@@ -1752,7 +1752,7 @@ the dish's rules text — name, description and non-removal option values, the
 text the carb modifiers read — against the bilingual `hiddenCarbTriggersEn`/`He`
 tables in `constants.dart` (a house or special sauce, a marinade, a glaze, a
 gravy or béchamel, a cornstarch-thickened Asian sauce, a crisp coating with no
-breading word, a rub, amba, garlic sauce, the dressing of the day; each with a
+breading word, a rub, garlic sauce, the dressing of the day; each with a
 source, `likely` or `suspected`, a concern of `sugar`, `flour` or
 `sugarOrFlour`, and a question in both languages) and writes each flag in the
 dish's language. A trigger is cancelled by its own D-V1 guard ("crispy skin",
