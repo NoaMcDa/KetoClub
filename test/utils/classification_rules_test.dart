@@ -1101,7 +1101,7 @@ void main() {
 
     test('halva itself is still red, with its common particles', () {
       _expectRed(ClassificationRules.match('פרפה חלבה'), label: 'חלבה');
-      _expectRed(ClassificationRules.match('גלידת וניל וחלבה'), label: 'חלבה');
+      _expectRed(ClassificationRules.match('פרפה וניל וחלבה'), label: 'חלבה');
       _expectRed(ClassificationRules.match('עוגיות בחלבה'));
       _expectRed(ClassificationRules.match('Halva parfait'));
     });
@@ -1372,6 +1372,197 @@ void main() {
       ]) {
         _expectRed(ClassificationRules.match(text));
       }
+    });
+  });
+
+  group('ClassificationRules — the Israeli keto corpus false greens', () {
+    test('doughs and dumplings are red, in Hebrew and English', () {
+      const dishes = <String, String>{
+        'חצ׳פורי אג׳ארולי': "חצ'פורי",
+        "חצ'אפורי אימרולי": "חצ'פורי",
+        'חאצ׳אפורי': "חצ'פורי",
+        'חינקלי (5 יח׳)': 'חינקלי',
+        'פלמני': 'פלמני',
+        'בלינצ׳יקי בשר': "בלינצ'יקי",
+        'בליני עם קוויאר': 'בליני',
+        'חביתיות ממולאות בשר טחון': 'חביתית',
+        'כיסוני בצק במילוי בשר': 'כיסונים',
+        'קיש פטריות ותרד': 'קיש',
+        'טארט על בצק פריך': 'טארט',
+        'פשטידה על בצק פריך': 'בצק פריך',
+        'קובנה בחמאה': 'קובנה',
+        'ספינג׳ מטוגן עם סוכר': "ספינג'",
+        'מופלטה בדבש': 'מופלטה',
+        'פוקאצ׳ה שום': "פוקאצ'ה",
+        'פלאפל במנה': 'פלאפל',
+        'גפילטע פיש': 'גפילטע',
+        'פיר פיר': 'פיר פיר',
+        'קרעי אינג׳רה ברוטב ברברה': "אינג'רה",
+        'קלמרי בציפוי קמח': 'ציפוי קמח',
+        'תבשיל שעועית לבנה': 'תבשיל שעועית',
+        'עוף חמוץ מתוק': 'עוף חמוץ מתוק',
+        'חטיף במבה': 'במבה',
+        'ביסלי גריל': 'ביסלי',
+        'Cheese khachapuri': 'khachapuri',
+        'Beef khinkali': 'khinkali',
+        'Pelmeni with sour cream': 'pelmeni',
+        'Blini with caviar': 'blini',
+        'Mushroom quiche': 'quiche',
+        'Kubaneh with butter': 'kubaneh',
+        'Sfenj': 'sfenj',
+        'Falafel plate': 'falafel',
+        'Gefilte fish': 'gefilte',
+        'Firfir': 'firfir',
+        'Fir fir': 'firfir',
+        'Flour-coated calamari': 'flour coating',
+        'White bean stew': 'bean stew',
+        'Sweet and sour chicken': 'sweet and sour chicken',
+        'Bamba': 'bamba',
+      };
+      for (final entry in dishes.entries) {
+        _expectRed(ClassificationRules.match(entry.key), label: entry.value);
+      }
+    });
+
+    test('desserts are red, in Hebrew and English', () {
+      const dishes = <String, String>{
+        'גלידת וניל': 'גלידה',
+        'גלידות הבית': 'גלידה',
+        'סורבה פסיפלורה': 'סורבה',
+        'סורבט לימון': 'סורבה',
+        'מוס שוקולד ופרלינה': 'מוס שוקולד',
+        'מבחר פטי פור': 'פטי פור',
+        'פרלינים': 'פרלין',
+        'Passion fruit sorbet': 'sorbet',
+        'Chocolate mousse': 'chocolate mousse',
+        'Petits fours': 'petits fours',
+        'Petit four': 'petits fours',
+        'Hazelnut pralines': 'praline',
+      };
+      for (final entry in dishes.entries) {
+        _expectRed(ClassificationRules.match(entry.key), label: entry.value);
+      }
+    });
+
+    test('penne is red as the dish names it heads, never alone', () {
+      _expectRed(ClassificationRules.match('פנה פסטו'), label: 'פסטה');
+      _expectRed(ClassificationRules.match('פנה ברוטב עגבניות'), label: 'פסטה');
+      _expectRed(ClassificationRules.match('פנה רוזה'), label: 'פסטה');
+      _expectRed(ClassificationRules.match('Penne pesto'), label: 'penne');
+      _expectGreen(ClassificationRules.match('סטייק אנטריקוט, פנה למלצר'));
+    });
+
+    test('sweet drinks and beer brands are red', () {
+      for (final text in [
+        'שוקו חם',
+        'קפה ברד',
+        'ברד ענבים',
+        'מים בטעם אפרסק',
+        'יין קינוח מתוק, כוס',
+        'סמוזי פירות יער',
+        'סאן מיגל',
+        'גולדסטאר',
+        'קרלסברג',
+        'הייניקן',
+        'Hot chocolate',
+        'Chocolate milk',
+        'Lemon slush',
+        'Peach flavoured water',
+        'Flavored water',
+        'Sauternes',
+        'Dessert wine',
+        'San Miguel',
+        'Heineken',
+        'Guinness',
+      ]) {
+        _expectRed(ClassificationRules.match(text));
+      }
+    });
+
+    test('a beer brand or a dessert wine is labelled by what it is', () {
+      _expectRed(ClassificationRules.match('Goldstar'), label: 'beer');
+      _expectRed(ClassificationRules.match('סאן מיגל'), label: 'בירה');
+      _expectRed(ClassificationRules.match('Sauternes'), label: 'sweet wine');
+      _expectRed(ClassificationRules.match('יין קינוח'), label: 'יין מתוק');
+    });
+
+    test('a sugar-free or cooked-in drink is rescued', () {
+      _expectGreen(ClassificationRules.match('מים בטעם ללא סוכר'));
+      _expectGreen(ClassificationRules.match('Sugar-free flavoured water'));
+      _expectGreen(ClassificationRules.match('Foie gras, sauternes reduction'));
+      _expectGreen(ClassificationRules.match('צלי בקר מבושל בגינס'));
+      _expectGreen(ClassificationRules.match('Short rib braised in guinness'));
+    });
+
+    test('שוקו is not שוקולד', () {
+      _expectGreen(ClassificationRules.match('שוקולד מריר 90%'));
+    });
+
+    test('the keto falafel, crustless quiche and lettuce cups are kept', () {
+      _expectGreen(ClassificationRules.match('פלאפל כרובית'));
+      _expectGreen(ClassificationRules.match('פלאפל קטו אפוי'));
+      _expectGreen(ClassificationRules.match('Cauliflower falafel'));
+      _expectGreen(ClassificationRules.match('Keto baked falafel'));
+      _expectGreen(ClassificationRules.match('קיש ללא בצק'));
+      _expectGreen(ClassificationRules.match('Crustless quiche'));
+      _expectGreen(ClassificationRules.match('כיסוני חסה במילוי בשר'));
+      _expectGreen(ClassificationRules.match('סלמון ללא ציפוי קמח'));
+      _expectGreen(ClassificationRules.match('Almond flour coated chicken'));
+      _expectRed(ClassificationRules.match('דג בציפוי קמח ללא גלוטן'));
+    });
+
+    test('a removable sugar is yellow with its sentence', () {
+      final yellows = <String, String?>{
+        'סלרי, תפוחים ואגוזי מלך עם צימוקים': carbModifiersHe['צימוקים'],
+        'סלט ירוק עם פירות יבשים': carbModifiersHe['פירות יבשים'],
+        'כרוב ואגוזי קשיו מסוכרים': carbModifiersHe['מסוכרים'],
+        'מרק בצל עם קרוטון': carbModifiersHe['קרוטון'],
+        'תבשיל עוף, מוגש על אינג׳רה': carbModifiersHe["אינג'רה"],
+        'שיפודי כבד עם עמבה': carbModifiersHe['עמבה'],
+        'יוגורט עם בננה': carbModifiersHe['בננה'],
+        'אבטיח ופטה': carbModifiersHe['אבטיח'],
+        'סלט עם בלסמי מצומצם': carbModifiersHe['בלסמי מצומצם'],
+        'דג ברוטב חמוץ מתוק': carbModifiersHe['חמוץ מתוק'],
+        'בשר בקר עם שעועית לבנה': carbModifiersHe['שעועית לבנה'],
+        'חלומי על עלים וסילאן': carbModifiersHe['סילאן'],
+        'Waldorf salad with raisins': carbModifiersEn['raisins'],
+        'Green salad, dried fruit': carbModifiersEn['dried fruit'],
+        'Leaves with candied pecans': carbModifiersEn['candied'],
+        'Onion soup with a crouton': carbModifiersEn['crouton'],
+        'Doro wat on injera': carbModifiersEn['injera'],
+        'Sabich with amba': carbModifiersEn['amba'],
+        'Yogurt with banana': carbModifiersEn['banana'],
+        'Watermelon and feta': carbModifiersEn['watermelon'],
+        'Burrata, balsamic reduction': carbModifiersEn['balsamic reduction'],
+        'Fish in sweet and sour sauce': carbModifiersEn['sweet and sour'],
+        'Beef with white beans': carbModifiersEn['white beans'],
+      };
+      for (final entry in yellows.entries) {
+        _expectYellow(ClassificationRules.match(entry.key), [entry.value]);
+      }
+    });
+
+    test('unsweetened candied words and green beans stay green', () {
+      _expectGreen(ClassificationRules.match('אגוזים לא מסוכרים'));
+      _expectGreen(ClassificationRules.match('רוטב נקי מסוכר'));
+      _expectGreen(ClassificationRules.match('בשר עם שעועית ירוקה'));
+    });
+
+    test('candied pine nuts emit one sentence, not two', () {
+      _expectYellow(ClassificationRules.match('סלט עם צנוברים מסוכרים'), [
+        carbModifiersHe['צנוברים מסוכרים'],
+      ]);
+    });
+
+    test('injera or dried fruit named alone is the carb itself', () {
+      for (final name in ['אינג׳רה', 'Injera', 'פירות יבשים', 'Dried fruit']) {
+        _expectRed(ClassificationRules.matchDish(_dishNamed(name)));
+      }
+      _expectRed(
+        ClassificationRules.matchDish(
+          _dishNamed('פירות יבשים', description: 'משמש מיובש וצימוקים'),
+        ),
+      );
     });
   });
 }
