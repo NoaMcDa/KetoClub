@@ -14,6 +14,10 @@ whole :class:`~app.keto.models.MenuAnalysed` it returns.
   carb sentence fired and ``dietaryRuleWhy`` otherwise, and a script of the
   carb sentences then the dietary ones, one per line. Everything else is
   **green** with ``greenWhy``.
+* **Hidden carbs** (§9.4 rule 5a on the rules path, issue #213): a red has
+  none; a yellow keeps its script and carries the rule match's flags; a dish
+  that would be green with at least one flag is yellow with
+  ``hiddenCarbWhy`` and the first flag's question as its script.
 * **Dietary rules** are switched on by the options' prompt fragments (a
   ``ClassificationOptions.seedOilFree`` is "the seed-oil fragment is in
   ``dietaryConstraints``") and run in the fixed order seed-oil, dairy,
@@ -87,6 +91,7 @@ def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
         )
 
     dietary = _dietary_sentences(text, options, is_hebrew=is_hebrew)
+    hidden_carbs = list(found.hidden_carbs)
     if found.instructions or dietary:
         if found.instructions:
             why = templates.yellow_why_he if is_hebrew else templates.yellow_why_en
@@ -96,12 +101,31 @@ def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
                 if is_hebrew
                 else templates.dietary_rule_why_en
             )
+        # A yellow keeps its own script and carries the flags beside it.
         return AnalysedDish(
             dish_id=dish.id,
             name=dish.name,
             verdict="modifiable",
             why=why,
             modification="\n".join([*found.instructions, *dietary]),
+            hidden_carbs=hidden_carbs,
+            concerns=concerns,
+        )
+
+    if hidden_carbs:
+        # §9.4 rule 5a on the rules path: the flag is the whole reason, so
+        # its question is the instruction.
+        return AnalysedDish(
+            dish_id=dish.id,
+            name=dish.name,
+            verdict="modifiable",
+            why=(
+                templates.hidden_carb_why_he
+                if is_hebrew
+                else templates.hidden_carb_why_en
+            ),
+            modification=hidden_carbs[0].waiter_question,
+            hidden_carbs=hidden_carbs,
             concerns=concerns,
         )
 

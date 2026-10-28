@@ -14,7 +14,7 @@ from typing import Any
 
 import pytest
 
-from app.keto.models import Dish, DishOption
+from app.keto.models import Dish, DishOption, to_json
 from app.keto.normaliser import (
     dish_core_text,
     dish_option_rules_text,
@@ -73,6 +73,7 @@ def _record(found: RuleMatch) -> dict[str, Any]:
         "isNonKeto": found.is_non_keto,
         "baseLabel": found.base_label,
         "instructions": list(found.instructions),
+        "hiddenCarbs": [to_json(flag) for flag in found.hidden_carbs],
     }
 
 

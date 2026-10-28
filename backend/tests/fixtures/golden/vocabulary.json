@@ -1,6 +1,7 @@
 {
   "caps": {
     "defaultNetCarbLimitGrams": 6,
+    "hiddenCarbWindowWords": 3,
     "maxAnalysedDishes": 1000,
     "maxHiddenCarbsPerDish": 3,
     "maxModificationLength": 300,
@@ -1793,6 +1794,1112 @@
     "withPrefix": "(?<![א-ת])[בהוכלמש]{0,2}פסטה(?![א-ת])",
     "withoutPrefix": "(?<![א-ת])פסטה(?![א-ת])"
   },
+  "hiddenCarbCoveringModifiers": [
+    "teriyaki",
+    "honey",
+    "bbq",
+    "barbecue",
+    "barbeque",
+    "bbqed",
+    "maple",
+    "balsamic glaze",
+    "silan",
+    "date honey",
+    "sweet tahini",
+    "sweet chili",
+    "ketchup",
+    "thousand island",
+    "house dressing",
+    "vinaigrette",
+    "tamarind",
+    "hoisin",
+    "cranberry sauce",
+    "port wine reduction",
+    "port reduction",
+    "port wine sauce",
+    "port sauce",
+    "port wine glaze",
+    "syrup",
+    "flavoured syrup",
+    "טריאקי",
+    "טריקי",
+    "דבש",
+    "זיגוג דבש",
+    "חרדל דבש",
+    "ברביקיו",
+    "בבקיו",
+    "רוטב ברביקיו",
+    "סילן",
+    "דבש תמרים",
+    "טחינה מתוקה",
+    "צ'ילי מתוק",
+    "קטשופ",
+    "אלף האיים",
+    "רוטב הבית",
+    "ויניגרט",
+    "תמרינד",
+    "הויסין",
+    "רוטב חמוציות",
+    "רוטב יין פורט",
+    "רוטב פורט",
+    "רדוקציית פורט",
+    "רדוקציית יין פורט",
+    "מייפל",
+    "זיגוג בלסמי",
+    "סירופ"
+  ],
+  "hiddenCarbGuardPhrasesEn": {
+    "any": [
+      "keto",
+      "low carb",
+      "lowcarb"
+    ],
+    "flour": [
+      "no flour",
+      "flourless",
+      "without flour"
+    ],
+    "sugar": [
+      "sugar free",
+      "sugarfree",
+      "no sugar",
+      "no added sugar",
+      "without sugar",
+      "zero sugar",
+      "unsweetened"
+    ]
+  },
+  "hiddenCarbGuardPhrasesHe": {
+    "any": [
+      "קטו",
+      "קטוגני",
+      "קטוגנית",
+      "דל פחמימות",
+      "דלת פחמימות"
+    ],
+    "flour": [
+      "ללא קמח",
+      "וללא קמח",
+      "בלי קמח"
+    ],
+    "sugar": [
+      "ללא סוכר",
+      "וללא סוכר",
+      "בלי סוכר",
+      "ובלי סוכר",
+      "ללא תוספת סוכר",
+      "בלי תוספת סוכר",
+      "ללא סוכרים",
+      "נטול סוכר",
+      "נטולת סוכר"
+    ]
+  },
+  "hiddenCarbTriggerGuardsEn": {
+    "crispy": {
+      "after": [
+        "skin",
+        "bacon",
+        "pancetta",
+        "prosciutto",
+        "pork belly",
+        "crackling",
+        "lettuce",
+        "salad",
+        "greens",
+        "leaves",
+        "kale",
+        "cucumber",
+        "cucumbers",
+        "shallots",
+        "garlic",
+        "capers",
+        "sage",
+        "leeks",
+        "seaweed",
+        "nori",
+        "parmesan",
+        "edges"
+      ],
+      "before": []
+    },
+    "marinated": {
+      "after": [
+        "olives",
+        "olive",
+        "feta",
+        "artichoke",
+        "artichokes",
+        "mushrooms",
+        "peppers",
+        "labneh",
+        "cheese",
+        "eggplant"
+      ],
+      "before": []
+    }
+  },
+  "hiddenCarbTriggerGuardsHe": {
+    "מרינדה": {
+      "after": [
+        "זיתים",
+        "פטה",
+        "ארטישוק",
+        "פטריות",
+        "פלפלים",
+        "לבנה",
+        "גבינה",
+        "חצילים"
+      ],
+      "before": [
+        "זיתים",
+        "פטה",
+        "ארטישוק",
+        "פטריות",
+        "פלפלים",
+        "לבנה",
+        "גבינה",
+        "חצילים"
+      ]
+    },
+    "מרינדת": {
+      "after": [
+        "זיתים",
+        "פטה",
+        "ארטישוק",
+        "פטריות",
+        "פלפלים",
+        "לבנה",
+        "גבינה",
+        "חצילים"
+      ],
+      "before": [
+        "זיתים",
+        "פטה",
+        "ארטישוק",
+        "פטריות",
+        "פלפלים",
+        "לבנה",
+        "גבינה",
+        "חצילים"
+      ]
+    },
+    "קריספי": {
+      "after": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ],
+      "before": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ]
+    },
+    "קריספיים": {
+      "after": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ],
+      "before": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ]
+    },
+    "קריספית": {
+      "after": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ],
+      "before": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ]
+    }
+  },
+  "hiddenCarbTriggersEn": [
+    [
+      "house sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the house sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב הבית?",
+        "sourceEn": "house sauce",
+        "sourceHe": "רוטב הבית"
+      }
+    ],
+    [
+      "special sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the special sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב המיוחד?",
+        "sourceEn": "special sauce",
+        "sourceHe": "רוטב מיוחד"
+      }
+    ],
+    [
+      "secret sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the secret sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב הסודי?",
+        "sourceEn": "secret sauce",
+        "sourceHe": "רוטב סודי"
+      }
+    ],
+    [
+      "signature sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the special sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב המיוחד?",
+        "sourceEn": "special sauce",
+        "sourceHe": "רוטב מיוחד"
+      }
+    ],
+    [
+      "chef's sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the chef's sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב של השף?",
+        "sourceEn": "chef's sauce",
+        "sourceHe": "רוטב השף"
+      }
+    ],
+    [
+      "marinade",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in the marinade?",
+        "questionHe": "יש סוכר או דבש במרינדה?",
+        "sourceEn": "marinade",
+        "sourceHe": "מרינדה"
+      }
+    ],
+    [
+      "marinated",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in the marinade?",
+        "questionHe": "יש סוכר או דבש במרינדה?",
+        "sourceEn": "marinade",
+        "sourceHe": "מרינדה"
+      }
+    ],
+    [
+      "sweet marinade",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Can it be made without the sweet marinade?",
+        "questionHe": "אפשר להכין את המנה בלי המרינדה המתוקה?",
+        "sourceEn": "sweet marinade",
+        "sourceHe": "מרינדה מתוקה"
+      }
+    ],
+    [
+      "glaze",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "glazed",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "gravy",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the gravy thickened with flour? Can it come on the side?",
+        "questionHe": "הרוטב מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "gravy",
+        "sourceHe": "רוטב גרייבי"
+      }
+    ],
+    [
+      "brown sauce",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the brown sauce thickened with flour? Can it come on the side?",
+        "questionHe": "הרוטב החום מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "brown sauce",
+        "sourceHe": "רוטב חום"
+      }
+    ],
+    [
+      "demi-glace",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the demi-glace thickened with flour? Can it come on the side?",
+        "questionHe": "הדמי גלאס מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "demi-glace",
+        "sourceHe": "דמי גלאס"
+      }
+    ],
+    [
+      "béchamel",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Béchamel is made with flour. Can the dish come without it?",
+        "questionHe": "רוטב בשמל עשוי מקמח. אפשר את המנה בלעדיו?",
+        "sourceEn": "béchamel",
+        "sourceHe": "רוטב בשמל"
+      }
+    ],
+    [
+      "sweet and sour",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Sweet and sour sauce has sugar and cornstarch. Can it be left off?",
+        "questionHe": "ברוטב חמוץ־מתוק יש סוכר ועמילן. אפשר בלעדיו?",
+        "sourceEn": "sweet and sour sauce",
+        "sourceHe": "רוטב חמוץ־מתוק"
+      }
+    ],
+    [
+      "kung pao",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is the kung pao sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב הקונג פאו סוכר או עמילן?",
+        "sourceEn": "kung pao sauce",
+        "sourceHe": "רוטב קונג פאו"
+      }
+    ],
+    [
+      "general tso",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is General Tso's sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב גנרל טסו סוכר או עמילן?",
+        "sourceEn": "General Tso's sauce",
+        "sourceHe": "רוטב גנרל טסו"
+      }
+    ],
+    [
+      "general tso's",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is General Tso's sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב גנרל טסו סוכר או עמילן?",
+        "sourceEn": "General Tso's sauce",
+        "sourceHe": "רוטב גנרל טסו"
+      }
+    ],
+    [
+      "oyster sauce",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Oyster sauce has sugar and cornstarch. Can it be made without it?",
+        "questionHe": "ברוטב צדפות יש סוכר ועמילן. אפשר להכין בלעדיו?",
+        "sourceEn": "oyster sauce",
+        "sourceHe": "רוטב צדפות"
+      }
+    ],
+    [
+      "sweet soy",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Sweet soy sauce is mostly sugar. Can it be made with plain soy sauce?",
+        "questionHe": "סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?",
+        "sourceEn": "sweet soy sauce",
+        "sourceHe": "סויה מתוקה"
+      }
+    ],
+    [
+      "kecap manis",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Sweet soy sauce is mostly sugar. Can it be made with plain soy sauce?",
+        "questionHe": "סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?",
+        "sourceEn": "sweet soy sauce",
+        "sourceHe": "סויה מתוקה"
+      }
+    ],
+    [
+      "wok sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or cornstarch in the wok sauce?",
+        "questionHe": "יש סוכר או עמילן ברוטב הווק?",
+        "sourceEn": "wok sauce",
+        "sourceHe": "רוטב ווק"
+      }
+    ],
+    [
+      "stir-fry sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or cornstarch in the wok sauce?",
+        "questionHe": "יש סוכר או עמילן ברוטב הווק?",
+        "sourceEn": "wok sauce",
+        "sourceHe": "רוטב ווק"
+      }
+    ],
+    [
+      "sweet sauce",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the sauce sweetened with sugar? Can it be left off?",
+        "questionHe": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
+        "sourceEn": "sweet sauce",
+        "sourceHe": "רוטב מתוק"
+      }
+    ],
+    [
+      "crispy",
+      {
+        "certainty": "suspected",
+        "concern": "flour",
+        "questionEn": "Is it coated in flour or batter to make it crispy? Can it come without the coating?",
+        "questionHe": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?",
+        "sourceEn": "crispy coating",
+        "sourceHe": "ציפוי קריספי"
+      }
+    ],
+    [
+      "rub",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the spice rub?",
+        "questionHe": "יש סוכר בתערובת התבלינים (הראב)?",
+        "sourceEn": "spice rub",
+        "sourceHe": "ראב תבלינים"
+      }
+    ],
+    [
+      "rubbed",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the spice rub?",
+        "questionHe": "יש סוכר בתערובת התבלינים (הראב)?",
+        "sourceEn": "spice rub",
+        "sourceHe": "ראב תבלינים"
+      }
+    ],
+    [
+      "amba",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the amba? Can it come on the side?",
+        "questionHe": "יש סוכר בעמבה? אפשר אותה בצד?",
+        "sourceEn": "amba",
+        "sourceHe": "עמבה"
+      }
+    ],
+    [
+      "garlic sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the garlic sauce?",
+        "questionHe": "יש סוכר ברוטב השום?",
+        "sourceEn": "garlic sauce",
+        "sourceHe": "רוטב שום"
+      }
+    ],
+    [
+      "dressing of the day",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in today's dressing?",
+        "questionHe": "יש סוכר או דבש ברוטב של היום?",
+        "sourceEn": "dressing of the day",
+        "sourceHe": "רוטב היום"
+      }
+    ],
+    [
+      "caramelized",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "caramelised",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "peanut sauce",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the peanut sauce? Can it come on the side?",
+        "questionHe": "יש סוכר ברוטב הבוטנים? אפשר אותו בצד?",
+        "sourceEn": "peanut sauce",
+        "sourceHe": "רוטב בוטנים"
+      }
+    ],
+    [
+      "satay",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the peanut sauce? Can it come on the side?",
+        "questionHe": "יש סוכר ברוטב הבוטנים? אפשר אותו בצד?",
+        "sourceEn": "peanut sauce",
+        "sourceHe": "רוטב בוטנים"
+      }
+    ]
+  ],
+  "hiddenCarbTriggersHe": [
+    [
+      "רוטב מיוחד",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the special sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב המיוחד?",
+        "sourceEn": "special sauce",
+        "sourceHe": "רוטב מיוחד"
+      }
+    ],
+    [
+      "רוטב סודי",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the secret sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב הסודי?",
+        "sourceEn": "secret sauce",
+        "sourceHe": "רוטב סודי"
+      }
+    ],
+    [
+      "רוטב השף",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the chef's sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב של השף?",
+        "sourceEn": "chef's sauce",
+        "sourceHe": "רוטב השף"
+      }
+    ],
+    [
+      "מרינדה",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in the marinade?",
+        "questionHe": "יש סוכר או דבש במרינדה?",
+        "sourceEn": "marinade",
+        "sourceHe": "מרינדה"
+      }
+    ],
+    [
+      "מרינדת",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in the marinade?",
+        "questionHe": "יש סוכר או דבש במרינדה?",
+        "sourceEn": "marinade",
+        "sourceHe": "מרינדה"
+      }
+    ],
+    [
+      "מרינדה מתוקה",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Can it be made without the sweet marinade?",
+        "questionHe": "אפשר להכין את המנה בלי המרינדה המתוקה?",
+        "sourceEn": "sweet marinade",
+        "sourceHe": "מרינדה מתוקה"
+      }
+    ],
+    [
+      "זיגוג",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "מזוגג",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "מזוגגת",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "מזוגגים",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "מזוגגות",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "רוטב חום",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the brown sauce thickened with flour? Can it come on the side?",
+        "questionHe": "הרוטב החום מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "brown sauce",
+        "sourceHe": "רוטב חום"
+      }
+    ],
+    [
+      "גרייבי",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the gravy thickened with flour? Can it come on the side?",
+        "questionHe": "הרוטב מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "gravy",
+        "sourceHe": "רוטב גרייבי"
+      }
+    ],
+    [
+      "דמי גלאס",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the demi-glace thickened with flour? Can it come on the side?",
+        "questionHe": "הדמי גלאס מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "demi-glace",
+        "sourceHe": "דמי גלאס"
+      }
+    ],
+    [
+      "בשמל",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Béchamel is made with flour. Can the dish come without it?",
+        "questionHe": "רוטב בשמל עשוי מקמח. אפשר את המנה בלעדיו?",
+        "sourceEn": "béchamel",
+        "sourceHe": "רוטב בשמל"
+      }
+    ],
+    [
+      "חמוץ מתוק",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Sweet and sour sauce has sugar and cornstarch. Can it be left off?",
+        "questionHe": "ברוטב חמוץ־מתוק יש סוכר ועמילן. אפשר בלעדיו?",
+        "sourceEn": "sweet and sour sauce",
+        "sourceHe": "רוטב חמוץ־מתוק"
+      }
+    ],
+    [
+      "קונג פאו",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is the kung pao sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב הקונג פאו סוכר או עמילן?",
+        "sourceEn": "kung pao sauce",
+        "sourceHe": "רוטב קונג פאו"
+      }
+    ],
+    [
+      "גנרל טסו",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is General Tso's sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב גנרל טסו סוכר או עמילן?",
+        "sourceEn": "General Tso's sauce",
+        "sourceHe": "רוטב גנרל טסו"
+      }
+    ],
+    [
+      "רוטב צדפות",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Oyster sauce has sugar and cornstarch. Can it be made without it?",
+        "questionHe": "ברוטב צדפות יש סוכר ועמילן. אפשר להכין בלעדיו?",
+        "sourceEn": "oyster sauce",
+        "sourceHe": "רוטב צדפות"
+      }
+    ],
+    [
+      "רוטב אויסטר",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Oyster sauce has sugar and cornstarch. Can it be made without it?",
+        "questionHe": "ברוטב צדפות יש סוכר ועמילן. אפשר להכין בלעדיו?",
+        "sourceEn": "oyster sauce",
+        "sourceHe": "רוטב צדפות"
+      }
+    ],
+    [
+      "סויה מתוקה",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Sweet soy sauce is mostly sugar. Can it be made with plain soy sauce?",
+        "questionHe": "סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?",
+        "sourceEn": "sweet soy sauce",
+        "sourceHe": "סויה מתוקה"
+      }
+    ],
+    [
+      "סויה מתוק",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Sweet soy sauce is mostly sugar. Can it be made with plain soy sauce?",
+        "questionHe": "סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?",
+        "sourceEn": "sweet soy sauce",
+        "sourceHe": "סויה מתוקה"
+      }
+    ],
+    [
+      "רוטב ווק",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or cornstarch in the wok sauce?",
+        "questionHe": "יש סוכר או עמילן ברוטב הווק?",
+        "sourceEn": "wok sauce",
+        "sourceHe": "רוטב ווק"
+      }
+    ],
+    [
+      "רוטב מתוק",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the sauce sweetened with sugar? Can it be left off?",
+        "questionHe": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
+        "sourceEn": "sweet sauce",
+        "sourceHe": "רוטב מתוק"
+      }
+    ],
+    [
+      "קריספי",
+      {
+        "certainty": "suspected",
+        "concern": "flour",
+        "questionEn": "Is it coated in flour or batter to make it crispy? Can it come without the coating?",
+        "questionHe": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?",
+        "sourceEn": "crispy coating",
+        "sourceHe": "ציפוי קריספי"
+      }
+    ],
+    [
+      "קריספית",
+      {
+        "certainty": "suspected",
+        "concern": "flour",
+        "questionEn": "Is it coated in flour or batter to make it crispy? Can it come without the coating?",
+        "questionHe": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?",
+        "sourceEn": "crispy coating",
+        "sourceHe": "ציפוי קריספי"
+      }
+    ],
+    [
+      "קריספיים",
+      {
+        "certainty": "suspected",
+        "concern": "flour",
+        "questionEn": "Is it coated in flour or batter to make it crispy? Can it come without the coating?",
+        "questionHe": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?",
+        "sourceEn": "crispy coating",
+        "sourceHe": "ציפוי קריספי"
+      }
+    ],
+    [
+      "ראב",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the spice rub?",
+        "questionHe": "יש סוכר בתערובת התבלינים (הראב)?",
+        "sourceEn": "spice rub",
+        "sourceHe": "ראב תבלינים"
+      }
+    ],
+    [
+      "עמבה",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the amba? Can it come on the side?",
+        "questionHe": "יש סוכר בעמבה? אפשר אותה בצד?",
+        "sourceEn": "amba",
+        "sourceHe": "עמבה"
+      }
+    ],
+    [
+      "רוטב שום",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the garlic sauce?",
+        "questionHe": "יש סוכר ברוטב השום?",
+        "sourceEn": "garlic sauce",
+        "sourceHe": "רוטב שום"
+      }
+    ],
+    [
+      "רוטב היום",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in today's dressing?",
+        "questionHe": "יש סוכר או דבש ברוטב של היום?",
+        "sourceEn": "dressing of the day",
+        "sourceHe": "רוטב היום"
+      }
+    ],
+    [
+      "רוטב של היום",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in today's dressing?",
+        "questionHe": "יש סוכר או דבש ברוטב של היום?",
+        "sourceEn": "dressing of the day",
+        "sourceHe": "רוטב היום"
+      }
+    ],
+    [
+      "מקורמל",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "מקורמלת",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "מקורמלים",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "מקורמלות",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "רוטב בוטנים",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the peanut sauce? Can it come on the side?",
+        "questionHe": "יש סוכר ברוטב הבוטנים? אפשר אותו בצד?",
+        "sourceEn": "peanut sauce",
+        "sourceHe": "רוטב בוטנים"
+      }
+    ],
+    [
+      "סאטה",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the peanut sauce? Can it come on the side?",
+        "questionHe": "יש סוכר ברוטב הבוטנים? אפשר אותו בצד?",
+        "sourceEn": "peanut sauce",
+        "sourceHe": "רוטב בוטנים"
+      }
+    ]
+  ],
   "ketoQualifierGuardsEn": {
     "ale": {
       "after": [
@@ -4788,6 +5895,8 @@
     "dietaryRuleWhyHe": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן.",
     "greenWhyEn": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed.",
     "greenWhyHe": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא.",
+    "hiddenCarbWhyEn": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering.",
+    "hiddenCarbWhyHe": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה.",
     "optionBaseModificationEn": "Among the options, skip the {base} and choose a salad or vegetables instead.",
     "optionBaseModificationHe": "מבין האפשרויות, בלי {base} — בחרו סלט או ירקות במקום.",
     "redWhyEn": "Built on {base}, which cannot be made keto.",

@@ -41,6 +41,13 @@ Behaviour the port keeps from Dart:
   (stable) up to 33 elements and a dual-pivot quicksort beyond. No dish in
   the golden corpus produces more than 33 occurrences; a dish that did, with
   two occurrences at one offset, could order its sentences differently.
+* **Hidden carbs** (issue #213 on the rules path): :func:`match` and
+  :func:`match_dish` also return the dish's hidden-carb flags, from the
+  ``hiddenCarbTriggers*`` tables, in the language of the text. The words
+  either side of a trigger are read as the guards read them, with
+  ``hiddenCarbWindowWords`` words for the guard phrases and the covering
+  sweeteners; the occurrences are sorted by ``(start, -end)``, a total
+  order, so the sort's stability never matters there.
 * ``mentions_*`` normalise their argument, even when a caller passes text
   that is already normalised: :func:`app.keto.normaliser.normalise` is not
   idempotent (``Ÿ``), and Dart normalises twice on those paths too.
@@ -54,7 +61,15 @@ from typing import Final, Literal, cast
 
 from app.keto.allergens import AllergenHit, allergens, find, find_with, match_text
 from app.keto.dart_text import DART_WHITESPACE, utf16_len, utf16_slice
-from app.keto.models import Certainty, Concern, ConcernSource, Dish, RestrictionIdName
+from app.keto.models import (
+    Certainty,
+    Concern,
+    ConcernSource,
+    Dish,
+    HiddenCarb,
+    HiddenCarbCertainty,
+    RestrictionIdName,
+)
 from app.keto.normaliser import (
     contains_hebrew,
     dish_core_text,
@@ -64,7 +79,7 @@ from app.keto.normaliser import (
     normalise,
 )
 from app.keto.patterns import hebrew_trigger_pattern, latin_trigger_pattern
-from app.keto.vocabulary import GuardWords, vocabulary
+from app.keto.vocabulary import GuardWords, HiddenCarbTrigger, vocabulary
 
 RuleKind = Literal["green", "yellow", "red"]
 """The verdict colour a :class:`RuleMatch` implies."""
@@ -97,16 +112,38 @@ class _Occurrence:
 
 
 @dataclass(frozen=True, slots=True)
+class _CompiledHidden:
+    """A compiled hidden-carb trigger: its key (for its per-trigger guard),
+    its pattern and its flag (issue #213 on the rules path)."""
+
+    key: str
+    pattern: re.Pattern[str]
+    flag: HiddenCarbTrigger
+
+
+@dataclass(frozen=True, slots=True)
+class _HiddenOccurrence:
+    """One unguarded hidden-carb occurrence. ``end`` is exclusive."""
+
+    start: int
+    end: int
+    flag: HiddenCarbTrigger
+
+
+@dataclass(frozen=True, slots=True)
 class RuleMatch:
     """Dart ``RuleMatch``: what the vocabulary found in one dish's text.
 
     ``base_label`` is set exactly when ``is_non_keto`` is true, and
-    ``instructions`` is empty then.
+    ``instructions`` and ``hidden_carbs`` are empty then. ``hidden_carbs``
+    never adds to ``instructions`` (so ``kind`` ignores it): the heuristic
+    decides what a flag does to the verdict (§9.4 rule 5a).
     """
 
     is_non_keto: bool
     instructions: tuple[str, ...] = ()
     base_label: str | None = None
+    hidden_carbs: tuple[HiddenCarb, ...] = ()
 
     @property
     def kind(self) -> RuleKind:
@@ -206,6 +243,51 @@ def _filling_protein() -> tuple[tuple[_Compiled, ...], tuple[_Compiled, ...]]:
         _latin(vocab.filling_protein_triggers_en),
         _hebrew(vocab.filling_protein_triggers_he, honour_no_prefix=False),
     )
+
+
+@cache
+def _hidden_en() -> tuple[_CompiledHidden, ...]:
+    """The English hidden-carb triggers, normalised at compile time."""
+    return tuple(
+        _CompiledHidden(key, latin_trigger_pattern(normalise(key)), flag)
+        for key, flag in vocabulary().hidden_carb_triggers_en
+    )
+
+
+@cache
+def _hidden_he() -> tuple[_CompiledHidden, ...]:
+    """The Hebrew hidden-carb triggers, every one with the permissive
+    prefix."""
+    return tuple(
+        _CompiledHidden(key, hebrew_trigger_pattern(normalise(key)), flag)
+        for key, flag in vocabulary().hidden_carb_triggers_he
+    )
+
+
+@cache
+def _hidden_guard_phrases(concern: str) -> tuple[str, ...]:
+    """Dart ``_hiddenGuardPhrasesFor``: the guard phrases, both languages,
+    that answer a flag of ``concern``. Only membership matters, so the
+    golden's sorted key order is harmless."""
+    vocab = vocabulary()
+    phrases: list[str] = []
+    for table in (
+        vocab.hidden_carb_guard_phrases_en,
+        vocab.hidden_carb_guard_phrases_he,
+    ):
+        for answers, words in table.items():
+            if (
+                answers == "any"
+                or (answers == "sugar" and concern != "flour")
+                or (answers == "flour" and concern != "sugar")
+            ):
+                phrases.extend(words)
+    return tuple(phrases)
+
+
+@cache
+def _covering_modifiers() -> frozenset[str]:
+    return frozenset(vocabulary().hidden_carb_covering_modifiers)
 
 
 @cache
@@ -374,6 +456,123 @@ def _sentences_after_suppression(occurrences: Sequence[_Occurrence]) -> list[str
     return list(sentences)
 
 
+def _unsuppressed(occurrences: Sequence[_Occurrence]) -> list[_Occurrence]:
+    """Dart ``_unsuppressed``: the occurrences ``triggerSuppresses`` leaves
+    standing, in their order."""
+    suppresses = vocabulary().trigger_suppresses
+    suppressed: set[str] = set()
+    for occurrence in occurrences:
+        suppressed.update(suppresses.get(occurrence.key, ()))
+    return [
+        occurrence for occurrence in occurrences if occurrence.key not in suppressed
+    ]
+
+
+@dataclass(frozen=True, slots=True)
+class _Window:
+    """Dart ``_window``: up to ``count`` words either side of a match, and
+    the offsets where that window starts and ends."""
+
+    before: list[str]
+    after: list[str]
+    start: int
+    end: int
+
+
+def _window(haystack: str, start: int, end: int, count: int) -> _Window:
+    """The words around ``haystack[start:end]``, read as ``_is_guarded``
+    reads them. Offsets are code points throughout, which keeps every
+    comparison Dart's UTF-16 offsets make (one string, order only)."""
+    before: list[str] = []
+    window_start = start
+    before_text = haystack[:start].rstrip(_DART_WHITESPACE_CHARS)
+    if before_text:
+        before = before_text.split(" ")[-count:]
+        window_start = len(before_text) - len(" ".join(before))
+    after: list[str] = []
+    window_end = end
+    rest = haystack[end:]
+    after_text = rest.lstrip(_DART_WHITESPACE_CHARS)
+    if after_text:
+        after = after_text.split(" ")[:count]
+        window_end = end + len(rest) - len(after_text) + len(" ".join(after))
+    return _Window(before, after, window_start, window_end)
+
+
+def _hidden_carbs_in(
+    haystack: str, *, modifiers: Sequence[_Occurrence], hebrew: bool
+) -> tuple[HiddenCarb, ...]:
+    """Dart ``_hiddenCarbsIn`` (issue #213 on the rules path, §9.4 rule 5a).
+
+    Guards (per trigger, D-V1 window; guard phrases answering the flag's
+    concern, ``hiddenCarbWindowWords`` either side) drop a trigger; of
+    overlapping triggers the earliest, at one start the longest, is kept; a
+    trigger a carb modifier overlaps, or a ``sugar`` one a covering
+    sweetener sits in the window of, is covered; one flag per source; at
+    most ``maxHiddenCarbsPerDish``, in text order.
+    """
+    vocab = vocabulary()
+    count = vocab.caps.hidden_carb_window_words
+    found: list[_HiddenOccurrence] = []
+    for table, guards in (
+        (_hidden_en(), vocab.hidden_carb_trigger_guards_en),
+        (_hidden_he(), vocab.hidden_carb_trigger_guards_he),
+    ):
+        for entry in table:
+            for hit in entry.pattern.finditer(haystack):
+                if _is_guarded(haystack, hit.start(), hit.end(), guards.get(entry.key)):
+                    continue
+                window = _window(haystack, hit.start(), hit.end(), count)
+                phrases = _hidden_guard_phrases(entry.flag.concern)
+                if _window_contains_any_phrase(
+                    window.before, phrases
+                ) or _window_contains_any_phrase(window.after, phrases):
+                    continue
+                found.append(_HiddenOccurrence(hit.start(), hit.end(), entry.flag))
+    found.sort(key=lambda occurrence: (occurrence.start, -occurrence.end))
+
+    kept: list[_HiddenOccurrence] = []
+    for occurrence in found:
+        if not any(
+            occurrence.start < other.end and other.start < occurrence.end
+            for other in kept
+        ):
+            kept.append(occurrence)
+
+    covering = _covering_modifiers()
+    flags: list[HiddenCarb] = []
+    sources: set[str] = set()
+    for occurrence in kept:
+        if len(flags) >= vocab.caps.max_hidden_carbs_per_dish:
+            break
+        flag = occurrence.flag
+        window = _window(haystack, occurrence.start, occurrence.end, count)
+        covered = any(
+            (modifier.start < occurrence.end and occurrence.start < modifier.end)
+            or (
+                flag.concern == "sugar"
+                and modifier.key in covering
+                and modifier.start < window.end
+                and window.start < modifier.end
+            )
+            for modifier in modifiers
+        )
+        if covered:
+            continue
+        source = flag.source_he if hebrew else flag.source_en
+        if source in sources:
+            continue
+        sources.add(source)
+        flags.append(
+            HiddenCarb(
+                source=source,
+                certainty=cast(HiddenCarbCertainty, flag.certainty),
+                waiter_question=flag.question_he if hebrew else flag.question_en,
+            )
+        )
+    return tuple(flags)
+
+
 # --- public API -----------------------------------------------------------------
 
 
@@ -391,6 +590,11 @@ def match(raw_text: str) -> RuleMatch:
     return RuleMatch(
         is_non_keto=False,
         instructions=tuple(_sentences_after_suppression(occurrences)),
+        hidden_carbs=_hidden_carbs_in(
+            haystack,
+            modifiers=_unsuppressed(occurrences),
+            hebrew=contains_hebrew(raw_text),
+        ),
     )
 
 
@@ -404,6 +608,9 @@ def match_dish(dish: Dish) -> RuleMatch:
     3. Carb modifiers are read from the rules text (options included,
        removals dropped). A non-keto base offered only as an option makes
        the dish yellow with ``optionBaseModification`` first.
+
+    A dish that is not red also carries its hidden-carb flags (issue #213),
+    read from the same rules text and written in its language.
     """
     carb_only = carb_only_base(dish.name)
     if carb_only is not None and not describes_filling(dish):
@@ -414,8 +621,13 @@ def match_dish(dish: Dish) -> RuleMatch:
     if base is not None:
         return RuleMatch(is_non_keto=True, base_label=base[1])
 
-    sentences = _sentences_after_suppression(
-        _unguarded_modifier_occurrences(dish_rules_text(dish), name=name)
+    rules_text = dish_rules_text(dish)
+    occurrences = _unguarded_modifier_occurrences(rules_text, name=name)
+    sentences = _sentences_after_suppression(occurrences)
+    hidden_carbs = _hidden_carbs_in(
+        rules_text,
+        modifiers=_unsuppressed(occurrences),
+        hebrew=contains_hebrew(rules_text),
     )
     option_base = _first_unguarded_base_match(dish_option_rules_text(dish), name=name)
     if option_base is not None:
@@ -429,8 +641,11 @@ def match_dish(dish: Dish) -> RuleMatch:
         return RuleMatch(
             is_non_keto=False,
             instructions=(template.replace("{base}", label), *sentences),
+            hidden_carbs=hidden_carbs,
         )
-    return RuleMatch(is_non_keto=False, instructions=tuple(sentences))
+    return RuleMatch(
+        is_non_keto=False, instructions=tuple(sentences), hidden_carbs=hidden_carbs
+    )
 
 
 def describes_filling(dish: Dish) -> bool:
