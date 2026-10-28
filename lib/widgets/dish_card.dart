@@ -18,6 +18,7 @@ import 'package:ketoclub/utils/price_format.dart';
 import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/focus_ring.dart';
+import 'package:ketoclub/widgets/hidden_carb_certainty.dart';
 import 'package:ketoclub/widgets/kitchen_notice.dart';
 import 'package:ketoclub/widgets/net_carbs_chip.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
@@ -1092,37 +1093,59 @@ class _HiddenCarbsRow extends StatelessWidget {
         ...hiddenCarbs.map(
           (flag) => Padding(
             padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.warning_amber_rounded, size: 14, color: tone.ink),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        flag.source,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: tone.ink,
+            // One phrase for a screen reader: the certainty qualifies the
+            // source, so the two are never read apart.
+            child: Semantics(
+              container: true,
+              label: hiddenCarbSemanticLabel(l10n, flag),
+              excludeSemantics: true,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.warning_amber_rounded, size: 14, color: tone.ink),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // The source stays in the menu's language; the
+                        // certainty label beside it follows the UI's.
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 6,
+                          children: [
+                            Text(
+                              flag.source,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: tone.ink,
+                              ),
+                            ),
+                            Text(
+                              hiddenCarbCertaintyLabel(l10n, flag.certainty),
+                              key: const ValueKey('hiddenCarbCertainty'),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        flag.waiterQuestion,
-                        textDirection: contentDirection(
+                        const SizedBox(height: 2),
+                        Text(
                           flag.waiterQuestion,
-                          ambient,
+                          textDirection: contentDirection(
+                            flag.waiterQuestion,
+                            ambient,
+                          ),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: tone.ink,
+                          ),
                         ),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: tone.ink,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

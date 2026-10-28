@@ -895,6 +895,109 @@ void main() {
         expect(find.text('פחמימות נסתרות אפשריות'), findsOneWidget);
       });
 
+      const likelyFlag = HiddenCarb(
+        source: 'teriyaki glaze',
+        certainty: HiddenCarbCertainty.likely,
+        waiterQuestion: 'Is there honey in the glaze?',
+      );
+
+      testWidgets('each flag shows its certainty as a label beside the '
+          'source — English, LTR', (tester) async {
+        // Arrange
+        final row = yellowWithFlag([flag, likelyFlag]);
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+        );
+
+        // Act
+        await tester.tap(find.text('Ask your waiter'));
+        await tester.pump();
+
+        // Assert
+        expect(find.text('Suspected'), findsOneWidget);
+        expect(find.text('Likely'), findsOneWidget);
+        final source = tester.getTopLeft(find.text('house dressing'));
+        final label = tester.getTopLeft(find.text('Suspected'));
+        expect(label.dx, greaterThan(source.dx));
+        expect(label.dy, closeTo(source.dy, 8));
+      });
+
+      testWidgets('each flag shows its certainty in Hebrew while the source '
+          "and question keep the menu's language — RTL", (tester) async {
+        // Arrange
+        final row = yellowWithFlag([flag, likelyFlag]);
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+          locale: const Locale('he'),
+        );
+
+        // Act
+        await tester.tap(find.text('שאלו את המלצר'));
+        await tester.pump();
+
+        // Assert
+        expect(find.text('חשד'), findsOneWidget);
+        expect(find.text('סביר'), findsOneWidget);
+        expect(find.text('Suspected'), findsNothing);
+        expect(find.text('house dressing'), findsOneWidget);
+        expect(find.text('Is the dressing sugar-free?'), findsOneWidget);
+        // RTL: the label sits to the left of the source it qualifies.
+        final source = tester.getTopLeft(find.text('house dressing'));
+        final label = tester.getTopLeft(find.text('חשד'));
+        expect(label.dx, lessThan(source.dx));
+      });
+
+      testWidgets('a flag reads source, certainty and question as one '
+          'semantics label', (tester) async {
+        // Arrange
+        final handle = tester.ensureSemantics();
+        final row = yellowWithFlag([flag]);
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+        );
+
+        // Act
+        await tester.tap(find.text('Ask your waiter'));
+        await tester.pump();
+
+        // Assert
+        expect(
+          find.bySemanticsLabel(
+            'house dressing, Suspected. Is the dressing sugar-free?',
+          ),
+          findsOneWidget,
+        );
+        handle.dispose();
+      });
+
+      testWidgets("a flag's semantics label names the certainty in "
+          'Hebrew', (tester) async {
+        // Arrange
+        final handle = tester.ensureSemantics();
+        final row = yellowWithFlag([likelyFlag]);
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+          locale: const Locale('he'),
+        );
+
+        // Act
+        await tester.tap(find.text('שאלו את המלצר'));
+        await tester.pump();
+
+        // Assert
+        expect(
+          find.bySemanticsLabel(
+            'teriyaki glaze, סביר. Is there honey in the glaze?',
+          ),
+          findsOneWidget,
+        );
+        handle.dispose();
+      });
+
       testWidgets(
         'hidden-carb section is not shown when the disclosure is collapsed',
         (tester) async {

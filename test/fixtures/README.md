@@ -153,6 +153,24 @@ the first"; one fixture per replaced rule (`nameless_element`,
 through `parseScanned` unchanged, so the two parsers are held to the same
 files. No vision reply has been recorded yet (#88).
 
+### Recorded replies (`llm/smoke_*.json`)
+
+The opposite of the above: **real**, redacted replies from the #165 smoke test
+(2026-09-28, `architecture.md` §17.1), each a wrapper `{content, model}` whose
+`content` is the reply text exactly as the model sent it. They predate issue
+#213, so a dish has six properties and no `hidden_carbs`.
+`recorded_gemini_replay_test.dart` replays both through `MenuResponseParser.parse`.
+
+- `smoke_10_dish_hebrew.json` answered ten dishes of `wolt_hamosad_menu.json`
+  and returned nine. Its `id` values are the first sixteen characters of the
+  menu's 24-character ids, so the parser places every dish by name, and its
+  first dish is named "ספיישל סמאשבורגר 🌟" where the 2026-09-25 recording says
+  "סמאשבורגר" (the live menu changed in between). The test rebuilds the menu
+  from the recording, using the reply's printed name for that one dish.
+- `smoke_20_dish_english.json` answered a menu that was **not** recorded. The
+  test rebuilds it from the reply's own ids (`e01`–`e20`) and names, so for
+  that file the provenance checks are a round trip, not an independent proof.
+
 ## Restaurant websites (`website/*.html`)
 
 **Synthetic**, hand-written for issue #181 (`architecture.md` D19); each says so
