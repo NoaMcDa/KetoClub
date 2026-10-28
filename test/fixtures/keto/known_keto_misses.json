@@ -21,18 +21,11 @@
     "reason": "label question: Moroccan mint tea is tea; whether \"מוגש מתוק\" (served sweet) reddens it or yellows it with an ask for no sugar is the owner's call"
   },
   {
-    "menu": "il_seafood_grill",
-    "dish": "d2",
-    "expected": "modifiable",
-    "got": "orderAsIs",
-    "reason": "normaliser: the maqaf in \"סויה־דבש\" is deleted, not spaced (סויהדבש), so the honey trigger never sees דבש; a normaliser fix, outside this vocabulary pass"
-  },
-  {
     "menu": "il_sushi_bar",
     "dish": "d15",
     "expected": "modifiable",
     "got": "orderAsIs",
-    "reason": "hidden carb: the sugar is in a ready-made wakame salad and its sesame dressing, not named; the hidden-carb lane (claude/rules-hidden-carbs)"
+    "reason": "hidden carb: the sugar is in a ready-made wakame salad and its sesame dressing, which the menu never names; no rules trigger can see it without flagging every salad"
   },
   {
     "menu": "il_sushi_bar",

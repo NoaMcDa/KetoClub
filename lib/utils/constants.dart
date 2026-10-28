@@ -1100,6 +1100,7 @@ const Map<String, HiddenCarbTrigger> hiddenCarbTriggersHe =
       'מרינדת': _hcMarinade,
       'מרינדה מתוקה': _hcSweetMarinade,
       'זיגוג': _hcGlaze,
+      'גלייז': _hcGlaze,
       'מזוגג': _hcGlaze,
       'מזוגגת': _hcGlaze,
       'מזוגגים': _hcGlaze,

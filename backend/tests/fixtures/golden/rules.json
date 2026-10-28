@@ -86679,6 +86679,136 @@
         "isNonKeto": false,
         "kind": "green"
       },
+      "text": "גלייז"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "זיגוג",
+            "waiterQuestion": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם גלייז להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "זיגוג",
+            "waiterQuestion": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם בגלייז להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "זיגוג",
+            "waiterQuestion": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם והגלייז להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם גלייזי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם גלייז ללא תוספת סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "זיגוג",
+            "waiterQuestion": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא קמח גלייז להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [],
+        "instructions": [
+          "אפשר בבקשה להכין את המנה בלי דבש?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "סלמון על הגריל עם גלייז בדבש להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "זיגוג",
+            "waiterQuestion": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?"
+          }
+        ],
+        "instructions": [
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "סלמון על הגריל עם גלייז וצ'יפס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "hiddenCarbs": [
+          {
+            "certainty": "likely",
+            "source": "זיגוג",
+            "waiterQuestion": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?"
+          }
+        ],
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
       "text": "מזוגג"
     },
     {

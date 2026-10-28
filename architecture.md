@@ -4798,8 +4798,65 @@ verified: no confirmation has been uploaded to a running backend.
 
 ### D28 — A keto measuring corpus, and hidden carbs on the rules path
 
-*(In progress: this entry is being written and the coordinator fills it when
-the round lands.)*
+*(Round 12, 2026-10-28. Builds on #213's hidden carbs; amends §9.4 with
+rule 5a on the rules path and the short prompt ids.)*
+
+**What changed.** Until now every keto fixture was a snapshot of the
+engine's own output, so nothing could say whether a verdict was right.
+Four decisions:
+
+1. **A labelled corpus is the measuring stick.**
+   `test/fixtures/keto/menus/` holds 24 Israeli menus, 456 dishes and 441 of
+   them in Hebrew. Each dish has an `expected` verdict, an optional
+   `acceptable` set of other verdicts a careful keto reader could give, its
+   expected hidden-carb flags, a one-line `why` and the words that decide it
+   (`SCHEMA.md`, `README.md`). The labels are unreviewed desk work: no
+   dietitian has read them, and every figure is a question for the labels as
+   much as for the engine.
+2. **The headline is the false-green rate, and only it gates.** A false
+   green is a dish labelled yellow or red that the engine calls green; it is
+   counted only when `acceptable` does not include green. It is the one
+   error that costs a keto diner a meal. The Dart gate
+   (`keto_corpus_gate_test.dart`, scored by `keto_scoring.dart`) and its
+   Python twin (`backend/tests/test_keto_corpus_gate.py`) replay the rules
+   engine over the corpus. They fail on any false green missing from the
+   shrink-only `known_keto_misses.json`, and on any entry that is no longer
+   a false green. Every entry carries a reason. Accuracy, false reds,
+   unplaced dishes and hidden-carb recall and precision are printed but do
+   not gate. Hidden-carb flags are matched on the label's `term` (the menu's
+   own Hebrew word) first, and on `source` only as a fallback. Lane V's
+   vocabulary fixes and the rules-path flags took the rules engine from 52
+   false greens out of 343 to 6 out of 343. The 6 left are label questions
+   (kombucha, Moroccan mint tea, sake, cashew cheese), one hidden carb the
+   menu never names (a ready-made wakame salad) and one that needs the model
+   (a fried fish's implied flour). The maqaf normaliser bug (#275) is still
+   open: `סויה־דבש` reads as one word, so its honey is missed, and the dish
+   is caught only because its glaze is flagged.
+3. **The rule engine raises hidden-carb flags too** (§9.4, "Rule 5a on the
+   rules path"). A rules result is no longer a model result with the flags
+   quietly missing. A trigger never doubles a carb modifier: where a
+   modifier already asks about the sauce ("sweet and sour", amba), the flag
+   is not added.
+4. **The model gets short dish ids** (§9.4). The prompt now writes 1, 2, …
+   in place of the platform's ids, and the parser maps them back through
+   `promptIds`. A recorded real reply had cut 24-character Wolt ids down to
+   16-character prefixes, which made every such dish an invention. The
+   platform id is still accepted, and the #277 name fallback after it. Ids
+   restart in each batch (#188). The system prompt is unchanged, so the keto
+   baseline is too. The chat-completion cache misses once per menu, and the
+   analysis cache is untouched. The menu-question path (§9.5) still sends
+   platform ids.
+
+**The model side is built and not yet run.** `backend/tools/keto_eval.py`
+scores rules, model and merged results over the same corpus. The merged
+result keeps the model's verdict but never upgrades a rules yellow or red
+to green, and it unions the hidden-carb flags. The tool writes
+`docs/KETO_EVAL.md` and, with `--record`, a redacted reply per menu under
+`test/fixtures/llm/keto_eval/`. It needs `GEMINI_API_KEY` in the
+environment, and no model figure exists until a person runs it.
+`recorded_gemini_replay_test.dart` replays the two #165 smoke replies
+through the parser. No `schemaVersion` bump, C3: the rules-path flags use
+the existing `hiddenCarbs` field.
 
 ---
 

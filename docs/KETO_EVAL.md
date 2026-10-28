@@ -1,6 +1,6 @@
 # Keto evaluation: the last result
 
-**Status: not yet run.** No person has run the model evaluation, so this page holds no model figure. The rules-only tables under "Last result" were made 2026-10-28 from `test/fixtures/keto/menus` with `--rules-only`, using the corpus as it stands on `claude/keto-corpus-il` at `975f435` (PR #434); the rules have no hidden-carb flags yet, so their hidden-carb recall is 0 by construction.
+**Status: not yet run.** No person has run the model evaluation, so this page holds no model figure. The rules-only tables under "Last result" were made 2026-10-28 from `test/fixtures/keto/menus` with `--rules-only`.
 
 ## What is measured
 
@@ -87,7 +87,7 @@ run's date, the configured `GEMINI_MODEL`, the commit, and the tables.
 
 ## Last result
 
-Run: 2026-10-28 17:48 UTC. Commit: `b7ca801`. Corpus: `test/fixtures/keto/menus` (24 menus, 456 dishes). Model: **not yet run** (rules only). Net-carb limit: 6 g, keto only.
+Run: 2026-10-28 19:40 UTC. Commit: `6cd4060`. Corpus: `test/fixtures/keto/menus` (24 menus, 456 dishes). Model: **not yet run** (rules only). Net-carb limit: 6 g, keto only.
 
 The labels are **unreviewed**: no dietitian has read them, so every figure here is a question for the labels as much as for the engine.
 
@@ -95,74 +95,28 @@ The labels are **unreviewed**: no dietitian has read them, so every figure here 
 
 | Source | Dishes | Accuracy | **False green** | False red | Unclassified | Hidden-carb recall | Hidden-carb precision |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Rules | 456 | 349/456 (76.5%) | **52/343 (15.2%)** | 5/232 (2.2%) | 0 | 0/137 (0.0%) | 0/0 (-) |
+| Rules | 456 | 400/456 (87.7%) | **6/343 (1.7%)** | 5/232 (2.2%) | 0 | 5/137 (3.6%) | 5/12 (41.7%) |
 
 ### Per language
 
 | Slice | Dishes | Accuracy | **False green** | False red | Unclassified | Hidden-carb recall | Hidden-carb precision |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| he: Rules | 441 | 341/441 (77.3%) | **48/331 (14.5%)** | 4/225 (1.8%) | 0 | 0/134 (0.0%) | 0/0 (-) |
-| mixed: Rules | 15 | 8/15 (53.3%) | **4/12 (33.3%)** | 1/7 (14.3%) | 0 | 0/3 (0.0%) | 0/0 (-) |
+| he: Rules | 441 | 388/441 (88.0%) | **6/331 (1.8%)** | 4/225 (1.8%) | 0 | 5/134 (3.7%) | 5/12 (41.7%) |
+| mixed: Rules | 15 | 12/15 (80.0%) | **0/12 (0.0%)** | 1/7 (14.3%) | 0 | 0/3 (0.0%) | 0/0 (-) |
 
 ### Hidden carbs
 
 | Source | Labelled | Found | Recall (likely) | Recall (suspected) | Flagged | Matched a label | Precision |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Rules | 137 | 0 | 0/81 (0.0%) | 0/56 (0.0%) | 0 | 0 | - |
+| Rules | 137 | 5 | 5/81 (6.2%) | 0/56 (0.0%) | 12 | 5 | 41.7% |
 
 ### False greens
 
 | Menu | Dish | Expected | Rules |
 |---|---|---|---|
 | golden_hebrew | דג מטוגן | modifiable | orderAsIs |
-| il_asian_wok | עוף חמוץ מתוק | nonKeto | orderAsIs |
-| il_asian_wok | עוף קונג פאו | modifiable | orderAsIs |
-| il_cafe_pastries | סלט וולדורף | modifiable | orderAsIs |
-| il_cafe_pastries | שוקו חם | nonKeto | orderAsIs |
-| il_cafe_pastries | חטיף במבה במילוי נוגט | nonKeto | orderAsIs |
-| il_dairy_cafe | קיש פטריות | nonKeto | orderAsIs |
-| il_dairy_cafe | מרק בצל | nonKeto | orderAsIs |
-| il_ethiopian | דורו וואט | modifiable | orderAsIs |
-| il_ethiopian | קיי וואט | modifiable | orderAsIs |
-| il_ethiopian | פיר פיר | nonKeto | orderAsIs |
-| il_fine_dining | Passion fruit sorbet | nonKeto | orderAsIs |
-| il_fine_dining | Chocolate mousse | nonKeto | orderAsIs |
-| il_fine_dining | Petits fours | nonKeto | orderAsIs |
-| il_fine_dining | Sauternes | nonKeto | orderAsIs |
-| il_georgian_khachapuri | חצ׳פורי אג׳ארולי | nonKeto | orderAsIs |
-| il_georgian_khachapuri | חצ׳פורי אימרולי | nonKeto | orderAsIs |
-| il_georgian_khachapuri | חצ׳פורי מגרולי | nonKeto | orderAsIs |
-| il_georgian_khachapuri | חינקלי (5 יח׳) | nonKeto | orderAsIs |
-| il_hummus_falafel | פלאפל במנה | nonKeto | orderAsIs |
-| il_iraqi | עמבה ביתית | nonKeto | orderAsIs |
-| il_juice_bar | סמוזי פירות יער | nonKeto | orderAsIs |
-| il_juice_bar | קפה ברד | nonKeto | orderAsIs |
 | il_juice_bar | קומבוצ׳ה | nonKeto | orderAsIs |
-| il_mizrahi_home | תבשיל שעועית לבנה | nonKeto | orderAsIs |
-| il_moroccan | ספינג׳ | nonKeto | orderAsIs |
 | il_moroccan | תה נענע מרוקאי | nonKeto | orderAsIs |
-| il_pizza_pasta | פנה פסטו | nonKeto | orderAsIs |
-| il_pizza_pasta | פוקאצ׳ה שום | nonKeto | orderAsIs |
-| il_pizza_pasta | גלידת וניל | nonKeto | orderAsIs |
-| il_russian_deli | פלמני | nonKeto | orderAsIs |
-| il_russian_deli | בלינצ׳יקי בשר | nonKeto | orderAsIs |
-| il_russian_deli | הרינג בשמנת | modifiable | orderAsIs |
-| il_salad_bar | סלט חלומי | modifiable | orderAsIs |
-| il_salad_bar | סלט אסייתי | modifiable | orderAsIs |
-| il_salad_bar | סלט אבטיח ופטה | nonKeto | orderAsIs |
-| il_salad_bar | רוטב בלסמי מצומצם | nonKeto | orderAsIs |
-| il_salad_bar | מים בטעם אפרסק | nonKeto | orderAsIs |
-| il_seafood_grill | פילה סלמון בגלייז | modifiable | orderAsIs |
-| il_seafood_grill | גפילטע פיש | nonKeto | orderAsIs |
-| il_seafood_grill | קלמרי מטוגן | nonKeto | orderAsIs |
-| il_seed_grill | כנפיים במרינדה מתוקה | modifiable | orderAsIs |
 | il_sushi_bar | סלט וואקמה | modifiable | orderAsIs |
 | il_sushi_bar | סאקה חם | nonKeto | orderAsIs |
 | il_vegan_place | גבינת קשיו | modifiable | orderAsIs |
-| il_vegan_place | שייק שקדים בננה | nonKeto | orderAsIs |
-| il_vegan_place | סמוזי ירוק | nonKeto | orderAsIs |
-| il_yemenite_bakery | קובנה בחמאה | nonKeto | orderAsIs |
-| il_yemenite_bakery | פירות יבשים | nonKeto | orderAsIs |
-| wolt_hamosad | כנפיים \| 8 יח׳ | modifiable | orderAsIs |
-| wolt_hamosad | סאן מיגל | nonKeto | orderAsIs |
-| wolt_hamosad | פרסקה סאן מיגל | nonKeto | orderAsIs |

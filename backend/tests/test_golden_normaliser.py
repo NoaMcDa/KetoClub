@@ -76,7 +76,7 @@ def test_the_corpus_is_the_size_the_exporter_wrote() -> None:
     # The edge cases, the twelve quote marks, all of U+00A0–U+00FF and the
     # vocabulary (with the hidden-carb tables, #213): a truncated file would
     # replay "green" with fewer cases.
-    assert len(_ENTRIES) == 1591
+    assert len(_ENTRIES) == 1593
     assert len({entry["in"] for entry in _ENTRIES}) == len(_ENTRIES)
 
 

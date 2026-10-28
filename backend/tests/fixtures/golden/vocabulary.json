@@ -2537,6 +2537,17 @@
       }
     ],
     [
+      "גלייז",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
       "מזוגג",
       {
         "certainty": "likely",

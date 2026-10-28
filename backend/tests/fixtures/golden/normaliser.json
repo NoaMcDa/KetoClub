@@ -18882,6 +18882,18 @@
   },
   {
     "containsHebrew": true,
+    "in": "גלייז",
+    "isRemovalOptionValue": false,
+    "normalised": "גלייז",
+    "words": [
+      "גלייז"
+    ],
+    "wordsMin3": [
+      "גלייז"
+    ]
+  },
+  {
+    "containsHebrew": true,
     "in": "מזוגג",
     "isRemovalOptionValue": false,
     "normalised": "מזוגג",
