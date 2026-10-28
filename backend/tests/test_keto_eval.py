@@ -19,6 +19,7 @@ import pytest
 import respx
 
 from app.config import Settings
+from app.keto import prompt
 from tools import keto_eval as ev
 
 FIXTURE = Path(__file__).parent / "fixtures" / "keto_eval" / "menus"
@@ -253,6 +254,22 @@ def test_model_verdicts_read_the_reply_as_the_parser_does() -> None:
     )
     assert "eval_en_bistro/en-06" not in got  # skipped
     assert len(got) == 4
+
+
+def test_model_verdicts_resolve_the_short_ids_the_prompt_sent() -> None:
+    menu = ev.load_corpus(FIXTURE)[0].to_menu()
+    short = {v: k for k, v in prompt.prompt_ids(menu).items()}
+    got = ev.model_verdicts(
+        _reply(
+            _raw(short["eval_en_bistro/en-01"], "modifiable", modification="No mash."),
+            _raw(short["eval_en_bistro/en-03"], "nonKeto"),
+        ),
+        menu,
+    )
+    assert got == {
+        "eval_en_bistro/en-01": ev.Got("modifiable"),
+        "eval_en_bistro/en-03": ev.Got("nonKeto"),
+    }
 
 
 @pytest.mark.parametrize("reply", ["", "not json", "[]", '{"dishes": 3}'])

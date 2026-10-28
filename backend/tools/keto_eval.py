@@ -359,6 +359,7 @@ def model_verdicts(reply: str, menu: Menu, *, model: str = "model") -> Verdicts 
         engine=LlmEngine.model_construct(model=model),
         net_carb_limit_grams=NET_CARB_LIMIT_GRAMS,
         analysed_at=_ANALYSED_AT,
+        prompt_ids=prompt.prompt_ids(menu),
     )
     if isinstance(parsed, parser.Failed):
         return None
