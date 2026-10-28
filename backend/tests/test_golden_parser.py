@@ -23,6 +23,7 @@ from app.keto.parser import (
     parse,
     parse_scanned,
 )
+from app.keto.prompt import prompt_ids
 
 _GOLDEN = Path(__file__).parent / "fixtures" / "golden" / "parser.json"
 _RAW: dict[str, Any] = json.loads(_GOLDEN.read_text(encoding="utf-8"))
@@ -30,6 +31,7 @@ _TEXT: list[dict[str, Any]] = _RAW["text"]
 _SCANNED: list[dict[str, Any]] = _RAW["scanned"]
 _EXTRACT_TEXT: list[dict[str, Any]] = _RAW["extractText"]
 _EXTRACT_SCANNED: list[dict[str, Any]] = _RAW["extractScanned"]
+_PROMPT_ID_TEXT: list[dict[str, Any]] = _RAW["promptIdText"]
 _ENGINE = LlmEngine(model="golden-model")
 _NOW = "2026-01-01T00:00:00.000Z"
 
@@ -54,6 +56,59 @@ def test_every_golden_text_reply_parses_as_dart_does(entry: dict[str, Any]) -> N
         case Failed(reason=reason):
             actual = {"failed": reason}
     assert _canonical(actual) == _canonical(entry["result"])
+
+
+@pytest.mark.parametrize(
+    "entry", _PROMPT_ID_TEXT, ids=[e["name"] for e in _PROMPT_ID_TEXT]
+)
+def test_every_golden_prompt_id_reply_parses_as_dart_does(
+    entry: dict[str, Any],
+) -> None:
+    assert set(entry) == {
+        "name",
+        "reply",
+        "sourceMenu",
+        "netCarbLimitGrams",
+        "promptIds",
+        "result",
+    }
+    source = Menu.model_validate(entry["sourceMenu"])
+    # The ids the golden parsed through are the ones the server's prompt
+    # sends for this menu.
+    assert prompt_ids(source) == entry["promptIds"]
+    result = parse(
+        entry["reply"],
+        source=source,
+        prompt_ids=entry["promptIds"],
+        engine=_ENGINE,
+        net_carb_limit_grams=entry["netCarbLimitGrams"],
+        analysed_at=_NOW,
+    )
+    match result:
+        case Analysed(analysis=analysis):
+            actual: dict[str, Any] = {"analysed": to_json(analysis)}
+        case Failed(reason=reason):
+            actual = {"failed": reason}
+    assert _canonical(actual) == _canonical(entry["result"])
+
+
+def test_the_prompt_id_corpus_places_two_dishes_of_one_name() -> None:
+    by_name = {entry["name"]: entry for entry in _PROMPT_ID_TEXT}
+    placed = by_name["hand_prompt_ids_place_every_dish"]["result"]["analysed"]
+    assert [d["dishId"] for d in placed["dishes"]] == [
+        "65b0c1f2a3d4e5f60718293a",
+        "65b0c1f2a3d4e5f60718293b",
+        "65b0c1f2a3d4e5f6071829ff",
+        "1",
+    ]
+    assert placed["unclassified"] == []
+    # The recorded reply's shape: prefixes match no id, so the names place
+    # the first dish only and its namesake is lost.
+    prefixes = by_name["hand_prompt_ids_prefixes_fall_to_names"]["result"]
+    assert [d["dishId"] for d in prefixes["analysed"]["dishes"]] == [
+        "65b0c1f2a3d4e5f60718293a",
+        "65b0c1f2a3d4e5f6071829ff",
+    ]
 
 
 @pytest.mark.parametrize("entry", _SCANNED, ids=[e["name"] for e in _SCANNED])

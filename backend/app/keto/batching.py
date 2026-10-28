@@ -36,9 +36,18 @@ dish."""
 
 
 class _Line(NamedTuple):
+    """One dish's prompt line: its category's index, the dish, and the
+    line's length without its prompt id, which is the dish's position in
+    the batch it ends up in (Dart ``_PromptLine``)."""
+
     category: int
     dish: Dish
-    length: int
+    rest: int
+
+    def length(self, position: int) -> int:
+        """Dart ``_lineLength``: the line's length as the ``position``th
+        line of its request (the prompt id's digits and the rest)."""
+        return len(str(position)) + self.rest
 
 
 def batch_max_dishes(*, extract: bool) -> int:
@@ -57,15 +66,19 @@ def split_batches(menu: Menu, *, max_dishes: int, max_chars: int) -> list[Menu]:
     order, a batch closing early when its next line (joined by one ``\\n``)
     would pass ``max_chars``. Each batch keeps ``menu``'s reference,
     currency, fetch time and venue name, and the categories its dishes come
-    from under their own ids and names.
+    from under their own ids and names. Each batch's ``user_prompt`` numbers
+    its own dishes from 1, and every line is measured with the prompt id it
+    carries there.
     """
     lines = [
-        _Line(index, dish, utf16_len(dish_line(dish, category.name)))
+        _Line(index, dish, utf16_len(dish_line("", dish, category.name)))
         for index, category in enumerate(menu.categories)
         for dish in category.dishes
     ]
     count = len(lines)
-    prompt_length = max(count - 1, 0) + sum(line.length for line in lines)
+    prompt_length = max(count - 1, 0) + sum(
+        line.length(position) for position, line in enumerate(lines, start=1)
+    )
     if count <= max_dishes and prompt_length <= max_chars:
         return [menu]
 
@@ -75,11 +88,15 @@ def split_batches(menu: Menu, *, max_dishes: int, max_chars: int) -> list[Menu]:
     current: list[_Line] = []
     current_length = 0
     for line in lines:
-        added = line.length if not current else current_length + 1 + line.length
+        added = (
+            line.length(1)
+            if not current
+            else current_length + 1 + line.length(len(current) + 1)
+        )
         if current and (len(current) >= target or added > max_chars):
             groups.append(current)
             current = []
-            added = line.length
+            added = line.length(1)
         current.append(line)
         current_length = added
     groups.append(current)

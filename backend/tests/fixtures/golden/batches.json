@@ -121,7 +121,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 24237
+          "userPromptLength": 22996
         }
       ],
       "maxChars": 400000,
@@ -192,7 +192,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 20192
+          "userPromptLength": 19567
         },
         {
           "categories": [
@@ -255,7 +255,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 4044
+          "userPromptLength": 3419
         }
       ],
       "maxChars": 400000,
@@ -287,7 +287,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 2921
+          "userPromptLength": 2829
         },
         {
           "categories": [
@@ -301,7 +301,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 2531
+          "userPromptLength": 2439
         },
         {
           "categories": [
@@ -320,7 +320,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 3275
+          "userPromptLength": 3183
         },
         {
           "categories": [
@@ -334,7 +334,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 2822
+          "userPromptLength": 2730
         },
         {
           "categories": [
@@ -358,7 +358,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 3181
+          "userPromptLength": 3089
         },
         {
           "categories": [
@@ -372,7 +372,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 3126
+          "userPromptLength": 3034
         },
         {
           "categories": [
@@ -386,7 +386,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 2330
+          "userPromptLength": 2238
         },
         {
           "categories": [
@@ -405,7 +405,7 @@
               "id": "da0d9fe5082a67a511611cfd"
             }
           ],
-          "userPromptLength": 2026
+          "userPromptLength": 1934
         },
         {
           "categories": [
@@ -419,7 +419,7 @@
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 659
+          "userPromptLength": 567
         },
         {
           "categories": [
@@ -438,7 +438,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 408
+          "userPromptLength": 316
         },
         {
           "categories": [
@@ -452,7 +452,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 237
+          "userPromptLength": 145
         },
         {
           "categories": [
@@ -476,7 +476,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 232
+          "userPromptLength": 140
         },
         {
           "categories": [
@@ -490,7 +490,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 226
+          "userPromptLength": 134
         },
         {
           "categories": [
@@ -504,7 +504,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 250
+          "userPromptLength": 158
         }
       ],
       "maxChars": 400000,
@@ -523,7 +523,7 @@
               "id": "3b68fdc73e96b9d84dd8c2d6"
             }
           ],
-          "userPromptLength": 605
+          "userPromptLength": 582
         },
         {
           "categories": [
@@ -534,7 +534,7 @@
               "id": "44b70bed7f6cbca07b606ef8"
             }
           ],
-          "userPromptLength": 399
+          "userPromptLength": 376
         },
         {
           "categories": [
@@ -545,7 +545,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 895
+          "userPromptLength": 872
         },
         {
           "categories": [
@@ -556,7 +556,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 1019
+          "userPromptLength": 996
         },
         {
           "categories": [
@@ -567,7 +567,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 990
+          "userPromptLength": 967
         },
         {
           "categories": [
@@ -578,7 +578,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 681
+          "userPromptLength": 658
         },
         {
           "categories": [
@@ -589,7 +589,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 272
+          "userPromptLength": 249
         },
         {
           "categories": [
@@ -600,7 +600,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 585
+          "userPromptLength": 562
         },
         {
           "categories": [
@@ -611,7 +611,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 933
+          "userPromptLength": 910
         },
         {
           "categories": [
@@ -622,7 +622,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 805
+          "userPromptLength": 782
         },
         {
           "categories": [
@@ -633,7 +633,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 839
+          "userPromptLength": 816
         },
         {
           "categories": [
@@ -644,7 +644,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 695
+          "userPromptLength": 672
         },
         {
           "categories": [
@@ -655,7 +655,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 774
+          "userPromptLength": 751
         },
         {
           "categories": [
@@ -666,7 +666,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 666
+          "userPromptLength": 643
         },
         {
           "categories": [
@@ -677,7 +677,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 622
+          "userPromptLength": 599
         },
         {
           "categories": [
@@ -688,7 +688,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 757
+          "userPromptLength": 734
         },
         {
           "categories": [
@@ -699,7 +699,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 613
+          "userPromptLength": 590
         },
         {
           "categories": [
@@ -710,7 +710,7 @@
               "id": "565f5876e7bbc7f42c9d6019"
             }
           ],
-          "userPromptLength": 889
+          "userPromptLength": 866
         },
         {
           "categories": [
@@ -721,7 +721,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 893
+          "userPromptLength": 870
         },
         {
           "categories": [
@@ -732,7 +732,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 783
+          "userPromptLength": 760
         },
         {
           "categories": [
@@ -743,7 +743,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 731
+          "userPromptLength": 708
         },
         {
           "categories": [
@@ -754,7 +754,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 855
+          "userPromptLength": 832
         },
         {
           "categories": [
@@ -765,7 +765,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 836
+          "userPromptLength": 813
         },
         {
           "categories": [
@@ -776,7 +776,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 701
+          "userPromptLength": 678
         },
         {
           "categories": [
@@ -787,7 +787,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 738
+          "userPromptLength": 715
         },
         {
           "categories": [
@@ -798,7 +798,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 437
+          "userPromptLength": 414
         },
         {
           "categories": [
@@ -809,7 +809,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 462
+          "userPromptLength": 439
         },
         {
           "categories": [
@@ -820,7 +820,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 690
+          "userPromptLength": 667
         },
         {
           "categories": [
@@ -831,7 +831,7 @@
               "id": "89f6a573dd33050695effd49"
             }
           ],
-          "userPromptLength": 352
+          "userPromptLength": 329
         },
         {
           "categories": [
@@ -842,7 +842,7 @@
               "id": "89f6a573dd33050695effd49"
             }
           ],
-          "userPromptLength": 361
+          "userPromptLength": 338
         },
         {
           "categories": [
@@ -853,7 +853,7 @@
               "id": "da0d9fe5082a67a511611cfd"
             }
           ],
-          "userPromptLength": 621
+          "userPromptLength": 598
         },
         {
           "categories": [
@@ -864,7 +864,7 @@
               "id": "da0d9fe5082a67a511611cfd"
             }
           ],
-          "userPromptLength": 689
+          "userPromptLength": 666
         },
         {
           "categories": [
@@ -872,18 +872,18 @@
               "dishIds": [
                 "61ecfdac853cef6ba4d5e3f6",
                 "61ecfdac853cef6ba4d5e3f5",
-                "62bc5c291f672dc067d86a75"
+                "62bc5c291f672dc067d86a75",
+                "664c3dfee7eb81be9272a555"
               ],
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 541
+          "userPromptLength": 567
         },
         {
           "categories": [
             {
               "dishIds": [
-                "664c3dfee7eb81be9272a555",
                 "61ecfdac853cef6ba4d5e421",
                 "6316e6412cc1aad2be5ed2c9"
               ],
@@ -893,19 +893,19 @@
               "dishIds": [
                 "6217356942b55ff888dfdcee",
                 "61ecfdac853cef6ba4d5e40f",
-                "61ecfdac853cef6ba4d5e410"
+                "61ecfdac853cef6ba4d5e410",
+                "61ecfdac853cef6ba4d5e411",
+                "61ecfdac853cef6ba4d5e414"
               ],
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 587
+          "userPromptLength": 432
         },
         {
           "categories": [
             {
               "dishIds": [
-                "61ecfdac853cef6ba4d5e411",
-                "61ecfdac853cef6ba4d5e414",
                 "61ecfdac853cef6ba4d5e40a",
                 "61ecfdac853cef6ba4d5e413"
               ],
@@ -920,40 +920,30 @@
             },
             {
               "dishIds": [
-                "61ecfdac853cef6ba4d5e3f3"
+                "61ecfdac853cef6ba4d5e3f3",
+                "61ecfdac853cef6ba4d5e3fb",
+                "61ecfdac853cef6ba4d5e3f2"
               ],
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 409
+          "userPromptLength": 236
         },
         {
           "categories": [
             {
               "dishIds": [
-                "61ecfdac853cef6ba4d5e3fb",
-                "61ecfdac853cef6ba4d5e3f2",
                 "61ecfdac853cef6ba4d5e3ff",
                 "61ecfdac853cef6ba4d5e400",
                 "61ecfdac853cef6ba4d5e3ed",
                 "61ecfdac853cef6ba4d5e3f1",
-                "61ecfdac853cef6ba4d5e41f"
-              ],
-              "id": "d48f602303b4539f5b923a25"
-            }
-          ],
-          "userPromptLength": 405
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "61ecfdac853cef6ba4d5e41f",
                 "61ecfdac853cef6ba4d5e41e"
               ],
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 71
+          "userPromptLength": 227
         }
       ],
       "maxChars": 600,
@@ -972,7 +962,7 @@
               "id": "3b68fdc73e96b9d84dd8c2d6"
             }
           ],
-          "userPromptLength": 605
+          "userPromptLength": 582
         },
         {
           "categories": [
@@ -983,7 +973,7 @@
               "id": "44b70bed7f6cbca07b606ef8"
             }
           ],
-          "userPromptLength": 399
+          "userPromptLength": 376
         },
         {
           "categories": [
@@ -994,7 +984,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 895
+          "userPromptLength": 872
         },
         {
           "categories": [
@@ -1005,7 +995,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 1019
+          "userPromptLength": 996
         },
         {
           "categories": [
@@ -1016,7 +1006,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 990
+          "userPromptLength": 967
         },
         {
           "categories": [
@@ -1027,7 +1017,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 681
+          "userPromptLength": 658
         },
         {
           "categories": [
@@ -1038,7 +1028,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 272
+          "userPromptLength": 249
         },
         {
           "categories": [
@@ -1049,7 +1039,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 585
+          "userPromptLength": 562
         },
         {
           "categories": [
@@ -1060,7 +1050,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 933
+          "userPromptLength": 910
         },
         {
           "categories": [
@@ -1071,7 +1061,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 805
+          "userPromptLength": 782
         },
         {
           "categories": [
@@ -1082,7 +1072,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 839
+          "userPromptLength": 816
         },
         {
           "categories": [
@@ -1093,7 +1083,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 695
+          "userPromptLength": 672
         },
         {
           "categories": [
@@ -1104,7 +1094,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 774
+          "userPromptLength": 751
         },
         {
           "categories": [
@@ -1115,7 +1105,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 666
+          "userPromptLength": 643
         },
         {
           "categories": [
@@ -1126,7 +1116,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 622
+          "userPromptLength": 599
         },
         {
           "categories": [
@@ -1137,7 +1127,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 757
+          "userPromptLength": 734
         },
         {
           "categories": [
@@ -1148,7 +1138,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 613
+          "userPromptLength": 590
         },
         {
           "categories": [
@@ -1159,7 +1149,7 @@
               "id": "565f5876e7bbc7f42c9d6019"
             }
           ],
-          "userPromptLength": 889
+          "userPromptLength": 866
         },
         {
           "categories": [
@@ -1170,7 +1160,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 893
+          "userPromptLength": 870
         },
         {
           "categories": [
@@ -1181,7 +1171,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 783
+          "userPromptLength": 760
         },
         {
           "categories": [
@@ -1192,7 +1182,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 731
+          "userPromptLength": 708
         },
         {
           "categories": [
@@ -1203,7 +1193,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 855
+          "userPromptLength": 832
         },
         {
           "categories": [
@@ -1214,7 +1204,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 836
+          "userPromptLength": 813
         },
         {
           "categories": [
@@ -1225,7 +1215,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 701
+          "userPromptLength": 678
         },
         {
           "categories": [
@@ -1236,7 +1226,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 738
+          "userPromptLength": 715
         },
         {
           "categories": [
@@ -1247,7 +1237,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 437
+          "userPromptLength": 414
         },
         {
           "categories": [
@@ -1258,7 +1248,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 462
+          "userPromptLength": 439
         },
         {
           "categories": [
@@ -1269,7 +1259,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 690
+          "userPromptLength": 667
         },
         {
           "categories": [
@@ -1280,7 +1270,7 @@
               "id": "89f6a573dd33050695effd49"
             }
           ],
-          "userPromptLength": 352
+          "userPromptLength": 329
         },
         {
           "categories": [
@@ -1291,7 +1281,7 @@
               "id": "89f6a573dd33050695effd49"
             }
           ],
-          "userPromptLength": 361
+          "userPromptLength": 338
         },
         {
           "categories": [
@@ -1302,7 +1292,7 @@
               "id": "da0d9fe5082a67a511611cfd"
             }
           ],
-          "userPromptLength": 621
+          "userPromptLength": 598
         },
         {
           "categories": [
@@ -1313,96 +1303,76 @@
               "id": "da0d9fe5082a67a511611cfd"
             }
           ],
-          "userPromptLength": 689
+          "userPromptLength": 666
         },
         {
           "categories": [
             {
               "dishIds": [
-                "61ecfdac853cef6ba4d5e3f6"
-              ],
-              "id": "6d44bb01b5dfb5e75cf5e75d"
-            }
-          ],
-          "userPromptLength": 159
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "61ecfdac853cef6ba4d5e3f6",
                 "61ecfdac853cef6ba4d5e3f5"
               ],
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 182
+          "userPromptLength": 296
         },
         {
           "categories": [
             {
               "dishIds": [
-                "62bc5c291f672dc067d86a75"
+                "62bc5c291f672dc067d86a75",
+                "664c3dfee7eb81be9272a555"
               ],
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 198
+          "userPromptLength": 270
         },
         {
           "categories": [
             {
               "dishIds": [
-                "664c3dfee7eb81be9272a555",
-                "61ecfdac853cef6ba4d5e421"
-              ],
-              "id": "6d44bb01b5dfb5e75cf5e75d"
-            }
-          ],
-          "userPromptLength": 228
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "61ecfdac853cef6ba4d5e421",
                 "6316e6412cc1aad2be5ed2c9"
               ],
               "id": "6d44bb01b5dfb5e75cf5e75d"
             },
             {
               "dishIds": [
-                "6217356942b55ff888dfdcee",
-                "61ecfdac853cef6ba4d5e40f"
+                "6217356942b55ff888dfdcee"
               ],
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 297
+          "userPromptLength": 268
         },
         {
           "categories": [
             {
               "dishIds": [
+                "61ecfdac853cef6ba4d5e40f",
                 "61ecfdac853cef6ba4d5e410",
                 "61ecfdac853cef6ba4d5e411",
                 "61ecfdac853cef6ba4d5e414",
-                "61ecfdac853cef6ba4d5e40a"
-              ],
-              "id": "7cb0b2040b3a96cc548198ea"
-            }
-          ],
-          "userPromptLength": 237
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "61ecfdac853cef6ba4d5e40a",
                 "61ecfdac853cef6ba4d5e413"
               ],
               "id": "7cb0b2040b3a96cc548198ea"
             },
             {
               "dishIds": [
-                "61ecfdac853cef6ba4d5e3f0",
+                "61ecfdac853cef6ba4d5e3f0"
+              ],
+              "id": "7ff66a47178897e7267f7402"
+            }
+          ],
+          "userPromptLength": 265
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
                 "61ecfdac853cef6ba4d5e3fc"
               ],
               "id": "7ff66a47178897e7267f7402"
@@ -1410,17 +1380,7 @@
             {
               "dishIds": [
                 "61ecfdac853cef6ba4d5e3f3",
-                "61ecfdac853cef6ba4d5e3fb"
-              ],
-              "id": "d48f602303b4539f5b923a25"
-            }
-          ],
-          "userPromptLength": 292
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "61ecfdac853cef6ba4d5e3fb",
                 "61ecfdac853cef6ba4d5e3f2",
                 "61ecfdac853cef6ba4d5e3ff",
                 "61ecfdac853cef6ba4d5e400",
@@ -1430,7 +1390,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 272
+          "userPromptLength": 263
         },
         {
           "categories": [
@@ -1442,7 +1402,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 144
+          "userPromptLength": 98
         }
       ],
       "maxChars": 300,
@@ -1461,7 +1421,7 @@
               "id": "3b68fdc73e96b9d84dd8c2d6"
             }
           ],
-          "userPromptLength": 605
+          "userPromptLength": 582
         },
         {
           "categories": [
@@ -1472,7 +1432,7 @@
               "id": "44b70bed7f6cbca07b606ef8"
             }
           ],
-          "userPromptLength": 399
+          "userPromptLength": 376
         },
         {
           "categories": [
@@ -1483,7 +1443,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 895
+          "userPromptLength": 872
         },
         {
           "categories": [
@@ -1494,7 +1454,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 1019
+          "userPromptLength": 996
         },
         {
           "categories": [
@@ -1505,7 +1465,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 990
+          "userPromptLength": 967
         },
         {
           "categories": [
@@ -1516,7 +1476,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 681
+          "userPromptLength": 658
         },
         {
           "categories": [
@@ -1527,7 +1487,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 272
+          "userPromptLength": 249
         },
         {
           "categories": [
@@ -1538,7 +1498,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 585
+          "userPromptLength": 562
         },
         {
           "categories": [
@@ -1549,7 +1509,7 @@
               "id": "805f2778173825e99c1d8581"
             }
           ],
-          "userPromptLength": 933
+          "userPromptLength": 910
         },
         {
           "categories": [
@@ -1560,7 +1520,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 805
+          "userPromptLength": 782
         },
         {
           "categories": [
@@ -1571,7 +1531,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 839
+          "userPromptLength": 816
         },
         {
           "categories": [
@@ -1582,7 +1542,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 695
+          "userPromptLength": 672
         },
         {
           "categories": [
@@ -1593,7 +1553,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 774
+          "userPromptLength": 751
         },
         {
           "categories": [
@@ -1604,7 +1564,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 666
+          "userPromptLength": 643
         },
         {
           "categories": [
@@ -1615,7 +1575,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 622
+          "userPromptLength": 599
         },
         {
           "categories": [
@@ -1626,7 +1586,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 757
+          "userPromptLength": 734
         },
         {
           "categories": [
@@ -1637,7 +1597,7 @@
               "id": "87e053f00c8c79a2a34824f5"
             }
           ],
-          "userPromptLength": 613
+          "userPromptLength": 590
         },
         {
           "categories": [
@@ -1648,7 +1608,7 @@
               "id": "565f5876e7bbc7f42c9d6019"
             }
           ],
-          "userPromptLength": 889
+          "userPromptLength": 866
         },
         {
           "categories": [
@@ -1659,7 +1619,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 893
+          "userPromptLength": 870
         },
         {
           "categories": [
@@ -1670,7 +1630,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 783
+          "userPromptLength": 760
         },
         {
           "categories": [
@@ -1681,7 +1641,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 731
+          "userPromptLength": 708
         },
         {
           "categories": [
@@ -1692,7 +1652,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 855
+          "userPromptLength": 832
         },
         {
           "categories": [
@@ -1703,7 +1663,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 836
+          "userPromptLength": 813
         },
         {
           "categories": [
@@ -1714,7 +1674,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 701
+          "userPromptLength": 678
         },
         {
           "categories": [
@@ -1725,7 +1685,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 738
+          "userPromptLength": 715
         },
         {
           "categories": [
@@ -1736,7 +1696,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 437
+          "userPromptLength": 414
         },
         {
           "categories": [
@@ -1747,7 +1707,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 462
+          "userPromptLength": 439
         },
         {
           "categories": [
@@ -1758,7 +1718,7 @@
               "id": "9dd5d3c61e43d307ff0a083b"
             }
           ],
-          "userPromptLength": 690
+          "userPromptLength": 667
         },
         {
           "categories": [
@@ -1769,7 +1729,7 @@
               "id": "89f6a573dd33050695effd49"
             }
           ],
-          "userPromptLength": 352
+          "userPromptLength": 329
         },
         {
           "categories": [
@@ -1780,7 +1740,7 @@
               "id": "89f6a573dd33050695effd49"
             }
           ],
-          "userPromptLength": 361
+          "userPromptLength": 338
         },
         {
           "categories": [
@@ -1791,7 +1751,7 @@
               "id": "da0d9fe5082a67a511611cfd"
             }
           ],
-          "userPromptLength": 621
+          "userPromptLength": 598
         },
         {
           "categories": [
@@ -1802,7 +1762,7 @@
               "id": "da0d9fe5082a67a511611cfd"
             }
           ],
-          "userPromptLength": 689
+          "userPromptLength": 666
         },
         {
           "categories": [
@@ -1813,7 +1773,7 @@
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 159
+          "userPromptLength": 136
         },
         {
           "categories": [
@@ -1824,7 +1784,7 @@
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 182
+          "userPromptLength": 159
         },
         {
           "categories": [
@@ -1835,7 +1795,7 @@
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 198
+          "userPromptLength": 175
         },
         {
           "categories": [
@@ -1846,7 +1806,7 @@
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 117
+          "userPromptLength": 94
         },
         {
           "categories": [
@@ -1857,7 +1817,7 @@
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 110
+          "userPromptLength": 87
         },
         {
           "categories": [
@@ -1868,7 +1828,7 @@
               "id": "6d44bb01b5dfb5e75cf5e75d"
             }
           ],
-          "userPromptLength": 149
+          "userPromptLength": 126
         },
         {
           "categories": [
@@ -1879,7 +1839,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 76
+          "userPromptLength": 53
         },
         {
           "categories": [
@@ -1890,7 +1850,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 70
+          "userPromptLength": 47
         },
         {
           "categories": [
@@ -1901,7 +1861,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 60
+          "userPromptLength": 37
         },
         {
           "categories": [
@@ -1912,7 +1872,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 59
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -1923,7 +1883,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 63
+          "userPromptLength": 40
         },
         {
           "categories": [
@@ -1934,7 +1894,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 52
+          "userPromptLength": 29
         },
         {
           "categories": [
@@ -1945,7 +1905,7 @@
               "id": "7cb0b2040b3a96cc548198ea"
             }
           ],
-          "userPromptLength": 63
+          "userPromptLength": 40
         },
         {
           "categories": [
@@ -1956,7 +1916,7 @@
               "id": "7ff66a47178897e7267f7402"
             }
           ],
-          "userPromptLength": 53
+          "userPromptLength": 30
         },
         {
           "categories": [
@@ -1967,7 +1927,7 @@
               "id": "7ff66a47178897e7267f7402"
             }
           ],
-          "userPromptLength": 59
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -1978,7 +1938,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 54
+          "userPromptLength": 31
         },
         {
           "categories": [
@@ -1989,7 +1949,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 59
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -2000,7 +1960,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 28
         },
         {
           "categories": [
@@ -2011,7 +1971,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 56
+          "userPromptLength": 33
         },
         {
           "categories": [
@@ -2022,7 +1982,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 57
+          "userPromptLength": 34
         },
         {
           "categories": [
@@ -2033,7 +1993,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 49
+          "userPromptLength": 26
         },
         {
           "categories": [
@@ -2044,7 +2004,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 55
+          "userPromptLength": 32
         },
         {
           "categories": [
@@ -2055,7 +2015,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 72
+          "userPromptLength": 49
         },
         {
           "categories": [
@@ -2066,7 +2026,7 @@
               "id": "d48f602303b4539f5b923a25"
             }
           ],
-          "userPromptLength": 71
+          "userPromptLength": 48
         }
       ],
       "maxChars": 1,
@@ -2103,7 +2063,7 @@
               "id": "cat_coming-soon"
             }
           ],
-          "userPromptLength": 369
+          "userPromptLength": 347
         }
       ],
       "maxChars": 400000,
@@ -2140,7 +2100,7 @@
               "id": "cat_coming-soon"
             }
           ],
-          "userPromptLength": 369
+          "userPromptLength": 347
         }
       ],
       "maxChars": 400000,
@@ -2166,7 +2126,7 @@
               "id": "cat_chef-s-specials"
             }
           ],
-          "userPromptLength": 274
+          "userPromptLength": 258
         },
         {
           "categories": [
@@ -2178,7 +2138,7 @@
               "id": "cat_סלטים"
             }
           ],
-          "userPromptLength": 94
+          "userPromptLength": 88
         }
       ],
       "maxChars": 400000,
@@ -2215,7 +2175,7 @@
               "id": "cat_coming-soon"
             }
           ],
-          "userPromptLength": 369
+          "userPromptLength": 347
         }
       ],
       "maxChars": 600,
@@ -2241,7 +2201,7 @@
               "id": "cat_chef-s-specials"
             }
           ],
-          "userPromptLength": 274
+          "userPromptLength": 258
         },
         {
           "categories": [
@@ -2253,7 +2213,7 @@
               "id": "cat_סלטים"
             }
           ],
-          "userPromptLength": 94
+          "userPromptLength": 88
         }
       ],
       "maxChars": 300,
@@ -2272,7 +2232,7 @@
               "id": "cat_steaks"
             }
           ],
-          "userPromptLength": 116
+          "userPromptLength": 113
         },
         {
           "categories": [
@@ -2283,7 +2243,7 @@
               "id": "cat_steaks"
             }
           ],
-          "userPromptLength": 85
+          "userPromptLength": 75
         },
         {
           "categories": [
@@ -2294,7 +2254,7 @@
               "id": "cat_chef-s-specials"
             }
           ],
-          "userPromptLength": 71
+          "userPromptLength": 68
         },
         {
           "categories": [
@@ -2305,7 +2265,7 @@
               "id": "cat_סלטים"
             }
           ],
-          "userPromptLength": 52
+          "userPromptLength": 49
         },
         {
           "categories": [
@@ -2316,7 +2276,7 @@
               "id": "cat_סלטים"
             }
           ],
-          "userPromptLength": 41
+          "userPromptLength": 38
         }
       ],
       "maxChars": 1,
@@ -2371,7 +2331,7 @@
               "id": "notices"
             }
           ],
-          "userPromptLength": 859
+          "userPromptLength": 842
         }
       ],
       "maxChars": 400000,
@@ -2426,7 +2386,7 @@
               "id": "notices"
             }
           ],
-          "userPromptLength": 859
+          "userPromptLength": 842
         }
       ],
       "maxChars": 400000,
@@ -2448,7 +2408,7 @@
               "id": "starters"
             }
           ],
-          "userPromptLength": 184
+          "userPromptLength": 180
         },
         {
           "categories": [
@@ -2462,7 +2422,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 329
+          "userPromptLength": 325
         },
         {
           "categories": [
@@ -2481,7 +2441,7 @@
               "id": "sides-sauces"
             }
           ],
-          "userPromptLength": 171
+          "userPromptLength": 164
         },
         {
           "categories": [
@@ -2495,7 +2455,7 @@
               "id": "drinks"
             }
           ],
-          "userPromptLength": 128
+          "userPromptLength": 120
         },
         {
           "categories": [
@@ -2506,7 +2466,7 @@
               "id": "notices"
             }
           ],
-          "userPromptLength": 43
+          "userPromptLength": 41
         }
       ],
       "maxChars": 400000,
@@ -2535,7 +2495,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 370
+          "userPromptLength": 364
         },
         {
           "categories": [
@@ -2556,7 +2516,7 @@
               "id": "sides-sauces"
             }
           ],
-          "userPromptLength": 315
+          "userPromptLength": 306
         },
         {
           "categories": [
@@ -2576,7 +2536,7 @@
               "id": "notices"
             }
           ],
-          "userPromptLength": 172
+          "userPromptLength": 162
         }
       ],
       "maxChars": 600,
@@ -2598,7 +2558,7 @@
               "id": "starters"
             }
           ],
-          "userPromptLength": 184
+          "userPromptLength": 180
         },
         {
           "categories": [
@@ -2611,7 +2571,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 236
+          "userPromptLength": 233
         },
         {
           "categories": [
@@ -2637,7 +2597,7 @@
               "id": "drinks"
             }
           ],
-          "userPromptLength": 295
+          "userPromptLength": 285
         },
         {
           "categories": [
@@ -2656,7 +2616,7 @@
               "id": "notices"
             }
           ],
-          "userPromptLength": 141
+          "userPromptLength": 133
         }
       ],
       "maxChars": 300,
@@ -2675,7 +2635,7 @@
               "id": "starters"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 50
         },
         {
           "categories": [
@@ -2686,7 +2646,7 @@
               "id": "starters"
             }
           ],
-          "userPromptLength": 49
+          "userPromptLength": 48
         },
         {
           "categories": [
@@ -2697,7 +2657,7 @@
               "id": "starters"
             }
           ],
-          "userPromptLength": 47
+          "userPromptLength": 46
         },
         {
           "categories": [
@@ -2708,7 +2668,7 @@
               "id": "starters"
             }
           ],
-          "userPromptLength": 34
+          "userPromptLength": 33
         },
         {
           "categories": [
@@ -2719,7 +2679,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 140
+          "userPromptLength": 139
         },
         {
           "categories": [
@@ -2730,7 +2690,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 44
+          "userPromptLength": 43
         },
         {
           "categories": [
@@ -2741,7 +2701,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 50
+          "userPromptLength": 49
         },
         {
           "categories": [
@@ -2752,7 +2712,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 92
+          "userPromptLength": 91
         },
         {
           "categories": [
@@ -2763,7 +2723,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 45
+          "userPromptLength": 44
         },
         {
           "categories": [
@@ -2774,7 +2734,7 @@
               "id": "mains"
             }
           ],
-          "userPromptLength": 44
+          "userPromptLength": 42
         },
         {
           "categories": [
@@ -2785,7 +2745,7 @@
               "id": "sides-sauces"
             }
           ],
-          "userPromptLength": 41
+          "userPromptLength": 39
         },
         {
           "categories": [
@@ -2796,7 +2756,7 @@
               "id": "sides-sauces"
             }
           ],
-          "userPromptLength": 38
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -2807,7 +2767,7 @@
               "id": "drinks"
             }
           ],
-          "userPromptLength": 30
+          "userPromptLength": 28
         },
         {
           "categories": [
@@ -2818,7 +2778,7 @@
               "id": "drinks"
             }
           ],
-          "userPromptLength": 30
+          "userPromptLength": 28
         },
         {
           "categories": [
@@ -2829,7 +2789,7 @@
               "id": "drinks"
             }
           ],
-          "userPromptLength": 36
+          "userPromptLength": 34
         },
         {
           "categories": [
@@ -2840,7 +2800,7 @@
               "id": "drinks"
             }
           ],
-          "userPromptLength": 29
+          "userPromptLength": 27
         },
         {
           "categories": [
@@ -2851,7 +2811,7 @@
               "id": "notices"
             }
           ],
-          "userPromptLength": 43
+          "userPromptLength": 41
         }
       ],
       "maxChars": 1,
@@ -2900,7 +2860,7 @@
               "id": "cat_רטבים"
             }
           ],
-          "userPromptLength": 674
+          "userPromptLength": 658
         }
       ],
       "maxChars": 400000,
@@ -2949,7 +2909,7 @@
               "id": "cat_רטבים"
             }
           ],
-          "userPromptLength": 674
+          "userPromptLength": 658
         }
       ],
       "maxChars": 400000,
@@ -2971,7 +2931,7 @@
               "id": "cat_ראשונות"
             }
           ],
-          "userPromptLength": 163
+          "userPromptLength": 159
         },
         {
           "categories": [
@@ -2985,7 +2945,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 237
+          "userPromptLength": 233
         },
         {
           "categories": [
@@ -3004,7 +2964,7 @@
               "id": "cat_שתייה"
             }
           ],
-          "userPromptLength": 146
+          "userPromptLength": 139
         },
         {
           "categories": [
@@ -3023,7 +2983,7 @@
               "id": "cat_רטבים"
             }
           ],
-          "userPromptLength": 125
+          "userPromptLength": 117
         }
       ],
       "maxChars": 400000,
@@ -3052,7 +3012,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 312
+          "userPromptLength": 306
         },
         {
           "categories": [
@@ -3073,7 +3033,7 @@
               "id": "cat_שתייה"
             }
           ],
-          "userPromptLength": 235
+          "userPromptLength": 226
         },
         {
           "categories": [
@@ -3092,7 +3052,7 @@
               "id": "cat_רטבים"
             }
           ],
-          "userPromptLength": 125
+          "userPromptLength": 117
         }
       ],
       "maxChars": 600,
@@ -3120,7 +3080,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 217
+          "userPromptLength": 212
         },
         {
           "categories": [
@@ -3136,7 +3096,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 300
+          "userPromptLength": 292
         },
         {
           "categories": [
@@ -3156,7 +3116,7 @@
               "id": "cat_רטבים"
             }
           ],
-          "userPromptLength": 155
+          "userPromptLength": 145
         }
       ],
       "maxChars": 300,
@@ -3175,7 +3135,7 @@
               "id": "cat_ראשונות"
             }
           ],
-          "userPromptLength": 55
+          "userPromptLength": 54
         },
         {
           "categories": [
@@ -3186,7 +3146,7 @@
               "id": "cat_ראשונות"
             }
           ],
-          "userPromptLength": 34
+          "userPromptLength": 33
         },
         {
           "categories": [
@@ -3197,7 +3157,7 @@
               "id": "cat_ראשונות"
             }
           ],
-          "userPromptLength": 32
+          "userPromptLength": 31
         },
         {
           "categories": [
@@ -3208,7 +3168,7 @@
               "id": "cat_ראשונות"
             }
           ],
-          "userPromptLength": 39
+          "userPromptLength": 38
         },
         {
           "categories": [
@@ -3219,7 +3179,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 53
+          "userPromptLength": 52
         },
         {
           "categories": [
@@ -3230,7 +3190,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 94
+          "userPromptLength": 93
         },
         {
           "categories": [
@@ -3241,7 +3201,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 49
+          "userPromptLength": 48
         },
         {
           "categories": [
@@ -3252,7 +3212,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 38
+          "userPromptLength": 37
         },
         {
           "categories": [
@@ -3263,7 +3223,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 36
+          "userPromptLength": 35
         },
         {
           "categories": [
@@ -3274,7 +3234,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 40
+          "userPromptLength": 38
         },
         {
           "categories": [
@@ -3285,7 +3245,7 @@
               "id": "cat_עיקריות"
             }
           ],
-          "userPromptLength": 38
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -3296,7 +3256,7 @@
               "id": "cat_שתייה"
             }
           ],
-          "userPromptLength": 29
+          "userPromptLength": 27
         },
         {
           "categories": [
@@ -3307,7 +3267,7 @@
               "id": "cat_שתייה"
             }
           ],
-          "userPromptLength": 34
+          "userPromptLength": 32
         },
         {
           "categories": [
@@ -3318,7 +3278,7 @@
               "id": "cat_שתייה"
             }
           ],
-          "userPromptLength": 38
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -3329,7 +3289,7 @@
               "id": "cat_רטבים"
             }
           ],
-          "userPromptLength": 25
+          "userPromptLength": 23
         },
         {
           "categories": [
@@ -3340,7 +3300,7 @@
               "id": "cat_רטבים"
             }
           ],
-          "userPromptLength": 25
+          "userPromptLength": 23
         }
       ],
       "maxChars": 1,
@@ -3389,7 +3349,7 @@
               "id": "m-beer"
             }
           ],
-          "userPromptLength": 748
+          "userPromptLength": 733
         }
       ],
       "maxChars": 400000,
@@ -3438,7 +3398,7 @@
               "id": "m-beer"
             }
           ],
-          "userPromptLength": 748
+          "userPromptLength": 733
         }
       ],
       "maxChars": 400000,
@@ -3465,7 +3425,7 @@
               "id": "m-coffee"
             }
           ],
-          "userPromptLength": 154
+          "userPromptLength": 150
         },
         {
           "categories": [
@@ -3484,7 +3444,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 220
+          "userPromptLength": 216
         },
         {
           "categories": [
@@ -3498,7 +3458,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 196
+          "userPromptLength": 189
         },
         {
           "categories": [
@@ -3517,7 +3477,7 @@
               "id": "m-beer"
             }
           ],
-          "userPromptLength": 175
+          "userPromptLength": 168
         }
       ],
       "maxChars": 400000,
@@ -3551,7 +3511,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 264
+          "userPromptLength": 258
         },
         {
           "categories": [
@@ -3567,7 +3527,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 307
+          "userPromptLength": 298
         },
         {
           "categories": [
@@ -3586,7 +3546,7 @@
               "id": "m-beer"
             }
           ],
-          "userPromptLength": 175
+          "userPromptLength": 168
         }
       ],
       "maxChars": 600,
@@ -3620,7 +3580,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 264
+          "userPromptLength": 258
         },
         {
           "categories": [
@@ -3630,18 +3590,18 @@
                 "x8",
                 "x9",
                 "x10",
-                "x11"
+                "x11",
+                "x12"
               ],
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 262
+          "userPromptLength": 298
         },
         {
           "categories": [
             {
               "dishIds": [
-                "x12",
                 "x2"
               ],
               "id": "m-mains"
@@ -3655,7 +3615,7 @@
               "id": "m-beer"
             }
           ],
-          "userPromptLength": 220
+          "userPromptLength": 168
         }
       ],
       "maxChars": 300,
@@ -3674,7 +3634,7 @@
               "id": "m-notice"
             }
           ],
-          "userPromptLength": 53
+          "userPromptLength": 52
         },
         {
           "categories": [
@@ -3685,7 +3645,7 @@
               "id": "m-coffee"
             }
           ],
-          "userPromptLength": 35
+          "userPromptLength": 34
         },
         {
           "categories": [
@@ -3696,7 +3656,7 @@
               "id": "m-coffee"
             }
           ],
-          "userPromptLength": 30
+          "userPromptLength": 29
         },
         {
           "categories": [
@@ -3707,7 +3667,7 @@
               "id": "m-coffee"
             }
           ],
-          "userPromptLength": 33
+          "userPromptLength": 32
         },
         {
           "categories": [
@@ -3718,7 +3678,7 @@
               "id": "m-coffee"
             }
           ],
-          "userPromptLength": 38
+          "userPromptLength": 37
         },
         {
           "categories": [
@@ -3729,7 +3689,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 70
+          "userPromptLength": 69
         },
         {
           "categories": [
@@ -3740,7 +3700,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 48
+          "userPromptLength": 47
         },
         {
           "categories": [
@@ -3751,7 +3711,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 61
+          "userPromptLength": 60
         },
         {
           "categories": [
@@ -3762,7 +3722,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 54
+          "userPromptLength": 53
         },
         {
           "categories": [
@@ -3773,7 +3733,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 49
         },
         {
           "categories": [
@@ -3784,7 +3744,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 44
+          "userPromptLength": 42
         },
         {
           "categories": [
@@ -3795,7 +3755,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 44
+          "userPromptLength": 42
         },
         {
           "categories": [
@@ -3806,7 +3766,7 @@
               "id": "m-mains"
             }
           ],
-          "userPromptLength": 53
+          "userPromptLength": 52
         },
         {
           "categories": [
@@ -3817,7 +3777,7 @@
               "id": "m-beer"
             }
           ],
-          "userPromptLength": 38
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -3828,7 +3788,7 @@
               "id": "m-beer"
             }
           ],
-          "userPromptLength": 39
+          "userPromptLength": 37
         },
         {
           "categories": [
@@ -3839,7 +3799,7 @@
               "id": "m-beer"
             }
           ],
-          "userPromptLength": 42
+          "userPromptLength": 40
         }
       ],
       "maxChars": 1,
@@ -3934,7 +3894,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 4811
+          "userPromptLength": 4293
         },
         {
           "categories": [
@@ -4021,7 +3981,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 4852
+          "userPromptLength": 4318
         },
         {
           "categories": [
@@ -4102,7 +4062,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 4682
+          "userPromptLength": 4155
         }
       ],
       "maxChars": 400000,
@@ -4154,7 +4114,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 2456
+          "userPromptLength": 2185
         },
         {
           "categories": [
@@ -4208,7 +4168,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 2425
+          "userPromptLength": 2161
         },
         {
           "categories": [
@@ -4252,7 +4212,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 2390
+          "userPromptLength": 2109
         },
         {
           "categories": [
@@ -4306,7 +4266,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 2561
+          "userPromptLength": 2291
         },
         {
           "categories": [
@@ -4355,7 +4315,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 2364
+          "userPromptLength": 2089
         },
         {
           "categories": [
@@ -4395,7 +4355,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 2146
+          "userPromptLength": 1901
         }
       ],
       "maxChars": 400000,
@@ -4417,7 +4377,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 293
+          "userPromptLength": 261
         },
         {
           "categories": [
@@ -4431,7 +4391,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 277
+          "userPromptLength": 245
         },
         {
           "categories": [
@@ -4445,7 +4405,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 255
         },
         {
           "categories": [
@@ -4459,7 +4419,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 325
+          "userPromptLength": 289
         },
         {
           "categories": [
@@ -4473,7 +4433,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 269
+          "userPromptLength": 233
         },
         {
           "categories": [
@@ -4487,7 +4447,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 277
+          "userPromptLength": 241
         },
         {
           "categories": [
@@ -4501,7 +4461,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 309
+          "userPromptLength": 273
         },
         {
           "categories": [
@@ -4515,7 +4475,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 253
+          "userPromptLength": 217
         },
         {
           "categories": [
@@ -4529,7 +4489,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 261
+          "userPromptLength": 225
         },
         {
           "categories": [
@@ -4543,7 +4503,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 293
+          "userPromptLength": 257
         },
         {
           "categories": [
@@ -4557,7 +4517,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 277
+          "userPromptLength": 241
         },
         {
           "categories": [
@@ -4571,7 +4531,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 285
+          "userPromptLength": 249
         },
         {
           "categories": [
@@ -4590,7 +4550,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 309
+          "userPromptLength": 275
         },
         {
           "categories": [
@@ -4604,7 +4564,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 285
+          "userPromptLength": 253
         },
         {
           "categories": [
@@ -4623,7 +4583,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 268
+          "userPromptLength": 236
         },
         {
           "categories": [
@@ -4637,7 +4597,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 305
+          "userPromptLength": 273
         },
         {
           "categories": [
@@ -4651,7 +4611,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 291
+          "userPromptLength": 258
         },
         {
           "categories": [
@@ -4665,7 +4625,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 305
+          "userPromptLength": 269
         },
         {
           "categories": [
@@ -4679,7 +4639,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 297
+          "userPromptLength": 261
         },
         {
           "categories": [
@@ -4693,7 +4653,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 281
+          "userPromptLength": 245
         },
         {
           "categories": [
@@ -4707,7 +4667,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 253
         },
         {
           "categories": [
@@ -4721,7 +4681,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 281
+          "userPromptLength": 245
         },
         {
           "categories": [
@@ -4735,7 +4695,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 265
+          "userPromptLength": 229
         },
         {
           "categories": [
@@ -4749,7 +4709,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 273
+          "userPromptLength": 237
         },
         {
           "categories": [
@@ -4763,7 +4723,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 265
+          "userPromptLength": 229
         },
         {
           "categories": [
@@ -4777,7 +4737,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 253
         },
         {
           "categories": [
@@ -4791,7 +4751,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 297
+          "userPromptLength": 261
         },
         {
           "categories": [
@@ -4805,7 +4765,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 329
+          "userPromptLength": 293
         },
         {
           "categories": [
@@ -4819,7 +4779,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 273
+          "userPromptLength": 237
         },
         {
           "categories": [
@@ -4843,7 +4803,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 354
+          "userPromptLength": 320
         },
         {
           "categories": [
@@ -4857,7 +4817,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 233
+          "userPromptLength": 201
         },
         {
           "categories": [
@@ -4871,7 +4831,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 281
+          "userPromptLength": 249
         },
         {
           "categories": [
@@ -4885,7 +4845,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 319
+          "userPromptLength": 284
         },
         {
           "categories": [
@@ -4899,7 +4859,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 305
+          "userPromptLength": 269
         },
         {
           "categories": [
@@ -4913,7 +4873,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 273
+          "userPromptLength": 237
         },
         {
           "categories": [
@@ -4927,7 +4887,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 305
+          "userPromptLength": 269
         },
         {
           "categories": [
@@ -4941,7 +4901,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 253
         },
         {
           "categories": [
@@ -4955,7 +4915,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 257
+          "userPromptLength": 221
         },
         {
           "categories": [
@@ -4969,7 +4929,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 253
         },
         {
           "categories": [
@@ -4983,7 +4943,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 273
+          "userPromptLength": 237
         },
         {
           "categories": [
@@ -4997,7 +4957,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 241
+          "userPromptLength": 205
         },
         {
           "categories": [
@@ -5011,7 +4971,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 317
+          "userPromptLength": 285
         },
         {
           "categories": [
@@ -5025,7 +4985,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 261
+          "userPromptLength": 229
         },
         {
           "categories": [
@@ -5039,7 +4999,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 273
+          "userPromptLength": 239
         },
         {
           "categories": [
@@ -5053,7 +5013,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 309
+          "userPromptLength": 273
         },
         {
           "categories": [
@@ -5067,7 +5027,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 253
+          "userPromptLength": 217
         },
         {
           "categories": [
@@ -5081,7 +5041,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 261
+          "userPromptLength": 225
         },
         {
           "categories": [
@@ -5095,7 +5055,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 293
+          "userPromptLength": 257
         },
         {
           "categories": [
@@ -5109,7 +5069,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 317
+          "userPromptLength": 281
         },
         {
           "categories": [
@@ -5123,7 +5083,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 285
+          "userPromptLength": 249
         }
       ],
       "maxChars": 400000,
@@ -5148,7 +5108,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 521
+          "userPromptLength": 465
         },
         {
           "categories": [
@@ -5165,7 +5125,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 496
+          "userPromptLength": 436
         },
         {
           "categories": [
@@ -5182,7 +5142,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 505
+          "userPromptLength": 442
         },
         {
           "categories": [
@@ -5199,7 +5159,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 520
+          "userPromptLength": 457
         },
         {
           "categories": [
@@ -5216,7 +5176,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 459
+          "userPromptLength": 396
         },
         {
           "categories": [
@@ -5233,7 +5193,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 450
+          "userPromptLength": 387
         },
         {
           "categories": [
@@ -5250,7 +5210,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 557
+          "userPromptLength": 494
         },
         {
           "categories": [
@@ -5272,7 +5232,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 500
+          "userPromptLength": 443
         },
         {
           "categories": [
@@ -5294,7 +5254,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 493
+          "userPromptLength": 437
         },
         {
           "categories": [
@@ -5311,7 +5271,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 531
+          "userPromptLength": 472
         },
         {
           "categories": [
@@ -5328,7 +5288,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 506
+          "userPromptLength": 443
         },
         {
           "categories": [
@@ -5345,7 +5305,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 509
+          "userPromptLength": 446
         },
         {
           "categories": [
@@ -5362,7 +5322,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 484
+          "userPromptLength": 421
         },
         {
           "categories": [
@@ -5379,7 +5339,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 463
+          "userPromptLength": 400
         },
         {
           "categories": [
@@ -5396,7 +5356,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 494
+          "userPromptLength": 431
         },
         {
           "categories": [
@@ -5413,7 +5373,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 561
+          "userPromptLength": 498
         },
         {
           "categories": [
@@ -5435,7 +5395,7 @@
               "id": "large-c3"
             }
           ],
-          "userPromptLength": 531
+          "userPromptLength": 469
         },
         {
           "categories": [
@@ -5452,7 +5412,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 477
+          "userPromptLength": 421
         },
         {
           "categories": [
@@ -5469,7 +5429,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 532
+          "userPromptLength": 472
         },
         {
           "categories": [
@@ -5486,7 +5446,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 501
+          "userPromptLength": 438
         },
         {
           "categories": [
@@ -5503,7 +5463,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 516
+          "userPromptLength": 453
         },
         {
           "categories": [
@@ -5520,7 +5480,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 495
+          "userPromptLength": 432
         },
         {
           "categories": [
@@ -5537,7 +5497,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 446
+          "userPromptLength": 383
         },
         {
           "categories": [
@@ -5559,7 +5519,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 517
+          "userPromptLength": 458
         },
         {
           "categories": [
@@ -5576,7 +5536,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 475
+          "userPromptLength": 418
         },
         {
           "categories": [
@@ -5593,7 +5553,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 478
+          "userPromptLength": 415
         },
         {
           "categories": [
@@ -5610,7 +5570,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 505
+          "userPromptLength": 442
         },
         {
           "categories": [
@@ -5627,7 +5587,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 512
+          "userPromptLength": 449
         },
         {
           "categories": [
@@ -5641,7 +5601,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 285
+          "userPromptLength": 249
         }
       ],
       "maxChars": 600,
@@ -5663,7 +5623,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 293
+          "userPromptLength": 261
         },
         {
           "categories": [
@@ -5677,7 +5637,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 277
+          "userPromptLength": 245
         },
         {
           "categories": [
@@ -5691,7 +5651,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 255
         },
         {
           "categories": [
@@ -5699,30 +5659,20 @@
               "dishIds": [
                 "large-0-12",
                 "large-0-13",
-                "large-0-14"
+                "large-0-14",
+                "large-0-15"
               ],
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 225
+          "userPromptLength": 289
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-0-15",
                 "large-0-16",
-                "large-0-17"
-              ],
-              "id": "large-c0"
-            }
-          ],
-          "userPromptLength": 216
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "large-0-17",
                 "large-0-18",
                 "large-0-19",
                 "large-0-20"
@@ -5730,7 +5680,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 219
+          "userPromptLength": 291
         },
         {
           "categories": [
@@ -5738,30 +5688,20 @@
               "dishIds": [
                 "large-0-21",
                 "large-0-22",
-                "large-0-23"
+                "large-0-23",
+                "large-0-24"
               ],
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 210
+          "userPromptLength": 277
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-0-24",
                 "large-0-25",
-                "large-0-26"
-              ],
-              "id": "large-c0"
-            }
-          ],
-          "userPromptLength": 213
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "large-0-26",
                 "large-0-27",
                 "large-0-28",
                 "large-0-29"
@@ -5769,7 +5709,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 204
+          "userPromptLength": 270
         },
         {
           "categories": [
@@ -5777,72 +5717,62 @@
               "dishIds": [
                 "large-0-30",
                 "large-0-31",
-                "large-0-32"
+                "large-0-32",
+                "large-0-33"
               ],
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 207
+          "userPromptLength": 265
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-0-33",
                 "large-0-34",
                 "large-0-35",
-                "large-0-36"
+                "large-0-36",
+                "large-0-37",
+                "large-0-38"
               ],
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 297
+          "userPromptLength": 261
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-0-37",
-                "large-0-38",
                 "large-0-39",
                 "large-0-40",
-                "large-0-41"
+                "large-0-41",
+                "large-0-42"
               ],
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 295
+          "userPromptLength": 253
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-0-42",
                 "large-0-43",
-                "large-0-44"
-              ],
-              "id": "large-c0"
-            }
-          ],
-          "userPromptLength": 235
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "large-0-44",
                 "large-0-45",
-                "large-0-46",
-                "large-0-47"
+                "large-0-46"
               ],
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 226
+          "userPromptLength": 277
         },
         {
           "categories": [
             {
               "dishIds": [
+                "large-0-47",
                 "large-0-48",
                 "large-0-49"
               ],
@@ -5855,7 +5785,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 249
+          "userPromptLength": 266
         },
         {
           "categories": [
@@ -5869,7 +5799,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 273
+          "userPromptLength": 241
         },
         {
           "categories": [
@@ -5883,57 +5813,47 @@
             {
               "dishIds": [
                 "large-2-0",
-                "large-2-1"
+                "large-2-1",
+                "large-2-2"
               ],
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 295
+          "userPromptLength": 300
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-2-2",
                 "large-2-3",
                 "large-2-4",
-                "large-2-5"
+                "large-2-5",
+                "large-2-6"
               ],
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 269
+          "userPromptLength": 273
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-2-6",
                 "large-2-7",
-                "large-2-8"
-              ],
-              "id": "large-c2"
-            }
-          ],
-          "userPromptLength": 227
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "large-2-8",
                 "large-2-9",
-                "large-2-10",
-                "large-2-11"
+                "large-2-10"
               ],
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 222
+          "userPromptLength": 258
         },
         {
           "categories": [
             {
               "dishIds": [
+                "large-2-11",
                 "large-2-12",
                 "large-2-13",
                 "large-2-14"
@@ -5941,7 +5861,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 227
+          "userPromptLength": 269
         },
         {
           "categories": [
@@ -5955,7 +5875,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 297
+          "userPromptLength": 261
         },
         {
           "categories": [
@@ -5969,7 +5889,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 281
+          "userPromptLength": 245
         },
         {
           "categories": [
@@ -5983,7 +5903,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 253
         },
         {
           "categories": [
@@ -5992,77 +5912,78 @@
                 "large-2-27",
                 "large-2-28",
                 "large-2-29",
-                "large-2-30"
+                "large-2-30",
+                "large-2-31"
               ],
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 281
+          "userPromptLength": 294
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-2-31",
                 "large-2-32",
                 "large-2-33",
-                "large-2-34"
+                "large-2-34",
+                "large-2-35"
               ],
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 265
+          "userPromptLength": 241
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-2-35",
                 "large-2-36",
                 "large-2-37",
-                "large-2-38"
-              ],
-              "id": "large-c2"
-            }
-          ],
-          "userPromptLength": 273
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "large-2-38",
                 "large-2-39",
-                "large-2-40",
+                "large-2-40"
+              ],
+              "id": "large-c2"
+            }
+          ],
+          "userPromptLength": 285
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
                 "large-2-41",
-                "large-2-42"
-              ],
-              "id": "large-c2"
-            }
-          ],
-          "userPromptLength": 265
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "large-2-42",
                 "large-2-43",
-                "large-2-44",
-                "large-2-45",
-                "large-2-46"
+                "large-2-44"
               ],
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 229
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-2-47",
+                "large-2-45",
+                "large-2-46",
+                "large-2-47"
+              ],
+              "id": "large-c2"
+            }
+          ],
+          "userPromptLength": 201
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
                 "large-2-48",
                 "large-2-49",
-                "large-2-50"
+                "large-2-50",
+                "large-2-51"
               ],
               "id": "large-c2"
             }
@@ -6073,32 +5994,21 @@
           "categories": [
             {
               "dishIds": [
-                "large-2-51",
                 "large-2-52",
-                "large-2-53"
-              ],
-              "id": "large-c2"
-            }
-          ],
-          "userPromptLength": 222
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "large-2-53",
                 "large-2-54",
-                "large-2-55",
-                "large-2-56"
+                "large-2-55"
               ],
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 225
+          "userPromptLength": 241
         },
         {
           "categories": [
             {
               "dishIds": [
+                "large-2-56",
                 "large-2-57",
                 "large-2-58",
                 "large-2-59"
@@ -6106,7 +6016,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 216
+          "userPromptLength": 249
         },
         {
           "categories": [
@@ -6124,24 +6034,174 @@
             },
             {
               "dishIds": [
-                "large-4-0"
+                "large-4-0",
+                "large-4-1"
               ],
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 292
+          "userPromptLength": 299
         },
         {
           "categories": [
             {
               "dishIds": [
-                "large-4-1",
                 "large-4-2",
                 "large-4-3",
                 "large-4-4",
-                "large-4-5"
+                "large-4-5",
+                "large-4-6"
               ],
               "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 300
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-7",
+                "large-4-8",
+                "large-4-9",
+                "large-4-10"
+              ],
+              "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 274
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-11",
+                "large-4-12",
+                "large-4-13",
+                "large-4-14"
+              ],
+              "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 245
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-15",
+                "large-4-16",
+                "large-4-17",
+                "large-4-18"
+              ],
+              "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 277
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-19",
+                "large-4-20",
+                "large-4-21",
+                "large-4-22",
+                "large-4-23"
+              ],
+              "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 300
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-24",
+                "large-4-25",
+                "large-4-26",
+                "large-4-27"
+              ],
+              "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 265
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-28",
+                "large-4-29",
+                "large-4-30",
+                "large-4-31",
+                "large-4-32"
+              ],
+              "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 291
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-33",
+                "large-4-34",
+                "large-4-35",
+                "large-4-36"
+              ],
+              "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 253
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-37",
+                "large-4-38",
+                "large-4-39",
+                "large-4-40",
+                "large-4-41"
+              ],
+              "id": "large-c4"
+            }
+          ],
+          "userPromptLength": 270
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-4-42",
+                "large-4-43",
+                "large-4-44"
+              ],
+              "id": "large-c4"
+            },
+            {
+              "dishIds": [
+                "large-5-0"
+              ],
+              "id": "large-c5"
+            }
+          ],
+          "userPromptLength": 269
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-5-1",
+                "large-5-2",
+                "large-5-3",
+                "large-5-4",
+                "large-5-5"
+              ],
+              "id": "large-c5"
             }
           ],
           "userPromptLength": 285
@@ -6150,176 +6210,10 @@
           "categories": [
             {
               "dishIds": [
-                "large-4-6",
-                "large-4-7",
-                "large-4-8"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 229
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-9",
-                "large-4-10",
-                "large-4-11"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 224
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-12",
-                "large-4-13",
-                "large-4-14"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 229
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-15",
-                "large-4-16",
-                "large-4-17"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 220
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-18",
-                "large-4-19",
-                "large-4-20"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 223
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-21",
-                "large-4-22",
-                "large-4-23"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 214
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-24",
-                "large-4-25",
-                "large-4-26"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 217
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-27",
-                "large-4-28",
-                "large-4-29",
-                "large-4-30"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 297
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-31",
-                "large-4-32",
-                "large-4-33",
-                "large-4-34"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 281
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-35",
-                "large-4-36",
-                "large-4-37",
-                "large-4-38"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 249
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-39",
-                "large-4-40",
-                "large-4-41",
-                "large-4-42"
-              ],
-              "id": "large-c4"
-            }
-          ],
-          "userPromptLength": 281
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-4-43",
-                "large-4-44"
-              ],
-              "id": "large-c4"
-            },
-            {
-              "dishIds": [
-                "large-5-0",
-                "large-5-1"
-              ],
-              "id": "large-c5"
-            }
-          ],
-          "userPromptLength": 267
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-5-2",
-                "large-5-3",
-                "large-5-4",
-                "large-5-5"
+                "large-5-6",
+                "large-5-7",
+                "large-5-8",
+                "large-5-9"
               ],
               "id": "large-c5"
             }
@@ -6330,89 +6224,11 @@
           "categories": [
             {
               "dishIds": [
-                "large-5-6",
-                "large-5-7",
-                "large-5-8"
-              ],
-              "id": "large-c5"
-            }
-          ],
-          "userPromptLength": 213
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-5-9",
                 "large-5-10",
-                "large-5-11"
-              ],
-              "id": "large-c5"
-            }
-          ],
-          "userPromptLength": 208
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
+                "large-5-11",
                 "large-5-12",
                 "large-5-13",
                 "large-5-14"
-              ],
-              "id": "large-c5"
-            }
-          ],
-          "userPromptLength": 213
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-5-15",
-                "large-5-16",
-                "large-5-17"
-              ],
-              "id": "large-c5"
-            }
-          ],
-          "userPromptLength": 204
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-5-18",
-                "large-5-19",
-                "large-5-20"
-              ],
-              "id": "large-c5"
-            }
-          ],
-          "userPromptLength": 207
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-5-21",
-                "large-5-22",
-                "large-5-23",
-                "large-5-24"
-              ],
-              "id": "large-c5"
-            }
-          ],
-          "userPromptLength": 297
-        },
-        {
-          "categories": [
-            {
-              "dishIds": [
-                "large-5-25",
-                "large-5-26",
-                "large-5-27",
-                "large-5-28"
               ],
               "id": "large-c5"
             }
@@ -6423,20 +6239,64 @@
           "categories": [
             {
               "dishIds": [
-                "large-5-29",
-                "large-5-30",
-                "large-5-31",
-                "large-5-32"
+                "large-5-15",
+                "large-5-16",
+                "large-5-17",
+                "large-5-18"
               ],
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 289
+          "userPromptLength": 269
         },
         {
           "categories": [
             {
               "dishIds": [
+                "large-5-19",
+                "large-5-20",
+                "large-5-21",
+                "large-5-22",
+                "large-5-23"
+              ],
+              "id": "large-c5"
+            }
+          ],
+          "userPromptLength": 260
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-5-24",
+                "large-5-25",
+                "large-5-26",
+                "large-5-27"
+              ],
+              "id": "large-c5"
+            }
+          ],
+          "userPromptLength": 257
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-5-28",
+                "large-5-29",
+                "large-5-30",
+                "large-5-31"
+              ],
+              "id": "large-c5"
+            }
+          ],
+          "userPromptLength": 281
+        },
+        {
+          "categories": [
+            {
+              "dishIds": [
+                "large-5-32",
                 "large-5-33",
                 "large-5-34",
                 "large-5-35"
@@ -6444,7 +6304,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 226
+          "userPromptLength": 249
         }
       ],
       "maxChars": 300,
@@ -6463,7 +6323,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 68
+          "userPromptLength": 60
         },
         {
           "categories": [
@@ -6474,7 +6334,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 43
         },
         {
           "categories": [
@@ -6485,7 +6345,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 70
+          "userPromptLength": 62
         },
         {
           "categories": [
@@ -6496,7 +6356,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 101
+          "userPromptLength": 93
         },
         {
           "categories": [
@@ -6507,7 +6367,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 56
+          "userPromptLength": 48
         },
         {
           "categories": [
@@ -6518,7 +6378,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 63
+          "userPromptLength": 55
         },
         {
           "categories": [
@@ -6529,7 +6389,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 106
+          "userPromptLength": 98
         },
         {
           "categories": [
@@ -6540,7 +6400,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 49
+          "userPromptLength": 41
         },
         {
           "categories": [
@@ -6551,7 +6411,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 68
+          "userPromptLength": 60
         },
         {
           "categories": [
@@ -6562,7 +6422,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 99
+          "userPromptLength": 91
         },
         {
           "categories": [
@@ -6573,7 +6433,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 56
+          "userPromptLength": 47
         },
         {
           "categories": [
@@ -6584,7 +6444,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 63
+          "userPromptLength": 54
         },
         {
           "categories": [
@@ -6595,7 +6455,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 106
+          "userPromptLength": 97
         },
         {
           "categories": [
@@ -6606,7 +6466,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 49
+          "userPromptLength": 40
         },
         {
           "categories": [
@@ -6617,7 +6477,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 68
+          "userPromptLength": 59
         },
         {
           "categories": [
@@ -6628,7 +6488,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 99
+          "userPromptLength": 90
         },
         {
           "categories": [
@@ -6639,7 +6499,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 54
+          "userPromptLength": 45
         },
         {
           "categories": [
@@ -6650,7 +6510,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 61
+          "userPromptLength": 52
         },
         {
           "categories": [
@@ -6661,7 +6521,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 104
+          "userPromptLength": 95
         },
         {
           "categories": [
@@ -6672,7 +6532,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 47
+          "userPromptLength": 38
         },
         {
           "categories": [
@@ -6683,7 +6543,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 66
+          "userPromptLength": 57
         },
         {
           "categories": [
@@ -6694,7 +6554,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 97
+          "userPromptLength": 88
         },
         {
           "categories": [
@@ -6705,7 +6565,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 52
+          "userPromptLength": 43
         },
         {
           "categories": [
@@ -6716,7 +6576,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 59
+          "userPromptLength": 50
         },
         {
           "categories": [
@@ -6727,7 +6587,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 102
+          "userPromptLength": 93
         },
         {
           "categories": [
@@ -6738,7 +6598,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 45
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -6749,7 +6609,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 64
+          "userPromptLength": 55
         },
         {
           "categories": [
@@ -6760,7 +6620,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 95
+          "userPromptLength": 86
         },
         {
           "categories": [
@@ -6771,7 +6631,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 50
+          "userPromptLength": 41
         },
         {
           "categories": [
@@ -6782,7 +6642,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 57
+          "userPromptLength": 48
         },
         {
           "categories": [
@@ -6793,7 +6653,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 100
+          "userPromptLength": 91
         },
         {
           "categories": [
@@ -6804,7 +6664,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 43
+          "userPromptLength": 34
         },
         {
           "categories": [
@@ -6815,7 +6675,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 62
+          "userPromptLength": 53
         },
         {
           "categories": [
@@ -6826,7 +6686,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 93
+          "userPromptLength": 84
         },
         {
           "categories": [
@@ -6837,7 +6697,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 48
+          "userPromptLength": 39
         },
         {
           "categories": [
@@ -6848,7 +6708,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 55
+          "userPromptLength": 46
         },
         {
           "categories": [
@@ -6859,7 +6719,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 98
+          "userPromptLength": 89
         },
         {
           "categories": [
@@ -6870,7 +6730,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 41
+          "userPromptLength": 32
         },
         {
           "categories": [
@@ -6881,7 +6741,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 60
+          "userPromptLength": 51
         },
         {
           "categories": [
@@ -6892,7 +6752,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 91
+          "userPromptLength": 82
         },
         {
           "categories": [
@@ -6903,7 +6763,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 46
+          "userPromptLength": 37
         },
         {
           "categories": [
@@ -6914,7 +6774,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 53
+          "userPromptLength": 44
         },
         {
           "categories": [
@@ -6925,7 +6785,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 96
+          "userPromptLength": 87
         },
         {
           "categories": [
@@ -6936,7 +6796,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 79
+          "userPromptLength": 70
         },
         {
           "categories": [
@@ -6947,7 +6807,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 58
+          "userPromptLength": 49
         },
         {
           "categories": [
@@ -6958,7 +6818,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 89
+          "userPromptLength": 80
         },
         {
           "categories": [
@@ -6969,7 +6829,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 84
+          "userPromptLength": 75
         },
         {
           "categories": [
@@ -6980,7 +6840,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 42
         },
         {
           "categories": [
@@ -6991,7 +6851,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 94
+          "userPromptLength": 85
         },
         {
           "categories": [
@@ -7002,7 +6862,7 @@
               "id": "large-c0"
             }
           ],
-          "userPromptLength": 77
+          "userPromptLength": 68
         },
         {
           "categories": [
@@ -7013,7 +6873,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 76
+          "userPromptLength": 68
         },
         {
           "categories": [
@@ -7024,7 +6884,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 59
+          "userPromptLength": 51
         },
         {
           "categories": [
@@ -7035,7 +6895,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 78
+          "userPromptLength": 70
         },
         {
           "categories": [
@@ -7046,7 +6906,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 69
+          "userPromptLength": 61
         },
         {
           "categories": [
@@ -7057,7 +6917,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 64
+          "userPromptLength": 56
         },
         {
           "categories": [
@@ -7068,7 +6928,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 71
+          "userPromptLength": 63
         },
         {
           "categories": [
@@ -7079,7 +6939,7 @@
               "id": "large-c1"
             }
           ],
-          "userPromptLength": 74
+          "userPromptLength": 66
         },
         {
           "categories": [
@@ -7090,7 +6950,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 82
+          "userPromptLength": 74
         },
         {
           "categories": [
@@ -7101,7 +6961,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 65
+          "userPromptLength": 57
         },
         {
           "categories": [
@@ -7112,7 +6972,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 44
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -7123,7 +6983,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 75
+          "userPromptLength": 67
         },
         {
           "categories": [
@@ -7134,7 +6994,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 70
+          "userPromptLength": 62
         },
         {
           "categories": [
@@ -7145,7 +7005,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 77
+          "userPromptLength": 69
         },
         {
           "categories": [
@@ -7156,7 +7016,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 80
+          "userPromptLength": 72
         },
         {
           "categories": [
@@ -7167,7 +7027,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 63
+          "userPromptLength": 55
         },
         {
           "categories": [
@@ -7178,7 +7038,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 82
+          "userPromptLength": 74
         },
         {
           "categories": [
@@ -7189,7 +7049,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 73
+          "userPromptLength": 65
         },
         {
           "categories": [
@@ -7200,7 +7060,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 70
+          "userPromptLength": 61
         },
         {
           "categories": [
@@ -7211,7 +7071,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 77
+          "userPromptLength": 68
         },
         {
           "categories": [
@@ -7222,7 +7082,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 80
+          "userPromptLength": 71
         },
         {
           "categories": [
@@ -7233,7 +7093,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 63
+          "userPromptLength": 54
         },
         {
           "categories": [
@@ -7244,7 +7104,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 82
+          "userPromptLength": 73
         },
         {
           "categories": [
@@ -7255,7 +7115,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 73
+          "userPromptLength": 64
         },
         {
           "categories": [
@@ -7266,7 +7126,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 68
+          "userPromptLength": 59
         },
         {
           "categories": [
@@ -7277,7 +7137,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 75
+          "userPromptLength": 66
         },
         {
           "categories": [
@@ -7288,7 +7148,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 78
+          "userPromptLength": 69
         },
         {
           "categories": [
@@ -7299,7 +7159,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 61
+          "userPromptLength": 52
         },
         {
           "categories": [
@@ -7310,7 +7170,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 80
+          "userPromptLength": 71
         },
         {
           "categories": [
@@ -7321,7 +7181,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 71
+          "userPromptLength": 62
         },
         {
           "categories": [
@@ -7332,7 +7192,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 66
+          "userPromptLength": 57
         },
         {
           "categories": [
@@ -7343,7 +7203,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 73
+          "userPromptLength": 64
         },
         {
           "categories": [
@@ -7354,7 +7214,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 76
+          "userPromptLength": 67
         },
         {
           "categories": [
@@ -7365,7 +7225,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 59
+          "userPromptLength": 50
         },
         {
           "categories": [
@@ -7376,7 +7236,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 78
+          "userPromptLength": 69
         },
         {
           "categories": [
@@ -7387,7 +7247,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 69
+          "userPromptLength": 60
         },
         {
           "categories": [
@@ -7398,7 +7258,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 64
+          "userPromptLength": 55
         },
         {
           "categories": [
@@ -7409,7 +7269,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 71
+          "userPromptLength": 62
         },
         {
           "categories": [
@@ -7420,7 +7280,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 74
+          "userPromptLength": 65
         },
         {
           "categories": [
@@ -7431,7 +7291,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 57
+          "userPromptLength": 48
         },
         {
           "categories": [
@@ -7442,7 +7302,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 76
+          "userPromptLength": 67
         },
         {
           "categories": [
@@ -7453,7 +7313,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 67
+          "userPromptLength": 58
         },
         {
           "categories": [
@@ -7464,7 +7324,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 62
+          "userPromptLength": 53
         },
         {
           "categories": [
@@ -7475,7 +7335,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 69
+          "userPromptLength": 60
         },
         {
           "categories": [
@@ -7486,7 +7346,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 72
+          "userPromptLength": 63
         },
         {
           "categories": [
@@ -7497,7 +7357,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 55
+          "userPromptLength": 46
         },
         {
           "categories": [
@@ -7508,7 +7368,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 74
+          "userPromptLength": 65
         },
         {
           "categories": [
@@ -7519,7 +7379,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 65
+          "userPromptLength": 56
         },
         {
           "categories": [
@@ -7530,7 +7390,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 60
+          "userPromptLength": 51
         },
         {
           "categories": [
@@ -7541,7 +7401,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 67
+          "userPromptLength": 58
         },
         {
           "categories": [
@@ -7552,7 +7412,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 70
+          "userPromptLength": 61
         },
         {
           "categories": [
@@ -7563,7 +7423,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 53
+          "userPromptLength": 44
         },
         {
           "categories": [
@@ -7574,7 +7434,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 72
+          "userPromptLength": 63
         },
         {
           "categories": [
@@ -7585,7 +7445,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 103
+          "userPromptLength": 94
         },
         {
           "categories": [
@@ -7596,7 +7456,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 58
+          "userPromptLength": 49
         },
         {
           "categories": [
@@ -7607,7 +7467,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 65
+          "userPromptLength": 56
         },
         {
           "categories": [
@@ -7618,7 +7478,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 108
+          "userPromptLength": 99
         },
         {
           "categories": [
@@ -7629,7 +7489,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 42
         },
         {
           "categories": [
@@ -7640,7 +7500,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 70
+          "userPromptLength": 61
         },
         {
           "categories": [
@@ -7651,7 +7511,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 101
+          "userPromptLength": 92
         },
         {
           "categories": [
@@ -7662,7 +7522,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 56
+          "userPromptLength": 47
         },
         {
           "categories": [
@@ -7673,7 +7533,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 63
+          "userPromptLength": 54
         },
         {
           "categories": [
@@ -7684,7 +7544,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 106
+          "userPromptLength": 97
         },
         {
           "categories": [
@@ -7695,7 +7555,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 49
+          "userPromptLength": 40
         },
         {
           "categories": [
@@ -7706,7 +7566,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 68
+          "userPromptLength": 59
         },
         {
           "categories": [
@@ -7717,7 +7577,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 99
+          "userPromptLength": 90
         },
         {
           "categories": [
@@ -7728,7 +7588,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 54
+          "userPromptLength": 45
         },
         {
           "categories": [
@@ -7739,7 +7599,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 61
+          "userPromptLength": 52
         },
         {
           "categories": [
@@ -7750,7 +7610,7 @@
               "id": "large-c2"
             }
           ],
-          "userPromptLength": 104
+          "userPromptLength": 95
         },
         {
           "categories": [
@@ -7761,7 +7621,7 @@
               "id": "large-c3"
             }
           ],
-          "userPromptLength": 90
+          "userPromptLength": 82
         },
         {
           "categories": [
@@ -7772,7 +7632,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 96
+          "userPromptLength": 88
         },
         {
           "categories": [
@@ -7783,7 +7643,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 39
+          "userPromptLength": 31
         },
         {
           "categories": [
@@ -7794,7 +7654,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 58
+          "userPromptLength": 50
         },
         {
           "categories": [
@@ -7805,7 +7665,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 89
+          "userPromptLength": 81
         },
         {
           "categories": [
@@ -7816,7 +7676,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 44
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -7827,7 +7687,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 43
         },
         {
           "categories": [
@@ -7838,7 +7698,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 94
+          "userPromptLength": 86
         },
         {
           "categories": [
@@ -7849,7 +7709,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 77
+          "userPromptLength": 69
         },
         {
           "categories": [
@@ -7860,7 +7720,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 56
+          "userPromptLength": 48
         },
         {
           "categories": [
@@ -7871,7 +7731,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 87
+          "userPromptLength": 79
         },
         {
           "categories": [
@@ -7882,7 +7742,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 84
+          "userPromptLength": 75
         },
         {
           "categories": [
@@ -7893,7 +7753,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 42
         },
         {
           "categories": [
@@ -7904,7 +7764,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 94
+          "userPromptLength": 85
         },
         {
           "categories": [
@@ -7915,7 +7775,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 77
+          "userPromptLength": 68
         },
         {
           "categories": [
@@ -7926,7 +7786,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 56
+          "userPromptLength": 47
         },
         {
           "categories": [
@@ -7937,7 +7797,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 87
+          "userPromptLength": 78
         },
         {
           "categories": [
@@ -7948,7 +7808,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 82
+          "userPromptLength": 73
         },
         {
           "categories": [
@@ -7959,7 +7819,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 49
+          "userPromptLength": 40
         },
         {
           "categories": [
@@ -7970,7 +7830,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 92
+          "userPromptLength": 83
         },
         {
           "categories": [
@@ -7981,7 +7841,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 75
+          "userPromptLength": 66
         },
         {
           "categories": [
@@ -7992,7 +7852,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 54
+          "userPromptLength": 45
         },
         {
           "categories": [
@@ -8003,7 +7863,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 85
+          "userPromptLength": 76
         },
         {
           "categories": [
@@ -8014,7 +7874,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 80
+          "userPromptLength": 71
         },
         {
           "categories": [
@@ -8025,7 +7885,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 47
+          "userPromptLength": 38
         },
         {
           "categories": [
@@ -8036,7 +7896,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 90
+          "userPromptLength": 81
         },
         {
           "categories": [
@@ -8047,7 +7907,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 73
+          "userPromptLength": 64
         },
         {
           "categories": [
@@ -8058,7 +7918,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 52
+          "userPromptLength": 43
         },
         {
           "categories": [
@@ -8069,7 +7929,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 83
+          "userPromptLength": 74
         },
         {
           "categories": [
@@ -8080,7 +7940,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 78
+          "userPromptLength": 69
         },
         {
           "categories": [
@@ -8091,7 +7951,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 45
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -8102,7 +7962,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 88
+          "userPromptLength": 79
         },
         {
           "categories": [
@@ -8113,7 +7973,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 71
+          "userPromptLength": 62
         },
         {
           "categories": [
@@ -8124,7 +7984,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 50
+          "userPromptLength": 41
         },
         {
           "categories": [
@@ -8135,7 +7995,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 81
+          "userPromptLength": 72
         },
         {
           "categories": [
@@ -8146,7 +8006,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 76
+          "userPromptLength": 67
         },
         {
           "categories": [
@@ -8157,7 +8017,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 43
+          "userPromptLength": 34
         },
         {
           "categories": [
@@ -8168,7 +8028,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 86
+          "userPromptLength": 77
         },
         {
           "categories": [
@@ -8179,7 +8039,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 69
+          "userPromptLength": 60
         },
         {
           "categories": [
@@ -8190,7 +8050,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 48
+          "userPromptLength": 39
         },
         {
           "categories": [
@@ -8201,7 +8061,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 79
+          "userPromptLength": 70
         },
         {
           "categories": [
@@ -8212,7 +8072,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 74
+          "userPromptLength": 65
         },
         {
           "categories": [
@@ -8223,7 +8083,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 41
+          "userPromptLength": 32
         },
         {
           "categories": [
@@ -8234,7 +8094,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 84
+          "userPromptLength": 75
         },
         {
           "categories": [
@@ -8245,7 +8105,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 67
+          "userPromptLength": 58
         },
         {
           "categories": [
@@ -8256,7 +8116,7 @@
               "id": "large-c4"
             }
           ],
-          "userPromptLength": 46
+          "userPromptLength": 37
         },
         {
           "categories": [
@@ -8267,7 +8127,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 104
+          "userPromptLength": 96
         },
         {
           "categories": [
@@ -8278,7 +8138,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 47
+          "userPromptLength": 39
         },
         {
           "categories": [
@@ -8289,7 +8149,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 66
+          "userPromptLength": 58
         },
         {
           "categories": [
@@ -8300,7 +8160,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 97
+          "userPromptLength": 89
         },
         {
           "categories": [
@@ -8311,7 +8171,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 52
+          "userPromptLength": 44
         },
         {
           "categories": [
@@ -8322,7 +8182,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 59
+          "userPromptLength": 51
         },
         {
           "categories": [
@@ -8333,7 +8193,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 102
+          "userPromptLength": 94
         },
         {
           "categories": [
@@ -8344,7 +8204,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 45
+          "userPromptLength": 37
         },
         {
           "categories": [
@@ -8355,7 +8215,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 64
+          "userPromptLength": 56
         },
         {
           "categories": [
@@ -8366,7 +8226,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 95
+          "userPromptLength": 87
         },
         {
           "categories": [
@@ -8377,7 +8237,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 52
+          "userPromptLength": 43
         },
         {
           "categories": [
@@ -8388,7 +8248,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 59
+          "userPromptLength": 50
         },
         {
           "categories": [
@@ -8399,7 +8259,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 102
+          "userPromptLength": 93
         },
         {
           "categories": [
@@ -8410,7 +8270,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 45
+          "userPromptLength": 36
         },
         {
           "categories": [
@@ -8421,7 +8281,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 64
+          "userPromptLength": 55
         },
         {
           "categories": [
@@ -8432,7 +8292,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 95
+          "userPromptLength": 86
         },
         {
           "categories": [
@@ -8443,7 +8303,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 50
+          "userPromptLength": 41
         },
         {
           "categories": [
@@ -8454,7 +8314,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 57
+          "userPromptLength": 48
         },
         {
           "categories": [
@@ -8465,7 +8325,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 100
+          "userPromptLength": 91
         },
         {
           "categories": [
@@ -8476,7 +8336,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 43
+          "userPromptLength": 34
         },
         {
           "categories": [
@@ -8487,7 +8347,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 62
+          "userPromptLength": 53
         },
         {
           "categories": [
@@ -8498,7 +8358,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 93
+          "userPromptLength": 84
         },
         {
           "categories": [
@@ -8509,7 +8369,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 48
+          "userPromptLength": 39
         },
         {
           "categories": [
@@ -8520,7 +8380,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 55
+          "userPromptLength": 46
         },
         {
           "categories": [
@@ -8531,7 +8391,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 98
+          "userPromptLength": 89
         },
         {
           "categories": [
@@ -8542,7 +8402,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 41
+          "userPromptLength": 32
         },
         {
           "categories": [
@@ -8553,7 +8413,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 60
+          "userPromptLength": 51
         },
         {
           "categories": [
@@ -8564,7 +8424,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 91
+          "userPromptLength": 82
         },
         {
           "categories": [
@@ -8575,7 +8435,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 86
+          "userPromptLength": 77
         },
         {
           "categories": [
@@ -8586,7 +8446,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 53
+          "userPromptLength": 44
         },
         {
           "categories": [
@@ -8597,7 +8457,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 96
+          "userPromptLength": 87
         },
         {
           "categories": [
@@ -8608,7 +8468,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 79
+          "userPromptLength": 70
         },
         {
           "categories": [
@@ -8619,7 +8479,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 58
+          "userPromptLength": 49
         },
         {
           "categories": [
@@ -8630,7 +8490,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 89
+          "userPromptLength": 80
         },
         {
           "categories": [
@@ -8641,7 +8501,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 84
+          "userPromptLength": 75
         },
         {
           "categories": [
@@ -8652,7 +8512,7 @@
               "id": "large-c5"
             }
           ],
-          "userPromptLength": 51
+          "userPromptLength": 42
         }
       ],
       "maxChars": 1,

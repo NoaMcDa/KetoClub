@@ -833,6 +833,7 @@ Map<String, Object?> _prompt(_Inputs inputs) => <String, Object?>{
           'options': options.snapshot.toJson(),
           'systemPrompt': MenuAnalysisPrompt.systemPrompt(options: options),
           'userPrompt': MenuAnalysisPrompt.userPrompt(menu),
+          'promptIds': MenuAnalysisPrompt.promptIds(menu),
           'visionPreamble1': MenuAnalysisPrompt.visionPreamble(1),
           'visionPreamble3': MenuAnalysisPrompt.visionPreamble(3),
           'visionUserPrompt1': MenuAnalysisPrompt.visionUserPrompt(1),
@@ -945,6 +946,31 @@ Map<String, Object?> _scannedResult(ScannedMenuResult result) =>
         'failed': reason.name,
       },
     };
+
+/// A text reply parsed through the prompt ids of its source menu, as
+/// `LlmMenuClassifier` and the server's classify route parse a live reply,
+/// with those ids.
+Map<String, Object?> _promptIdEntry(ReplyCase reply) {
+  final source = reply.source!;
+  final promptIds = MenuAnalysisPrompt.promptIds(source);
+  return <String, Object?>{
+    'name': reply.name,
+    'reply': reply.body,
+    'sourceMenu': source.toJson(),
+    'netCarbLimitGrams': reply.limit,
+    'promptIds': promptIds,
+    'result': _textResult(
+      MenuResponseParser.parse(
+        reply.body,
+        source: source,
+        promptIds: promptIds,
+        analysedAt: goldenNow,
+        engine: _engine,
+        netCarbLimitGrams: reply.limit,
+      ),
+    ),
+  };
+}
 
 Map<String, Object?> _textEntry(
   String name,
@@ -1133,6 +1159,12 @@ Map<String, Object?> _parser() {
     'extractScanned': <Object?>[
       for (final reply in handExtractionScannedReplies())
         _extractScannedEntry(reply),
+    ],
+    // Replies read through the short ids the prompt sends: the lists above
+    // are parsed with none, so a reply's id is compared with the dishes'
+    // own ids only.
+    'promptIdText': <Object?>[
+      for (final reply in promptIdReplies()) _promptIdEntry(reply),
     ],
   };
 }

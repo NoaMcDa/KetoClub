@@ -71,7 +71,8 @@ abstract final class MenuQuestionPrompt {
   /// options, so the question path never needs to re-state them.
   static String systemPrompt() => _questionSystemPrompt;
 
-  /// The user prompt: `MenuAnalysisPrompt.userPrompt(menu)` lines for
+  /// The user prompt: `MenuAnalysisPrompt.platformIdLines(menu)` — the
+  /// analysis prompt's dish lines, under each dish's own id — for
   /// context, then one verdict line per analysed dish, then the question,
   /// all delimited so the model knows what each section is.
   ///
@@ -85,7 +86,7 @@ abstract final class MenuQuestionPrompt {
   /// [question] must not exceed [menuQuestionMaxLength] characters; the
   /// caller is responsible for enforcing that before calling this.
   static String userPrompt(Menu menu, MenuAnalysed analysis, String question) {
-    final menuLines = MenuAnalysisPrompt.userPrompt(menu);
+    final menuLines = MenuAnalysisPrompt.platformIdLines(menu);
     final analysedById = <String, AnalysedDish>{
       for (final d in analysis.dishes) d.dishId: d,
     };

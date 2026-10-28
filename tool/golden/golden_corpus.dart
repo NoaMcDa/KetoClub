@@ -1528,6 +1528,71 @@ List<ReplyCase> provenanceReplies() {
   ];
 }
 
+/// The source menu of the prompt-id cases: two dishes of one name under
+/// Wolt-shaped 24-character ids that share their first sixteen, as the
+/// #165 recording's ids did, and a dish whose own id `'1'` is also the
+/// first dish's prompt id (a 10bis-style numeric id).
+final Menu parserPromptIdMenu = parserMenu(<Dish>[
+  parserDish('65b0c1f2a3d4e5f60718293a', 'Smashburger'),
+  parserDish('65b0c1f2a3d4e5f60718293b', 'Smashburger'),
+  parserDish('65b0c1f2a3d4e5f6071829ff', 'Caesar Salad'),
+  parserDish('1', 'Fries'),
+]);
+
+/// Hand-written replies read through the prompt's short ids
+/// (`MenuAnalysisPrompt.promptIds` of [parserPromptIdMenu]), against
+/// [parserPromptIdMenu].
+List<ReplyCase> promptIdReplies() {
+  ReplyCase c(String name, List<Object?> elements) => (
+    name: name,
+    body: replyBody(elements),
+    source: parserPromptIdMenu,
+    limit: 6,
+  );
+  const why = 'Reason.';
+  const modification = 'No bun.';
+  return <ReplyCase>[
+    c('hand_prompt_ids_place_every_dish', <Object?>[
+      replyDish(id: '1', name: 'Smashburger', why: why),
+      replyDish(
+        id: '2',
+        name: 'Smashburger',
+        verdict: 'modifiable',
+        modification: modification,
+      ),
+      replyDish(id: '3', name: 'Caesar Salad', verdict: 'nonKeto'),
+      replyDish(id: '4', name: 'Fries', verdict: 'nonKeto'),
+    ]),
+    c('hand_prompt_ids_renamed_dish', <Object?>[
+      replyDish(id: '1', name: 'Special Smashburger 🌟'),
+      replyDish(id: '3', name: 'Salad of the house', verdict: 'nonKeto'),
+    ]),
+    c('hand_prompt_ids_full_platform_ids', <Object?>[
+      replyDish(id: '65b0c1f2a3d4e5f60718293b', name: 'Smashburger'),
+      replyDish(id: '65b0c1f2a3d4e5f6071829ff', name: 'Caesar Salad'),
+    ]),
+    c('hand_prompt_ids_prefixes_fall_to_names', <Object?>[
+      replyDish(id: '65b0c1f2a3d4e5f6', name: 'Smashburger'),
+      replyDish(
+        id: '65b0c1f2a3d4e5f6',
+        name: 'Smashburger',
+        verdict: 'nonKeto',
+      ),
+      replyDish(id: '65b0c1f2a3d4e5f6', name: 'Caesar Salad'),
+    ]),
+    c('hand_prompt_ids_unknown_short_id_falls_to_name', <Object?>[
+      replyDish(id: '9', name: 'Caesar Salad', verdict: 'nonKeto'),
+    ]),
+    // '1' is the first dish's prompt id and the fourth dish's own id: the
+    // prompt id wins, and the repeat is a duplicate.
+    c('hand_prompt_ids_short_id_wins_then_duplicate', <Object?>[
+      replyDish(id: '4', name: 'Fries', verdict: 'nonKeto'),
+      replyDish(id: '1', name: 'Fries'),
+      replyDish(id: '1', name: 'Smashburger', verdict: 'nonKeto'),
+    ]),
+  ];
+}
+
 /// Hand-written scanned replies beyond the checked-in fixtures: name
 /// trimming and dedupe, the page rule, the category language.
 List<({String name, String body, int? pageCount, int limit})>

@@ -74,8 +74,16 @@ const String _visionDescriptionSection =
 
 /// One dish's [MenuAnalysisPrompt.userPrompt] line, as
 /// [MenuAnalysisPrompt.batches] measures it: the index of its category in
-/// the menu, the dish, and the line's length in UTF-16 code units.
-typedef _PromptLine = ({int category, Dish dish, int length});
+/// the menu, the dish, and the length in UTF-16 code units of the line
+/// without its prompt id. The id is the dish's position in the request it
+/// ends up in, so the whole line's length is known only once its batch is
+/// (see [_lineLength]).
+typedef _PromptLine = ({int category, Dish dish, int rest});
+
+/// The length of [line] as the [position]th line of its request: the
+/// digits of its prompt id ([MenuAnalysisPrompt.promptIds]) and the rest.
+int _lineLength(_PromptLine line, int position) =>
+    '$position'.length + line.rest;
 
 /// Builds the system prompt, user prompt, and strict JSON schema
 /// `LlmMenuClassifier` sends to the model through `LlmChatClient`
@@ -192,7 +200,17 @@ abstract final class MenuAnalysisPrompt {
       : 'Menu: $pageCount pages, attached in reading order.';
 
   /// The menu as one line per dish, in menu order:
-  /// `id | category | name | description | options`.
+  /// `id | category | name | description | options`, where `id` is the
+  /// dish's prompt id ([promptIds]) — `1`, `2`, `3`, … in menu order —
+  /// never its platform id.
+  ///
+  /// A short number is what the model copies back exactly: given Wolt's
+  /// 24-character hex ids, the reply the #165 smoke test recorded
+  /// (`smoke_10_dish_hebrew.json`) sent back 16-character prefixes, so no
+  /// id matched and every dish was placed by its name alone. The caller
+  /// hands [promptIds] of the same [menu] to `MenuResponseParser.parse`,
+  /// which reads a reply's `id` through it. The ids are per request: each
+  /// of [batches]' menus numbers its own dishes from 1.
   ///
   /// Prices are omitted: they play no part in a keto verdict and would
   /// only spend tokens the model reads and discards (architecture.md
@@ -203,11 +221,31 @@ abstract final class MenuAnalysisPrompt {
     final lines = <String>[];
     for (final category in menu.categories) {
       for (final dish in category.dishes) {
-        lines.add(_dishLine(dish, category.name));
+        lines.add(_dishLine('${lines.length + 1}', dish, category.name));
       }
     }
     return lines.join('\n');
   }
+
+  /// The prompt id of every dish of [menu], mapped to the dish's own
+  /// [Dish.id]: `'1'` for the first dish in menu order, `'2'` for the
+  /// second, and so on — the ids [userPrompt] writes for [menu].
+  ///
+  /// Two dishes sharing one [Dish.id] (one item listed under two
+  /// categories) get a prompt id each, both mapped to that id.
+  static Map<String, String> promptIds(Menu menu) => <String, String>{
+    for (final (index, dish) in menu.allDishes.indexed) '${index + 1}': dish.id,
+  };
+
+  /// The menu as [userPrompt]'s lines, but each under the dish's own
+  /// [Dish.id] rather than its prompt id: the dish lines of a menu
+  /// question (`MenuQuestionPrompt`, issue #214), whose verdict lines and
+  /// reply name dishes by [Dish.id].
+  static String platformIdLines(Menu menu) => <String>[
+    for (final category in menu.categories)
+      for (final dish in category.dishes)
+        _dishLine(dish.id, dish, category.name),
+  ].join('\n');
 
   /// The most dishes one request asks about (issue #188):
   /// [llmBatchMaxDishesWithExtraction] when the request also extracts
@@ -230,6 +268,8 @@ abstract final class MenuAnalysisPrompt {
   /// Otherwise the dishes are dealt out in menu order, never reordered, so
   /// the same menu always splits the same way and each batch's request is
   /// the same bytes every time (the server's chat cache is keyed by them).
+  /// Each batch's [userPrompt] numbers its own dishes from 1, and every
+  /// line is measured with the prompt id it carries there.
   /// The dish ceiling is balanced first: a menu needing `k` batches by
   /// count fills each with at most `ceil(n / k)` dishes, so 200 dishes
   /// under a ceiling of 80 are 67, 67 and 66 rather than 80, 80 and 40.
@@ -256,14 +296,14 @@ abstract final class MenuAnalysisPrompt {
         lines.add((
           category: c,
           dish: dish,
-          length: _dishLine(dish, category.name).length,
+          rest: _dishLine('', dish, category.name).length,
         ));
       }
     }
     final count = lines.length;
     var promptLength = count == 0 ? 0 : count - 1;
-    for (final line in lines) {
-      promptLength += line.length;
+    for (final (index, line) in lines.indexed) {
+      promptLength += _lineLength(line, index + 1);
     }
     if (count <= maxDishes && promptLength <= maxChars) return <Menu>[menu];
 
@@ -274,13 +314,13 @@ abstract final class MenuAnalysisPrompt {
     var currentLength = 0;
     for (final line in lines) {
       var added = current.isEmpty
-          ? line.length
-          : currentLength + 1 + line.length;
+          ? _lineLength(line, 1)
+          : currentLength + 1 + _lineLength(line, current.length + 1);
       if (current.isNotEmpty &&
           (current.length >= target || added > maxChars)) {
         groups.add(current);
         current = <_PromptLine>[];
-        added = line.length;
+        added = _lineLength(line, 1);
       }
       current.add(line);
       currentLength = added;
@@ -321,11 +361,12 @@ abstract final class MenuAnalysisPrompt {
     );
   }
 
-  /// One `userPrompt` line for [dish], under [categoryName].
-  static String _dishLine(Dish dish, String categoryName) {
+  /// One `userPrompt` line for [dish] under the id [id], in
+  /// [categoryName].
+  static String _dishLine(String id, Dish dish, String categoryName) {
     final options = dish.options.map(_optionText).join('; ');
     return <String>[
-      dish.id,
+      id,
       categoryName,
       dish.name,
       dish.description,

@@ -102,8 +102,36 @@ def test_an_llm_analysis_matches_the_parser_golden(
     assert analysis["dishes"] == expected["dishes"]
     assert analysis["unclassified"] == expected["unclassified"]
     sent = json.loads(route.calls.last.request.content)
-    assert "dish-steak | Mains | Grilled Steak" in json.dumps(sent)
+    # The prompt numbers the dish; the golden reply echoes its platform id,
+    # which still places it.
+    assert "1 | Mains | Grilled Steak" in json.dumps(sent)
+    assert "dish-steak" not in json.dumps(sent)
     assert sent["generationConfig"]["responseSchema"]["type"] == "object"
+
+
+def test_a_reply_by_short_ids_gives_two_dishes_of_one_name_their_own_verdicts(
+    app_client: TestClient, gemini: respx.MockRouter
+) -> None:
+    entry = next(
+        e
+        for e in golden("parser.json")["promptIdText"]
+        if e["name"] == "hand_prompt_ids_place_every_dish"
+    )
+    route = gemini.post(GEMINI_URL).respond(200, json=gemini_answer(entry["reply"]))
+
+    response = _post(app_client, _body(entry["sourceMenu"]))
+
+    assert response.status_code == 200
+    analysis = response.json()["analysis"]
+    expected = entry["result"]["analysed"]
+    assert analysis["dishes"] == expected["dishes"]
+    assert analysis["unclassified"] == []
+    assert [d["dishId"] for d in analysis["dishes"]][:2] == [
+        "65b0c1f2a3d4e5f60718293a",
+        "65b0c1f2a3d4e5f60718293b",
+    ]
+    user_text = json.loads(route.calls.last.request.content)["contents"]
+    assert "65b0c1f2" not in json.dumps(user_text)
 
 
 def test_the_options_reach_the_prompt_and_come_back(

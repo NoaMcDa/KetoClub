@@ -178,7 +178,8 @@ final class LlmMenuClassifier implements MenuClassifier {
   }
 
   /// Sends one request for [menu] — a whole menu, or one batch of one —
-  /// and parses its reply against [menu].
+  /// and parses its reply against [menu], reading the reply's ids through
+  /// the batch's own prompt ids ([MenuAnalysisPrompt.promptIds]).
   Future<MenuAnalysis> _classifyBatch(
     Menu menu,
     ClassificationOptions options,
@@ -198,6 +199,9 @@ final class LlmMenuClassifier implements MenuClassifier {
         final parsed = MenuResponseParser.parse(
           content,
           source: menu,
+          // The short ids this request's prompt numbered [menu]'s dishes
+          // with, so a reply's `id` is read back through them.
+          promptIds: MenuAnalysisPrompt.promptIds(menu),
           analysedAt: _clock.now(),
           engine: LlmEngine(model: model),
           // The same limit the prompt stated, so the parser holds the
