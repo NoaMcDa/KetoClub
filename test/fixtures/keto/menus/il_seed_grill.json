@@ -1,0 +1,142 @@
+{
+  "id": "il_seed_grill",
+  "name": "גריל השכונה",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Israeli neighbourhood grill (מסעדת בשרים) written for the keto corpus as its contract seed; Hebrew.",
+  "categories": [
+    {
+      "name": "מהגריל",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "שיפודי פרגית",
+          "description": "שיפודי פרגית על האש, מוגשים עם תוספת לבחירה",
+          "options": [
+            {"name": "תוספת לבחירה", "values": ["צ׳יפס", "אורז", "סלט ירוק"]}
+          ],
+          "expected": "modifiable",
+          "acceptable": ["orderAsIs"],
+          "hiddenCarbs": [],
+          "why": "Grilled chicken thigh; the side is a choice and two of the three choices are starch, so the order must name the salad.",
+          "evidence": ["פרגית", "צ׳יפס", "אורז"]
+        },
+        {
+          "id": "d2",
+          "name": "אנטריקוט 300 גרם",
+          "description": "סטייק אנטריקוט על הגריל ברוטב הבית",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": ["orderAsIs"],
+          "hiddenCarbs": [
+            {"source": "house sauce (רוטב הבית)", "certainty": "suspected", "term": "רוטב הבית"}
+          ],
+          "why": "A plain rib-eye; only the unnamed house sauce may carry sugar, so ask for it on the side.",
+          "evidence": ["אנטריקוט", "רוטב הבית"]
+        },
+        {
+          "id": "d3",
+          "name": "כנפיים במרינדה מתוקה",
+          "description": "כנפי עוף צלויות במרינדה מתוקה ושום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": ["nonKeto"],
+          "hiddenCarbs": [
+            {"source": "sweet marinade (מרינדה מתוקה)", "certainty": "likely", "term": "מרינדה מתוקה"}
+          ],
+          "why": "Chicken wings are keto, but the sweet marinade is sugar; ask for them grilled with salt and garlic only.",
+          "evidence": ["כנפיים", "מרינדה מתוקה"]
+        },
+        {
+          "id": "d4",
+          "name": "קבב טלה",
+          "description": "קבב טלה בפיתה עם טחינה וסלט",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": ["nonKeto"],
+          "hiddenCarbs": [
+            {"source": "breadcrumb or bread binder in minced kebab", "certainty": "suspected"}
+          ],
+          "why": "Lamb kebab with tahini and salad; the pita only carries it and can be replaced by a plate.",
+          "evidence": ["קבב טלה", "בפיתה"]
+        },
+        {
+          "id": "d5",
+          "name": "שניצל עוף",
+          "description": "שניצל עוף פריך עם צ׳יפס",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A breaded protein: the crumb coating is the dish, so no swap fixes it.",
+          "evidence": ["שניצל"]
+        },
+        {
+          "id": "d6",
+          "name": "צלחת שווארמה הודו",
+          "description": "שווארמה הודו על צלחת עם סלט ירקות, טחינה ועמבה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": ["orderAsIs"],
+          "hiddenCarbs": [
+            {"source": "amba, mango pickle often sweetened (עמבה)", "certainty": "likely", "term": "עמבה"}
+          ],
+          "why": "Turkey shawarma on a plate with salad and tahini; leave out the amba.",
+          "evidence": ["שווארמה", "עמבה"]
+        }
+      ]
+    },
+    {
+      "name": "סלטים ומנות פתיחה",
+      "dishes": [
+        {
+          "id": "d7",
+          "name": "סלט ירוק",
+          "description": "חסה, מלפפון, נענע ופטרוזיליה בוויניגרט הבית",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": ["modifiable"],
+          "hiddenCarbs": [
+            {"source": "house vinaigrette may contain honey or sugar (ויניגרט הבית)", "certainty": "suspected", "term": "ויניגרט הבית"}
+          ],
+          "why": "Leaf salad and herbs; only the house vinaigrette is a question.",
+          "evidence": ["חסה", "מלפפון", "ויניגרט הבית"]
+        },
+        {
+          "id": "d8",
+          "name": "חומוס עם בשר",
+          "description": "חומוס חם עם בשר טחון מוקפץ וצנוברים, מוגש עם פיתה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "The base is a bowl of chickpea purée; the meat topping cannot fix that.",
+          "evidence": ["חומוס"]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d9",
+          "name": "קוקה קולה זירו",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A zero-sugar soda.",
+          "evidence": ["זירו"]
+        },
+        {
+          "id": "d10",
+          "name": "לימונענע",
+          "description": "לימונדה עם נענע גרוסה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Lemonade is sugar water.",
+          "evidence": ["לימונדה"]
+        }
+      ]
+    }
+  ]
+}
