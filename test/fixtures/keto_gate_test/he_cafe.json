@@ -1,0 +1,26 @@
+{
+  "id": "gate_he_cafe",
+  "name": "קפה מבחן",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic, written for keto_scoring_test.dart; not part of the keto corpus.",
+  "categories": [
+    {
+      "name": "עיקריות",
+      "dishes": [
+        {
+          "id": "meatballs",
+          "name": "קציצות בקר ברוטב עגבניות",
+          "description": "קציצות בקר ביתיות ברוטב עגבניות",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [
+            {"source": "breadcrumb binder (פירורי לחם)", "certainty": "likely"}
+          ],
+          "why": "House meatballs are usually bound with breadcrumbs; ask.",
+          "evidence": ["קציצות"]
+        }
+      ]
+    }
+  ]
+}
