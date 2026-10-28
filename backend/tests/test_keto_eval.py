@@ -248,7 +248,9 @@ def test_model_verdicts_read_the_reply_as_the_parser_does() -> None:
     assert got["eval_en_bistro/en-02"].verdict == "modifiable"  # over 6 g
     assert got["eval_en_bistro/en-03"] == ev.Got("nonKeto")
     assert "eval_en_bistro/en-04" not in got  # demoted to unclassified
-    assert got["eval_en_bistro/en-05"] == ev.Got("modifiable", ("sugar",))
+    assert got["eval_en_bistro/en-05"] == ev.Got(
+        "modifiable", (ev.Flag("sugar", "Sugar?"),)
+    )
     assert "eval_en_bistro/en-06" not in got  # skipped
     assert len(got) == 4
 
@@ -260,21 +262,21 @@ def test_an_unusable_reply_has_no_verdicts(reply: str) -> None:
 
 def test_merge_never_upgrades_a_rules_yellow_or_red_to_green() -> None:
     rules = {
-        "a": ev.Got("modifiable", ("rice",)),
+        "a": ev.Got("modifiable", (ev.Flag("rice"),)),
         "b": ev.Got("nonKeto"),
         "c": ev.Got("orderAsIs"),
         "d": ev.Got("nonKeto"),
         "e": ev.Got("modifiable"),
     }
     model = {
-        "a": ev.Got("orderAsIs", ("Rice", "honey")),
+        "a": ev.Got("orderAsIs", (ev.Flag("Rice", "Rice?"), ev.Flag("honey"))),
         "b": ev.Got("orderAsIs"),
         "c": ev.Got("nonKeto"),
         "d": ev.Got("modifiable"),
         "f": ev.Got("orderAsIs"),
     }
     merged = ev.merge(rules, model)
-    assert merged["a"] == ev.Got("modifiable", ("rice", "honey"))
+    assert merged["a"] == ev.Got("modifiable", (ev.Flag("rice"), ev.Flag("honey")))
     assert merged["b"] == ev.Got("nonKeto")
     assert merged["c"] == ev.Got("nonKeto")
     assert merged["d"] == ev.Got("modifiable")  # a downgrade from red stands
@@ -292,28 +294,39 @@ def test_merge_never_upgrades_a_rules_yellow_or_red_to_green() -> None:
         ("sugar", "Sugar", True),
         ("sugar", "brown sugar", True),
         ("brown sugar", "sugar", True),
-        ("sugar", "sugarcane", False),
+        ("sugar", "sugarcane", True),
+        ("rice", "sugar", False),
         ("רוטב סויה", "סויה", True),
         ("sweet marinade (מרינדה מתוקה)", "Sweet marinade", True),
         ("sweet marinade (מרינדה מתוקה)", "מרינדה מתוקה", True),
         ("honey", "", False),
     ],
 )
-def test_sources_match_on_normalised_whole_words(
+def test_the_source_fallback_is_normalised_containment(
     expected: str, flagged: str, match: bool
 ) -> None:
-    assert ev.sources_match(expected, flagged) is match
+    assert ev.texts_match(expected, flagged) is match
+    assert ev.ExpectedCarb(expected, "likely").matched_by(ev.Flag(flagged)) is match
 
 
-def test_a_hidden_carb_label_is_matched_by_its_source_or_its_term() -> None:
+def test_a_label_with_a_term_is_matched_by_the_term_alone() -> None:
     carb = ev.ExpectedCarb("house sauce (רוטב הבית)", "suspected", "רוטב הבית")
-    assert carb.names == ("house sauce (רוטב הבית)", "רוטב הבית")
-    assert carb.matched_by("House sauce")
-    assert carb.matched_by("רוטב הבית")
-    assert not carb.matched_by("sugar")
+    # The flag's source contains the term, or the term contains the source.
+    assert carb.matched_by(ev.Flag("רוטב הבית המתוק"))
+    assert carb.matched_by(ev.Flag("רוטב"))
+    # The waiter question contains the term.
+    assert carb.matched_by(ev.Flag("sugar", "יש סוכר ברוטב הבית?"))
+    # The English source is not consulted once there is a term.
+    assert not carb.matched_by(ev.Flag("House sauce"))
+    assert not carb.matched_by(ev.Flag("sugar", "Is there sugar?"))
+    assert not carb.matched_by(ev.Flag("", ""))
+    assert not ev.ExpectedCarb("x", "likely", "!!").matched_by(ev.Flag("x"))
+
+
+def test_a_label_without_a_term_falls_back_to_its_source() -> None:
     implied = ev.ExpectedCarb("bread binder in minced kebab", "suspected")
-    assert implied.names == ("bread binder in minced kebab",)
-    assert implied.matched_by("bread binder")
+    assert implied.matched_by(ev.Flag("Bread binder"))
+    assert not implied.matched_by(ev.Flag("sugar", "bread binder in minced kebab?"))
 
 
 def test_score_counts_every_metric() -> None:
@@ -352,9 +365,9 @@ def test_score_counts_hidden_carb_recall_and_precision() -> None:
         _dish("orderAsIs", id="3"),
     ]
     got = {
-        "m/1": ev.Got("modifiable", ("brown sugar", "starch")),
-        "m/2": ev.Got("modifiable", ("Soy Sauce",)),
-        "m/3": ev.Got("modifiable", ("honey",)),
+        "m/1": ev.Got("modifiable", (ev.Flag("brown sugar"), ev.Flag("starch"))),
+        "m/2": ev.Got("modifiable", (ev.Flag("Soy Sauce"),)),
+        "m/3": ev.Got("modifiable", (ev.Flag("honey"),)),
     }
     result = ev.score(dishes, got)
     assert (result.carbs_found, result.carbs_expected) == (2, 3)
@@ -465,7 +478,7 @@ def test_a_rules_only_report_has_the_rules_tables_and_no_model() -> None:
 def test_a_model_report_compares_rules_model_and_merged() -> None:
     menus = ev.load_corpus(FIXTURE)
     model = {dish.key: ev.Got(dish.expected) for dish in ev.all_dishes(menus)}
-    model["eval_en_bistro/en-05"] = ev.Got("modifiable", ("Sugar",))
+    model["eval_en_bistro/en-05"] = ev.Got("modifiable", (ev.Flag("Sugar"),))
     del model["eval_he_grill/he-05"]
     runs = [
         ev.MenuRun(

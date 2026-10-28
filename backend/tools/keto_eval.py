@@ -51,11 +51,13 @@ Two things live here:
   ``orderAsIs`` or ``modifiable``.
 * *unclassified*: dishes with no verdict at all.
 * *hidden-carb recall / precision*: a labelled hidden carb is found when a
-  flagged source matches its ``source`` or its ``term``, and a flagged
-  source is matched when it matches a labelled one. Two texts match when
-  their normalised forms (``app.keto.normaliser.normalise``) are equal or
-  one holds the other as whole words ("sugar" matches "brown sugar";
-  "sweet marinade" matches "sweet marinade (מרינדה מתוקה)").
+  produced flag matches it, and a produced flag is matched when it matches
+  a labelled one. A label with a ``term`` (the text in the dish that points
+  at it) is matched by the term: the flag's source contains the term, the
+  term contains the flag's source, or the flag's waiter question contains
+  the term. A label without one falls back to its ``source``: one of the
+  two texts contains the other. Every text is normalised first
+  (``app.keto.normaliser.normalise``: case, punctuation and brackets gone).
 
 The labels are unreviewed desk research: a number from this module is a
 question for the labels as much as for the engine.
@@ -82,7 +84,7 @@ from app.errors import BackendError
 from app.keto import parser, prompt
 from app.keto.batching import batch_max_dishes, split_batches
 from app.keto.heuristic import classify_heuristic
-from app.keto.models import AnalysisOptionsSnapshot, LlmEngine, Menu
+from app.keto.models import AnalysedDish, AnalysisOptionsSnapshot, LlmEngine, Menu
 from app.keto.normaliser import normalise
 from app.schemas import USER_PROMPT_MAX_CHARS, ChatRequest
 from app.services import gemini
@@ -139,14 +141,24 @@ class ExpectedCarb:
     certainty: str
     term: str | None = None
 
-    @property
-    def names(self) -> tuple[str, ...]:
-        """The texts a flag may match: the source, then the term."""
-        return (self.source,) if not self.term else (self.source, self.term)
-
-    def matched_by(self, flagged: str) -> bool:
-        """Whether a flagged source names this hidden carb."""
-        return any(sources_match(name, flagged) for name in self.names)
+    def matched_by(self, flag: "Flag") -> bool:
+        """Whether a produced ``flag`` (the model's or the rules') names this
+        hidden carb. With a ``term``, by the term alone: the flag's source
+        contains the term, the term contains the flag's source, or the flag's
+        waiter question contains the term. Without one, by the source
+        (:func:`texts_match`). Every text is normalised first."""
+        if not self.term:
+            return texts_match(self.source, flag.source)
+        term = _norm(self.term)
+        if not term:
+            return False
+        source = _norm(flag.source)
+        question = _norm(flag.question)
+        return (
+            bool(source)
+            and (term in source or source in term)
+            or (bool(question) and term in question)
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -301,12 +313,25 @@ def all_dishes(menus: Iterable[CorpusMenu]) -> list[CorpusDish]:
 
 
 @dataclass(frozen=True, slots=True)
+class Flag:
+    """One hidden carb a source flagged: its ``source`` text and the waiter
+    question it came with (empty when it has none)."""
+
+    source: str
+    question: str = ""
+
+
+@dataclass(frozen=True, slots=True)
 class Got:
-    """What one source said about one dish: its verdict and the hidden-carb
-    sources it flagged."""
+    """What one source said about one dish: its verdict and the hidden
+    carbs it flagged."""
 
     verdict: str
-    hidden_carbs: tuple[str, ...] = ()
+    hidden_carbs: tuple[Flag, ...] = ()
+
+
+def _flags(dish: AnalysedDish) -> tuple[Flag, ...]:
+    return tuple(Flag(c.source, c.waiter_question) for c in dish.hidden_carbs)
 
 
 Verdicts = dict[str, Got]
@@ -318,10 +343,7 @@ def rules_verdicts(menu: CorpusMenu) -> Verdicts:
     """What the rules engine (``app.keto.heuristic``, the Dart heuristic's
     twin) says about every dish of ``menu`` under :data:`OPTIONS`."""
     analysis = classify_heuristic(menu.to_menu(), OPTIONS, analysed_at=_ANALYSED_AT)
-    return {
-        dish.dish_id: Got(dish.verdict, tuple(c.source for c in dish.hidden_carbs))
-        for dish in analysis.dishes
-    }
+    return {dish.dish_id: Got(dish.verdict, _flags(dish)) for dish in analysis.dishes}
 
 
 def model_verdicts(reply: str, menu: Menu, *, model: str = "model") -> Verdicts | None:
@@ -341,13 +363,12 @@ def model_verdicts(reply: str, menu: Menu, *, model: str = "model") -> Verdicts 
     if isinstance(parsed, parser.Failed):
         return None
     return {
-        dish.dish_id: Got(dish.verdict, tuple(c.source for c in dish.hidden_carbs))
-        for dish in parsed.analysis.dishes
+        dish.dish_id: Got(dish.verdict, _flags(dish)) for dish in parsed.analysis.dishes
     }
 
 
-def _source_key(source: str) -> str:
-    return normalise(source)
+def _norm(text: str) -> str:
+    return normalise(text)
 
 
 def merge(rules: Mapping[str, Got], model: Mapping[str, Got]) -> Verdicts:
@@ -372,31 +393,29 @@ def merge(rules: Mapping[str, Got], model: Mapping[str, Got]) -> Verdicts:
             and from_rules.verdict != "orderAsIs"
         ):
             verdict = from_rules.verdict
-        sources: list[str] = []
+        flags: list[Flag] = []
         seen: set[str] = set()
-        for source in [
+        for flag in [
             *(from_rules.hidden_carbs if from_rules else ()),
             *from_model.hidden_carbs,
         ]:
-            if _source_key(source) not in seen:
-                seen.add(_source_key(source))
-                sources.append(source)
-        merged[key] = Got(verdict, tuple(sources))
+            if _norm(flag.source) not in seen:
+                seen.add(_norm(flag.source))
+                flags.append(flag)
+        merged[key] = Got(verdict, tuple(flags))
     return merged
 
 
 # --- the metrics -----------------------------------------------------------------
 
 
-def sources_match(expected: str, flagged: str) -> bool:
-    """Whether two hidden-carb texts name the same thing: their normalised
-    texts (punctuation and brackets gone) are equal, or one holds the other
-    as whole words, so "sweet marinade" and "מרינדה מתוקה" both match the
-    label "sweet marinade (מרינדה מתוקה)"."""
-    a, b = _source_key(expected), _source_key(flagged)
-    if not a or not b:
-        return False
-    return a == b or f" {a} " in f" {b} " or f" {b} " in f" {a} "
+def texts_match(expected: str, flagged: str) -> bool:
+    """The source fallback for a label with no ``term``: the two normalised
+    texts (punctuation and brackets gone) are non-empty and one contains the
+    other, so "brown sugar" matches "sugar" and "sweet marinade" matches
+    "sweet marinade (מרינדה מתוקה)"."""
+    a, b = _norm(expected), _norm(flagged)
+    return bool(a) and bool(b) and (a in b or b in a)
 
 
 def _rate(hit: int, total: int) -> float | None:
@@ -472,16 +491,16 @@ def score(expected: Sequence[CorpusDish], got: Mapping[str, Got]) -> Score:
                 result.false_red += 1
         flagged = found.hidden_carbs if found is not None else ()
         for carb in dish.hidden_carbs:
-            hit = any(carb.matched_by(source) for source in flagged)
+            hit = any(carb.matched_by(flag) for flag in flagged)
             result.carbs_expected += 1
             result.carbs_found += hit
             tally = result.carbs_by_certainty.setdefault(carb.certainty, [0, 0])
             tally[0] += hit
             tally[1] += 1
-        for source in flagged:
+        for flag in flagged:
             result.carbs_flagged += 1
             result.carbs_flagged_matched += any(
-                carb.matched_by(source) for carb in dish.hidden_carbs
+                carb.matched_by(flag) for carb in dish.hidden_carbs
             )
     return result
 
