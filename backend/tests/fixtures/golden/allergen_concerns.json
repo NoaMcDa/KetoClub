@@ -49879,8 +49879,8 @@
             "modification": null,
             "name": "Goldstar",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+            "verdict": "nonKeto",
+            "why": "Built on beer, which cannot be made keto."
           },
           {
             "dishId": "x14",

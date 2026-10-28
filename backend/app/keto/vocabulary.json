@@ -348,6 +348,66 @@
     [
       "flavoured syrup",
       "Please leave out the flavoured syrup."
+    ],
+    [
+      "raisin",
+      "Please leave out the raisins."
+    ],
+    [
+      "raisins",
+      "Please leave out the raisins."
+    ],
+    [
+      "dried fruit",
+      "Please leave out the dried fruit; it is concentrated sugar."
+    ],
+    [
+      "candied",
+      "Please leave out the candied nuts or fruit; they are sugared."
+    ],
+    [
+      "crouton",
+      "Please prepare it without the crouton."
+    ],
+    [
+      "injera",
+      "Please serve the stew in a bowl, without the injera."
+    ],
+    [
+      "amba",
+      "Please leave out the amba; the mango pickle is sweetened."
+    ],
+    [
+      "banana",
+      "Please leave out the banana."
+    ],
+    [
+      "bananas",
+      "Please leave out the banana."
+    ],
+    [
+      "watermelon",
+      "Please leave out the watermelon; it is high in sugar."
+    ],
+    [
+      "balsamic reduction",
+      "Please leave out the balsamic reduction; it is reduced to sugar."
+    ],
+    [
+      "sweet and sour",
+      "Please leave out the sweet and sour sauce; it is mostly sugar."
+    ],
+    [
+      "white beans",
+      "Please leave out the beans and add vegetables instead."
+    ],
+    [
+      "kidney beans",
+      "Please leave out the beans and add vegetables instead."
+    ],
+    [
+      "baked beans",
+      "Please leave out the baked beans; they are sweetened."
     ]
   ],
   "carbModifiersHe": [
@@ -738,6 +798,82 @@
     [
       "טוניק",
       "אפשר בבקשה לשים סודה במקום הטוניק? הטוניק עתיר סוכר."
+    ],
+    [
+      "צימוקים",
+      "אפשר בבקשה בלי הצימוקים?"
+    ],
+    [
+      "פירות יבשים",
+      "אפשר בבקשה בלי הפירות היבשים? הם סוכר מרוכז."
+    ],
+    [
+      "פירות מיובשים",
+      "אפשר בבקשה בלי הפירות המיובשים? הם סוכר מרוכז."
+    ],
+    [
+      "מסוכרים",
+      "אפשר בבקשה בלי האגוזים או הפירות המסוכרים?"
+    ],
+    [
+      "מסוכרות",
+      "אפשר בבקשה בלי האגוזים או הפירות המסוכרים?"
+    ],
+    [
+      "מסוכר",
+      "אפשר בבקשה בלי האגוזים או הפירות המסוכרים?"
+    ],
+    [
+      "מסוכרת",
+      "אפשר בבקשה בלי האגוזים או הפירות המסוכרים?"
+    ],
+    [
+      "קרוטון",
+      "אפשר בבקשה בלי הקרוטון?"
+    ],
+    [
+      "אינג'רה",
+      "אפשר בבקשה את התבשיל בקערה, בלי האינג'רה?"
+    ],
+    [
+      "עמבה",
+      "אפשר בבקשה בלי העמבה? יש בה סוכר."
+    ],
+    [
+      "בננה",
+      "אפשר בבקשה בלי הבננה?"
+    ],
+    [
+      "בננות",
+      "אפשר בבקשה בלי הבננה?"
+    ],
+    [
+      "אבטיח",
+      "אפשר בבקשה בלי האבטיח? יש בו הרבה סוכר."
+    ],
+    [
+      "בלסמי מצומצם",
+      "אפשר בבקשה בלי הבלסמי המצומצם? הוא מצטמצם לסוכר."
+    ],
+    [
+      "רדוקציית בלסמי",
+      "אפשר בבקשה בלי רדוקציית הבלסמי? היא מצטמצמת לסוכר."
+    ],
+    [
+      "חמוץ מתוק",
+      "אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר."
+    ],
+    [
+      "שעועית לבנה",
+      "אפשר בבקשה בלי השעועית, ועם ירקות במקום?"
+    ],
+    [
+      "שעועית אדומה",
+      "אפשר בבקשה בלי השעועית, ועם ירקות במקום?"
+    ],
+    [
+      "סילאן",
+      "אפשר בבקשה בלי הסילאן? הוא סוכר כמעט לגמרי."
     ]
   ],
   "carbOnlyBaseLabels": {
@@ -819,7 +955,12 @@
     "טורטיות",
     "האש בראון",
     "טבעות בצל",
-    "נאן"
+    "נאן",
+    "injera",
+    "אינג'רה",
+    "dried fruit",
+    "פירות יבשים",
+    "פירות מיובשים"
   ],
   "carbOnlyQualifiersEn": [
     "a",
@@ -1325,6 +1466,21 @@
       "sweet wine",
       "moscato",
       "port wine",
+      "hot chocolate",
+      "chocolate milk",
+      "slush",
+      "slushie",
+      "flavoured water",
+      "flavored water",
+      "dessert wine",
+      "sauternes",
+      "san miguel",
+      "goldstar",
+      "carlsberg",
+      "tuborg",
+      "heineken",
+      "stella artois",
+      "guinness",
       "latte",
       "iced latte",
       "cappuccino",
@@ -1375,6 +1531,18 @@
       "ליקר",
       "סמוטי",
       "יין מתוק",
+      "שוקו",
+      "ברד",
+      "מים בטעם",
+      "יין קינוח",
+      "סמוזי",
+      "סאן מיגל",
+      "גולדסטאר",
+      "קרלסברג",
+      "טובורג",
+      "הייניקן",
+      "סטלה ארטואה",
+      "גינס",
       "הפוך",
       "הפוך קר",
       "לאטה",
@@ -1749,6 +1917,50 @@
         "naked"
       ]
     },
+    "carlsberg": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
     "cheeseburger": {
       "after": [],
       "before": [
@@ -1769,6 +1981,28 @@
         "cabbage",
         "coconut",
         "keto"
+      ]
+    },
+    "chocolate milk": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
       ]
     },
     "coke": {
@@ -1836,6 +2070,42 @@
       ],
       "before": []
     },
+    "dessert wine": {
+      "after": [
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "falafel": {
+      "after": [],
+      "before": [
+        "cauliflower",
+        "broccoli",
+        "keto"
+      ]
+    },
     "fanta": {
       "after": [
         "zero",
@@ -1858,12 +2128,162 @@
         "light"
       ]
     },
+    "flavored water": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "flavoured water": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "flour coated": {
+      "after": [],
+      "before": [
+        "almond",
+        "coconut",
+        "no",
+        "without"
+      ]
+    },
+    "flour coating": {
+      "after": [],
+      "before": [
+        "almond",
+        "coconut",
+        "no",
+        "without"
+      ]
+    },
     "fried chicken": {
       "after": [],
       "before": [
         "pan",
         "stir",
         "air"
+      ]
+    },
+    "goldstar": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "guinness": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
       ]
     },
     "hamburger": {
@@ -1873,6 +2293,72 @@
         "keto",
         "bunless",
         "naked"
+      ]
+    },
+    "heineken": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "hot chocolate": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
       ]
     },
     "juice": {
@@ -2085,6 +2571,13 @@
         "poached"
       ]
     },
+    "quiche": {
+      "after": [],
+      "before": [
+        "crustless",
+        "keto"
+      ]
+    },
     "rice": {
       "after": [
         "vinegar"
@@ -2104,6 +2597,122 @@
         "cauliflower",
         "konjac",
         "keto"
+      ]
+    },
+    "san miguel": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "sauternes": {
+      "after": [
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "slush": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "slushie": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
       ]
     },
     "spaghetti": {
@@ -2132,6 +2741,50 @@
         "zero sugar",
         "unsweetened",
         "light"
+      ]
+    },
+    "stella artois": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
       ]
     },
     "stout": {
@@ -2218,6 +2871,50 @@
         "zero sugar",
         "unsweetened",
         "light"
+      ]
+    },
+    "tuborg": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
       ]
     },
     "waffle": {
@@ -2366,6 +3063,152 @@
         "במרינדת"
       ]
     },
+    "ברד": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "גולדסטאר": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
+    "גינס": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
+    "הייניקן": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
     "המבורגר": {
       "after": [
         "חסה",
@@ -2376,6 +3219,50 @@
         "חסה",
         "בחסה",
         "קטו"
+      ]
+    },
+    "טובורג": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
       ]
     },
     "טוניק": {
@@ -2402,6 +3289,52 @@
         "קטו",
         "ענן",
         "שקדים"
+      ]
+    },
+    "יין קינוח": {
+      "after": [
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
+    "כיסוני": {
+      "after": [
+        "חסה",
+        "כרוב"
+      ],
+      "before": [
+        "חסה",
+        "כרוב"
       ]
     },
     "לחם": {
@@ -2461,6 +3394,20 @@
       ]
     },
     "לימונדה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "מים בטעם": {
       "after": [
         "זירו",
         "דיאט",
@@ -2554,6 +3501,50 @@
         "במרינדת"
       ]
     },
+    "מסוכר": {
+      "after": [],
+      "before": [
+        "לא",
+        "ללא",
+        "נקי",
+        "נקייה",
+        "נקיים",
+        "נקיות"
+      ]
+    },
+    "מסוכרות": {
+      "after": [],
+      "before": [
+        "לא",
+        "ללא",
+        "נקי",
+        "נקייה",
+        "נקיים",
+        "נקיות"
+      ]
+    },
+    "מסוכרים": {
+      "after": [],
+      "before": [
+        "לא",
+        "ללא",
+        "נקי",
+        "נקייה",
+        "נקיים",
+        "נקיות"
+      ]
+    },
+    "מסוכרת": {
+      "after": [],
+      "before": [
+        "לא",
+        "ללא",
+        "נקי",
+        "נקייה",
+        "נקיים",
+        "נקיות"
+      ]
+    },
     "נודלס": {
       "after": [
         "קישואים",
@@ -2572,6 +3563,50 @@
         "קטו"
       ]
     },
+    "סאן מיגל": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
     "סושי": {
       "after": [
         "איכות",
@@ -2580,6 +3615,50 @@
       "before": [
         "איכות",
         "באיכות"
+      ]
+    },
+    "סטלה ארטואה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
       ]
     },
     "ספרייט": {
@@ -2622,6 +3701,18 @@
         "קטו",
         "שקדים",
         "דלת פחמימות"
+      ]
+    },
+    "פלאפל": {
+      "after": [
+        "כרובית",
+        "ברוקולי",
+        "קטו"
+      ],
+      "before": [
+        "כרובית",
+        "ברוקולי",
+        "קטו"
       ]
     },
     "פסטה": {
@@ -2720,6 +3811,18 @@
         "קטו"
       ]
     },
+    "ציפוי קמח": {
+      "after": [
+        "שקדים",
+        "קוקוס"
+      ],
+      "before": [
+        "ללא",
+        "בלי",
+        "שקדים",
+        "קוקוס"
+      ]
+    },
     "קולה": {
       "after": [
         "זירו",
@@ -2748,6 +3851,62 @@
         "ללא סוכרים"
       ]
     },
+    "קיש": {
+      "after": [
+        "ללא בצק",
+        "בלי בצק",
+        "קטו"
+      ],
+      "before": [
+        "ללא בצק",
+        "בלי בצק",
+        "קטו"
+      ]
+    },
+    "קרלסברג": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
     "ריזוטו": {
       "after": [
         "כרובית",
@@ -2756,6 +3915,20 @@
       "before": [
         "כרובית",
         "קטו"
+      ]
+    },
+    "שוקו": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
       ]
     },
     "שמרים": {
@@ -2788,6 +3961,11 @@
     "yellow": 0.5
   },
   "ketoSubstituteNameWordsEn": {
+    "falafel": [
+      "keto",
+      "low carb",
+      "lowcarb"
+    ],
     "noodle": [
       "keto",
       "low carb",
@@ -2868,6 +4046,10 @@
       "בצק שקדים",
       "קמח שקדים"
     ],
+    "פלאפל": [
+      "קטו",
+      "דלת פחמימות"
+    ],
     "פסטה": [
       "קטו",
       "דלת פחמימות",
@@ -2907,24 +4089,63 @@
     "שמרים"
   ],
   "nonKetoBaseLabelsEn": {
+    "carlsberg": "beer",
+    "dessert wine": "sweet wine",
+    "fir fir": "firfir",
     "fish and chips": "battered fish",
     "fish chips": "battered fish",
     "fish n chips": "battered fish",
-    "noodle": "noodles"
+    "flavored water": "flavoured water",
+    "flour coated": "flour coating",
+    "goldstar": "beer",
+    "guinness": "beer",
+    "heineken": "beer",
+    "noodle": "noodles",
+    "petit four": "petits fours",
+    "san miguel": "beer",
+    "sauternes": "sweet wine",
+    "slushie": "slush",
+    "stella artois": "beer",
+    "tuborg": "beer"
   },
   "nonKetoBaseLabelsHe": {
     "בבלילה": "בלילה",
     "בבלילת": "בלילה",
     "בחלבה": "חלבה",
+    "גולדסטאר": "בירה",
+    "גינס": "בירה",
+    "גלידות": "גלידה",
+    "גלידת": "גלידה",
     "דג וצ'יפס": "דג מצופה",
+    "הייניקן": "בירה",
     "וחלבה": "חלבה",
+    "חאצ'אפורי": "חצ'פורי",
+    "חביתיות": "חביתית",
+    "חצ'אפורי": "חצ'פורי",
+    "טובורג": "בירה",
+    "יין קינוח": "יין מתוק",
+    "כיסוני": "כיסונים",
+    "סאן מיגל": "בירה",
+    "סורבט": "סורבה",
+    "סטלה ארטואה": "בירה",
     "ספאגטי": "ספגטי",
     "עוגיית": "עוגיה",
     "עוגת": "עוגה",
     "פיצות": "פיצה",
     "פיש אנד צ'יפס": "דג מצופה",
     "פיש נ' צ'יפס": "דג מצופה",
+    "פנה אלפרדו": "פסטה",
+    "פנה ארביאטה": "פסטה",
+    "פנה בולונז": "פסטה",
+    "פנה ברוטב": "פסטה",
+    "פנה פומודורו": "פסטה",
+    "פנה פסטו": "פסטה",
+    "פנה רוזה": "פסטה",
     "פסטת": "פסטה",
+    "פרלינה": "פרלין",
+    "פרלינים": "פרלין",
+    "קרלסברג": "בירה",
+    "קרעי אינג'רה": "אינג'רה",
     "רזוטו": "ריזוטו",
     "רמן": "ראמן"
   },
@@ -3038,6 +4259,31 @@
     "rugelach",
     "muffin",
     "scone",
+    "khachapuri",
+    "khinkali",
+    "pelmeni",
+    "blini",
+    "blinchiki",
+    "quiche",
+    "shortcrust",
+    "kubaneh",
+    "sfenj",
+    "mufleta",
+    "falafel",
+    "gefilte",
+    "firfir",
+    "fir fir",
+    "flour coating",
+    "flour coated",
+    "bean stew",
+    "sorbet",
+    "chocolate mousse",
+    "petit four",
+    "petits fours",
+    "praline",
+    "sweet and sour chicken",
+    "bamba",
+    "bissli",
     "cola",
     "coke",
     "pepsi",
@@ -3055,7 +4301,22 @@
     "smoothie",
     "sweet wine",
     "moscato",
-    "port wine"
+    "port wine",
+    "hot chocolate",
+    "chocolate milk",
+    "slush",
+    "slushie",
+    "flavoured water",
+    "flavored water",
+    "dessert wine",
+    "sauternes",
+    "san miguel",
+    "goldstar",
+    "carlsberg",
+    "tuborg",
+    "heineken",
+    "stella artois",
+    "guinness"
   ],
   "nonKetoBasesHe": [
     "פסטה",
@@ -3212,6 +4473,47 @@
     "צ'יקן קריספי",
     "עוף קריספי",
     "פיש נ' צ'יפס",
+    "חצ'פורי",
+    "חצ'אפורי",
+    "חאצ'אפורי",
+    "חינקלי",
+    "פלמני",
+    "בלינצ'יקי",
+    "בליני",
+    "חביתיות",
+    "חביתית",
+    "כיסוני",
+    "קיש",
+    "בצק פריך",
+    "קובנה",
+    "ספינג'",
+    "מופלטה",
+    "פוקאצ'ה",
+    "פלאפל",
+    "גפילטע",
+    "פיר פיר",
+    "קרעי אינג'רה",
+    "ציפוי קמח",
+    "תבשיל שעועית",
+    "עוף חמוץ מתוק",
+    "במבה",
+    "ביסלי",
+    "גלידת",
+    "גלידות",
+    "סורבה",
+    "סורבט",
+    "מוס שוקולד",
+    "פטי פור",
+    "פרלינים",
+    "פרלינה",
+    "פרלין",
+    "פנה ברוטב",
+    "פנה פסטו",
+    "פנה רוזה",
+    "פנה ארביאטה",
+    "פנה אלפרדו",
+    "פנה בולונז",
+    "פנה פומודורו",
     "קולה",
     "קוקה קולה",
     "ספרייט",
@@ -3226,7 +4528,19 @@
     "שיכר",
     "ליקר",
     "סמוטי",
-    "יין מתוק"
+    "יין מתוק",
+    "שוקו",
+    "ברד",
+    "מים בטעם",
+    "יין קינוח",
+    "סמוזי",
+    "סאן מיגל",
+    "גולדסטאר",
+    "קרלסברג",
+    "טובורג",
+    "הייניקן",
+    "סטלה ארטואה",
+    "גינס"
   ],
   "nonKetoDrinkBasesEn": [
     "cola",
@@ -3246,7 +4560,22 @@
     "smoothie",
     "sweet wine",
     "moscato",
-    "port wine"
+    "port wine",
+    "hot chocolate",
+    "chocolate milk",
+    "slush",
+    "slushie",
+    "flavoured water",
+    "flavored water",
+    "dessert wine",
+    "sauternes",
+    "san miguel",
+    "goldstar",
+    "carlsberg",
+    "tuborg",
+    "heineken",
+    "stella artois",
+    "guinness"
   ],
   "nonKetoDrinkBasesHe": [
     "קולה",
@@ -3263,7 +4592,19 @@
     "שיכר",
     "ליקר",
     "סמוטי",
-    "יין מתוק"
+    "יין מתוק",
+    "שוקו",
+    "ברד",
+    "מים בטעם",
+    "יין קינוח",
+    "סמוזי",
+    "סאן מיגל",
+    "גולדסטאר",
+    "קרלסברג",
+    "טובורג",
+    "הייניקן",
+    "סטלה ארטואה",
+    "גינס"
   ],
   "optionRemovalWordsEn": [
     "no",
@@ -3514,6 +4855,9 @@
     "צ'יפס": [
       "תפוח אדמה",
       "תפוחי אדמה"
+    ],
+    "צנוברים מסוכרים": [
+      "מסוכרים"
     ],
     "רוטב חמוציות": [
       "חמוציות"

@@ -2216,8 +2216,8 @@
             "modification": null,
             "name": "סאן מיגל",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e3fc",
@@ -2225,8 +2225,8 @@
             "modification": null,
             "name": "פרסקה סאן מיגל",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e3f3",
@@ -5738,8 +5738,8 @@
             "modification": null,
             "name": "Goldstar",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+            "verdict": "nonKeto",
+            "why": "Built on beer, which cannot be made keto."
           },
           {
             "dishId": "x14",
@@ -5772,10 +5772,10 @@
         "unclassified": []
       },
       "counts": {
-        "green": 4,
+        "green": 3,
         "hiddenCarbYellow": 0,
         "red": 5,
-        "score": 4.5,
+        "score": 4.0,
         "yellow": 2
       },
       "menu": {
