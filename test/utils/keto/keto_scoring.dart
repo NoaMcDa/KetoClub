@@ -28,10 +28,12 @@
 ///   dish not labelled `nonKeto`. The safe direction, but a lost dish;
 /// - unclassified: dishes the analysis gave no verdict;
 /// - hidden-carb recall and precision: a labelled flag and an engine flag
-///   on the same dish match when the normalised words
-///   (`TextNormaliser.words`) of the engine's source and of the label's
-///   source, or of its `term`, are one a subset of the other; pairs are
-///   matched one to one. Recall is matched pairs over labelled flags;
+///   on the same dish match by the label's `term` when it has one (the
+///   normalised engine source contains the normalised term, or the term
+///   contains the source), and otherwise when the normalised words
+///   (`TextNormaliser.words`) of the engine's source and the label's
+///   English `source` are one a subset of the other; pairs are matched one
+///   to one. Recall is matched pairs over labelled flags;
 ///   precision is matched pairs over engine flags, and reads as "-" while
 ///   the engine raises none;
 /// - the same counts per menu and per language.
@@ -398,11 +400,20 @@ bool hiddenCarbSourcesMatch(String label, String found) {
   return b.containsAll(a) || a.containsAll(b);
 }
 
-/// Whether the engine flag [found] matches [label]: its source matches the
-/// label's source or, when the label has one, its term.
-bool hiddenCarbLabelMatches(KetoHiddenCarbLabel label, String found) =>
-    hiddenCarbSourcesMatch(label.source, found) ||
-    (label.term != null && hiddenCarbSourcesMatch(label.term!, found));
+/// Whether the engine flag source [found] matches [label].
+///
+/// By the label's `term` when it has one (the exact dish text that points
+/// at the flag): after `TextNormaliser.normalise`, [found] contains the
+/// term or the term contains [found]. Only a label with no term falls back
+/// to its English `source`, by [hiddenCarbSourcesMatch].
+bool hiddenCarbLabelMatches(KetoHiddenCarbLabel label, String found) {
+  final term = label.term;
+  if (term == null) return hiddenCarbSourcesMatch(label.source, found);
+  final t = TextNormaliser.normalise(term);
+  final f = TextNormaliser.normalise(found);
+  if (t.isEmpty || f.isEmpty) return false;
+  return f.contains(t) || t.contains(f);
+}
 
 /// How many pairs of [labels] and engine sources [found] match, one to one,
 /// greedily in label order.

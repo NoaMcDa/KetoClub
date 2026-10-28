@@ -248,16 +248,29 @@ void main() {
       );
     });
 
-    test("match a label's term as well as its source", () {
+    test('match a label by its term, not its source, when it has one', () {
       const label = KetoHiddenCarbLabel(
         source: 'house sauce (רוטב הבית)',
         certainty: 'suspected',
         term: 'ברוטב הבית',
       );
+      // The term contains the flag, or the flag contains the term.
       expect(hiddenCarbLabelMatches(label, 'רוטב הבית'), isTrue);
       expect(hiddenCarbLabelMatches(label, 'ברוטב הבית'), isTrue);
-      expect(hiddenCarbLabelMatches(label, 'house sauce'), isTrue);
+      expect(hiddenCarbLabelMatches(label, 'ברוטב הבית המתוק!'), isTrue);
+      // The English source is not consulted once there is a term.
+      expect(hiddenCarbLabelMatches(label, 'house sauce'), isFalse);
       expect(hiddenCarbLabelMatches(label, 'sweet marinade'), isFalse);
+    });
+
+    test('fall back to the source when a label has no term', () {
+      const label = KetoHiddenCarbLabel(
+        source: 'breadcrumb binder (פירורי לחם)',
+        certainty: 'likely',
+      );
+      expect(hiddenCarbLabelMatches(label, 'פירורי לחם'), isTrue);
+      expect(hiddenCarbLabelMatches(label, 'breadcrumb binder'), isTrue);
+      expect(hiddenCarbLabelMatches(label, 'sugar'), isFalse);
     });
 
     test('recall and precision count matched sources', () {
