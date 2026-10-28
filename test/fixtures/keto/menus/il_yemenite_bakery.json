@@ -1,0 +1,365 @@
+{
+  "id": "il_yemenite_bakery",
+  "name": "המאפייה התימנית",
+  "source": "copied:test/fixtures/allergens/menus/il_yemenite_bakery.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/il_yemenite_bakery.json (synthetic Yemenite bakery written for the corpus from 12 §1.1, 1.3-1.6 (ג׳חנון, מלאווח, כובאנה and their accompaniments)); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "מאפים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "מלאווח",
+          "description": "מלאווח פריך מבצק עלים, מוגש עם ביצה קשה, רסק עגבניות וסחוג",
+          "options": [
+            {
+              "name": "תוספות",
+              "values": [
+                "ביצה קשה",
+                "רסק עגבניות",
+                "סחוג",
+                "טחינה"
+              ]
+            }
+          ],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Malawach is fried layered dough; the toppings cannot fix it.",
+          "evidence": [
+            "מלאווח",
+            "בצק עלים"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "ג׳חנון",
+          "description": "ג׳חנון מסורתי בבישול איטי, מוגש עם ביצה קשה, עגבנייה מגוררת וחילבה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Jachnun is rolled dough baked overnight.",
+          "evidence": [
+            "ג׳חנון"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "כובאנה",
+          "description": "לחם שמרים מתפחים שנאפה לילה שלם, עם עגבנייה מגוררת וסחוג",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Yeast bread.",
+          "evidence": [
+            "לחם שמרים"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "קובנה בחמאה",
+          "description": "קובנה אפויה בחמאה ובשמן, עם ביצה קשה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Kubaneh is bread.",
+          "evidence": [
+            "קובנה"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "ג׳חנון פרווה",
+          "description": "ג׳חנון שנאפה במרגרינה, ללא חמאה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Jachnun is dough.",
+          "evidence": [
+            "ג׳חנון"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "בורקס גבינה",
+          "description": "בצק עלים במילוי גבינה בולגרית וצפתית, מצופה בביצה ושומשום",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Puff pastry.",
+          "evidence": [
+            "בורקס",
+            "בצק עלים"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "בורקס תפוחי אדמה",
+          "description": "בצק עלים במילוי פירה תפוחי אדמה ובצל",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Puff pastry with mashed potato.",
+          "evidence": [
+            "בורקס",
+            "פירה"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "סמבוסק גבינה",
+          "description": "סמבוסק מטוגן במילוי גבינה ובזיליקום, עם סחוג",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fried filled pastry.",
+          "evidence": [
+            "סמבוסק"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "עוגת שמרים",
+          "description": "עוגת שמרים עם צימוקים ואגוזי מלך",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Yeast cake with raisins.",
+          "evidence": [
+            "עוגת שמרים"
+          ]
+        },
+        {
+          "id": "d17",
+          "name": "עוגיות שומשום",
+          "description": "עוגיות חמאה בציפוי שומשום",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Butter cookies.",
+          "evidence": [
+            "עוגיות"
+          ]
+        },
+        {
+          "id": "d18",
+          "name": "פיתה טרייה מהתנור",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pita.",
+          "evidence": [
+            "פיתה"
+          ]
+        },
+        {
+          "id": "d22",
+          "name": "ג'חנון קלאסי",
+          "description": "ג'חנון בבישול ארוך עם ביצה קשה, עגבנייה מגוררת וסחוג",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Jachnun is dough.",
+          "evidence": [
+            "ג'חנון"
+          ]
+        },
+        {
+          "id": "d23",
+          "name": "מלווח עם טחינא",
+          "description": "מלווח פריך מוגש עם טחינא, ביצה קשה ועגבנייה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Malawach is fried dough.",
+          "evidence": [
+            "מלווח"
+          ]
+        },
+        {
+          "id": "d24",
+          "name": "עוגיות שומשומין",
+          "description": "עוגיות חמאה עם שומשומין",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Butter cookies.",
+          "evidence": [
+            "עוגיות"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ממרחים ותוספות",
+      "dishes": [
+        {
+          "id": "d9",
+          "name": "חילבה",
+          "description": "מטבל חילבה ביתי עם שום, פטרוזיליה ולימון",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Fenugreek dip; the seeds are mostly fibre.",
+          "evidence": [
+            "חילבה"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "סחוג",
+          "description": "סחוג אדום חריף ביתי",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Hot pepper paste.",
+          "evidence": [
+            "סחוג"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "טחינה גולמית",
+          "description": "צלוחית טחינה",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Raw tahini.",
+          "evidence": [
+            "טחינה"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "ביצה קשה",
+          "description": "ביצה קשה מבושלת",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A hard-boiled egg.",
+          "evidence": [
+            "ביצה קשה"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "עגבנייה מגוררת",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Grated tomato.",
+          "evidence": [
+            "עגבנייה מגוררת"
+          ]
+        },
+        {
+          "id": "d19",
+          "name": "ממרח גבינה",
+          "description": "גבינה לבנה עם עשבי תיבול ושמן זית",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "White cheese with herbs and olive oil.",
+          "evidence": [
+            "גבינה לבנה"
+          ]
+        },
+        {
+          "id": "d25",
+          "name": "פירות יבשים",
+          "description": "משמש מיובש וצימוקים, משומרים בגופרית דו חמצנית (E220)",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Dried fruit is concentrated sugar.",
+          "evidence": [
+            "משמש מיובש",
+            "צימוקים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מרקים",
+      "dishes": [
+        {
+          "id": "d14",
+          "name": "מרק עוף תימני",
+          "description": "מרק עוף ביתי עם סלרי, גזר, כוסברה וחילבה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Yemenite chicken soup usually has potatoes in the pot",
+              "certainty": "suspected",
+              "term": "מרק עוף תימני"
+            }
+          ],
+          "why": "Chicken soup with celery and fenugreek; ask without the carrot and any potato.",
+          "evidence": [
+            "מרק עוף",
+            "גזר"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "מרק קובה",
+          "description": "קובה סולת במרק ירקות חם",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Semolina dumplings are the point of the soup.",
+          "evidence": [
+            "קובה סולת"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d20",
+          "name": "תה נענע",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "mint tea in Mizrahi homes is often served sweetened",
+              "certainty": "suspected",
+              "term": "תה נענע"
+            }
+          ],
+          "why": "Mint tea; ask for it without sugar.",
+          "evidence": [
+            "תה נענע"
+          ]
+        },
+        {
+          "id": "d21",
+          "name": "קפה תימני",
+          "description": "קפה שחור עם תערובת תבלינים",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Black coffee with spices.",
+          "evidence": [
+            "קפה שחור"
+          ]
+        }
+      ]
+    }
+  ]
+}

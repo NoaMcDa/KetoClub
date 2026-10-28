@@ -1,0 +1,236 @@
+{
+  "id": "il_moroccan",
+  "name": "דאר אל מגרב",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Moroccan restaurant (חריימה, couscous, tagine) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "עיקריות",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "חריימה",
+          "description": "פילה דג לבן ברוטב חריימה חריף עם פלפלים, שום וכוסברה",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "White fish in spicy pepper sauce.",
+          "evidence": [
+            "פילה דג",
+            "חריימה"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "קוסקוס בשר וירקות",
+          "description": "קוסקוס ביתי עם מרק ירקות, דלעת, גזר, גרגירי חומוס ובשר בקר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Couscous is semolina.",
+          "evidence": [
+            "קוסקוס"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "טאג׳ין עוף ולימון כבוש",
+          "description": "עוף בבישול איטי בטאג׳ין עם לימון כבוש, זיתים ירוקים וכורכום",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Chicken with preserved lemon and olives.",
+          "evidence": [
+            "עוף",
+            "זיתים"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "טאג׳ין טלה בשזיפים",
+          "description": "טלה בטאג׳ין עם שזיפים מיובשים, דבש ושקדים קלויים",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Lamb is keto; the prunes and honey are sugar, ask for the lamb without them.",
+          "evidence": [
+            "טלה",
+            "שזיפים מיובשים",
+            "דבש"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "קציצות דג מרוקאיות",
+          "description": "קציצות דג מרוקאיות ברוטב עגבניות וכוסברה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs",
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "breadcrumb or matzah-meal binder in fish patties",
+              "certainty": "likely",
+              "term": "קציצות דג"
+            }
+          ],
+          "why": "Fish in tomato sauce, but the patties usually hold bread; ask.",
+          "evidence": [
+            "קציצות דג"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "כבד בקר מוקפץ",
+          "description": "כבד בקר מוקפץ עם בצל ופטרוזיליה",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Sautéed beef liver.",
+          "evidence": [
+            "כבד בקר"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ראשונות",
+      "dishes": [
+        {
+          "id": "d7",
+          "name": "סיגרים",
+          "description": "סיגרים מטוגנים בבצק פילו במילוי בשר טחון",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fried filo.",
+          "evidence": [
+            "בצק פילו"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "פסטל",
+          "description": "מאפה פילו במילוי עוף, שקדים וקינמון עם אבקת סוכר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Filo pie dusted with sugar.",
+          "evidence": [
+            "מאפה פילו",
+            "אבקת סוכר"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "סלט גזר מרוקאי",
+          "description": "גזר מבושל בכמון, שום, פפריקה וכוסברה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Carrot is the whole salad.",
+          "evidence": [
+            "גזר"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "מטבוחה",
+          "description": "עגבניות ופלפלים מבושלים שעות עם שום ושמן זית",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "matbucha is often finished with sugar (מטבוחה)",
+              "certainty": "suspected",
+              "term": "מטבוחה"
+            }
+          ],
+          "why": "Slow-cooked tomato and pepper.",
+          "evidence": [
+            "עגבניות",
+            "פלפלים"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "סלק מרוקאי",
+          "description": "סלק מבושל בכמון ולימון",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Beet is the whole salad.",
+          "evidence": [
+            "סלק"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "זעלוק",
+          "description": "חציל ועגבנייה מבושלים עם כמון ושום",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Eggplant and tomato.",
+          "evidence": [
+            "חציל"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מתוקים ושתייה",
+      "dishes": [
+        {
+          "id": "d13",
+          "name": "מופלטה",
+          "description": "מופלטה בחמאה ודבש",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A thin pancake with honey.",
+          "evidence": [
+            "מופלטה",
+            "דבש"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "ספינג׳",
+          "description": "ספינג׳ מטוגן עם סוכר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fried dough with sugar.",
+          "evidence": [
+            "ספינג׳"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "תה נענע מרוקאי",
+          "description": "תה ירוק עם נענע, מוגש מתוק",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "The menu says it is served sweet; ask for it unsweetened.",
+          "evidence": [
+            "מוגש מתוק"
+          ]
+        }
+      ]
+    }
+  ]
+}

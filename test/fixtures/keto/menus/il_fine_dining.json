@@ -1,0 +1,243 @@
+{
+  "id": "il_fine_dining",
+  "name": "ערב",
+  "source": "synthetic",
+  "language": "mixed",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Tel Aviv fine-dining tasting menu (English names, Hebrew descriptions) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "תפריט טעימות",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "Oysters",
+          "description": "שלוש צדפות טריות עם מיניונט שאלוט",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Raw oysters with shallot vinegar.",
+          "evidence": [
+            "צדפות"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "Scallops, brown butter",
+          "description": "צדפות סן ז׳אק צרובות, חמאה חומה, אגוזי לוז קלויים ופירה כרובית",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Seared scallops; the purée is cauliflower, not potato.",
+          "evidence": [
+            "צדפות",
+            "פירה כרובית"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "Beef tartare",
+          "description": "בקר נא קצוץ, חלמון כבוש, צלפים ובריוש קלוי",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Beef tartare is keto; leave out the brioche.",
+          "evidence": [
+            "בקר נא",
+            "בריוש"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "Beet carpaccio",
+          "description": "פרוסות סלק דקיקות, גבינת עיזים ואגוזי מלך מסוכרים",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Beet is the base, with candied walnuts.",
+          "evidence": [
+            "סלק",
+            "מסוכרים"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "Ricotta gnocchi",
+          "description": "ניוקי ריקוטה בציר פטריות",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Gnocchi.",
+          "evidence": [
+            "ניוקי"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "Sea fish, crab bisque",
+          "description": "פילה דג לבן צרוב, ביסק סרטנים ושעועית ירוקה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "bisque is thickened with rice or flour (ביסק)",
+              "certainty": "likely",
+              "term": "ביסק"
+            }
+          ],
+          "why": "Seared fish and green beans; ask how the bisque is thickened.",
+          "evidence": [
+            "פילה דג",
+            "ביסק"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "Duck, cherries",
+          "description": "חזה ברווז צלוי, רוטב דובדבנים, סלק צלוי ופולנטה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "cherry sauce is sweetened (רוטב דובדבנים)",
+              "certainty": "likely",
+              "term": "רוטב דובדבנים"
+            }
+          ],
+          "why": "Duck breast is keto; leave out the polenta, beet and cherry sauce.",
+          "evidence": [
+            "חזה ברווז",
+            "פולנטה"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "Veal, jus",
+          "description": "פילה עגל, ג׳וס מצומצם, ארטישוק ירושלמי ותרד",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "a reduced jus may be finished with flour or sugar (ג׳וס)",
+              "certainty": "suspected",
+              "term": "ג׳וס"
+            }
+          ],
+          "why": "Veal and spinach; Jerusalem artichoke is a starchy tuber to leave out.",
+          "evidence": [
+            "פילה עגל",
+            "ארטישוק ירושלמי"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "Lemon risotto",
+          "description": "ריזוטו לימון ופרמזן",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Risotto.",
+          "evidence": [
+            "ריזוטו"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "Bread service",
+          "description": "לחם מחמצת וחמאה מעושנת",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Bread and butter.",
+          "evidence": [
+            "לחם מחמצת"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוחים",
+      "dishes": [
+        {
+          "id": "d11",
+          "name": "Passion fruit sorbet",
+          "description": "סורבה פסיפלורה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Sorbet is fruit and sugar.",
+          "evidence": [
+            "סורבה"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "Chocolate mousse",
+          "description": "מוס שוקולד ופרלינה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Dessert.",
+          "evidence": [
+            "מוס שוקולד"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "Petits fours",
+          "description": "מבחר פטי פור ופרלינים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Sweets.",
+          "evidence": [
+            "פטי פור"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "יין",
+      "dishes": [
+        {
+          "id": "d14",
+          "name": "Champagne brut",
+          "description": "כוס שמפניה ברוט",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Brut is the dry style.",
+          "evidence": [
+            "ברוט"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "Sauternes",
+          "description": "יין קינוח מתוק, כוס",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A sweet dessert wine.",
+          "evidence": [
+            "יין קינוח מתוק"
+          ]
+        }
+      ]
+    }
+  ]
+}

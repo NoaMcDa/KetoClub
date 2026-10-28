@@ -1,0 +1,260 @@
+{
+  "id": "golden_hebrew",
+  "name": "תפריט הזהב",
+  "source": "copied:test/fixtures/allergens/menus/golden_hebrew.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/golden_hebrew.json (hand-built in tool/golden/golden_corpus.dart (goldenHebrewMenu), dish texts copied (nikud, maqaf, geresh)); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "מנות",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "סָלָט יְרָקוֹת",
+          "description": "עגבניה, מלפפון, בצל",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Chopped tomato, cucumber and onion.",
+          "evidence": [
+            "עגבניה",
+            "מלפפון"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "חומוס",
+          "description": "עם פיתה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Chickpea purée with pita.",
+          "evidence": [
+            "חומוס"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "פיתה רגילה",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Bread.",
+          "evidence": [
+            "פיתה"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "סלק צלוי",
+          "description": "בחרדל־דבש",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Beet is the dish, in a honey mustard.",
+          "evidence": [
+            "סלק",
+            "דבש"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "שניצל",
+          "description": "בציפוי פירורי לחם, עם צ׳יפס",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Breaded schnitzel with fries.",
+          "evidence": [
+            "שניצל",
+            "פירורי לחם"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "אנטריקוט",
+          "description": "עם פירה תפו\"א",
+          "options": [
+            {
+              "name": "תוספת לבחירה",
+              "values": [
+                "פירה",
+                "סלט ירוק",
+                "אורז"
+              ]
+            },
+            {
+              "name": "שינויים",
+              "values": [
+                "ללא בצל"
+              ]
+            }
+          ],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "A steak with mash by default; choose the green salad.",
+          "evidence": [
+            "אנטריקוט",
+            "פירה",
+            "סלט ירוק"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "המבורגר",
+          "description": "בלחמניית מחמצת, גבינה",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "A burger in a sourdough bun; drop the bun.",
+          "evidence": [
+            "המבורגר",
+            "בלחמניית"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "המבורגר עטוף בחסה",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A burger wrapped in lettuce instead of a bun.",
+          "evidence": [
+            "עטוף בחסה"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "פסטה ברוטב שמנת",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta.",
+          "evidence": [
+            "פסטה"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "דג מטוגן",
+          "description": "בשמן קנולה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "fried fish is usually dredged in flour (דג מטוגן)",
+              "certainty": "likely",
+              "term": "דג מטוגן"
+            }
+          ],
+          "why": "Fried fish is usually floured; ask for it grilled or fried bare.",
+          "evidence": [
+            "דג מטוגן"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "סלמון",
+          "description": "עם חמאת שום",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Salmon with garlic butter.",
+          "evidence": [
+            "סלמון",
+            "חמאת שום"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d12",
+          "name": "קוקה קולה",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Sugared cola.",
+          "evidence": [
+            "קוקה קולה"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "קוקה קולה זירו",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Zero-sugar cola.",
+          "evidence": [
+            "זירו"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "הפוך גדול",
+          "description": "חלב שקדים",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "almond milk may be the sweetened kind (חלב שקדים)",
+              "certainty": "suspected",
+              "term": "חלב שקדים"
+            }
+          ],
+          "why": "A latte already made with almond milk.",
+          "evidence": [
+            "הפוך",
+            "חלב שקדים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "רטבים",
+      "dishes": [
+        {
+          "id": "d15",
+          "name": "טחינה",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Tahini.",
+          "evidence": [
+            "טחינה"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "קטשופ",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Ketchup is sugar.",
+          "evidence": [
+            "קטשופ"
+          ]
+        }
+      ]
+    }
+  ]
+}

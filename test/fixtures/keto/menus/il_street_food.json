@@ -1,0 +1,255 @@
+{
+  "id": "il_street_food",
+  "name": "דוכן הנמל",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Israeli street-food stall (sabich, falafel, shawarma) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "בפיתה ובלאפה",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "סביח בפיתה",
+          "description": "פיתה עם חציל מטוגן, ביצה חומה, תפוח אדמה, טחינה, עמבה וסלט קצוץ",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Eggplant, egg, tahini and salad are keto; drop the pita, potato and amba.",
+          "evidence": [
+            "פיתה",
+            "תפוח אדמה",
+            "עמבה"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "פלאפל בחצי פיתה",
+          "description": "חצי פיתה עם ארבעה כדורי פלאפל, חומוס וסלט",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Falafel and hummus in pita.",
+          "evidence": [
+            "פלאפל",
+            "חצי פיתה"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "שווארמה בפיתה",
+          "description": "שווארמה פרגית עם טחינה, חמוצים ובצל בפיתה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Chicken shawarma; ask for it on a plate without the pita.",
+          "evidence": [
+            "שווארמה",
+            "בפיתה"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "מעורב ירושלמי",
+          "description": "לבבות, כבד וטחול עוף על הפלאנצ׳ה עם בצל ותבלינים, בלאפה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Griddled chicken offal and onion; drop the laffa.",
+          "evidence": [
+            "כבד",
+            "בלאפה"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "צ׳יפס בפיתה",
+          "description": "פיתה עם צ׳יפס, טחינה וסלט",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fries in pita.",
+          "evidence": [
+            "צ׳יפס",
+            "פיתה"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "לאפה שניצל",
+          "description": "שניצל עוף, חומוס, סלט וחמוצים בלאפה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Breaded schnitzel in laffa.",
+          "evidence": [
+            "שניצל"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "קבב בפיתה",
+          "description": "קבב טלה, עמבה, טחינה ובצל בפיתה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            },
+            {
+              "source": "bread or breadcrumb binder in minced kebab",
+              "certainty": "suspected"
+            }
+          ],
+          "why": "Lamb kebab and tahini; drop the pita and the amba.",
+          "evidence": [
+            "קבב",
+            "בפיתה",
+            "עמבה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "בצלחת",
+      "dishes": [
+        {
+          "id": "d8",
+          "name": "סביח בצלחת",
+          "description": "חציל מטוגן, ביצה חומה, טחינה וסלט ישראלי, ללא פיתה",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "The sabich fillings on a plate with no pita and no amba.",
+          "evidence": [
+            "חציל מטוגן",
+            "ללא פיתה"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "שווארמה בצלחת",
+          "description": "שווארמה פרגית על צלחת עם סלט, טחינה ואורז",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Shawarma on a plate; leave out the rice.",
+          "evidence": [
+            "שווארמה",
+            "אורז"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "צלחת סלטים",
+          "description": "שלושה סלטים לבחירה מהוויטרינה",
+          "options": [
+            {
+              "name": "סלטים לבחירה",
+              "values": [
+                "סלט ישראלי",
+                "חצילים בטחינה",
+                "מטבוחה",
+                "תפוחי אדמה בשמיר",
+                "סלט גזר מרוקאי",
+                "כרוב במיונז"
+              ]
+            }
+          ],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "carrot salad and cabbage salad are usually sweetened",
+              "certainty": "suspected",
+              "term": "סלט גזר מרוקאי"
+            }
+          ],
+          "why": "The carbs are only in the options: pick the chopped salad, eggplant and matbucha, not potato or carrot.",
+          "evidence": [
+            "תפוחי אדמה בשמיר",
+            "סלט גזר מרוקאי"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מהדוכן",
+      "dishes": [
+        {
+          "id": "d11",
+          "name": "תירס חם",
+          "description": "קלח תירס מבושל עם חמאה ומלח",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Corn on the cob.",
+          "evidence": [
+            "תירס"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "מיץ רימונים",
+          "description": "מיץ רימונים סחוט",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pomegranate juice.",
+          "evidence": [
+            "מיץ רימונים"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "מיץ פטל עם סודה",
+          "description": "סירופ פטל עם סודה וקרח",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Raspberry syrup drink.",
+          "evidence": [
+            "סירופ פטל"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "תה קר דיאט",
+          "description": "תה קר בטעם אפרסק, דיאט",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A diet iced tea.",
+          "evidence": [
+            "דיאט"
+          ]
+        }
+      ]
+    }
+  ]
+}

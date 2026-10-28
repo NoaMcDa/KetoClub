@@ -1,0 +1,299 @@
+{
+  "id": "il_asian_wok",
+  "name": "ווק אקספרס",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Israeli Asian wok chain (cornstarch and sweet sauces) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "מוקפצים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "פאד תאי עוף",
+          "description": "אטריות אורז מוקפצות עם עוף, ביצה, נבטים ובוטנים ברוטב תמרהינדי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Rice noodles.",
+          "evidence": [
+            "אטריות אורז"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "עוף בקשיו",
+          "description": "נתחי עוף מוקפצים עם קשיו, פלפלים ובצל ברוטב צדפות, מוגש עם אורז",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "oyster sauce is sweetened and thickened with cornstarch (רוטב צדפות)",
+              "certainty": "likely",
+              "term": "רוטב צדפות"
+            },
+            {
+              "source": "wok chicken is often velveted in cornstarch",
+              "certainty": "suspected",
+              "term": "נתחי עוף"
+            }
+          ],
+          "why": "Chicken and vegetables; leave out the rice and ask for a light, unsweetened sauce.",
+          "evidence": [
+            "נתחי עוף",
+            "רוטב צדפות",
+            "אורז"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "בקר במרינדת טריאקי",
+          "description": "רצועות בקר במרינדת טריאקי עם ברוקולי ושומשום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "teriyaki marinade is sugar and mirin (טריאקי)",
+              "certainty": "likely",
+              "term": "טריאקי"
+            }
+          ],
+          "why": "Beef and broccoli are keto; ask for them without the teriyaki.",
+          "evidence": [
+            "בקר",
+            "טריאקי"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "עוף חמוץ מתוק",
+          "description": "נתחי עוף פריכים ברוטב חמוץ מתוק עם אננס ופלפלים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "crispy wok chicken is battered (פריכים)",
+              "certainty": "likely",
+              "term": "פריכים"
+            }
+          ],
+          "why": "Battered chicken in a sugar sauce with pineapple.",
+          "evidence": [
+            "פריכים",
+            "חמוץ מתוק"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "עוף קונג פאו",
+          "description": "קוביות עוף מוקפצות עם בוטנים, צ׳ילי יבש ובצל ירוק ברוטב קונג פאו",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "kung pao sauce carries sugar and cornstarch (רוטב קונג פאו)",
+              "certainty": "likely",
+              "term": "רוטב קונג פאו"
+            }
+          ],
+          "why": "Chicken and peanuts; the sauce is sweetened and thickened.",
+          "evidence": [
+            "קוביות עוף",
+            "רוטב קונג פאו"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "ירקות מוקפצים עם טופו",
+          "description": "ברוקולי, כרוב סיני, פטריות שיטאקי וטופו ברוטב סויה ושום",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "wok sauces are often thickened with cornstarch",
+              "certainty": "suspected",
+              "term": "רוטב סויה ושום"
+            }
+          ],
+          "why": "Green vegetables and tofu in soy and garlic.",
+          "evidence": [
+            "ברוקולי",
+            "טופו"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "אורז כרובית מוקפץ",
+          "description": "אורז כרובית מוקפץ עם ביצה, בצל ירוק וגזר",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Cauliflower rice is the keto substitute, not rice.",
+          "evidence": [
+            "אורז כרובית"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "נודלס ביצים",
+          "description": "אטריות ביצים מוקפצות עם ירקות",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Egg noodles.",
+          "evidence": [
+            "אטריות ביצים"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "אטריות קישואים",
+          "description": "אטריות קישואים מוקפצות עם עוף, שום, צ׳ילי ובצל ירוק",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Zucchini noodles are a keto substitute despite the word noodles.",
+          "evidence": [
+            "אטריות קישואים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ראשונות",
+      "dishes": [
+        {
+          "id": "d10",
+          "name": "מרק טום יאם",
+          "description": "מרק חמוץ חריף עם שרימפס, פטריות, למון גראס וחלב קוקוס",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "tom yum paste is often sweetened with palm sugar",
+              "certainty": "suspected",
+              "term": "טום יאם"
+            }
+          ],
+          "why": "Shrimp and mushrooms in a coconut broth.",
+          "evidence": [
+            "שרימפס",
+            "חלב קוקוס"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "ספרינג רול",
+          "description": "שלושה רולים מטוגנים במילוי ירקות, עם רוטב צ׳ילי מתוק",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "sweet chili sauce (צ׳ילי מתוק)",
+              "certainty": "likely",
+              "term": "צ׳ילי מתוק"
+            }
+          ],
+          "why": "Fried wrapper rolls with a sugar dip.",
+          "evidence": [
+            "רולים מטוגנים"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "באן בקר",
+          "description": "לחמניית באו מאודה עם בקר צלוי, מלפפון והויסין",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "hoisin is a sweet bean sauce (הויסין)",
+              "certainty": "likely",
+              "term": "הויסין"
+            }
+          ],
+          "why": "A steamed bun is bread; the beef is a small filling.",
+          "evidence": [
+            "לחמניית באו"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "סלט תאילנדי",
+          "description": "כרוב, גזר, נענע, כוסברה ובוטנים ברוטב הבית התאילנדי",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Thai house dressing is usually sweetened with palm sugar (רוטב הבית)",
+              "certainty": "likely",
+              "term": "רוטב הבית"
+            }
+          ],
+          "why": "Cabbage, herbs and peanuts; ask for the dressing on the side or lime and fish sauce only.",
+          "evidence": [
+            "כרוב",
+            "רוטב הבית"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "שרימפס בטמפורה",
+          "description": "שרימפס בבלילה פריכה עם מיונז ספייסי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Battered shrimp.",
+          "evidence": [
+            "טמפורה",
+            "בבלילה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d15",
+          "name": "תה ירוק",
+          "description": "קנקן תה ירוק יפני",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Green tea.",
+          "evidence": [
+            "תה ירוק"
+          ]
+        }
+      ]
+    }
+  ]
+}

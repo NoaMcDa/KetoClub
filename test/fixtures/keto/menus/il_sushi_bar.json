@@ -1,0 +1,344 @@
+{
+  "id": "il_sushi_bar",
+  "name": "סושי בר",
+  "source": "copied:test/fixtures/allergens/menus/il_sushi_bar.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/il_sushi_bar.json (synthetic Israeli sushi bar written for the corpus from 11 §6, §7.2, §8 and 12 §1.4, §1.7, §1.11, §5); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "סושי ורולים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "סושי סלמון (8 יח׳)",
+          "description": "אורז, סלמון טרי ואצות נורי, מוגש עם רוטב סויה, וואסבי וג׳ינג׳ר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "sushi rice is seasoned with sugar",
+              "certainty": "likely",
+              "term": "אורז"
+            }
+          ],
+          "why": "Sushi is rice.",
+          "evidence": [
+            "סושי",
+            "אורז"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "סושי טונה (8 יח׳)",
+          "description": "אורז, טונה טרייה ואצות נורי, מוגש עם רוטב סויה, וואסבי וג׳ינג׳ר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "sushi rice is seasoned with sugar",
+              "certainty": "likely",
+              "term": "אורז"
+            }
+          ],
+          "why": "Sushi is rice.",
+          "evidence": [
+            "סושי",
+            "אורז"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "רול קליפורניה",
+          "description": "סורימי, אבוקדו, מלפפון ואורז, שומשום מבחוץ",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A rice roll with surimi (itself starch-bound).",
+          "evidence": [
+            "רול",
+            "אורז"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "רול ספייסי טונה",
+          "description": "טונה חריפה עם מיונז ספייסי וטמפורה פלייקס, שומשום ורוטב סויה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "tempura flakes are fried batter (טמפורה פלייקס)",
+              "certainty": "likely",
+              "term": "טמפורה פלייקס"
+            }
+          ],
+          "why": "A roll is rice, and the tempura flakes are batter.",
+          "evidence": [
+            "רול"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "רול טמפורה שרימפס",
+          "description": "שרימפס בטמפורה, אבוקדו, איולי ספייסי ורוטב אונאגי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "unagi sauce is sweet soy (רוטב אונאגי)",
+              "certainty": "likely",
+              "term": "רוטב אונאגי"
+            }
+          ],
+          "why": "A rice roll around battered shrimp.",
+          "evidence": [
+            "רול",
+            "טמפורה"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "אינסייד אאוט אבוקדו",
+          "description": "אבוקדו, מלפפון וגזר בשומשום, מוגש עם רוטב סויה, וואסבי וג׳ינג׳ר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "An inside-out roll is rice on the outside even when rice is not named.",
+          "evidence": [
+            "אינסייד אאוט"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "ספייסי סלמון קראנץ׳",
+          "description": "סלמון חריף, מיונז, פירורי פאנקו ושומשום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "spicy salmon crunch is often served on crispy rice or as a roll",
+              "certainty": "suspected",
+              "term": "קראנץ׳"
+            }
+          ],
+          "why": "Spicy salmon with mayo is keto; the panko crumbs are not.",
+          "evidence": [
+            "סלמון",
+            "פירורי פאנקו"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סשימי ומנות פתיחה",
+      "dishes": [
+        {
+          "id": "d8",
+          "name": "סשימי סלמון",
+          "description": "שש פרוסות סלמון טרי על מצע צנון, וואסבי וג׳ינג׳ר",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "pickled ginger is pickled in sugar (ג׳ינג׳ר)",
+              "certainty": "suspected",
+              "term": "ג׳ינג׳ר"
+            }
+          ],
+          "why": "Raw salmon on daikon.",
+          "evidence": [
+            "סשימי",
+            "סלמון"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "סשימי טונה",
+          "description": "שש פרוסות טונה טרייה, וואסבי וג׳ינג׳ר",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "pickled ginger is pickled in sugar (ג׳ינג׳ר)",
+              "certainty": "suspected",
+              "term": "ג׳ינג׳ר"
+            }
+          ],
+          "why": "Raw tuna slices.",
+          "evidence": [
+            "סשימי",
+            "טונה"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "אדממה",
+          "description": "שעועית סויה מאודה עם מלח ים",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Edamame are mostly fibre and protein; a legume that is keto in a starter portion.",
+          "evidence": [
+            "שעועית סויה"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "מרק מיסו",
+          "description": "מרק מיסו עם טופו, אצות ובצל ירוק",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Miso broth with tofu and seaweed.",
+          "evidence": [
+            "מרק מיסו",
+            "טופו"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "סלט וואקמה",
+          "description": "סלט אצות עם שומשום קלוי ורוטב שומשום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "ready-made wakame salad is heavily sweetened",
+              "certainty": "likely",
+              "term": "סלט אצות"
+            },
+            {
+              "source": "sesame dressing is usually sweet (רוטב שומשום)",
+              "certainty": "likely",
+              "term": "רוטב שומשום"
+            }
+          ],
+          "why": "Seaweed is keto; the usual ready-made wakame salad is sugared, ask for plain seaweed.",
+          "evidence": [
+            "סלט אצות",
+            "רוטב שומשום"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מנות חמות",
+      "dishes": [
+        {
+          "id": "d12",
+          "name": "גיוזה ירקות",
+          "description": "כיסוני בצק ממולאים בירקות ומוקפצים, עם רוטב פונזו",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Dough dumplings.",
+          "evidence": [
+            "כיסוני בצק"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "אודון מוקפץ",
+          "description": "אטריות אודון מוקפצות עם ירקות וטריאקי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "teriyaki is sugar and mirin (טריאקי)",
+              "certainty": "likely",
+              "term": "טריאקי"
+            }
+          ],
+          "why": "Udon noodles in teriyaki.",
+          "evidence": [
+            "אטריות אודון"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "אורז מטוגן עם ביצה",
+          "description": "אורז מוקפץ עם ביצה, ירקות ורוטב סויה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fried rice.",
+          "evidence": [
+            "אורז מוקפץ"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "טמפורה ירקות",
+          "description": "ירקות בציפוי טמפורה פריך עם רוטב טנצוי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Battered vegetables.",
+          "evidence": [
+            "טמפורה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוח ושתייה",
+      "dishes": [
+        {
+          "id": "d17",
+          "name": "מוצ׳י גלידה",
+          "description": "כדורי אורז דביק במילוי גלידה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Sticky rice around ice cream.",
+          "evidence": [
+            "אורז דביק",
+            "גלידה"
+          ]
+        },
+        {
+          "id": "d18",
+          "name": "בירה אסאהי",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Beer.",
+          "evidence": [
+            "בירה"
+          ]
+        },
+        {
+          "id": "d19",
+          "name": "סאקה חם",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Sake is rice wine with residual carbs.",
+          "evidence": [
+            "סאקה"
+          ]
+        }
+      ]
+    }
+  ]
+}

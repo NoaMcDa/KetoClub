@@ -1,0 +1,470 @@
+{
+  "id": "il_hummus_falafel",
+  "name": "חומוסיית הכיכר",
+  "source": "copied:test/fixtures/allergens/menus/il_hummus_falafel.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/il_hummus_falafel.json (synthetic Israeli hummus-and-falafel place written for the corpus from 12 §1.1-1.6); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "חומוס",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "חומוס מסבחה",
+          "description": "חומוס חם עם גרגרי חומוס שלמים, שמן זית ופפריקה",
+          "options": [
+            {
+              "name": "תוספת",
+              "values": [
+                "פיתה",
+                "לאפה",
+                "ללא לחם"
+              ]
+            }
+          ],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A bowl of chickpea purée; leaving out the bread does not change the base.",
+          "evidence": [
+            "חומוס",
+            "גרגרי חומוס"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "חומוס פול",
+          "description": "חומוס עם פול מדמס, טחינה וביצה קשה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Chickpea purée with fava beans.",
+          "evidence": [
+            "חומוס",
+            "פול מדמס"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "חומוס בשר",
+          "description": "חומוס עם בשר טחון, צנוברים וטחינה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "The meat sits on a bowl of chickpea purée.",
+          "evidence": [
+            "חומוס"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "פלאפל ובפיתה",
+      "dishes": [
+        {
+          "id": "d4",
+          "name": "פלאפל במנה",
+          "description": "חמישה כדורי פלאפל טריים עם סלט, חמוצים וטחינה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Falafel are fried chickpea balls, often with flour.",
+          "evidence": [
+            "פלאפל"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "פלאפל בפיתה",
+          "description": "פיתה עם פלאפל, חומוס, סלט ישראלי, חמוצים, עמבה וטחינה",
+          "options": [
+            {
+              "name": "תוספות",
+              "values": [
+                "צ׳יפס",
+                "חצילים",
+                "כרוב סגול"
+              ]
+            }
+          ],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Falafel and hummus in a pita.",
+          "evidence": [
+            "פיתה",
+            "פלאפל"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "פלאפל בלאפה",
+          "description": "לאפה עם פלאפל, סלט, חמוצים, טחינה ועמבה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Falafel in a laffa.",
+          "evidence": [
+            "לאפה",
+            "פלאפל"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "סביח",
+          "description": "פיתה, חציל מטוגן, ביצה קשה, טחינה, עמבה וסלט ירקות",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Fried eggplant, egg, tahini and salad are keto; drop the pita and the amba.",
+          "evidence": [
+            "פיתה",
+            "חציל מטוגן",
+            "עמבה"
+          ]
+        },
+        {
+          "id": "d17",
+          "name": "שניצל בפיתה",
+          "description": "שניצל עוף בציפוי פירורי לחם עם חומוס, חסה, עגבנייה ומיונז",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A breaded schnitzel in a pita.",
+          "evidence": [
+            "שניצל",
+            "פירורי לחם"
+          ]
+        },
+        {
+          "id": "d18",
+          "name": "קבב בלאפה",
+          "description": "קבב כבש ובקר, סלט טחינה, בצל ופטרוזיליה בלאפה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "bread or breadcrumb binder in minced kebab",
+              "certainty": "suspected"
+            }
+          ],
+          "why": "Kebab with tahini salad; the laffa only carries it.",
+          "evidence": [
+            "קבב",
+            "בלאפה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סלטים",
+      "dishes": [
+        {
+          "id": "d8",
+          "name": "סלט חצילים בטחינה",
+          "description": "חציל שרוף, טחינה גולמית, פטרוזיליה ושום",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Charred eggplant with raw tahini.",
+          "evidence": [
+            "חציל שרוף",
+            "טחינה"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "סלט חצילים במיונז",
+          "description": "חציל שרוף, מיונז, מיץ לימון, שום וחרדל",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Charred eggplant with mayonnaise.",
+          "evidence": [
+            "חציל שרוף",
+            "מיונז"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "סלט כרוב",
+          "description": "כרוב לבן וגזר במיונז",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Israeli cabbage salad dressing is usually sweetened with sugar",
+              "certainty": "likely",
+              "term": "סלט כרוב"
+            }
+          ],
+          "why": "Cabbage in mayo reads keto, but the dressing is typically sweetened; ask.",
+          "evidence": [
+            "כרוב",
+            "מיונז"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "סלט ישראלי",
+          "description": "עגבנייה, מלפפון, בצל, פטרוזיליה, שמן זית ולימון",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Chopped vegetables, olive oil and lemon.",
+          "evidence": [
+            "עגבנייה",
+            "מלפפון"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מנות ביתיות",
+      "dishes": [
+        {
+          "id": "d12",
+          "name": "שקשוקה",
+          "description": "ביצים ברוטב עגבניות חריף, מוגשת עם פיתה",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [
+            {
+              "source": "tomato sauce sometimes sweetened (רוטב עגבניות)",
+              "certainty": "suspected",
+              "term": "רוטב עגבניות"
+            }
+          ],
+          "why": "Eggs in tomato sauce; leave out the pita.",
+          "evidence": [
+            "שקשוקה",
+            "פיתה"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "מג׳דרה",
+          "description": "אורז ועדשים עם בצל מטוגן, מוגש עם יוגורט",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Rice and lentils.",
+          "evidence": [
+            "אורז ועדשים"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "מרק עדשים",
+          "description": "מרק עדשים כתומות עם כמון ולימון",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Lentil soup.",
+          "evidence": [
+            "מרק עדשים"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "חריימה",
+          "description": "דג בצלי חריף ברוטב עגבניות ופלפל חריף",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Fish in spicy tomato sauce.",
+          "evidence": [
+            "דג",
+            "רוטב עגבניות"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "קובה בורגול",
+          "description": "קובה ממולאת בשר טחון בקליפת בורגול, במרק עגבניות",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "The kubbeh shell is bulgur.",
+          "evidence": [
+            "קובה",
+            "בורגול"
+          ]
+        },
+        {
+          "id": "d19",
+          "name": "מרק עוף",
+          "description": "מרק עוף ביתי עם ירקות ופתיתים",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Chicken soup with vegetables; ask for it without the ptitim.",
+          "evidence": [
+            "מרק עוף",
+            "פתיתים"
+          ]
+        },
+        {
+          "id": "d20",
+          "name": "קוסקוס מרוקאי",
+          "description": "קוסקוס עם ירקות, גרגירי חומוס וצימוקים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Couscous is semolina.",
+          "evidence": [
+            "קוסקוס"
+          ]
+        },
+        {
+          "id": "d27",
+          "name": "מרק עוף עם שקדי מרק",
+          "description": "מרק עוף חם עם גזר ושקדי מרק פריכים",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "soup almonds are fried flour croutons, not almonds (שקדי מרק)",
+              "certainty": "likely",
+              "term": "שקדי מרק"
+            }
+          ],
+          "why": "Chicken soup is keto; the soup almonds are fried dough and the carrot is a root.",
+          "evidence": [
+            "מרק עוף",
+            "שקדי מרק"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "תוספות",
+      "dishes": [
+        {
+          "id": "d21",
+          "name": "תורמוס כבוש",
+          "description": "תורמוס כבוש עם לימון ופלפל חריף",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Brined lupini beans are mostly fibre; a small bowl is keto.",
+          "evidence": [
+            "תורמוס"
+          ]
+        },
+        {
+          "id": "d22",
+          "name": "טחינה ביתית",
+          "description": "תוספת טחינה גולמית",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A side of raw tahini.",
+          "evidence": [
+            "טחינה גולמית"
+          ]
+        },
+        {
+          "id": "d24",
+          "name": "אורז לבן",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "White rice.",
+          "evidence": [
+            "אורז לבן"
+          ]
+        },
+        {
+          "id": "d25",
+          "name": "צ׳יפס",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fries.",
+          "evidence": [
+            "צ׳יפס"
+          ]
+        },
+        {
+          "id": "d28",
+          "name": "פתיתי אורז",
+          "description": "פתיתי אורז עם ירקות ושמן זית",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Ptitim are pasta.",
+          "evidence": [
+            "פתיתי אורז"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה וקינוח",
+      "dishes": [
+        {
+          "id": "d23",
+          "name": "חלבה",
+          "description": "חלבה בטעם פיסטוק לקינוח",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Halva is sesame and sugar.",
+          "evidence": [
+            "חלבה"
+          ]
+        },
+        {
+          "id": "d26",
+          "name": "לימונדה עם נענע",
+          "description": "לימון סחוט, נענע וסוכר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Lemonade with sugar.",
+          "evidence": [
+            "לימונדה",
+            "סוכר"
+          ]
+        }
+      ]
+    }
+  ]
+}

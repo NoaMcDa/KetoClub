@@ -1,0 +1,261 @@
+{
+  "id": "il_dairy_cafe",
+  "name": "קפה נחת",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic kosher dairy café (חלבי) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "ראשונות ועיקריות",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "פסטה רוזה",
+          "description": "פנה ברוטב עגבניות ושמנת",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta.",
+          "evidence": [
+            "פנה"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "פיצה אישית",
+          "description": "פיצה עם רוטב עגבניות ומוצרלה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pizza.",
+          "evidence": [
+            "פיצה"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "סלט יווני",
+          "description": "עגבניות, מלפפון, בצל, זיתים וגבינה בולגרית",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Greek salad with Bulgarian cheese.",
+          "evidence": [
+            "גבינה בולגרית"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "שקשוקה עם גבינות",
+          "description": "ביצים ברוטב עגבניות עם גבינה בולגרית ומוצרלה, מוגשת עם לחם הבית",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [
+            {
+              "source": "tomato sauce sometimes sweetened (רוטב עגבניות)",
+              "certainty": "suspected",
+              "term": "רוטב עגבניות"
+            }
+          ],
+          "why": "Eggs and cheese in tomato sauce; leave out the bread.",
+          "evidence": [
+            "שקשוקה",
+            "לחם הבית"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "קיש פטריות",
+          "description": "קיש פטריות ותרד על בצק פריך",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "A quiche on shortcrust.",
+          "evidence": [
+            "קיש",
+            "בצק פריך"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "סלמון בתנור",
+          "description": "פילה סלמון בתנור עם אורז ירוק",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Salmon; swap the rice for salad.",
+          "evidence": [
+            "סלמון",
+            "אורז"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "לזניה ירקות",
+          "description": "לזניה עם ירקות קלויים ורוטב בשמל",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta sheets and béchamel.",
+          "evidence": [
+            "לזניה"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "בלינצ׳ס גבינה",
+          "description": "בלינצ׳ס ממולאים גבינה מתוקה, עם שמנת חמוצה וריבה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Sweet cheese crêpes with jam.",
+          "evidence": [
+            "בלינצ׳ס",
+            "ריבה"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "פלטת גבינות",
+          "description": "פלטת גבינות קשות, אגוזים, ענבים ופריכיות",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [],
+          "why": "Cheese and nuts are keto; leave out the grapes and crackers.",
+          "evidence": [
+            "גבינות קשות",
+            "ענבים",
+            "פריכיות"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "פטריות מוקרמות",
+          "description": "פטריות ברוטב שמנת ופרמזן",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "cream sauces are sometimes thickened with flour (רוטב שמנת)",
+              "certainty": "suspected",
+              "term": "רוטב שמנת"
+            }
+          ],
+          "why": "Mushrooms in cream and parmesan.",
+          "evidence": [
+            "פטריות",
+            "רוטב שמנת"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "חביתה עם גבינות",
+          "description": "חביתה מלאה עם גבינה צהובה ובולגרית, ליד סלט ולחם",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "A cheese omelette with salad; leave out the bread.",
+          "evidence": [
+            "חביתה",
+            "לחם"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "מרק בצל",
+          "description": "מרק בצל צרפתי עם קרוטון וגבינה מוקרמת",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "A bowl of cooked-down onion topped with bread.",
+          "evidence": [
+            "מרק בצל",
+            "קרוטון"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוחים",
+      "dishes": [
+        {
+          "id": "d13",
+          "name": "עוגת גבינה ללא סוכר",
+          "description": "עוגת גבינה ללא תוספת סוכר, ממותקת בסטיביה, על בסיס שקדים",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "\"no added sugar\" can still mean maltitol or fruit sugar (ללא תוספת סוכר)",
+              "certainty": "suspected",
+              "term": "ללא תוספת סוכר"
+            }
+          ],
+          "why": "A stevia cheesecake on an almond base is a keto dessert.",
+          "evidence": [
+            "ממותקת בסטיביה",
+            "בסיס שקדים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d14",
+          "name": "סמוזי פירות",
+          "description": "בננה, תות ומיץ תפוזים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fruit and juice.",
+          "evidence": [
+            "בננה",
+            "מיץ תפוזים"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "קפוצ׳ינו",
+          "description": "קפוצ׳ינו עם חלב 3%",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "A cup of milk; ask for a small one or with almond milk.",
+          "evidence": [
+            "קפוצ׳ינו",
+            "חלב"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "אספרסו קצר",
+          "description": "אספרסו",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Espresso.",
+          "evidence": [
+            "אספרסו"
+          ]
+        }
+      ]
+    }
+  ]
+}

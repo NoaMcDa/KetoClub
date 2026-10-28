@@ -1,0 +1,259 @@
+{
+  "id": "il_juice_bar",
+  "name": "מיץ טבעי",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Israeli juice and smoothie bar (drinks) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "מיצים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "מיץ תפוזים",
+          "description": "תפוזים סחוטים טריים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Juice is sugar.",
+          "evidence": [
+            "מיץ תפוזים"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "גזר תפוז ג׳ינג׳ר",
+          "description": "מיץ גזר ותפוזים עם ג׳ינג׳ר טרי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Carrot and orange juice.",
+          "evidence": [
+            "מיץ גזר"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "מיץ ירוק",
+          "description": "סלרי, מלפפון, תרד, לימון וג׳ינג׳ר",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "green juices often have apple added to sweeten (מיץ ירוק)",
+              "certainty": "suspected",
+              "term": "מיץ ירוק"
+            }
+          ],
+          "why": "Celery, cucumber and spinach juice.",
+          "evidence": [
+            "סלרי",
+            "מלפפון"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "לימונדה ביתית",
+          "description": "לימון סחוט, מים וסוכר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Lemonade with sugar.",
+          "evidence": [
+            "לימונדה",
+            "סוכר"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "שוט ג׳ינג׳ר",
+          "description": "ג׳ינג׳ר, לימון וכורכום, ממותק בדבש",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Sweetened with honey.",
+          "evidence": [
+            "ממותק בדבש"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שייקים",
+      "dishes": [
+        {
+          "id": "d6",
+          "name": "סמוזי פירות יער",
+          "description": "פירות יער, בננה ויוגורט",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Banana and fruit.",
+          "evidence": [
+            "בננה"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "שייק חלבון",
+          "description": "אבקת חלבון וניל, חלב שקדים ללא סוכר וחמאת בוטנים",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "flavoured protein powders are often sweetened (אבקת חלבון וניל)",
+              "certainty": "suspected",
+              "term": "אבקת חלבון וניל"
+            }
+          ],
+          "why": "Protein powder, unsweetened almond milk and peanut butter.",
+          "evidence": [
+            "חלב שקדים ללא סוכר",
+            "אבקת חלבון"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "שייק אבוקדו",
+          "description": "אבוקדו, חלב קוקוס ותמרים",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Avocado and coconut milk are keto; ask for it without the dates.",
+          "evidence": [
+            "אבוקדו",
+            "תמרים"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "מילקשייק וניל",
+          "description": "גלידת וניל וחלב",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Ice cream and milk.",
+          "evidence": [
+            "גלידת וניל"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קפה וקר",
+      "dishes": [
+        {
+          "id": "d10",
+          "name": "קפה ברד",
+          "description": "קפה ברד מוקצף",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "Israeli coffee slush is sugar syrup and coffee (ברד)",
+              "certainty": "likely",
+              "term": "ברד"
+            }
+          ],
+          "why": "A sweetened coffee slush.",
+          "evidence": [
+            "קפה ברד"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "אספרסו טוניק",
+          "description": "אספרסו על מי טוניק וקרח",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Tonic is sugared; ask for espresso on soda water.",
+          "evidence": [
+            "טוניק"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "קומבוצ׳ה",
+          "description": "קומבוצ׳ה ביתית בטעם ג׳ינג׳ר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "kombucha keeps residual sugar from fermentation (קומבוצ׳ה)",
+              "certainty": "likely",
+              "term": "קומבוצ׳ה"
+            }
+          ],
+          "why": "House kombucha keeps much of its sugar.",
+          "evidence": [
+            "קומבוצ׳ה"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "תה צמחים קר",
+          "description": "תה צמחים קר ללא סוכר",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Unsweetened iced herbal tea.",
+          "evidence": [
+            "ללא סוכר"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "סודה לימון",
+          "description": "מים מוגזים בטעם לימון, ללא סוכר",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Unsweetened sparkling water.",
+          "evidence": [
+            "ללא סוכר"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "רד בול ללא סוכר",
+          "description": "משקה אנרגיה ללא סוכר",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A sugar-free energy drink.",
+          "evidence": [
+            "ללא סוכר"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "מים עם לימון ונענע",
+          "description": "מים קרים עם פלחי לימון ונענע",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Water.",
+          "evidence": [
+            "מים"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,261 @@
+{
+  "id": "il_mizrahi_home",
+  "name": "אוכל ביתי אצל סבתא רחל",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Mizrahi home-food restaurant (אוכל ביתי, kubbeh, majadra) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "מרקים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "קובה סלק",
+          "description": "מרק סלק חמוץ־מתוק עם כופתאות קובה סולת ממולאות בשר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "sweet-and-sour soups are balanced with sugar (חמוץ־מתוק)",
+              "certainty": "likely",
+              "term": "חמוץ־מתוק"
+            }
+          ],
+          "why": "Semolina dumplings in a sweet-sour beet soup.",
+          "evidence": [
+            "קובה סולת",
+            "סלק"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "קובה חמוסטה",
+          "description": "מרק חמוץ עם קישואים, סלק עלים ולימון וקובה סולת",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "The semolina kubbeh are the point of the soup.",
+          "evidence": [
+            "קובה סולת"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "עיקריות",
+      "dishes": [
+        {
+          "id": "d3",
+          "name": "מג׳דרה",
+          "description": "אורז ועדשים חומות עם בצל מטוגן",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Rice and lentils.",
+          "evidence": [
+            "אורז ועדשים"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "ממולאים",
+          "description": "פלפלים, בצלים וקישואים ממולאים באורז ובשר טחון ברוטב עגבניות",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "The stuffing is rice.",
+          "evidence": [
+            "ממולאים באורז"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "עוף בתנור",
+          "description": "כרעי עוף צלויים עם תפוחי אדמה, בצל ופפריקה",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Roast chicken legs; ask for salad instead of the potatoes.",
+          "evidence": [
+            "כרעי עוף",
+            "תפוחי אדמה"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "קציצות בשר ברוטב עגבניות",
+          "description": "קציצות בקר ביתיות ברוטב עגבניות, מוגש עם אורז לבן",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "home meatballs are bound with soaked bread or breadcrumbs",
+              "certainty": "likely",
+              "term": "קציצות בקר"
+            },
+            {
+              "source": "tomato sauce sometimes sweetened (רוטב עגבניות)",
+              "certainty": "suspected",
+              "term": "רוטב עגבניות"
+            }
+          ],
+          "why": "Beef meatballs in tomato; leave out the rice and ask what binds them.",
+          "evidence": [
+            "קציצות בקר",
+            "אורז לבן"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "תבשיל שעועית לבנה",
+          "description": "שעועית לבנה ברוטב עגבניות עם בשר בקר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A bean stew; the beans are the base.",
+          "evidence": [
+            "שעועית לבנה"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "כבד עוף מוקפץ",
+          "description": "כבדי עוף מוקפצים עם בצל ופטריות, ליד פירה",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Chicken livers with onion and mushrooms; swap the mash for salad.",
+          "evidence": [
+            "כבדי עוף",
+            "פירה"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "פשטידת קישואים",
+          "description": "פשטידת קישואים, ביצים וגבינה בולגרית",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "a pashtida is usually bound with flour or breadcrumbs (פשטידת)",
+              "certainty": "likely",
+              "term": "פשטידת"
+            }
+          ],
+          "why": "Courgette, eggs and cheese, but a pashtida usually has flour; ask.",
+          "evidence": [
+            "פשטידת",
+            "קישואים"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "אורז אדום",
+          "description": "אורז ברוטב עגבניות",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Rice.",
+          "evidence": [
+            "אורז"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סלטים",
+      "dishes": [
+        {
+          "id": "d11",
+          "name": "סלט מטבוחה",
+          "description": "עגבניות ופלפלים מבושלים לאט עם שום ושמן זית",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "matbucha is often finished with sugar (מטבוחה)",
+              "certainty": "suspected",
+              "term": "מטבוחה"
+            }
+          ],
+          "why": "Slow-cooked tomato and pepper.",
+          "evidence": [
+            "עגבניות",
+            "פלפלים"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "חצילים מטוגנים",
+          "description": "פרוסות חציל מטוגנות עם שום וחומץ",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "fried eggplant slices are sometimes floured first (מטוגנות)",
+              "certainty": "suspected",
+              "term": "מטוגנות"
+            }
+          ],
+          "why": "Fried eggplant with garlic and vinegar.",
+          "evidence": [
+            "חציל"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "סלט כרוב סגול",
+          "description": "כרוב סגול עם מיונז וקצת סוכר",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [],
+          "why": "Cabbage and mayo are keto, but the menu names sugar; ask for it without.",
+          "evidence": [
+            "כרוב סגול",
+            "סוכר"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוח",
+      "dishes": [
+        {
+          "id": "d14",
+          "name": "מעמול",
+          "description": "עוגיות סולת במילוי תמרים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Semolina cookies with dates.",
+          "evidence": [
+            "סולת",
+            "תמרים"
+          ]
+        }
+      ]
+    }
+  ]
+}
