@@ -1473,7 +1473,14 @@ One request per menu. The **system** prompt (in `menu_analysis_prompt.dart`) sta
 
 The **user** prompt is the normalised menu, one line per dish:
 `id | category | name | description | options`. Prices are omitted; they are
-irrelevant to the verdict and waste tokens.
+irrelevant to the verdict and waste tokens. `id` is the dish's **prompt id**,
+`1`, `2`, … in the request's own order (each batch, #188, numbers from 1),
+never the platform id: given Wolt's 24-character hex ids, the reply the #165
+smoke test recorded sent back 16-character prefixes, so no id matched and every
+dish was placed by name alone, which loses a verdict when two dishes share a
+name. `MenuAnalysisPrompt.promptIds` maps each prompt id to its `Dish.id`, and
+§9.4 rule 3 reads a reply's `id` through that map first, then as a platform id,
+and only then by name. The menu-question prompt (#214) keeps the platform ids.
 
 ### 9.2 The response schema
 
@@ -1599,7 +1606,10 @@ tests free of a real clock.)* In order:
    `badResponse`.
 2. Root not a map, or `dishes` missing or not a list → `badResponse`.
 3. Per element: an `id` that matches a dish in `source` **always wins**, whatever
-   `name` says. Only when `id` is missing or matches no source dish is `name` read,
+   `name` says — a prompt id (§9.1, the `promptIds` the caller passes) first, read
+   as the dish it maps to, then a dish's own platform id (a model ignoring the
+   short ids). A truncated id, such as the #165 recording's 16-character
+   prefixes, is neither. Only when `id` is missing or matches no source dish is `name` read,
    and it must either normalise (`text_normaliser`) exactly to a source dish's name
    (the first such in menu order), or overlap one source dish's name highly: the
    *content words* of a name are its normalised words of ≥ 3 letters not in

@@ -167,25 +167,49 @@ def vision_user_prompt(page_count: int) -> str:
 
 def user_prompt(menu: Menu) -> str:
     """``MenuAnalysisPrompt.userPrompt``: one line per dish, in menu order,
-    ``id | category | name | description | options``, joined by ``\\n``.
+    ``id | category | name | description | options``, joined by ``\\n``,
+    where ``id`` is the dish's prompt id (:func:`prompt_ids`), ``1``, ``2``,
+    ... in menu order, never its platform id: a short number is what the
+    model copies back exactly (the #165 recording sent back 16-character
+    prefixes of Wolt's 24-character ids).
 
     Prices are omitted. Each option group is ``label: value, value``; groups
     are joined by ``; ``.
     """
     return "\n".join(
-        dish_line(dish, category.name)
-        for category in menu.categories
-        for dish in category.dishes
+        dish_line(str(position), dish, category_name)
+        for position, (category_name, dish) in enumerate(_dishes(menu), start=1)
     )
 
 
-def dish_line(dish: Dish, category_name: str) -> str:
-    """Dart ``_dishLine``: one :func:`user_prompt` line for ``dish`` under
-    ``category_name``. Public for ``app.keto.batching``, which measures it."""
+def prompt_ids(menu: Menu) -> dict[str, str]:
+    """``MenuAnalysisPrompt.promptIds``: each dish's prompt id, ``"1"`` for
+    the first dish in menu order and so on, mapped to its own ``id``; the
+    ids :func:`user_prompt` writes for ``menu``, which ``parser.parse``
+    reads a reply's ``id`` through."""
+    return {
+        str(position): dish.id
+        for position, (_, dish) in enumerate(_dishes(menu), start=1)
+    }
+
+
+def _dishes(menu: Menu) -> list[tuple[str, Dish]]:
+    """Every dish of ``menu`` in menu order, with its category's name."""
+    return [
+        (category.name, dish)
+        for category in menu.categories
+        for dish in category.dishes
+    ]
+
+
+def dish_line(prompt_id: str, dish: Dish, category_name: str) -> str:
+    """Dart ``_dishLine``: one :func:`user_prompt` line for ``dish`` under the
+    id ``prompt_id``, in ``category_name``. Public for ``app.keto.batching``,
+    which measures it."""
     options = "; ".join(
         f"{option.name}: {', '.join(option.values)}" for option in dish.options
     )
-    return " | ".join([dish.id, category_name, dish.name, dish.description, options])
+    return " | ".join([prompt_id, category_name, dish.name, dish.description, options])
 
 
 def _ingredients_schema() -> dict[str, Any]:

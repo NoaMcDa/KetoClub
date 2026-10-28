@@ -246,17 +246,17 @@ void main() {
         // Assert
         expect(
           prompt,
-          'starter-1 | Starters | Greek Salad | Feta, olives and cucumber | '
+          '1 | Starters | Greek Salad | Feta, olives and cucumber | '
           '\n'
-          'starter-2 | Starters | Buffalo Wings | Crispy wings with hot '
+          '2 | Starters | Buffalo Wings | Crispy wings with hot '
           'sauce | Sauce: Buffalo, BBQ\n'
-          'main-1 | Mains | Grilled Salmon | Served with lemon butter | '
+          '3 | Mains | Grilled Salmon | Served with lemon butter | '
           'Side: French Fries, Green Salad\n'
-          'main-2 | Mains | Margherita Pizza | Tomato, mozzarella, '
+          '4 | Mains | Margherita Pizza | Tomato, mozzarella, '
           'basil | \n'
-          'main-3 | Mains | Beef Burger | Served on a brioche bun with '
+          '5 | Mains | Beef Burger | Served on a brioche bun with '
           'fries | Bun: Brioche bun, Lettuce wrap; Side: Fries, Salad\n'
-          'dessert-1 | Desserts | Chocolate Cake | Rich dark chocolate '
+          '6 | Desserts | Chocolate Cake | Rich dark chocolate '
           '| ',
         );
       });
@@ -315,12 +315,12 @@ void main() {
         // Assert
         expect(
           prompt,
-          'starter-1 | מנות ראשונות | סלט יווני | פטה, זיתים ומלפפון | \n'
-          "starter-2 | מנות ראשונות | כנפי עוף | צ'יפס וכנפיים פריכות "
+          '1 | מנות ראשונות | סלט יווני | פטה, זיתים ומלפפון | \n'
+          "2 | מנות ראשונות | כנפי עוף | צ'יפס וכנפיים פריכות "
           'עם רוטב חריף | רוטב: חריף, ברביקיו\n'
-          'main-1 | עיקריות | סלמון בגריל | מוגש עם חמאת לימון ופירה '
+          '3 | עיקריות | סלמון בגריל | מוגש עם חמאת לימון ופירה '
           "תפוחי אדמה | תוספת: צ'יפס, סלט ירוק\n"
-          'main-2 | עיקריות | המבורגר בקר | מוגש בלחמנייה עם צ׳יפס | ',
+          '4 | עיקריות | המבורגר בקר | מוגש בלחמנייה עם צ׳יפס | ',
         );
       });
     });
@@ -372,7 +372,7 @@ void main() {
         // Assert
         expect(
           prompt,
-          'dish-1 | Mains | Grilled Chicken |  | '
+          '1 | Mains | Grilled Chicken |  | '
           'Choice of side: French Fries, Green Salad',
         );
       });
@@ -387,6 +387,76 @@ void main() {
 
         // Assert
         expect(prompt, isEmpty);
+        expect(MenuAnalysisPrompt.promptIds(menu), isEmpty);
+      });
+
+      test('userPrompt sends short positional ids, never the platform id, '
+          'and promptIds maps each back to its dish', () {
+        // Arrange: Wolt-shaped ids, two dishes of one name, and one item
+        // listed under two categories.
+        const burgerA = Dish(
+          id: '65b0c1f2a3d4e5f60718293a',
+          name: 'Smashburger',
+          description: '',
+          price: 52,
+          options: [],
+        );
+        const burgerB = Dish(
+          id: '65b0c1f2a3d4e5f60718293b',
+          name: 'Smashburger',
+          description: 'Double',
+          price: 64,
+          options: [],
+        );
+        final menu = _menuOf([
+          ('Burgers', [burgerA, burgerB]),
+          ('Specials', [burgerA]),
+        ]);
+
+        // Act
+        final prompt = MenuAnalysisPrompt.userPrompt(menu);
+        final ids = MenuAnalysisPrompt.promptIds(menu);
+
+        // Assert
+        expect(
+          prompt,
+          '1 | Burgers | Smashburger |  | \n'
+          '2 | Burgers | Smashburger | Double | \n'
+          '3 | Specials | Smashburger |  | ',
+        );
+        expect(prompt, isNot(contains('65b0c1f2')));
+        expect(ids, <String, String>{
+          '1': burgerA.id,
+          '2': burgerB.id,
+          '3': burgerA.id,
+        });
+      });
+
+      test('platformIdLines is userPrompt under the platform ids, for the '
+          'menu question path', () {
+        // Arrange
+        const dish = Dish(
+          id: 'dish-1',
+          name: 'Grilled Chicken',
+          description: 'Lemon',
+          price: 45,
+          options: [
+            DishOption(name: 'Side', values: ['Fries']),
+          ],
+        );
+        final menu = _menuOf([
+          ('Mains', [dish]),
+        ]);
+
+        // Act + Assert
+        expect(
+          MenuAnalysisPrompt.platformIdLines(menu),
+          'dish-1 | Mains | Grilled Chicken | Lemon | Side: Fries',
+        );
+        expect(
+          MenuAnalysisPrompt.userPrompt(menu),
+          '1 | Mains | Grilled Chicken | Lemon | Side: Fries',
+        );
       });
     });
 
@@ -846,10 +916,11 @@ void main() {
         maxDishes: MenuAnalysisPrompt.batchMaxDishes(extract: false),
       );
 
-      // Assert: the prompt the issue measured, far under the budget, and
-      // the menu itself, so the request is the bytes it always was.
+      // Assert: the prompt the issue measured (24,237 characters under the
+      // platform ids; 56 short ids save 1,241), far under the budget, and
+      // the menu itself, so the request is one request of the whole menu.
       expect(menu.allDishes, hasLength(56));
-      expect(MenuAnalysisPrompt.userPrompt(menu).length, 24237);
+      expect(MenuAnalysisPrompt.userPrompt(menu).length, 22996);
       expect(batches, hasLength(1));
       expect(identical(batches.single, menu), isTrue);
     });
@@ -913,22 +984,69 @@ void main() {
       expect(first.categories.last.dishes, hasLength(7));
       expect(
         MenuAnalysisPrompt.userPrompt(first).split('\n').first,
-        'd0 | Aisle 0 | Dish number 0 |  | ',
+        '1 | Aisle 0 | Dish number 0 |  | ',
       );
     });
 
-    test("the batches' prompts are the whole prompt's lines, partitioned", () {
+    test("the batches' prompts are the whole prompt's lines, partitioned, "
+        'each numbered from 1', () {
       // Arrange
       final menu = _largeMenu(200);
+      List<String> withoutIds(String prompt) => [
+        for (final line in prompt.split('\n'))
+          line.substring(line.indexOf(' | ')),
+      ];
 
       // Act
       final batches = MenuAnalysisPrompt.batches(menu, maxDishes: 80);
 
       // Assert
       expect(
-        batches.map(MenuAnalysisPrompt.userPrompt).join('\n'),
-        MenuAnalysisPrompt.userPrompt(menu),
+        batches.map(MenuAnalysisPrompt.userPrompt).expand(withoutIds).toList(),
+        withoutIds(MenuAnalysisPrompt.userPrompt(menu)),
       );
+      for (final batch in batches) {
+        final ids = [
+          for (final line in MenuAnalysisPrompt.userPrompt(batch).split('\n'))
+            line.substring(0, line.indexOf(' | ')),
+        ];
+        expect(ids, [for (var i = 1; i <= ids.length; i++) '$i']);
+        expect(MenuAnalysisPrompt.promptIds(batch).keys, ids);
+        expect(MenuAnalysisPrompt.promptIds(batch).values, [
+          for (final dish in batch.allDishes) dish.id,
+        ]);
+      }
+    });
+
+    test('the character budget measures each line with the id it carries '
+        'in its batch', () {
+      // Arrange: twelve dishes, so the last three carry two-digit ids.
+      final menu = _largeMenu(12);
+      final whole = MenuAnalysisPrompt.userPrompt(menu).length;
+
+      // Act
+      final exact = MenuAnalysisPrompt.batches(
+        menu,
+        maxDishes: 100,
+        maxChars: whole,
+      );
+      final short = MenuAnalysisPrompt.batches(
+        menu,
+        maxDishes: 100,
+        maxChars: whole - 1,
+      );
+
+      // Assert: the whole prompt, two-digit ids and all, fits exactly its
+      // own length; one character less splits it, and every batch's real
+      // prompt, renumbered from 1, is within the budget.
+      expect(identical(exact.single, menu), isTrue);
+      expect(short, hasLength(2));
+      for (final batch in short) {
+        expect(
+          MenuAnalysisPrompt.userPrompt(batch).length,
+          lessThanOrEqualTo(whole - 1),
+        );
+      }
     });
 
     test('the character budget closes a batch before the dish ceiling', () {

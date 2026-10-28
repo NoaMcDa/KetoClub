@@ -877,6 +877,609 @@
       }
     }
   ],
+  "promptIdText": [
+    {
+      "name": "hand_prompt_ids_place_every_dish",
+      "netCarbLimitGrams": 6,
+      "promptIds": {
+        "1": "65b0c1f2a3d4e5f60718293a",
+        "2": "65b0c1f2a3d4e5f60718293b",
+        "3": "65b0c1f2a3d4e5f6071829ff",
+        "4": "1"
+      },
+      "reply": "{\"dishes\":[{\"id\":\"1\",\"name\":\"Smashburger\",\"verdict\":\"orderAsIs\",\"why\":\"Reason.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"2\",\"name\":\"Smashburger\",\"verdict\":\"modifiable\",\"why\":\"Plain grilled protein.\",\"modification\":\"No bun.\",\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"3\",\"name\":\"Caesar Salad\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"4\",\"name\":\"Fries\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "65b0c1f2a3d4e5f60718293a",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Smashburger",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Reason."
+            },
+            {
+              "dishId": "65b0c1f2a3d4e5f60718293b",
+              "hiddenCarbs": [],
+              "modification": "No bun.",
+              "name": "Smashburger",
+              "netCarbsEstimate": null,
+              "verdict": "modifiable",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "65b0c1f2a3d4e5f6071829ff",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Caesar Salad",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "1",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Fries",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": []
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293a",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293b",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f6071829ff",
+                "imageUrl": null,
+                "name": "Caesar Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "1",
+                "imageUrl": null,
+                "name": "Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_prompt_ids_renamed_dish",
+      "netCarbLimitGrams": 6,
+      "promptIds": {
+        "1": "65b0c1f2a3d4e5f60718293a",
+        "2": "65b0c1f2a3d4e5f60718293b",
+        "3": "65b0c1f2a3d4e5f6071829ff",
+        "4": "1"
+      },
+      "reply": "{\"dishes\":[{\"id\":\"1\",\"name\":\"Special Smashburger 🌟\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"3\",\"name\":\"Salad of the house\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "65b0c1f2a3d4e5f60718293a",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Smashburger",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "65b0c1f2a3d4e5f6071829ff",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Caesar Salad",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Smashburger",
+            "Fries"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293a",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293b",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f6071829ff",
+                "imageUrl": null,
+                "name": "Caesar Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "1",
+                "imageUrl": null,
+                "name": "Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_prompt_ids_full_platform_ids",
+      "netCarbLimitGrams": 6,
+      "promptIds": {
+        "1": "65b0c1f2a3d4e5f60718293a",
+        "2": "65b0c1f2a3d4e5f60718293b",
+        "3": "65b0c1f2a3d4e5f6071829ff",
+        "4": "1"
+      },
+      "reply": "{\"dishes\":[{\"id\":\"65b0c1f2a3d4e5f60718293b\",\"name\":\"Smashburger\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"65b0c1f2a3d4e5f6071829ff\",\"name\":\"Caesar Salad\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "65b0c1f2a3d4e5f60718293b",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Smashburger",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "65b0c1f2a3d4e5f6071829ff",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Caesar Salad",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Smashburger",
+            "Fries"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293a",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293b",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f6071829ff",
+                "imageUrl": null,
+                "name": "Caesar Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "1",
+                "imageUrl": null,
+                "name": "Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_prompt_ids_prefixes_fall_to_names",
+      "netCarbLimitGrams": 6,
+      "promptIds": {
+        "1": "65b0c1f2a3d4e5f60718293a",
+        "2": "65b0c1f2a3d4e5f60718293b",
+        "3": "65b0c1f2a3d4e5f6071829ff",
+        "4": "1"
+      },
+      "reply": "{\"dishes\":[{\"id\":\"65b0c1f2a3d4e5f6\",\"name\":\"Smashburger\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"65b0c1f2a3d4e5f6\",\"name\":\"Smashburger\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"65b0c1f2a3d4e5f6\",\"name\":\"Caesar Salad\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "65b0c1f2a3d4e5f60718293a",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Smashburger",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "65b0c1f2a3d4e5f6071829ff",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Caesar Salad",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Smashburger",
+            "Fries"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293a",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293b",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f6071829ff",
+                "imageUrl": null,
+                "name": "Caesar Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "1",
+                "imageUrl": null,
+                "name": "Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_prompt_ids_unknown_short_id_falls_to_name",
+      "netCarbLimitGrams": 6,
+      "promptIds": {
+        "1": "65b0c1f2a3d4e5f60718293a",
+        "2": "65b0c1f2a3d4e5f60718293b",
+        "3": "65b0c1f2a3d4e5f6071829ff",
+        "4": "1"
+      },
+      "reply": "{\"dishes\":[{\"id\":\"9\",\"name\":\"Caesar Salad\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "65b0c1f2a3d4e5f6071829ff",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Caesar Salad",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Smashburger",
+            "Smashburger",
+            "Fries"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293a",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293b",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f6071829ff",
+                "imageUrl": null,
+                "name": "Caesar Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "1",
+                "imageUrl": null,
+                "name": "Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_prompt_ids_short_id_wins_then_duplicate",
+      "netCarbLimitGrams": 6,
+      "promptIds": {
+        "1": "65b0c1f2a3d4e5f60718293a",
+        "2": "65b0c1f2a3d4e5f60718293b",
+        "3": "65b0c1f2a3d4e5f6071829ff",
+        "4": "1"
+      },
+      "reply": "{\"dishes\":[{\"id\":\"4\",\"name\":\"Fries\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"1\",\"name\":\"Fries\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"1\",\"name\":\"Smashburger\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "1",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Fries",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "65b0c1f2a3d4e5f60718293a",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Smashburger",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Smashburger",
+            "Caesar Salad"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293a",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f60718293b",
+                "imageUrl": null,
+                "name": "Smashburger",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "65b0c1f2a3d4e5f6071829ff",
+                "imageUrl": null,
+                "name": "Caesar Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "1",
+                "imageUrl": null,
+                "name": "Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    }
+  ],
   "scanned": [
     {
       "name": "llm_scanned_duplicate_names.json",

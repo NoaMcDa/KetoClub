@@ -14,6 +14,7 @@ import pytest
 from app.keto.models import AnalysisOptionsSnapshot, Menu
 from app.keto.prompt import (
     SCHEMA_NAME,
+    prompt_ids,
     response_schema,
     system_prompt,
     user_prompt,
@@ -34,6 +35,7 @@ _ENTRY_KEYS = {
     "options",
     "systemPrompt",
     "userPrompt",
+    "promptIds",
     "visionPreamble1",
     "visionPreamble3",
     "visionUserPrompt1",
@@ -55,6 +57,7 @@ def test_every_golden_prompt_is_built_byte_for_byte(entry: dict[str, Any]) -> No
 
     assert system_prompt(options) == entry["systemPrompt"]
     assert user_prompt(menu) == entry["userPrompt"]
+    assert prompt_ids(menu) == entry["promptIds"]
     assert vision_preamble(1) == entry["visionPreamble1"]
     assert vision_preamble(3) == entry["visionPreamble3"]
     assert vision_user_prompt(1) == entry["visionUserPrompt1"]

@@ -67,8 +67,11 @@ abstract final class MenuResponseParser {
   ///    [maxAnalysedDishes] dishes is too.
   /// 3. Each element must be traceable to a dish in [source] or it is an
   ///    invention and never receives a verdict (constraint 6). A matching
-  ///    `id` always wins; only an element whose `id` is missing or names
-  ///    no source dish falls back to its `name`, which must normalise
+  ///    `id` always wins: one of [promptIds] — the short ids the prompt
+  ///    sent (`MenuAnalysisPrompt.promptIds` of [source]) — first, read
+  ///    as the source dish it maps to, then a source dish's own
+  ///    [Dish.id]. Only an element whose `id` is missing or names no
+  ///    source dish either way falls back to its `name`, which must normalise
   ///    exactly to a source dish's name or share at least
   ///    [nameOverlapNumerator]/[nameOverlapDenominator] of its content
   ///    words ([minOverlapWordLength]+ letters, not in [nameStopWords])
@@ -130,6 +133,7 @@ abstract final class MenuResponseParser {
     required AnalysisEngine engine,
     int netCarbLimitGrams = defaultNetCarbLimitGrams,
     bool extract = false,
+    Map<String, String> promptIds = const <String, String>{},
   }) {
     final decoded = _decode(body);
     if (decoded == null) return _badResponse();
@@ -146,6 +150,7 @@ abstract final class MenuResponseParser {
       _processElement(
         rawDish,
         source: source,
+        promptIds: promptIds,
         netCarbLimitGrams: netCarbLimitGrams,
         extract: extract,
         resolvedSourceIds: resolvedSourceIds,
@@ -408,6 +413,7 @@ abstract final class MenuResponseParser {
   static void _processElement(
     Object? rawDish, {
     required Menu source,
+    required Map<String, String> promptIds,
     required int netCarbLimitGrams,
     required bool extract,
     required Set<String> resolvedSourceIds,
@@ -422,7 +428,12 @@ abstract final class MenuResponseParser {
     final modelName = rawName is String ? rawName : '';
     if (modelId.isEmpty && modelName.isEmpty) return;
 
-    final matched = _findSourceDish(source, id: modelId, name: modelName);
+    final matched = _findSourceDish(
+      source,
+      promptIds: promptIds,
+      id: modelId,
+      name: modelName,
+    );
     if (matched == null) {
       // Constraint 6: never invent a dish. There is no source dish to
       // trust a name from, so the model's own, unverifiable name is
@@ -653,9 +664,12 @@ abstract final class MenuResponseParser {
   /// [name] refers to (architecture.md §9.4 rule 3, issue #277). Returns
   /// null when nothing matches: an invention.
   ///
-  /// 1. A non-empty [id] equal to a source [Dish.id] always wins, whatever
-  ///    [name] says: the model was given the ids, and a name can be
-  ///    paraphrased into another dish's.
+  /// 1. A non-empty [id] always wins, whatever [name] says: the model was
+  ///    given the ids, and a name can be paraphrased into another dish's.
+  ///    A key of [promptIds] is read as the source dish whose [Dish.id]
+  ///    it maps to; otherwise an [id] equal to a source [Dish.id] is that
+  ///    dish (a reply echoing a platform id, as before the prompt sent
+  ///    short ids). A truncated or otherwise altered id is neither.
   /// 2. Only when [id] is missing or names no source dish is [name] read.
   ///    A source dish whose name normalises ([TextNormaliser.normalise])
   ///    exactly to [name]'s is the match — the first such in menu order.
@@ -675,11 +689,18 @@ abstract final class MenuResponseParser {
   /// is still free.
   static Dish? _findSourceDish(
     Menu source, {
+    required Map<String, String> promptIds,
     required String id,
     required String name,
   }) {
     final all = source.allDishes;
     if (id.isNotEmpty) {
+      final mapped = promptIds[id];
+      if (mapped != null) {
+        for (final dish in all) {
+          if (dish.id == mapped) return dish;
+        }
+      }
       for (final dish in all) {
         if (dish.id == id) return dish;
       }

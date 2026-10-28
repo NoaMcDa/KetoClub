@@ -839,5 +839,141 @@ void main() {
         expect(client.userPrompts, [MenuAnalysisPrompt.userPrompt(fits)]);
       },
     );
+
+    test('each batch numbers its dishes from 1, and the merge maps every '
+        'reply id back to its own dish, even when every name is one', () async {
+      // Arrange: 200 dishes of one name, so no name can place a dish.
+      final menu = Menu(
+        venueRef: _venueRef,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: [
+          MenuCategory(
+            id: 'cat',
+            name: 'Burgers',
+            dishes: [
+              for (var i = 0; i < 200; i++) _dishNamed('wolt-$i', 'Burger'),
+            ],
+          ),
+        ],
+      );
+      final client = _PromptAnsweringChatClient();
+
+      // Act
+      final result = await _over(client).classify(menu);
+
+      // Assert
+      expect(client.userPrompts, hasLength(3));
+      for (final prompt in client.userPrompts) {
+        expect(prompt.split('\n').first, startsWith('1 | Burgers | Burger'));
+        expect(prompt, isNot(contains('wolt-')));
+      }
+      final analysed = result as MenuAnalysed;
+      expect(
+        [for (final dish in analysed.dishes) dish.dishId],
+        [for (final dish in menu.allDishes) dish.id],
+      );
+      expect(analysed.unclassified, isEmpty);
+    });
+  });
+
+  group('LlmMenuClassifier reads reply ids through the prompt ids', () {
+    const burgerA = Dish(
+      id: '65b0c1f2a3d4e5f60718293a',
+      name: 'סמאשבורגר',
+      description: '',
+      price: 52,
+      options: [],
+    );
+    const burgerB = Dish(
+      id: '65b0c1f2a3d4e5f60718293b',
+      name: 'סמאשבורגר',
+      description: 'כפול',
+      price: 64,
+      options: [],
+    );
+    final menu = _menuOf([burgerA, burgerB]);
+
+    Map<String, Object?> element(String id, String name, String verdict) =>
+        <String, Object?>{
+          'id': id,
+          'name': name,
+          'verdict': verdict,
+          'why': 'סיבה.',
+          'modification': verdict == 'modifiable' ? 'בלי לחמנייה.' : null,
+          'net_carbs_estimate': null,
+          'hidden_carbs': <Object?>[],
+        };
+
+    Future<MenuAnalysed> classifyReplying(List<Object?> elements) async {
+      final client = FakeLlmChatClient()
+        ..enqueue(
+          ChatCompleted(
+            content: jsonEncode(<String, Object?>{'dishes': elements}),
+            model: 'm',
+          ),
+        );
+      final result = await _over(client).classify(menu);
+      expect(
+        client.requests.single.userPrompt,
+        '1 | Mains | סמאשבורגר |  | \n2 | Mains | סמאשבורגר | כפול | ',
+      );
+      return result as MenuAnalysed;
+    }
+
+    test('two dishes of one name each get their own verdict, even under a '
+        'name the model reworded', () async {
+      // Act
+      final analysed = await classifyReplying([
+        element('1', 'ספיישל סמאשבורגר 🌟', 'modifiable'),
+        element('2', 'סמאשבורגר', 'nonKeto'),
+      ]);
+
+      // Assert
+      expect(
+        [for (final d in analysed.dishes) (d.dishId, d.verdict)],
+        [
+          (burgerA.id, DishVerdict.modifiable),
+          (burgerB.id, DishVerdict.nonKeto),
+        ],
+      );
+      expect(analysed.dishes.first.name, 'סמאשבורגר');
+      expect(analysed.unclassified, isEmpty);
+    });
+
+    test('a reply echoing the full platform ids still places both', () async {
+      // Act
+      final analysed = await classifyReplying([
+        element(burgerB.id, 'סמאשבורגר', 'nonKeto'),
+        element(burgerA.id, 'סמאשבורגר', 'orderAsIs'),
+      ]);
+
+      // Assert
+      expect(
+        [for (final d in analysed.dishes) (d.dishId, d.verdict)],
+        [
+          (burgerB.id, DishVerdict.nonKeto),
+          (burgerA.id, DishVerdict.orderAsIs),
+        ],
+      );
+      expect(analysed.unclassified, isEmpty);
+    });
+
+    test('16-character prefixes, as the recorded reply sent, fall to the '
+        'names: the first namesake is placed and the second lost, as '
+        'before', () async {
+      // Act
+      final analysed = await classifyReplying([
+        element('65b0c1f2a3d4e5f6', 'סמאשבורגר', 'modifiable'),
+        element('65b0c1f2a3d4e5f6', 'סמאשבורגר', 'nonKeto'),
+      ]);
+
+      // Assert
+      expect(
+        [for (final d in analysed.dishes) (d.dishId, d.verdict)],
+        [(burgerA.id, DishVerdict.modifiable)],
+      );
+      expect(analysed.unclassified, ['סמאשבורגר']);
+    });
   });
 }
