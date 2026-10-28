@@ -396,13 +396,24 @@ def test_find_misses_names_every_dish_the_labels_do_not_accept() -> None:
         _dish("modifiable", id="1"),
         _dish("orderAsIs", id="2", acceptable=("modifiable",)),
         _dish("nonKeto", id="3"),
+        _dish("orderAsIs", id="4"),
+        _dish("nonKeto", id="5", acceptable=("modifiable",)),
     )
-    got = {"m/1": ev.Got("orderAsIs"), "m/2": ev.Got("modifiable")}
+    got = {
+        "m/1": ev.Got("orderAsIs"),
+        "m/2": ev.Got("modifiable"),
+        "m/4": ev.Got("nonKeto"),
+        "m/5": ev.Got("orderAsIs"),
+    }
     misses = ev.find_misses([menu], got)
-    assert [miss.key for miss in misses] == [
-        ("m", "1", "modifiable", "orderAsIs"),
-        ("m", "3", "nonKeto", "unclassified"),
+    assert [(m.dish, m.expected, m.got) for m in misses] == [
+        ("1", "modifiable", "orderAsIs"),
+        ("3", "nonKeto", "unclassified"),
+        ("4", "orderAsIs", "nonKeto"),
+        ("5", "nonKeto", "orderAsIs"),
     ]
+    assert [m.dish for m in ev.false_greens(misses)] == ["1", "5"]
+    assert misses[0].key == ("m", "1")
     assert str(misses[0]) == "m  1  'Dish 1'  expected modifiable, got orderAsIs"
     assert misses[0].entry("sweet dressing") == {
         "menu": "m",
@@ -411,22 +422,67 @@ def test_find_misses_names_every_dish_the_labels_do_not_accept() -> None:
         "got": "orderAsIs",
         "reason": "sweet dressing",
     }
+    assert misses[0].entry()["reason"] == "TODO"
 
 
-def test_the_known_misses_list_can_only_shrink() -> None:
+def test_a_green_the_labels_accept_is_not_a_false_green() -> None:
+    menu = _menu(_dish("modifiable", id="1", acceptable=("orderAsIs",)))
+    assert ev.find_misses([menu], {"m/1": ev.Got("orderAsIs")}) == []
+
+
+def test_the_gate_holds_false_greens_only_and_can_only_shrink() -> None:
     misses = [
-        ev.Miss("m", "1", "A", "modifiable", "orderAsIs"),
-        ev.Miss("m", "2", "B", "nonKeto", "modifiable"),
+        ev.Miss("m", "1", "A", "modifiable", "orderAsIs"),  # listed
+        ev.Miss("m", "2", "B", "nonKeto", "modifiable"),  # not a false green
+        ev.Miss("m", "3", "C", "nonKeto", "orderAsIs"),  # unlisted
+        ev.Miss("m", "4", "D", "modifiable", "orderAsIs"),  # expected changed
     ]
     known = [
         misses[0].entry("listed"),
-        {**misses[1].entry("now wrong differently"), "got": "orderAsIs"},
-        ev.Miss("m", "9", "C", "nonKeto", "orderAsIs").entry("fixed since"),
+        {**misses[1].entry("now yellow"), "got": "orderAsIs"},
+        ev.Miss("m", "9", "E", "nonKeto", "orderAsIs").entry("fixed since"),
+        {**misses[3].entry("relabelled"), "expected": "nonKeto"},
     ]
-    assert ev.unlisted_misses(misses, known) == [misses[1]]
-    assert [entry["dish"] for entry in ev.stale_entries(misses, known)] == ["2", "9"]
-    assert ev.unlisted_misses(misses, [m.entry("x") for m in misses]) == []
-    assert ev.stale_entries(misses, [m.entry("x") for m in misses]) == []
+    assert ev.unlisted_false_greens(misses, known) == [misses[2]]
+    assert [e["dish"] for e in ev.stale_known_misses(misses, known)] == [
+        "2",
+        "9",
+        "4",
+    ]
+    exact = [m.entry("x") for m in ev.false_greens(misses)]
+    assert ev.unlisted_false_greens(misses, exact) == []
+    assert ev.stale_known_misses(misses, exact) == []
+
+
+def test_regenerate_keeps_reasons_and_marks_new_entries_todo() -> None:
+    misses = [
+        ev.Miss("m", "1", "A", "modifiable", "orderAsIs"),
+        ev.Miss("m", "2", "B", "nonKeto", "modifiable"),
+        ev.Miss("m", "3", "C", "nonKeto", "orderAsIs"),
+    ]
+    existing = [misses[0].entry("sweet dressing"), {**misses[2].entry("x")}]
+    existing[1]["dish"] = "gone"
+    assert ev.regenerate_known_misses(misses, existing) == [
+        misses[0].entry("sweet dressing"),
+        misses[2].entry("TODO"),
+    ]
+
+
+def test_encode_known_misses_writes_the_dart_shape() -> None:
+    entry = ev.Miss("il_x", "d1", "סלט", "modifiable", "orderAsIs").entry("טעם")
+    assert ev.encode_known_misses([]) == "[]\n"
+    assert ev.encode_known_misses([entry]) == (
+        "[\n"
+        "  {\n"
+        '    "menu": "il_x",\n'
+        '    "dish": "d1",\n'
+        '    "expected": "modifiable",\n'
+        '    "got": "orderAsIs",\n'
+        '    "reason": "טעם"\n'
+        "  }\n"
+        "]\n"
+    )
+    assert list(entry) == list(ev.KNOWN_MISS_FIELDS)
 
 
 def test_load_known_misses(tmp_path: Path) -> None:
@@ -793,9 +849,10 @@ def test_the_fixture_gate_finds_the_one_rules_gap() -> None:
     for menu in menus:
         rules.update(ev.rules_verdicts(menu))
     misses = ev.find_misses(menus, rules)
-    assert [miss.key for miss in misses] == [
+    assert [(m.menu, m.dish, m.expected, m.got) for m in misses] == [
         ("eval_en_bistro", "en-05", "modifiable", "orderAsIs")
     ]
     known = [misses[0].entry("a deli coleslaw dressing is sweetened")]
-    assert ev.unlisted_misses(misses, known) == []
-    assert ev.stale_entries(misses, known) == []
+    assert ev.unlisted_false_greens(misses, known) == []
+    assert ev.stale_known_misses(misses, known) == []
+    assert ev.unlisted_false_greens(misses, []) == misses

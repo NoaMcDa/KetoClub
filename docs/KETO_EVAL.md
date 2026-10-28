@@ -43,14 +43,17 @@ the two texts contains the other. Every text is normalised first
 ## The CI gate is separate
 
 The rules-only half runs on every push, with no key and no network:
-`backend/tests/test_keto_corpus_gate.py` (Python) and the Dart gate over the
-same corpus hold the same rule. A dish whose rules verdict the labels do not
-accept is a miss; the misses the rules do not close yet are listed in
-`test/fixtures/keto/known_keto_misses.json` (`[{menu, dish, expected, got,
-reason}]`, read by both). A miss that is not listed fails the build, and so
-does a listed entry that no longer misses in exactly that way, so the list
-can only shrink. The Python gate skips when the corpus directory is absent
-or empty.
+`backend/tests/test_keto_corpus_gate.py` (Python) and
+`test/utils/keto/keto_corpus_gate_test.dart` (Dart) hold the same rule over
+the same corpus. **Only false greens fail.** The false greens the rules do
+not close yet are listed in `test/fixtures/keto/known_keto_misses.json`
+(`[{menu, dish, expected, got, reason}]`, false greens only, read by both;
+the Dart gate's `--dart-define=KETO_GATE_WRITE_MISSES=true` rewrites it,
+keeping each reason and marking a new entry `TODO`). An unlisted false green
+fails the build, and so does a listed entry that is no longer a false green
+or whose `expected` or `got` changed, so the list can only shrink. Every
+other disagreement (a false red, a yellow for a red) is printed and never
+fails. The Python gate skips when the corpus directory is absent or empty.
 
 ## How to run it
 

@@ -506,6 +506,14 @@ def score(expected: Sequence[CorpusDish], got: Mapping[str, Got]) -> Score:
 
 
 # --- the gate --------------------------------------------------------------------
+#
+# The gate holds only false greens, as the Dart gate
+# (``test/utils/keto/keto_corpus_gate_test.dart``) does: an unlisted false
+# green fails, and so does a listed entry that is no longer a false green or
+# whose ``expected`` or ``got`` changed. Every other disagreement is printed
+# and never fails. ``known_keto_misses.json`` therefore lists false greens
+# only, in the shape the Dart gate's ``KETO_GATE_WRITE_MISSES`` mode writes
+# (:func:`encode_known_misses`).
 
 
 @dataclass(frozen=True, slots=True)
@@ -519,12 +527,19 @@ class Miss:
     got: str
 
     @property
-    def key(self) -> tuple[str, str, str, str]:
-        """What a known-misses entry must equal: menu, dish, expected, got."""
-        return (self.menu, self.dish, self.expected, self.got)
+    def key(self) -> tuple[str, str]:
+        """What a known-misses entry is matched on: menu id and dish id."""
+        return (self.menu, self.dish)
 
-    def entry(self, reason: str = "") -> dict[str, str]:
-        """This miss as a ``known_keto_misses.json`` entry."""
+    @property
+    def is_false_green(self) -> bool:
+        """A green on a dish the labels expect yellow or red (a miss is
+        never acceptable, so a got-green miss is a false green)."""
+        return self.got == "orderAsIs" and self.expected != "orderAsIs"
+
+    def entry(self, reason: str = "TODO") -> dict[str, str]:
+        """This miss as a ``known_keto_misses.json`` entry, keys in the Dart
+        order."""
         return {
             "menu": self.menu,
             "dish": self.dish,
@@ -560,8 +575,14 @@ def find_misses(menus: Iterable[CorpusMenu], got: Mapping[str, Got]) -> list[Mis
     return misses
 
 
-KNOWN_MISS_FIELDS: Final = frozenset({"menu", "dish", "expected", "got", "reason"})
-"""The fields of one known-misses entry, all non-blank strings."""
+def false_greens(misses: Iterable[Miss]) -> list[Miss]:
+    """The misses the gate holds: the false greens, in corpus order."""
+    return [miss for miss in misses if miss.is_false_green]
+
+
+KNOWN_MISS_FIELDS: Final = ("menu", "dish", "expected", "got", "reason")
+"""The fields of one known-misses entry, in the order the Dart gate writes
+them; every one a non-blank string."""
 
 
 def load_known_misses(path: Path = KNOWN_MISSES_PATH) -> list[dict[str, str]]:
@@ -575,26 +596,52 @@ def load_known_misses(path: Path = KNOWN_MISSES_PATH) -> list[dict[str, str]]:
     return [dict(entry) for entry in document]
 
 
-def entry_key(entry: Mapping[str, str]) -> tuple[str, str, str, str]:
-    """An entry's ``(menu, dish, expected, got)``."""
-    return (entry["menu"], entry["dish"], entry["expected"], entry["got"])
+def entry_key(entry: Mapping[str, str]) -> tuple[str, str]:
+    """An entry's ``(menu, dish)``: Dart ``KetoKnownMiss.key``."""
+    return (entry["menu"], entry["dish"])
 
 
-def unlisted_misses(
+def unlisted_false_greens(
     misses: Iterable[Miss], known: Iterable[Mapping[str, str]]
 ) -> list[Miss]:
-    """The misses no entry lists with exactly that expected and got."""
+    """Dart ``unlistedFalseGreens``: the false greens of ``misses`` whose
+    dish no entry lists."""
     listed = {entry_key(entry) for entry in known}
-    return [miss for miss in misses if miss.key not in listed]
+    return [miss for miss in false_greens(misses) if miss.key not in listed]
 
 
-def stale_entries(
+def stale_known_misses(
     misses: Iterable[Miss], known: Iterable[Mapping[str, str]]
 ) -> list[dict[str, str]]:
-    """The entries that no longer name a current miss (fixed, or now wrong
-    in another way): the list can only shrink."""
-    current = {miss.key for miss in misses}
-    return [dict(entry) for entry in known if entry_key(entry) not in current]
+    """Dart ``staleKnownKetoMisses``: the entries whose dish is no longer a
+    false green, or whose ``expected`` or ``got`` no longer says what the
+    replay does. The list can only shrink."""
+    current = {miss.key: miss for miss in false_greens(misses)}
+
+    def still_misses(entry: Mapping[str, str]) -> bool:
+        miss = current.get(entry_key(entry))
+        return (
+            miss is not None
+            and miss.expected == entry["expected"]
+            and miss.got == entry["got"]
+        )
+
+    return [dict(entry) for entry in known if not still_misses(entry)]
+
+
+def regenerate_known_misses(
+    misses: Iterable[Miss], existing: Iterable[Mapping[str, str]]
+) -> list[dict[str, str]]:
+    """Dart ``regenerateKnownKetoMisses``: one entry per current false
+    green; an existing entry keeps its reason, a new one reads ``TODO``."""
+    reasons = {entry_key(entry): entry["reason"] for entry in existing}
+    return [miss.entry(reasons.get(miss.key, "TODO")) for miss in false_greens(misses)]
+
+
+def encode_known_misses(entries: Iterable[Mapping[str, str]]) -> str:
+    """Dart ``encodeKnownKetoMisses``: a two-space-indented JSON list, the
+    text unescaped (Hebrew stays Hebrew), with a final newline."""
+    return json.dumps(list(entries), ensure_ascii=False, indent=2) + "\n"
 
 
 # --- the report ------------------------------------------------------------------
