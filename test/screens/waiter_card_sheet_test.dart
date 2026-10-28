@@ -337,6 +337,88 @@ void main() {
       expect(find.text('Is the glaze sugar-free?'), findsOneWidget);
     });
 
+    const suspected = HiddenCarb(
+      source: 'house glaze',
+      certainty: HiddenCarbCertainty.suspected,
+      waiterQuestion: 'Is the glaze sugar-free?',
+    );
+    const likely = HiddenCarb(
+      source: 'teriyaki',
+      certainty: HiddenCarbCertainty.likely,
+      waiterQuestion: 'Is there honey in the teriyaki?',
+    );
+
+    testWidgets("panel shows each flag's certainty in the UI language, "
+        'English', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        WaiterCardSheet(row: rowWithFlags([suspected, likely])),
+      );
+
+      // Assert
+      expect(find.text('Suspected'), findsOneWidget);
+      expect(find.text('Likely'), findsOneWidget);
+      expect(find.text('house glaze'), findsOneWidget);
+      expect(find.text('Is the glaze sugar-free?'), findsOneWidget);
+    });
+
+    testWidgets("panel shows each flag's certainty in Hebrew while the "
+        'source and question stay as the menu printed them, RTL', (
+      tester,
+    ) async {
+      // Act
+      await _pump(
+        tester,
+        WaiterCardSheet(row: rowWithFlags([suspected, likely])),
+        locale: const Locale('he'),
+      );
+
+      // Assert: the label follows the UI; the English menu text does not.
+      expect(find.text('חשד'), findsOneWidget);
+      expect(find.text('סביר'), findsOneWidget);
+      expect(find.text('Suspected'), findsNothing);
+      expect(find.text('house glaze'), findsOneWidget);
+      expect(find.text('Is the glaze sugar-free?'), findsOneWidget);
+      // RTL: the source starts at the right, so its muted label sits to
+      // its left.
+      final source = tester.getTopLeft(find.text('house glaze'));
+      final label = tester.getTopLeft(find.text('חשד'));
+      expect(label.dx, lessThan(source.dx));
+      expect(label.dy, closeTo(source.dy, 8));
+    });
+
+    testWidgets('panel puts the certainty after the source in English, '
+        'LTR', (tester) async {
+      // Act
+      await _pump(tester, WaiterCardSheet(row: rowWithFlags([suspected])));
+
+      // Assert
+      final source = tester.getTopLeft(find.text('house glaze'));
+      final label = tester.getTopLeft(find.text('Suspected'));
+      expect(label.dx, greaterThan(source.dx));
+    });
+
+    testWidgets('panel reads source, certainty and question as one '
+        'semantics label', (tester) async {
+      // Arrange
+      final handle = tester.ensureSemantics();
+
+      // Act
+      await _pump(
+        tester,
+        WaiterCardSheet(row: rowWithFlags([suspected])),
+        locale: const Locale('he'),
+      );
+
+      // Assert
+      expect(
+        find.bySemanticsLabel('house glaze, חשד. Is the glaze sugar-free?'),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
+
     testWidgets('panel is not shown when the dish has no flags', (
       tester,
     ) async {
