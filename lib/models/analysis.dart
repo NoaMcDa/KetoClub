@@ -310,10 +310,11 @@ final class AnalysedDish {
   /// it.
   final double? netCarbsEstimate;
 
-  /// Hidden-carb flags from the LLM engine (issue #213, architecture.md
-  /// §6.2). Empty when the engine found none, or when this is a
-  /// rules-engine result. A non-empty list on a green dish means the dish
-  /// was demoted to yellow by the parser.
+  /// Hidden-carb flags from either engine (issue #213, architecture.md
+  /// §6.2, §9.4 rule 5a): the model's, through the parser, or the rule
+  /// vocabulary's (`hiddenCarbTriggersEn`/`He`). Empty when the engine
+  /// found none, and always on a red dish. A yellow dish with flags may
+  /// have been a green the flags demoted.
   final List<HiddenCarb> hiddenCarbs;
 
   /// The ingredients a model read or inferred in the dish, whatever

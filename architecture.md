@@ -1693,6 +1693,32 @@ honest substitute — so:
   pasted once, are one entry. It replaced a ref the caller built from the
   clock, which made every re-read a new entry.
 
+**Rule 5a on the rules path (issue #213).** The rule engine raises hidden-carb
+flags too, so a rules result (no consent, no network, no key) is not a model
+result with the flags quietly missing. `ClassificationRules.matchDish` reads
+the dish's rules text — name, description and non-removal option values, the
+text the carb modifiers read — against the bilingual `hiddenCarbTriggersEn`/`He`
+tables in `constants.dart` (a house or special sauce, a marinade, a glaze, a
+gravy or béchamel, a cornstarch-thickened Asian sauce, a crisp coating with no
+breading word, a rub, amba, garlic sauce, the dressing of the day; each with a
+source, `likely` or `suspected`, a concern of `sugar`, `flour` or
+`sugarOrFlour`, and a question in both languages) and writes each flag in the
+dish's language. A trigger is cancelled by its own D-V1 guard ("crispy skin",
+"marinated olives") or by a phrase answering its concern within three words
+("sugar-free", `ללא תוספת סוכר`, "keto"), and is **covered**, so dropped, when a
+carb modifier's match overlaps it or, for a `sugar` flag, a sweetener modifier
+sits within those three words ("honey marinade"): the modifier's sentence
+already asks for it. Of overlapping triggers the longest wins, a source is
+flagged once, and at most three survive. `HeuristicMenuClassifier` then applies
+rule 5a as the parser does: a red drops its flags; a yellow keeps its own script
+and carries the flags beside it; a dish that would be green with a flag is yellow,
+with `hiddenCarbWhy` and the first flag's question as its whole script — the one
+place a question stands in for an instruction on this path too. No
+`schemaVersion` bump: `AnalysedDish.hiddenCarbs` already exists and is read
+tolerantly, and a cached rules analysis gains its flags when it is next made.
+The Python twin (`backend/app/keto/rules.py`, `heuristic.py`) reads the same
+tables from `vocabulary.json` and replays `rules.json` and `heuristic.json`.
+
 ### 9.6 Banto: extract, then evaluate on the device (D26, ALG-03)
 
 The epic weighed two ways to ask the model about a restriction profile:

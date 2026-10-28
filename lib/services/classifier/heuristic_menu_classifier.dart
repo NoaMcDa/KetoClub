@@ -85,6 +85,12 @@ final class HeuristicMenuClassifier implements MenuClassifier {
   /// one gains the extra ask. A dish yellow only because of a dietary rule
   /// gets [dietaryRuleWhyEn]/[dietaryRuleWhyHe], since the carb-component
   /// `why` would not be true of it.
+  ///
+  /// Hidden-carb flags ([RuleMatch.hiddenCarbs], issue #213) follow §9.4
+  /// rule 5a as the parser applies it to the model: a red has none; a
+  /// yellow keeps its script and carries the flags; a dish that would be
+  /// green with at least one flag is yellow, with [hiddenCarbWhyEn]/
+  /// [hiddenCarbWhyHe] and the first flag's question as its script.
   AnalysedDish _analyse(Dish dish, ClassificationOptions options) {
     // The rules read the dish minus its removal options (issue #192), and
     // judge it as a whole dish rather than one flat string (issue #191):
@@ -114,6 +120,9 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     }
 
     final dietary = _dietarySentences(text, options, isHebrew: isHebrew);
+    // Already in the dish's language, and never covered by a carb
+    // sentence (ClassificationRules.matchDish drops those).
+    final hiddenCarbs = match.hiddenCarbs;
     if (match.instructions.isNotEmpty || dietary.isNotEmpty) {
       final String why;
       if (match.instructions.isNotEmpty) {
@@ -121,12 +130,31 @@ final class HeuristicMenuClassifier implements MenuClassifier {
       } else {
         why = isHebrew ? dietaryRuleWhyHe : dietaryRuleWhyEn;
       }
+      // A yellow keeps its own script and gains the flags beside it: the
+      // flag's question is not an instruction for a dish that is yellow
+      // for another reason (§9.4 rule 5a).
       return AnalysedDish(
         dishId: dish.id,
         name: dish.name,
         verdict: DishVerdict.modifiable,
         why: why,
         modification: _joinInstructions([...match.instructions, ...dietary]),
+        hiddenCarbs: hiddenCarbs,
+        concerns: concerns,
+      );
+    }
+
+    if (hiddenCarbs.isNotEmpty) {
+      // §9.4 rule 5a on the rules path: a green with a flag is a wrong
+      // green. The flag is its whole reason to be yellow, so the first
+      // flag's question is the instruction.
+      return AnalysedDish(
+        dishId: dish.id,
+        name: dish.name,
+        verdict: DishVerdict.modifiable,
+        why: isHebrew ? hiddenCarbWhyHe : hiddenCarbWhyEn,
+        modification: hiddenCarbs.first.waiterQuestion,
+        hiddenCarbs: hiddenCarbs,
         concerns: concerns,
       );
     }
