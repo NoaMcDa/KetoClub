@@ -1,0 +1,99 @@
+{
+  "id": "eval_he_grill",
+  "name": "Test grill (Hebrew, hand-made)",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. A hand-made test fixture for tools/keto_eval.py, not part of the keto corpus and not a real restaurant.",
+  "categories": [
+    {
+      "name": "עיקריות",
+      "dishes": [
+        {
+          "id": "he-01",
+          "name": "אנטריקוט",
+          "description": "עם צ'יפס",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "The steak is keto; the fries are the side to swap.",
+          "evidence": [
+            "אנטריקוט",
+            "צ'יפס"
+          ]
+        },
+        {
+          "id": "he-02",
+          "name": "סלמון בגריל",
+          "description": "ירקות מוקפצים",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "sweet soy sauce (רוטב סויה)",
+              "certainty": "suspected",
+              "term": "מוקפצים"
+            }
+          ],
+          "why": "Stir-fried vegetables may carry a sweet soy sauce.",
+          "evidence": [
+            "סלמון",
+            "מוקפצים"
+          ]
+        },
+        {
+          "id": "he-03",
+          "name": "פסטה ברוטב שמנת",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "The dish is the pasta.",
+          "evidence": [
+            "פסטה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מהגריל",
+      "dishes": [
+        {
+          "id": "he-04",
+          "name": "שיפודי פרגית",
+          "description": "מוגש עם אורז",
+          "options": [
+            {
+              "name": "תוספת",
+              "values": [
+                "אורז",
+                "סלט"
+              ]
+            }
+          ],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "The skewers are keto; the rice is the side to swap.",
+          "evidence": [
+            "פרגית",
+            "אורז"
+          ]
+        },
+        {
+          "id": "he-05",
+          "name": "חזה עוף בגריל",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Plain grilled chicken.",
+          "evidence": [
+            "חזה עוף"
+          ]
+        }
+      ]
+    }
+  ]
+}
