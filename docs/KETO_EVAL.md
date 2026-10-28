@@ -87,7 +87,7 @@ run's date, the configured `GEMINI_MODEL`, the commit, and the tables.
 
 ## Last result
 
-Run: 2026-10-28 19:40 UTC. Commit: `6cd4060`. Corpus: `test/fixtures/keto/menus` (24 menus, 456 dishes). Model: **not yet run** (rules only). Net-carb limit: 6 g, keto only.
+Run: 2026-10-28 19:44 UTC. Commit: `9355472`. Corpus: `test/fixtures/keto/menus` (24 menus, 456 dishes). Model: **not yet run** (rules only). Net-carb limit: 6 g, keto only.
 
 The labels are **unreviewed**: no dietitian has read them, so every figure here is a question for the labels as much as for the engine.
 
