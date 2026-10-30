@@ -1,6 +1,7 @@
 {
   "caps": {
     "defaultNetCarbLimitGrams": 6,
+    "hiddenCarbWindowWords": 3,
     "maxAnalysedDishes": 1000,
     "maxHiddenCarbsPerDish": 3,
     "maxModificationLength": 300,
@@ -348,6 +349,66 @@
     [
       "flavoured syrup",
       "Please leave out the flavoured syrup."
+    ],
+    [
+      "raisin",
+      "Please leave out the raisins."
+    ],
+    [
+      "raisins",
+      "Please leave out the raisins."
+    ],
+    [
+      "dried fruit",
+      "Please leave out the dried fruit; it is concentrated sugar."
+    ],
+    [
+      "candied",
+      "Please leave out the candied nuts or fruit; they are sugared."
+    ],
+    [
+      "crouton",
+      "Please prepare it without the crouton."
+    ],
+    [
+      "injera",
+      "Please serve the stew in a bowl, without the injera."
+    ],
+    [
+      "amba",
+      "Please leave out the amba; the mango pickle is sweetened."
+    ],
+    [
+      "banana",
+      "Please leave out the banana."
+    ],
+    [
+      "bananas",
+      "Please leave out the banana."
+    ],
+    [
+      "watermelon",
+      "Please leave out the watermelon; it is high in sugar."
+    ],
+    [
+      "balsamic reduction",
+      "Please leave out the balsamic reduction; it is reduced to sugar."
+    ],
+    [
+      "sweet and sour",
+      "Please leave out the sweet and sour sauce; it is mostly sugar."
+    ],
+    [
+      "white beans",
+      "Please leave out the beans and add vegetables instead."
+    ],
+    [
+      "kidney beans",
+      "Please leave out the beans and add vegetables instead."
+    ],
+    [
+      "baked beans",
+      "Please leave out the baked beans; they are sweetened."
     ]
   ],
   "carbModifiersHe": [
@@ -738,6 +799,82 @@
     [
       "טוניק",
       "אפשר בבקשה לשים סודה במקום הטוניק? הטוניק עתיר סוכר."
+    ],
+    [
+      "צימוקים",
+      "אפשר בבקשה בלי הצימוקים?"
+    ],
+    [
+      "פירות יבשים",
+      "אפשר בבקשה בלי הפירות היבשים? הם סוכר מרוכז."
+    ],
+    [
+      "פירות מיובשים",
+      "אפשר בבקשה בלי הפירות המיובשים? הם סוכר מרוכז."
+    ],
+    [
+      "מסוכרים",
+      "אפשר בבקשה בלי האגוזים או הפירות המסוכרים?"
+    ],
+    [
+      "מסוכרות",
+      "אפשר בבקשה בלי האגוזים או הפירות המסוכרים?"
+    ],
+    [
+      "מסוכר",
+      "אפשר בבקשה בלי האגוזים או הפירות המסוכרים?"
+    ],
+    [
+      "מסוכרת",
+      "אפשר בבקשה בלי האגוזים או הפירות המסוכרים?"
+    ],
+    [
+      "קרוטון",
+      "אפשר בבקשה בלי הקרוטון?"
+    ],
+    [
+      "אינג'רה",
+      "אפשר בבקשה את התבשיל בקערה, בלי האינג'רה?"
+    ],
+    [
+      "עמבה",
+      "אפשר בבקשה בלי העמבה? יש בה סוכר."
+    ],
+    [
+      "בננה",
+      "אפשר בבקשה בלי הבננה?"
+    ],
+    [
+      "בננות",
+      "אפשר בבקשה בלי הבננה?"
+    ],
+    [
+      "אבטיח",
+      "אפשר בבקשה בלי האבטיח? יש בו הרבה סוכר."
+    ],
+    [
+      "בלסמי מצומצם",
+      "אפשר בבקשה בלי הבלסמי המצומצם? הוא מצטמצם לסוכר."
+    ],
+    [
+      "רדוקציית בלסמי",
+      "אפשר בבקשה בלי רדוקציית הבלסמי? היא מצטמצמת לסוכר."
+    ],
+    [
+      "חמוץ מתוק",
+      "אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר."
+    ],
+    [
+      "שעועית לבנה",
+      "אפשר בבקשה בלי השעועית, ועם ירקות במקום?"
+    ],
+    [
+      "שעועית אדומה",
+      "אפשר בבקשה בלי השעועית, ועם ירקות במקום?"
+    ],
+    [
+      "סילאן",
+      "אפשר בבקשה בלי הסילאן? הוא סוכר כמעט לגמרי."
     ]
   ],
   "carbOnlyBaseLabels": {
@@ -819,7 +956,12 @@
     "טורטיות",
     "האש בראון",
     "טבעות בצל",
-    "נאן"
+    "נאן",
+    "injera",
+    "אינג'רה",
+    "dried fruit",
+    "פירות יבשים",
+    "פירות מיובשים"
   ],
   "carbOnlyQualifiersEn": [
     "a",
@@ -1325,6 +1467,21 @@
       "sweet wine",
       "moscato",
       "port wine",
+      "hot chocolate",
+      "chocolate milk",
+      "slush",
+      "slushie",
+      "flavoured water",
+      "flavored water",
+      "dessert wine",
+      "sauternes",
+      "san miguel",
+      "goldstar",
+      "carlsberg",
+      "tuborg",
+      "heineken",
+      "stella artois",
+      "guinness",
       "latte",
       "iced latte",
       "cappuccino",
@@ -1375,6 +1532,18 @@
       "ליקר",
       "סמוטי",
       "יין מתוק",
+      "שוקו",
+      "ברד",
+      "מים בטעם",
+      "יין קינוח",
+      "סמוזי",
+      "סאן מיגל",
+      "גולדסטאר",
+      "קרלסברג",
+      "טובורג",
+      "הייניקן",
+      "סטלה ארטואה",
+      "גינס",
       "הפוך",
       "הפוך קר",
       "לאטה",
@@ -1625,6 +1794,1090 @@
     "withPrefix": "(?<![א-ת])[בהוכלמש]{0,2}פסטה(?![א-ת])",
     "withoutPrefix": "(?<![א-ת])פסטה(?![א-ת])"
   },
+  "hiddenCarbCoveringModifiers": [
+    "teriyaki",
+    "honey",
+    "bbq",
+    "barbecue",
+    "barbeque",
+    "bbqed",
+    "maple",
+    "balsamic glaze",
+    "silan",
+    "date honey",
+    "sweet tahini",
+    "sweet chili",
+    "ketchup",
+    "thousand island",
+    "house dressing",
+    "vinaigrette",
+    "tamarind",
+    "hoisin",
+    "cranberry sauce",
+    "port wine reduction",
+    "port reduction",
+    "port wine sauce",
+    "port sauce",
+    "port wine glaze",
+    "syrup",
+    "flavoured syrup",
+    "טריאקי",
+    "טריקי",
+    "דבש",
+    "זיגוג דבש",
+    "חרדל דבש",
+    "ברביקיו",
+    "בבקיו",
+    "רוטב ברביקיו",
+    "סילן",
+    "דבש תמרים",
+    "טחינה מתוקה",
+    "צ'ילי מתוק",
+    "קטשופ",
+    "אלף האיים",
+    "רוטב הבית",
+    "ויניגרט",
+    "תמרינד",
+    "הויסין",
+    "רוטב חמוציות",
+    "רוטב יין פורט",
+    "רוטב פורט",
+    "רדוקציית פורט",
+    "רדוקציית יין פורט",
+    "מייפל",
+    "זיגוג בלסמי",
+    "סירופ"
+  ],
+  "hiddenCarbGuardPhrasesEn": {
+    "any": [
+      "keto",
+      "low carb",
+      "lowcarb"
+    ],
+    "flour": [
+      "no flour",
+      "flourless",
+      "without flour"
+    ],
+    "sugar": [
+      "sugar free",
+      "sugarfree",
+      "no sugar",
+      "no added sugar",
+      "without sugar",
+      "zero sugar",
+      "unsweetened"
+    ]
+  },
+  "hiddenCarbGuardPhrasesHe": {
+    "any": [
+      "קטו",
+      "קטוגני",
+      "קטוגנית",
+      "דל פחמימות",
+      "דלת פחמימות"
+    ],
+    "flour": [
+      "ללא קמח",
+      "וללא קמח",
+      "בלי קמח"
+    ],
+    "sugar": [
+      "ללא סוכר",
+      "וללא סוכר",
+      "בלי סוכר",
+      "ובלי סוכר",
+      "ללא תוספת סוכר",
+      "בלי תוספת סוכר",
+      "ללא סוכרים",
+      "נטול סוכר",
+      "נטולת סוכר"
+    ]
+  },
+  "hiddenCarbTriggerGuardsEn": {
+    "crispy": {
+      "after": [
+        "skin",
+        "bacon",
+        "pancetta",
+        "prosciutto",
+        "pork belly",
+        "crackling",
+        "lettuce",
+        "salad",
+        "greens",
+        "leaves",
+        "kale",
+        "cucumber",
+        "cucumbers",
+        "shallots",
+        "garlic",
+        "capers",
+        "sage",
+        "leeks",
+        "seaweed",
+        "nori",
+        "parmesan",
+        "edges"
+      ],
+      "before": []
+    },
+    "marinated": {
+      "after": [
+        "olives",
+        "olive",
+        "feta",
+        "artichoke",
+        "artichokes",
+        "mushrooms",
+        "peppers",
+        "labneh",
+        "cheese",
+        "eggplant"
+      ],
+      "before": []
+    }
+  },
+  "hiddenCarbTriggerGuardsHe": {
+    "מרינדה": {
+      "after": [
+        "זיתים",
+        "פטה",
+        "ארטישוק",
+        "פטריות",
+        "פלפלים",
+        "לבנה",
+        "גבינה",
+        "חצילים"
+      ],
+      "before": [
+        "זיתים",
+        "פטה",
+        "ארטישוק",
+        "פטריות",
+        "פלפלים",
+        "לבנה",
+        "גבינה",
+        "חצילים"
+      ]
+    },
+    "מרינדת": {
+      "after": [
+        "זיתים",
+        "פטה",
+        "ארטישוק",
+        "פטריות",
+        "פלפלים",
+        "לבנה",
+        "גבינה",
+        "חצילים"
+      ],
+      "before": [
+        "זיתים",
+        "פטה",
+        "ארטישוק",
+        "פטריות",
+        "פלפלים",
+        "לבנה",
+        "גבינה",
+        "חצילים"
+      ]
+    },
+    "קריספי": {
+      "after": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ],
+      "before": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ]
+    },
+    "קריספיים": {
+      "after": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ],
+      "before": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ]
+    },
+    "קריספית": {
+      "after": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ],
+      "before": [
+        "עור",
+        "בעור",
+        "העור",
+        "בייקון",
+        "פנצטה",
+        "פרושוטו",
+        "חסה",
+        "סלט",
+        "עלים",
+        "מלפפון",
+        "שאלוט",
+        "שום",
+        "צלפים",
+        "מרווה",
+        "כרישה",
+        "אצות",
+        "פרמזן"
+      ]
+    }
+  },
+  "hiddenCarbTriggersEn": [
+    [
+      "house sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the house sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב הבית?",
+        "sourceEn": "house sauce",
+        "sourceHe": "רוטב הבית"
+      }
+    ],
+    [
+      "special sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the special sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב המיוחד?",
+        "sourceEn": "special sauce",
+        "sourceHe": "רוטב מיוחד"
+      }
+    ],
+    [
+      "secret sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the secret sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב הסודי?",
+        "sourceEn": "secret sauce",
+        "sourceHe": "רוטב סודי"
+      }
+    ],
+    [
+      "signature sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the special sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב המיוחד?",
+        "sourceEn": "special sauce",
+        "sourceHe": "רוטב מיוחד"
+      }
+    ],
+    [
+      "chef's sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the chef's sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב של השף?",
+        "sourceEn": "chef's sauce",
+        "sourceHe": "רוטב השף"
+      }
+    ],
+    [
+      "marinade",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in the marinade?",
+        "questionHe": "יש סוכר או דבש במרינדה?",
+        "sourceEn": "marinade",
+        "sourceHe": "מרינדה"
+      }
+    ],
+    [
+      "marinated",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in the marinade?",
+        "questionHe": "יש סוכר או דבש במרינדה?",
+        "sourceEn": "marinade",
+        "sourceHe": "מרינדה"
+      }
+    ],
+    [
+      "sweet marinade",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Can it be made without the sweet marinade?",
+        "questionHe": "אפשר להכין את המנה בלי המרינדה המתוקה?",
+        "sourceEn": "sweet marinade",
+        "sourceHe": "מרינדה מתוקה"
+      }
+    ],
+    [
+      "glaze",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "glazed",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "gravy",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the gravy thickened with flour? Can it come on the side?",
+        "questionHe": "הרוטב מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "gravy",
+        "sourceHe": "רוטב גרייבי"
+      }
+    ],
+    [
+      "brown sauce",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the brown sauce thickened with flour? Can it come on the side?",
+        "questionHe": "הרוטב החום מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "brown sauce",
+        "sourceHe": "רוטב חום"
+      }
+    ],
+    [
+      "demi-glace",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the demi-glace thickened with flour? Can it come on the side?",
+        "questionHe": "הדמי גלאס מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "demi-glace",
+        "sourceHe": "דמי גלאס"
+      }
+    ],
+    [
+      "béchamel",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Béchamel is made with flour. Can the dish come without it?",
+        "questionHe": "רוטב בשמל עשוי מקמח. אפשר את המנה בלעדיו?",
+        "sourceEn": "béchamel",
+        "sourceHe": "רוטב בשמל"
+      }
+    ],
+    [
+      "kung pao",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is the kung pao sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב הקונג פאו סוכר או עמילן?",
+        "sourceEn": "kung pao sauce",
+        "sourceHe": "רוטב קונג פאו"
+      }
+    ],
+    [
+      "general tso",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is General Tso's sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב גנרל טסו סוכר או עמילן?",
+        "sourceEn": "General Tso's sauce",
+        "sourceHe": "רוטב גנרל טסו"
+      }
+    ],
+    [
+      "general tso's",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is General Tso's sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב גנרל טסו סוכר או עמילן?",
+        "sourceEn": "General Tso's sauce",
+        "sourceHe": "רוטב גנרל טסו"
+      }
+    ],
+    [
+      "oyster sauce",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Oyster sauce has sugar and cornstarch. Can it be made without it?",
+        "questionHe": "ברוטב צדפות יש סוכר ועמילן. אפשר להכין בלעדיו?",
+        "sourceEn": "oyster sauce",
+        "sourceHe": "רוטב צדפות"
+      }
+    ],
+    [
+      "sweet soy",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Sweet soy sauce is mostly sugar. Can it be made with plain soy sauce?",
+        "questionHe": "סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?",
+        "sourceEn": "sweet soy sauce",
+        "sourceHe": "סויה מתוקה"
+      }
+    ],
+    [
+      "kecap manis",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Sweet soy sauce is mostly sugar. Can it be made with plain soy sauce?",
+        "questionHe": "סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?",
+        "sourceEn": "sweet soy sauce",
+        "sourceHe": "סויה מתוקה"
+      }
+    ],
+    [
+      "wok sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or cornstarch in the wok sauce?",
+        "questionHe": "יש סוכר או עמילן ברוטב הווק?",
+        "sourceEn": "wok sauce",
+        "sourceHe": "רוטב ווק"
+      }
+    ],
+    [
+      "stir-fry sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or cornstarch in the wok sauce?",
+        "questionHe": "יש סוכר או עמילן ברוטב הווק?",
+        "sourceEn": "wok sauce",
+        "sourceHe": "רוטב ווק"
+      }
+    ],
+    [
+      "sweet sauce",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the sauce sweetened with sugar? Can it be left off?",
+        "questionHe": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
+        "sourceEn": "sweet sauce",
+        "sourceHe": "רוטב מתוק"
+      }
+    ],
+    [
+      "crispy",
+      {
+        "certainty": "suspected",
+        "concern": "flour",
+        "questionEn": "Is it coated in flour or batter to make it crispy? Can it come without the coating?",
+        "questionHe": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?",
+        "sourceEn": "crispy coating",
+        "sourceHe": "ציפוי קריספי"
+      }
+    ],
+    [
+      "rub",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the spice rub?",
+        "questionHe": "יש סוכר בתערובת התבלינים (הראב)?",
+        "sourceEn": "spice rub",
+        "sourceHe": "ראב תבלינים"
+      }
+    ],
+    [
+      "rubbed",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the spice rub?",
+        "questionHe": "יש סוכר בתערובת התבלינים (הראב)?",
+        "sourceEn": "spice rub",
+        "sourceHe": "ראב תבלינים"
+      }
+    ],
+    [
+      "garlic sauce",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the garlic sauce?",
+        "questionHe": "יש סוכר ברוטב השום?",
+        "sourceEn": "garlic sauce",
+        "sourceHe": "רוטב שום"
+      }
+    ],
+    [
+      "dressing of the day",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in today's dressing?",
+        "questionHe": "יש סוכר או דבש ברוטב של היום?",
+        "sourceEn": "dressing of the day",
+        "sourceHe": "רוטב היום"
+      }
+    ],
+    [
+      "caramelized",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "caramelised",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "peanut sauce",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the peanut sauce? Can it come on the side?",
+        "questionHe": "יש סוכר ברוטב הבוטנים? אפשר אותו בצד?",
+        "sourceEn": "peanut sauce",
+        "sourceHe": "רוטב בוטנים"
+      }
+    ],
+    [
+      "satay",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the peanut sauce? Can it come on the side?",
+        "questionHe": "יש סוכר ברוטב הבוטנים? אפשר אותו בצד?",
+        "sourceEn": "peanut sauce",
+        "sourceHe": "רוטב בוטנים"
+      }
+    ]
+  ],
+  "hiddenCarbTriggersHe": [
+    [
+      "רוטב מיוחד",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the special sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב המיוחד?",
+        "sourceEn": "special sauce",
+        "sourceHe": "רוטב מיוחד"
+      }
+    ],
+    [
+      "רוטב סודי",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the secret sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב הסודי?",
+        "sourceEn": "secret sauce",
+        "sourceHe": "רוטב סודי"
+      }
+    ],
+    [
+      "רוטב השף",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or flour in the chef's sauce?",
+        "questionHe": "יש סוכר או קמח ברוטב של השף?",
+        "sourceEn": "chef's sauce",
+        "sourceHe": "רוטב השף"
+      }
+    ],
+    [
+      "מרינדה",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in the marinade?",
+        "questionHe": "יש סוכר או דבש במרינדה?",
+        "sourceEn": "marinade",
+        "sourceHe": "מרינדה"
+      }
+    ],
+    [
+      "מרינדת",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in the marinade?",
+        "questionHe": "יש סוכר או דבש במרינדה?",
+        "sourceEn": "marinade",
+        "sourceHe": "מרינדה"
+      }
+    ],
+    [
+      "מרינדה מתוקה",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Can it be made without the sweet marinade?",
+        "questionHe": "אפשר להכין את המנה בלי המרינדה המתוקה?",
+        "sourceEn": "sweet marinade",
+        "sourceHe": "מרינדה מתוקה"
+      }
+    ],
+    [
+      "זיגוג",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "גלייז",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "מזוגג",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "מזוגגת",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "מזוגגים",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "מזוגגות",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the glaze made with sugar or honey? Can it be left off?",
+        "questionHe": "יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?",
+        "sourceEn": "glaze",
+        "sourceHe": "זיגוג"
+      }
+    ],
+    [
+      "רוטב חום",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the brown sauce thickened with flour? Can it come on the side?",
+        "questionHe": "הרוטב החום מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "brown sauce",
+        "sourceHe": "רוטב חום"
+      }
+    ],
+    [
+      "גרייבי",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the gravy thickened with flour? Can it come on the side?",
+        "questionHe": "הרוטב מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "gravy",
+        "sourceHe": "רוטב גרייבי"
+      }
+    ],
+    [
+      "דמי גלאס",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Is the demi-glace thickened with flour? Can it come on the side?",
+        "questionHe": "הדמי גלאס מוסמך בקמח? אפשר אותו בצד?",
+        "sourceEn": "demi-glace",
+        "sourceHe": "דמי גלאס"
+      }
+    ],
+    [
+      "בשמל",
+      {
+        "certainty": "likely",
+        "concern": "flour",
+        "questionEn": "Béchamel is made with flour. Can the dish come without it?",
+        "questionHe": "רוטב בשמל עשוי מקמח. אפשר את המנה בלעדיו?",
+        "sourceEn": "béchamel",
+        "sourceHe": "רוטב בשמל"
+      }
+    ],
+    [
+      "קונג פאו",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is the kung pao sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב הקונג פאו סוכר או עמילן?",
+        "sourceEn": "kung pao sauce",
+        "sourceHe": "רוטב קונג פאו"
+      }
+    ],
+    [
+      "גנרל טסו",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is General Tso's sauce made with sugar or cornstarch?",
+        "questionHe": "יש ברוטב גנרל טסו סוכר או עמילן?",
+        "sourceEn": "General Tso's sauce",
+        "sourceHe": "רוטב גנרל טסו"
+      }
+    ],
+    [
+      "רוטב צדפות",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Oyster sauce has sugar and cornstarch. Can it be made without it?",
+        "questionHe": "ברוטב צדפות יש סוכר ועמילן. אפשר להכין בלעדיו?",
+        "sourceEn": "oyster sauce",
+        "sourceHe": "רוטב צדפות"
+      }
+    ],
+    [
+      "רוטב אויסטר",
+      {
+        "certainty": "likely",
+        "concern": "sugarOrFlour",
+        "questionEn": "Oyster sauce has sugar and cornstarch. Can it be made without it?",
+        "questionHe": "ברוטב צדפות יש סוכר ועמילן. אפשר להכין בלעדיו?",
+        "sourceEn": "oyster sauce",
+        "sourceHe": "רוטב צדפות"
+      }
+    ],
+    [
+      "סויה מתוקה",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Sweet soy sauce is mostly sugar. Can it be made with plain soy sauce?",
+        "questionHe": "סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?",
+        "sourceEn": "sweet soy sauce",
+        "sourceHe": "סויה מתוקה"
+      }
+    ],
+    [
+      "סויה מתוק",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Sweet soy sauce is mostly sugar. Can it be made with plain soy sauce?",
+        "questionHe": "סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?",
+        "sourceEn": "sweet soy sauce",
+        "sourceHe": "סויה מתוקה"
+      }
+    ],
+    [
+      "רוטב ווק",
+      {
+        "certainty": "suspected",
+        "concern": "sugarOrFlour",
+        "questionEn": "Is there sugar or cornstarch in the wok sauce?",
+        "questionHe": "יש סוכר או עמילן ברוטב הווק?",
+        "sourceEn": "wok sauce",
+        "sourceHe": "רוטב ווק"
+      }
+    ],
+    [
+      "רוטב מתוק",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the sauce sweetened with sugar? Can it be left off?",
+        "questionHe": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
+        "sourceEn": "sweet sauce",
+        "sourceHe": "רוטב מתוק"
+      }
+    ],
+    [
+      "רוטב מתקתק",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is the sauce sweetened with sugar? Can it be left off?",
+        "questionHe": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
+        "sourceEn": "sweet sauce",
+        "sourceHe": "רוטב מתוק"
+      }
+    ],
+    [
+      "קריספי",
+      {
+        "certainty": "suspected",
+        "concern": "flour",
+        "questionEn": "Is it coated in flour or batter to make it crispy? Can it come without the coating?",
+        "questionHe": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?",
+        "sourceEn": "crispy coating",
+        "sourceHe": "ציפוי קריספי"
+      }
+    ],
+    [
+      "קריספית",
+      {
+        "certainty": "suspected",
+        "concern": "flour",
+        "questionEn": "Is it coated in flour or batter to make it crispy? Can it come without the coating?",
+        "questionHe": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?",
+        "sourceEn": "crispy coating",
+        "sourceHe": "ציפוי קריספי"
+      }
+    ],
+    [
+      "קריספיים",
+      {
+        "certainty": "suspected",
+        "concern": "flour",
+        "questionEn": "Is it coated in flour or batter to make it crispy? Can it come without the coating?",
+        "questionHe": "יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?",
+        "sourceEn": "crispy coating",
+        "sourceHe": "ציפוי קריספי"
+      }
+    ],
+    [
+      "ראב",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the spice rub?",
+        "questionHe": "יש סוכר בתערובת התבלינים (הראב)?",
+        "sourceEn": "spice rub",
+        "sourceHe": "ראב תבלינים"
+      }
+    ],
+    [
+      "רוטב שום",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the garlic sauce?",
+        "questionHe": "יש סוכר ברוטב השום?",
+        "sourceEn": "garlic sauce",
+        "sourceHe": "רוטב שום"
+      }
+    ],
+    [
+      "רוטב היום",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in today's dressing?",
+        "questionHe": "יש סוכר או דבש ברוטב של היום?",
+        "sourceEn": "dressing of the day",
+        "sourceHe": "רוטב היום"
+      }
+    ],
+    [
+      "רוטב של היום",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is there sugar or honey in today's dressing?",
+        "questionHe": "יש סוכר או דבש ברוטב של היום?",
+        "sourceEn": "dressing of the day",
+        "sourceHe": "רוטב היום"
+      }
+    ],
+    [
+      "מקורמל",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "מקורמלת",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "מקורמלים",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "מקורמלות",
+      {
+        "certainty": "suspected",
+        "concern": "sugar",
+        "questionEn": "Is sugar added to caramelize it?",
+        "questionHe": "מוסיפים סוכר כדי לקרמל?",
+        "sourceEn": "caramelizing",
+        "sourceHe": "קרמול"
+      }
+    ],
+    [
+      "רוטב בוטנים",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the peanut sauce? Can it come on the side?",
+        "questionHe": "יש סוכר ברוטב הבוטנים? אפשר אותו בצד?",
+        "sourceEn": "peanut sauce",
+        "sourceHe": "רוטב בוטנים"
+      }
+    ],
+    [
+      "סאטה",
+      {
+        "certainty": "likely",
+        "concern": "sugar",
+        "questionEn": "Is there sugar in the peanut sauce? Can it come on the side?",
+        "questionHe": "יש סוכר ברוטב הבוטנים? אפשר אותו בצד?",
+        "sourceEn": "peanut sauce",
+        "sourceHe": "רוטב בוטנים"
+      }
+    ]
+  ],
   "ketoQualifierGuardsEn": {
     "ale": {
       "after": [
@@ -1749,6 +3002,50 @@
         "naked"
       ]
     },
+    "carlsberg": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
     "cheeseburger": {
       "after": [],
       "before": [
@@ -1769,6 +3066,28 @@
         "cabbage",
         "coconut",
         "keto"
+      ]
+    },
+    "chocolate milk": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
       ]
     },
     "coke": {
@@ -1836,6 +3155,42 @@
       ],
       "before": []
     },
+    "dessert wine": {
+      "after": [
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "falafel": {
+      "after": [],
+      "before": [
+        "cauliflower",
+        "broccoli",
+        "keto"
+      ]
+    },
     "fanta": {
       "after": [
         "zero",
@@ -1858,12 +3213,162 @@
         "light"
       ]
     },
+    "flavored water": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "flavoured water": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "flour coated": {
+      "after": [],
+      "before": [
+        "almond",
+        "coconut",
+        "no",
+        "without"
+      ]
+    },
+    "flour coating": {
+      "after": [],
+      "before": [
+        "almond",
+        "coconut",
+        "no",
+        "without"
+      ]
+    },
     "fried chicken": {
       "after": [],
       "before": [
         "pan",
         "stir",
         "air"
+      ]
+    },
+    "goldstar": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "guinness": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
       ]
     },
     "hamburger": {
@@ -1873,6 +3378,72 @@
         "keto",
         "bunless",
         "naked"
+      ]
+    },
+    "heineken": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "hot chocolate": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
       ]
     },
     "juice": {
@@ -2085,6 +3656,13 @@
         "poached"
       ]
     },
+    "quiche": {
+      "after": [],
+      "before": [
+        "crustless",
+        "keto"
+      ]
+    },
     "rice": {
       "after": [
         "vinegar"
@@ -2104,6 +3682,122 @@
         "cauliflower",
         "konjac",
         "keto"
+      ]
+    },
+    "san miguel": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "sauternes": {
+      "after": [
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ]
+    },
+    "slush": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "slushie": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
       ]
     },
     "spaghetti": {
@@ -2132,6 +3826,50 @@
         "zero sugar",
         "unsweetened",
         "light"
+      ]
+    },
+    "stella artois": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
       ]
     },
     "stout": {
@@ -2218,6 +3956,50 @@
         "zero sugar",
         "unsweetened",
         "light"
+      ]
+    },
+    "tuborg": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light",
+        "braised",
+        "braise",
+        "marinated",
+        "marinade",
+        "glaze",
+        "glazed",
+        "sauce",
+        "reduction",
+        "jus",
+        "gravy",
+        "poached"
       ]
     },
     "waffle": {
@@ -2366,6 +4148,152 @@
         "במרינדת"
       ]
     },
+    "ברד": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "גולדסטאר": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
+    "גינס": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
+    "הייניקן": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
     "המבורגר": {
       "after": [
         "חסה",
@@ -2376,6 +4304,50 @@
         "חסה",
         "בחסה",
         "קטו"
+      ]
+    },
+    "טובורג": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
       ]
     },
     "טוניק": {
@@ -2402,6 +4374,52 @@
         "קטו",
         "ענן",
         "שקדים"
+      ]
+    },
+    "יין קינוח": {
+      "after": [
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
+    "כיסוני": {
+      "after": [
+        "חסה",
+        "כרוב"
+      ],
+      "before": [
+        "חסה",
+        "כרוב"
       ]
     },
     "לחם": {
@@ -2461,6 +4479,20 @@
       ]
     },
     "לימונדה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "מים בטעם": {
       "after": [
         "זירו",
         "דיאט",
@@ -2554,6 +4586,50 @@
         "במרינדת"
       ]
     },
+    "מסוכר": {
+      "after": [],
+      "before": [
+        "לא",
+        "ללא",
+        "נקי",
+        "נקייה",
+        "נקיים",
+        "נקיות"
+      ]
+    },
+    "מסוכרות": {
+      "after": [],
+      "before": [
+        "לא",
+        "ללא",
+        "נקי",
+        "נקייה",
+        "נקיים",
+        "נקיות"
+      ]
+    },
+    "מסוכרים": {
+      "after": [],
+      "before": [
+        "לא",
+        "ללא",
+        "נקי",
+        "נקייה",
+        "נקיים",
+        "נקיות"
+      ]
+    },
+    "מסוכרת": {
+      "after": [],
+      "before": [
+        "לא",
+        "ללא",
+        "נקי",
+        "נקייה",
+        "נקיים",
+        "נקיות"
+      ]
+    },
     "נודלס": {
       "after": [
         "קישואים",
@@ -2572,6 +4648,50 @@
         "קטו"
       ]
     },
+    "סאן מיגל": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
     "סושי": {
       "after": [
         "איכות",
@@ -2580,6 +4700,50 @@
       "before": [
         "איכות",
         "באיכות"
+      ]
+    },
+    "סטלה ארטואה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
       ]
     },
     "ספרייט": {
@@ -2622,6 +4786,18 @@
         "קטו",
         "שקדים",
         "דלת פחמימות"
+      ]
+    },
+    "פלאפל": {
+      "after": [
+        "כרובית",
+        "ברוקולי",
+        "קטו"
+      ],
+      "before": [
+        "כרובית",
+        "ברוקולי",
+        "קטו"
       ]
     },
     "פסטה": {
@@ -2720,6 +4896,18 @@
         "קטו"
       ]
     },
+    "ציפוי קמח": {
+      "after": [
+        "שקדים",
+        "קוקוס"
+      ],
+      "before": [
+        "ללא",
+        "בלי",
+        "שקדים",
+        "קוקוס"
+      ]
+    },
     "קולה": {
       "after": [
         "זירו",
@@ -2748,6 +4936,62 @@
         "ללא סוכרים"
       ]
     },
+    "קיש": {
+      "after": [
+        "ללא בצק",
+        "בלי בצק",
+        "קטו"
+      ],
+      "before": [
+        "ללא בצק",
+        "בלי בצק",
+        "קטו"
+      ]
+    },
+    "קרלסברג": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים",
+        "מבושל",
+        "מבושלת",
+        "מבושלים",
+        "צלוי",
+        "צלויה",
+        "צלי",
+        "רוטב",
+        "ברוטב",
+        "רדוקציה",
+        "רדוקציית",
+        "זיגוג",
+        "בזיגוג",
+        "מרינדה",
+        "במרינדה",
+        "במרינדת"
+      ]
+    },
     "ריזוטו": {
       "after": [
         "כרובית",
@@ -2756,6 +5000,20 @@
       "before": [
         "כרובית",
         "קטו"
+      ]
+    },
+    "שוקו": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
       ]
     },
     "שמרים": {
@@ -2788,6 +5046,11 @@
     "yellow": 0.5
   },
   "ketoSubstituteNameWordsEn": {
+    "falafel": [
+      "keto",
+      "low carb",
+      "lowcarb"
+    ],
     "noodle": [
       "keto",
       "low carb",
@@ -2868,6 +5131,10 @@
       "בצק שקדים",
       "קמח שקדים"
     ],
+    "פלאפל": [
+      "קטו",
+      "דלת פחמימות"
+    ],
     "פסטה": [
       "קטו",
       "דלת פחמימות",
@@ -2907,24 +5174,63 @@
     "שמרים"
   ],
   "nonKetoBaseLabelsEn": {
+    "carlsberg": "beer",
+    "dessert wine": "sweet wine",
+    "fir fir": "firfir",
     "fish and chips": "battered fish",
     "fish chips": "battered fish",
     "fish n chips": "battered fish",
-    "noodle": "noodles"
+    "flavored water": "flavoured water",
+    "flour coated": "flour coating",
+    "goldstar": "beer",
+    "guinness": "beer",
+    "heineken": "beer",
+    "noodle": "noodles",
+    "petit four": "petits fours",
+    "san miguel": "beer",
+    "sauternes": "sweet wine",
+    "slushie": "slush",
+    "stella artois": "beer",
+    "tuborg": "beer"
   },
   "nonKetoBaseLabelsHe": {
     "בבלילה": "בלילה",
     "בבלילת": "בלילה",
     "בחלבה": "חלבה",
+    "גולדסטאר": "בירה",
+    "גינס": "בירה",
+    "גלידות": "גלידה",
+    "גלידת": "גלידה",
     "דג וצ'יפס": "דג מצופה",
+    "הייניקן": "בירה",
     "וחלבה": "חלבה",
+    "חאצ'אפורי": "חצ'פורי",
+    "חביתיות": "חביתית",
+    "חצ'אפורי": "חצ'פורי",
+    "טובורג": "בירה",
+    "יין קינוח": "יין מתוק",
+    "כיסוני": "כיסונים",
+    "סאן מיגל": "בירה",
+    "סורבט": "סורבה",
+    "סטלה ארטואה": "בירה",
     "ספאגטי": "ספגטי",
     "עוגיית": "עוגיה",
     "עוגת": "עוגה",
     "פיצות": "פיצה",
     "פיש אנד צ'יפס": "דג מצופה",
     "פיש נ' צ'יפס": "דג מצופה",
+    "פנה אלפרדו": "פסטה",
+    "פנה ארביאטה": "פסטה",
+    "פנה בולונז": "פסטה",
+    "פנה ברוטב": "פסטה",
+    "פנה פומודורו": "פסטה",
+    "פנה פסטו": "פסטה",
+    "פנה רוזה": "פסטה",
     "פסטת": "פסטה",
+    "פרלינה": "פרלין",
+    "פרלינים": "פרלין",
+    "קרלסברג": "בירה",
+    "קרעי אינג'רה": "אינג'רה",
     "רזוטו": "ריזוטו",
     "רמן": "ראמן"
   },
@@ -3038,6 +5344,31 @@
     "rugelach",
     "muffin",
     "scone",
+    "khachapuri",
+    "khinkali",
+    "pelmeni",
+    "blini",
+    "blinchiki",
+    "quiche",
+    "shortcrust",
+    "kubaneh",
+    "sfenj",
+    "mufleta",
+    "falafel",
+    "gefilte",
+    "firfir",
+    "fir fir",
+    "flour coating",
+    "flour coated",
+    "bean stew",
+    "sorbet",
+    "chocolate mousse",
+    "petit four",
+    "petits fours",
+    "praline",
+    "sweet and sour chicken",
+    "bamba",
+    "bissli",
     "cola",
     "coke",
     "pepsi",
@@ -3055,7 +5386,22 @@
     "smoothie",
     "sweet wine",
     "moscato",
-    "port wine"
+    "port wine",
+    "hot chocolate",
+    "chocolate milk",
+    "slush",
+    "slushie",
+    "flavoured water",
+    "flavored water",
+    "dessert wine",
+    "sauternes",
+    "san miguel",
+    "goldstar",
+    "carlsberg",
+    "tuborg",
+    "heineken",
+    "stella artois",
+    "guinness"
   ],
   "nonKetoBasesHe": [
     "פסטה",
@@ -3212,6 +5558,47 @@
     "צ'יקן קריספי",
     "עוף קריספי",
     "פיש נ' צ'יפס",
+    "חצ'פורי",
+    "חצ'אפורי",
+    "חאצ'אפורי",
+    "חינקלי",
+    "פלמני",
+    "בלינצ'יקי",
+    "בליני",
+    "חביתיות",
+    "חביתית",
+    "כיסוני",
+    "קיש",
+    "בצק פריך",
+    "קובנה",
+    "ספינג'",
+    "מופלטה",
+    "פוקאצ'ה",
+    "פלאפל",
+    "גפילטע",
+    "פיר פיר",
+    "קרעי אינג'רה",
+    "ציפוי קמח",
+    "תבשיל שעועית",
+    "עוף חמוץ מתוק",
+    "במבה",
+    "ביסלי",
+    "גלידת",
+    "גלידות",
+    "סורבה",
+    "סורבט",
+    "מוס שוקולד",
+    "פטי פור",
+    "פרלינים",
+    "פרלינה",
+    "פרלין",
+    "פנה ברוטב",
+    "פנה פסטו",
+    "פנה רוזה",
+    "פנה ארביאטה",
+    "פנה אלפרדו",
+    "פנה בולונז",
+    "פנה פומודורו",
     "קולה",
     "קוקה קולה",
     "ספרייט",
@@ -3226,7 +5613,19 @@
     "שיכר",
     "ליקר",
     "סמוטי",
-    "יין מתוק"
+    "יין מתוק",
+    "שוקו",
+    "ברד",
+    "מים בטעם",
+    "יין קינוח",
+    "סמוזי",
+    "סאן מיגל",
+    "גולדסטאר",
+    "קרלסברג",
+    "טובורג",
+    "הייניקן",
+    "סטלה ארטואה",
+    "גינס"
   ],
   "nonKetoDrinkBasesEn": [
     "cola",
@@ -3246,7 +5645,22 @@
     "smoothie",
     "sweet wine",
     "moscato",
-    "port wine"
+    "port wine",
+    "hot chocolate",
+    "chocolate milk",
+    "slush",
+    "slushie",
+    "flavoured water",
+    "flavored water",
+    "dessert wine",
+    "sauternes",
+    "san miguel",
+    "goldstar",
+    "carlsberg",
+    "tuborg",
+    "heineken",
+    "stella artois",
+    "guinness"
   ],
   "nonKetoDrinkBasesHe": [
     "קולה",
@@ -3263,7 +5677,19 @@
     "שיכר",
     "ליקר",
     "סמוטי",
-    "יין מתוק"
+    "יין מתוק",
+    "שוקו",
+    "ברד",
+    "מים בטעם",
+    "יין קינוח",
+    "סמוזי",
+    "סאן מיגל",
+    "גולדסטאר",
+    "קרלסברג",
+    "טובורג",
+    "הייניקן",
+    "סטלה ארטואה",
+    "גינס"
   ],
   "optionRemovalWordsEn": [
     "no",
@@ -3447,6 +5873,8 @@
     "dietaryRuleWhyHe": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן.",
     "greenWhyEn": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed.",
     "greenWhyHe": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא.",
+    "hiddenCarbWhyEn": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering.",
+    "hiddenCarbWhyHe": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה.",
     "optionBaseModificationEn": "Among the options, skip the {base} and choose a salad or vegetables instead.",
     "optionBaseModificationHe": "מבין האפשרויות, בלי {base} — בחרו סלט או ירקות במקום.",
     "redWhyEn": "Built on {base}, which cannot be made keto.",
@@ -3514,6 +5942,9 @@
     "צ'יפס": [
       "תפוח אדמה",
       "תפוחי אדמה"
+    ],
+    "צנוברים מסוכרים": [
+      "מסוכרים"
     ],
     "רוטב חמוציות": [
       "חמוציות"

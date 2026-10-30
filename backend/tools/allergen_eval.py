@@ -361,10 +361,11 @@ class MenuRun:
 
 def ingredients_by_dish(body: str, menu: Menu) -> dict[int, list[Any]]:
     """The ``ingredients`` the model's reply ``body`` gives each dish of
-    ``menu``, keyed by the dish's position in the menu. The reply is
-    untrusted: a dish id the menu does not hold, or an entry that is not an
-    object, is dropped. Returns an empty dict for a reply that is not
-    JSON."""
+    ``menu``, keyed by the dish's position in the menu. A reply's ``id`` is
+    read through the prompt's short ids (``prompt.prompt_ids``) first, then
+    as a dish's own id. The reply is untrusted: a dish id the menu does not
+    hold, or an entry that is not an object, is dropped. Returns an empty
+    dict for a reply that is not JSON."""
     try:
         document = json.loads(body)
     except ValueError:
@@ -373,11 +374,13 @@ def ingredients_by_dish(body: str, menu: Menu) -> dict[int, list[Any]]:
     if not isinstance(raw_dishes, list):
         return {}
     positions = {dish.id: i for i, dish in enumerate(menu.all_dishes())}
+    short_ids = prompt.prompt_ids(menu)
     out: dict[int, list[Any]] = {}
     for raw in raw_dishes:
         if not isinstance(raw, dict):
             continue
-        position = positions.get(str(raw.get("id")))
+        raw_id = str(raw.get("id"))
+        position = positions.get(short_ids.get(raw_id, raw_id))
         ingredients = raw.get("ingredients")
         if position is not None and isinstance(ingredients, list):
             out[position] = ingredients

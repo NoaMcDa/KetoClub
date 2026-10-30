@@ -256,7 +256,26 @@ List<Object?> _pairs(Map<String, String> map) => <Object?>[
   for (final entry in map.entries) <Object?>[entry.key, entry.value],
 ];
 
-/// A [RuleMatch] with every field, plus the verdict colour it implies.
+/// The hidden-carb trigger table [table] as `[[trigger, {flag}], ...]`,
+/// so the order survives the canonical key sort (issue #213).
+List<Object?> _hiddenCarbTriggers(Map<String, HiddenCarbTrigger> table) =>
+    <Object?>[
+      for (final MapEntry(key: trigger, value: flag) in table.entries)
+        <Object?>[
+          trigger,
+          <String, Object?>{
+            'sourceEn': flag.sourceEn,
+            'sourceHe': flag.sourceHe,
+            'certainty': flag.certainty,
+            'questionEn': flag.questionEn,
+            'questionHe': flag.questionHe,
+            'concern': flag.concern,
+          },
+        ],
+    ];
+
+/// A [RuleMatch] with every field, plus the verdict colour it implies
+/// (from its instructions alone: a flag never colours a [RuleMatch]).
 Map<String, Object?> _match(RuleMatch match) => <String, Object?>{
   'kind': match.isNonKeto
       ? 'red'
@@ -264,6 +283,7 @@ Map<String, Object?> _match(RuleMatch match) => <String, Object?>{
   'isNonKeto': match.isNonKeto,
   'baseLabel': match.baseLabel,
   'instructions': match.instructions,
+  'hiddenCarbs': <Object?>[for (final flag in match.hiddenCarbs) flag.toJson()],
 };
 
 /// A [Venue] in the shape the backend's `Venue` model mirrors. Written
@@ -364,6 +384,13 @@ Map<String, Object?> _vocabulary() {
     'dairyGuardsHe': _guards(dairyGuardsHe),
     'optionRemovalWordsEn': optionRemovalWordsEn,
     'optionRemovalWordsHe': optionRemovalWordsHe,
+    'hiddenCarbTriggersEn': _hiddenCarbTriggers(hiddenCarbTriggersEn),
+    'hiddenCarbTriggersHe': _hiddenCarbTriggers(hiddenCarbTriggersHe),
+    'hiddenCarbGuardPhrasesEn': hiddenCarbGuardPhrasesEn,
+    'hiddenCarbGuardPhrasesHe': hiddenCarbGuardPhrasesHe,
+    'hiddenCarbTriggerGuardsEn': _guards(hiddenCarbTriggerGuardsEn),
+    'hiddenCarbTriggerGuardsHe': _guards(hiddenCarbTriggerGuardsHe),
+    'hiddenCarbCoveringModifiers': hiddenCarbCoveringModifiers.toList(),
     'noPrefixHebrewTriggers': _noPrefixHebrewTriggers(),
     'hebrewTriggerPatternExample': <String, Object?>{
       'trigger': _exampleHe,
@@ -432,6 +459,8 @@ Map<String, Object?> _vocabulary() {
       'carnivoreOnlyModificationHe': carnivoreOnlyModificationHe,
       'optionBaseModificationEn': optionBaseModificationEn,
       'optionBaseModificationHe': optionBaseModificationHe,
+      'hiddenCarbWhyEn': hiddenCarbWhyEn,
+      'hiddenCarbWhyHe': hiddenCarbWhyHe,
     },
     'prompt': <String, Object?>{
       'promptVerdictDefinitionsTemplate': promptVerdictDefinitionsTemplate,
@@ -454,8 +483,10 @@ Map<String, Object?> _vocabulary() {
       'defaultNetCarbLimitGrams': defaultNetCarbLimitGrams,
       'minNetCarbLimitGrams': minNetCarbLimitGrams,
       'maxNetCarbLimitGrams': maxNetCarbLimitGrams,
-      // A literal in `MenuResponseParser._parseHiddenCarbs`.
-      'maxHiddenCarbsPerDish': 3,
+      // The rules path's cap; `MenuResponseParser._parseHiddenCarbs`
+      // holds the same 3 as a literal.
+      'maxHiddenCarbsPerDish': maxHiddenCarbsPerDish,
+      'hiddenCarbWindowWords': hiddenCarbWindowWords,
       'parserSchemaVersion': MenuResponseParser.schemaVersion,
       'maxScanPages': maxScanPages,
       'maxScanPageBytes': maxScanPageBytes,
@@ -562,6 +593,14 @@ List<String> _allVocabularyWords() => <String>[
   ]) ...<String>[...guard.before, ...guard.after],
   ...optionRemovalWordsEn,
   ...optionRemovalWordsHe,
+  ...hiddenCarbTriggersEn.keys,
+  ...hiddenCarbTriggersHe.keys,
+  for (final table in [hiddenCarbGuardPhrasesEn, hiddenCarbGuardPhrasesHe])
+    for (final phrases in table.values) ...phrases,
+  for (final guard in <GuardWords>[
+    ...hiddenCarbTriggerGuardsEn.values,
+    ...hiddenCarbTriggerGuardsHe.values,
+  ]) ...<String>[...guard.before, ...guard.after],
   ...drinkCategoryWordsEn,
   ...drinkCategoryWordsHe,
   ...extraCategoryWordsEn,
@@ -713,6 +752,42 @@ Map<String, Object?> _rules() {
       trigger,
       for (final victim in victims) '$trigger, $victim',
     ],
+    // Hidden carbs (issue #213 on the rules path): every trigger alone and
+    // in context, a guard phrase of each concern beside it, a covering
+    // sweetener beside it, a carb modifier that does not cover it, and
+    // each per-trigger guard word.
+    ...hiddenCarbTexts,
+    for (final trigger in hiddenCarbTriggersEn.keys) ...<String>[
+      trigger,
+      en(trigger),
+      en(trigger.toUpperCase()),
+      en('$trigger, sugar free'),
+      en('no flour $trigger'),
+      en('keto $trigger'),
+      en('honey $trigger'),
+      en('$trigger and fries'),
+    ],
+    for (final trigger in hiddenCarbTriggersHe.keys) ...<String>[
+      trigger,
+      he(trigger),
+      he('ב$trigger'),
+      he('וה$trigger'),
+      he('$triggerי'),
+      he('$trigger ללא תוספת סוכר'),
+      he('ללא קמח $trigger'),
+      he('$trigger בדבש'),
+      he("$trigger וצ'יפס"),
+    ],
+    for (final MapEntry(key: trigger, value: guard)
+        in hiddenCarbTriggerGuardsEn.entries) ...<String>[
+      for (final word in guard.before) en('$word $trigger'),
+      for (final word in guard.after) en('$trigger $word'),
+    ],
+    for (final MapEntry(key: trigger, value: guard)
+        in hiddenCarbTriggerGuardsHe.entries) ...<String>[
+      for (final word in guard.before) he('$word $trigger'),
+      for (final word in guard.after) he('$trigger $word'),
+    ],
   ];
 
   final mentions = _unique(<String>[
@@ -748,6 +823,7 @@ Map<String, Object?> _rules() {
   final dishes = <Dish>[
     ...ruleDishes,
     for (final name in carbOnlyNames) ruleDish(name),
+    ...hiddenCarbRuleDishes,
   ];
 
   return <String, Object?>{
@@ -797,7 +873,12 @@ Map<String, Object?> _rules() {
 Future<List<Object?>> _heuristic(_Inputs inputs) async {
   const classifier = HeuristicMenuClassifier(clock: _GoldenClock());
   final entries = <Object?>[];
-  for (final MapEntry(key: menuName, value: menu) in inputs.menus.entries) {
+  // The hidden-carb menu (issue #213) only here, so no other golden moves.
+  final menus = <String, Menu>{
+    ...inputs.menus,
+    'hidden_carbs': goldenHiddenCarbMenu,
+  };
+  for (final MapEntry(key: menuName, value: menu) in menus.entries) {
     for (final MapEntry(key: optionsName, value: options)
         in _optionSets.entries) {
       final analysis =
@@ -833,6 +914,7 @@ Map<String, Object?> _prompt(_Inputs inputs) => <String, Object?>{
           'options': options.snapshot.toJson(),
           'systemPrompt': MenuAnalysisPrompt.systemPrompt(options: options),
           'userPrompt': MenuAnalysisPrompt.userPrompt(menu),
+          'promptIds': MenuAnalysisPrompt.promptIds(menu),
           'visionPreamble1': MenuAnalysisPrompt.visionPreamble(1),
           'visionPreamble3': MenuAnalysisPrompt.visionPreamble(3),
           'visionUserPrompt1': MenuAnalysisPrompt.visionUserPrompt(1),
@@ -945,6 +1027,31 @@ Map<String, Object?> _scannedResult(ScannedMenuResult result) =>
         'failed': reason.name,
       },
     };
+
+/// A text reply parsed through the prompt ids of its source menu, as
+/// `LlmMenuClassifier` and the server's classify route parse a live reply,
+/// with those ids.
+Map<String, Object?> _promptIdEntry(ReplyCase reply) {
+  final source = reply.source!;
+  final promptIds = MenuAnalysisPrompt.promptIds(source);
+  return <String, Object?>{
+    'name': reply.name,
+    'reply': reply.body,
+    'sourceMenu': source.toJson(),
+    'netCarbLimitGrams': reply.limit,
+    'promptIds': promptIds,
+    'result': _textResult(
+      MenuResponseParser.parse(
+        reply.body,
+        source: source,
+        promptIds: promptIds,
+        analysedAt: goldenNow,
+        engine: _engine,
+        netCarbLimitGrams: reply.limit,
+      ),
+    ),
+  };
+}
 
 Map<String, Object?> _textEntry(
   String name,
@@ -1133,6 +1240,12 @@ Map<String, Object?> _parser() {
     'extractScanned': <Object?>[
       for (final reply in handExtractionScannedReplies())
         _extractScannedEntry(reply),
+    ],
+    // Replies read through the short ids the prompt sends: the lists above
+    // are parsed with none, so a reply's id is compared with the dishes'
+    // own ids only.
+    'promptIdText': <Object?>[
+      for (final reply in promptIdReplies()) _promptIdEntry(reply),
     ],
   };
 }

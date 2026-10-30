@@ -693,6 +693,168 @@ final List<Dish> ruleDishes = <Dish>[
 ];
 
 // ---------------------------------------------------------------------------
+// Hidden carbs on the rules path (issue #213, §9.4 rule 5a)
+// ---------------------------------------------------------------------------
+
+/// Hand-written `ClassificationRules.match` inputs for the hidden-carb
+/// tables, beyond the per-trigger texts the exporter writes: overlaps,
+/// window edges (a guard or a sweetener three words away, then four),
+/// covering by overlap and by a sweetener, concerns a guard does not
+/// answer, the source dedupe, the three-flag cap, mixed scripts and an
+/// astral letter before a window.
+const List<String> hiddenCarbTexts = <String>[
+  'Chicken in sweet marinade',
+  'Chicken in honey marinade',
+  'Chicken marinated in honey',
+  'Chicken in honey and soy marinade',
+  'Honey, then lemon, soy, ginger marinade',
+  'Teriyaki glazed salmon',
+  'Glazed carrots',
+  'BBQ rub ribs',
+  'Crispy onion and crispy chicken thighs',
+  'Crispy skin salmon',
+  'Crispy salmon with fries',
+  'Crispy pork belly',
+  'Marinated olives',
+  'Marinated chicken skewers',
+  'Steak with gravy, sugar-free',
+  'Steak with gravy, flourless',
+  'House sauce, no added sugar',
+  'House sauce with lots of herbs, no added sugar',
+  'House sauce with lots of fresh herbs, no added sugar',
+  'Keto gravy',
+  'Marinade and marinated chicken',
+  'House sauce, special sauce, garlic sauce, amba and gravy',
+  'Sweet and sour chicken with rice',
+  'Kung pao chicken',
+  "General Tso's chicken",
+  'Pad see ew with oyster sauce',
+  'Beef in sweet soy',
+  'Béchamel gratin',
+  'Demi-glace short rib',
+  'Caramelized onions',
+  'Satay skewers',
+  'Peanut sauce noodles',
+  'Steak with chimichurri',
+  'Salmon in house sauce',
+  'סלמון ברוטב הבית',
+  'עוף במרינדה מתוקה',
+  'עוף במרינדת דבש',
+  'עוף במרינדה של דבש וסויה',
+  'סלמון בזיגוג דבש',
+  'סלמון מזוגג',
+  'סלמון בעור קריספי',
+  'סלמון קריספי',
+  'עוף קריספי',
+  'פרגית ברוטב שום ללא סוכר',
+  'פרגית ברוטב שום וללא סוכר',
+  'שווארמה עם עמבה',
+  'זיתים במרינדה',
+  'אנטריקוט ברוטב חום',
+  'אנטריקוט ברוטב חום ללא סוכר',
+  'אנטריקוט ברוטב חום ללא קמח',
+  'עוף חמוץ־מתוק',
+  'בצל מקורמל',
+  'סלט עם רוטב היום',
+  'סלמון with house sauce',
+  'Salmon ברוטב שום',
+  '\u{1D401}\u{1D41E}\u{1D41E}\u{1D41F} with honey and soy marinade',
+  '\u{1D401}\u{1D41E}\u{1D41E}\u{1D41F} with house sauce',
+];
+
+/// Hand-written `ClassificationRules.matchDish` inputs for the hidden-carb
+/// tables: a flag in the description and in a choice option, a removal
+/// option naming a trigger (dropped, #192), a red carrying a trigger, a
+/// carb-only red, a yellow by option base, and a Hebrew dish with an
+/// English trigger.
+final List<Dish> hiddenCarbRuleDishes = <Dish>[
+  ruleDish('Grilled chicken', description: 'With our house sauce'),
+  ruleDish(
+    'Grilled chicken',
+    options: const <DishOption>[
+      DishOption(name: 'Sauce', values: <String>['Garlic sauce', 'Tahini']),
+    ],
+  ),
+  ruleDish(
+    'Grilled chicken',
+    description: 'Marinated',
+    options: const <DishOption>[
+      DishOption(name: 'Changes', values: <String>['No house sauce']),
+    ],
+  ),
+  ruleDish(
+    'שיפודי פרגית',
+    options: const <DishOption>[
+      DishOption(name: 'שינויים', values: <String>['ללא עמבה']),
+    ],
+  ),
+  ruleDish('Spaghetti', description: 'In house sauce'),
+  ruleDish('Fries', description: 'Crispy'),
+  ruleDish(
+    'Steak',
+    description: 'With gravy',
+    options: const <DishOption>[
+      DishOption(name: 'Side', values: <String>['Mashed potatoes', 'Pasta']),
+    ],
+  ),
+  ruleDish('פרגית', description: 'with house sauce'),
+  ruleDish(
+    'Ribeye',
+    description: 'Glazed, crispy edges, amba, house sauce and gravy',
+  ),
+];
+
+/// A hand-built menu for §9.4 rule 5a on the rules path, run through the
+/// heuristic classifier under every option set (`heuristic.json`): a green
+/// a flag makes yellow in English and Hebrew, a yellow keeping its script
+/// with an uncovered flag and dropping a covered one, a red dropping its
+/// flags, a dish a dietary rule alone makes yellow, the three-flag cap and
+/// a guard. It is not one of [goldenHandBuiltMenus], so the goldens built
+/// over those (and the keto baseline) do not move with it.
+final Menu goldenHiddenCarbMenu = Menu(
+  venueRef: const VenueRef(source: MenuSource.scan, platformId: 'hidden'),
+  currency: 'ILS',
+  fetchedAt: goldenNow,
+  categories: <MenuCategory>[
+    MenuCategory(
+      id: 'hc-mains',
+      name: 'Mains',
+      dishes: <Dish>[
+        menuDish('hc1', 'Grilled salmon', description: 'House sauce'),
+        menuDish('hc2', 'Crispy chicken thighs', description: 'With fries'),
+        menuDish('hc3', 'Honey-glazed salmon'),
+        menuDish('hc4', 'Fettuccine', description: 'Creamy house sauce'),
+        menuDish('hc5', 'Steak', description: 'Butter, gravy'),
+        menuDish(
+          'hc6',
+          'Ribeye',
+          description: 'Glazed, amba, house sauce, gravy and garlic sauce',
+        ),
+        menuDish('hc7', 'Grilled salmon', description: 'Sugar-free glaze'),
+        menuDish(
+          'hc8',
+          'Chicken breast',
+          description: 'Marinated, with salad',
+          options: const <DishOption>[
+            DishOption(name: 'Changes', values: <String>['No marinade']),
+          ],
+        ),
+      ],
+    ),
+    MenuCategory(
+      id: 'hc-he',
+      name: 'עיקריות',
+      dishes: <Dish>[
+        menuDish('hc9', 'פרגית במרינדה', description: 'עם סלט ירוק'),
+        menuDish('hc10', 'סלמון בעור קריספי'),
+        menuDish('hc11', 'אנטריקוט', description: 'ברוטב חום, עם פירה'),
+        menuDish('hc12', 'שניצל', description: 'קריספי, ברוטב שום'),
+      ],
+    ),
+  ],
+);
+
+// ---------------------------------------------------------------------------
 // Hand-built menus
 // ---------------------------------------------------------------------------
 
@@ -1524,6 +1686,71 @@ List<ReplyCase> provenanceReplies() {
         verdict: 'modifiable',
         hiddenCarbs: <Object?>[hiddenCarb('glaze')],
       ),
+    ]),
+  ];
+}
+
+/// The source menu of the prompt-id cases: two dishes of one name under
+/// Wolt-shaped 24-character ids that share their first sixteen, as the
+/// #165 recording's ids did, and a dish whose own id `'1'` is also the
+/// first dish's prompt id (a 10bis-style numeric id).
+final Menu parserPromptIdMenu = parserMenu(<Dish>[
+  parserDish('65b0c1f2a3d4e5f60718293a', 'Smashburger'),
+  parserDish('65b0c1f2a3d4e5f60718293b', 'Smashburger'),
+  parserDish('65b0c1f2a3d4e5f6071829ff', 'Caesar Salad'),
+  parserDish('1', 'Fries'),
+]);
+
+/// Hand-written replies read through the prompt's short ids
+/// (`MenuAnalysisPrompt.promptIds` of [parserPromptIdMenu]), against
+/// [parserPromptIdMenu].
+List<ReplyCase> promptIdReplies() {
+  ReplyCase c(String name, List<Object?> elements) => (
+    name: name,
+    body: replyBody(elements),
+    source: parserPromptIdMenu,
+    limit: 6,
+  );
+  const why = 'Reason.';
+  const modification = 'No bun.';
+  return <ReplyCase>[
+    c('hand_prompt_ids_place_every_dish', <Object?>[
+      replyDish(id: '1', name: 'Smashburger', why: why),
+      replyDish(
+        id: '2',
+        name: 'Smashburger',
+        verdict: 'modifiable',
+        modification: modification,
+      ),
+      replyDish(id: '3', name: 'Caesar Salad', verdict: 'nonKeto'),
+      replyDish(id: '4', name: 'Fries', verdict: 'nonKeto'),
+    ]),
+    c('hand_prompt_ids_renamed_dish', <Object?>[
+      replyDish(id: '1', name: 'Special Smashburger 🌟'),
+      replyDish(id: '3', name: 'Salad of the house', verdict: 'nonKeto'),
+    ]),
+    c('hand_prompt_ids_full_platform_ids', <Object?>[
+      replyDish(id: '65b0c1f2a3d4e5f60718293b', name: 'Smashburger'),
+      replyDish(id: '65b0c1f2a3d4e5f6071829ff', name: 'Caesar Salad'),
+    ]),
+    c('hand_prompt_ids_prefixes_fall_to_names', <Object?>[
+      replyDish(id: '65b0c1f2a3d4e5f6', name: 'Smashburger'),
+      replyDish(
+        id: '65b0c1f2a3d4e5f6',
+        name: 'Smashburger',
+        verdict: 'nonKeto',
+      ),
+      replyDish(id: '65b0c1f2a3d4e5f6', name: 'Caesar Salad'),
+    ]),
+    c('hand_prompt_ids_unknown_short_id_falls_to_name', <Object?>[
+      replyDish(id: '9', name: 'Caesar Salad', verdict: 'nonKeto'),
+    ]),
+    // '1' is the first dish's prompt id and the fourth dish's own id: the
+    // prompt id wins, and the repeat is a duplicate.
+    c('hand_prompt_ids_short_id_wins_then_duplicate', <Object?>[
+      replyDish(id: '4', name: 'Fries', verdict: 'nonKeto'),
+      replyDish(id: '1', name: 'Fries'),
+      replyDish(id: '1', name: 'Smashburger', verdict: 'nonKeto'),
     ]),
   ];
 }

@@ -120,6 +120,60 @@ def _guards(value: Any, where: str) -> Mapping[str, GuardWords]:
 
 
 @dataclass(frozen=True, slots=True)
+class HiddenCarbTrigger:
+    """Dart ``HiddenCarbTrigger`` (issue #213 on the rules path): one
+    trigger's flag in both languages, its ``certainty`` (a
+    ``HiddenCarbCertainty`` name) and its ``concern`` (``sugar``, ``flour``
+    or ``sugarOrFlour``)."""
+
+    source_en: str
+    source_he: str
+    certainty: str
+    question_en: str
+    question_he: str
+    concern: str
+
+
+def _hidden_carb_triggers(
+    value: Any, where: str
+) -> tuple[tuple[str, HiddenCarbTrigger], ...]:
+    """The exporter's ordered ``[[trigger, {flag}], ...]`` pairs."""
+    if not isinstance(value, list):
+        raise ValueError(f"{where}: expected a list of pairs")
+    pairs: list[tuple[str, HiddenCarbTrigger]] = []
+    for item in value:
+        if not isinstance(item, list) or len(item) != 2:
+            raise ValueError(f"{where}: expected a [trigger, flag] pair")
+        key = _str(item[0], where)
+        flag = _obj(item[1], f"{where}.{key}")
+        fields = {
+            name: _str(flag[name], f"{where}.{key}.{name}")
+            for name in (
+                "sourceEn",
+                "sourceHe",
+                "certainty",
+                "questionEn",
+                "questionHe",
+                "concern",
+            )
+        }
+        pairs.append(
+            (
+                key,
+                HiddenCarbTrigger(
+                    source_en=fields["sourceEn"],
+                    source_he=fields["sourceHe"],
+                    certainty=fields["certainty"],
+                    question_en=fields["questionEn"],
+                    question_he=fields["questionHe"],
+                    concern=fields["concern"],
+                ),
+            )
+        )
+    return tuple(pairs)
+
+
+@dataclass(frozen=True, slots=True)
 class HebrewPrefixAllowed:
     """Which ``dish_kind`` vocabularies match Hebrew with the permissive
     prefix (private to ``utils/dish_kind.dart``)."""
@@ -175,6 +229,8 @@ class Templates:
     carnivore_only_modification_he: str
     option_base_modification_en: str
     option_base_modification_he: str
+    hidden_carb_why_en: str
+    hidden_carb_why_he: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -207,6 +263,7 @@ class Caps:
     min_net_carb_limit_grams: int
     max_net_carb_limit_grams: int
     max_hidden_carbs_per_dish: int
+    hidden_carb_window_words: int
     parser_schema_version: int
     max_scan_pages: int
     max_scan_page_bytes: int
@@ -327,6 +384,13 @@ class Vocabulary:
     dairy_guards_he: Mapping[str, GuardWords]
     option_removal_words_en: tuple[str, ...]
     option_removal_words_he: tuple[str, ...]
+    hidden_carb_triggers_en: tuple[tuple[str, HiddenCarbTrigger], ...]
+    hidden_carb_triggers_he: tuple[tuple[str, HiddenCarbTrigger], ...]
+    hidden_carb_guard_phrases_en: Mapping[str, tuple[str, ...]]
+    hidden_carb_guard_phrases_he: Mapping[str, tuple[str, ...]]
+    hidden_carb_trigger_guards_en: Mapping[str, GuardWords]
+    hidden_carb_trigger_guards_he: Mapping[str, GuardWords]
+    hidden_carb_covering_modifiers: tuple[str, ...]
     no_prefix_hebrew_triggers: tuple[str, ...]
     hebrew_trigger_pattern_example: HebrewPatternExample
     latin_trigger_pattern_example: LatinPatternExample
@@ -413,6 +477,25 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         dairy_guards_he=_guards(root["dairyGuardsHe"], "dairyGuardsHe"),
         option_removal_words_en=strs("optionRemovalWordsEn"),
         option_removal_words_he=strs("optionRemovalWordsHe"),
+        hidden_carb_triggers_en=_hidden_carb_triggers(
+            root["hiddenCarbTriggersEn"], "hiddenCarbTriggersEn"
+        ),
+        hidden_carb_triggers_he=_hidden_carb_triggers(
+            root["hiddenCarbTriggersHe"], "hiddenCarbTriggersHe"
+        ),
+        hidden_carb_guard_phrases_en=_strs_map(
+            root["hiddenCarbGuardPhrasesEn"], "hiddenCarbGuardPhrasesEn"
+        ),
+        hidden_carb_guard_phrases_he=_strs_map(
+            root["hiddenCarbGuardPhrasesHe"], "hiddenCarbGuardPhrasesHe"
+        ),
+        hidden_carb_trigger_guards_en=_guards(
+            root["hiddenCarbTriggerGuardsEn"], "hiddenCarbTriggerGuardsEn"
+        ),
+        hidden_carb_trigger_guards_he=_guards(
+            root["hiddenCarbTriggerGuardsHe"], "hiddenCarbTriggerGuardsHe"
+        ),
+        hidden_carb_covering_modifiers=strs("hiddenCarbCoveringModifiers"),
         no_prefix_hebrew_triggers=strs("noPrefixHebrewTriggers"),
         hebrew_trigger_pattern_example=HebrewPatternExample(
             trigger=_str(he_example["trigger"], "trigger"),
@@ -470,6 +553,8 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
             carnivore_only_modification_he=template("carnivoreOnlyModificationHe"),
             option_base_modification_en=template("optionBaseModificationEn"),
             option_base_modification_he=template("optionBaseModificationHe"),
+            hidden_carb_why_en=template("hiddenCarbWhyEn"),
+            hidden_carb_why_he=template("hiddenCarbWhyHe"),
         ),
         prompt=PromptText(
             prompt_verdict_definitions_template=prompt_text(
@@ -494,6 +579,7 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
             min_net_carb_limit_grams=cap("minNetCarbLimitGrams"),
             max_net_carb_limit_grams=cap("maxNetCarbLimitGrams"),
             max_hidden_carbs_per_dish=cap("maxHiddenCarbsPerDish"),
+            hidden_carb_window_words=cap("hiddenCarbWindowWords"),
             parser_schema_version=cap("parserSchemaVersion"),
             max_scan_pages=cap("maxScanPages"),
             max_scan_page_bytes=cap("maxScanPageBytes"),

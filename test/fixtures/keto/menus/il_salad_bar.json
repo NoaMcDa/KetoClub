@@ -1,0 +1,294 @@
+{
+  "id": "il_salad_bar",
+  "name": "גרין בר",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Israeli salad bar with build-your-own bowls written for the keto corpus.",
+  "categories": [
+    {
+      "name": "סלטים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "סלט בהרכבה אישית",
+          "description": "בסיס לבחירה, עד ארבע תוספות ורוטב",
+          "options": [
+            {
+              "name": "בסיס",
+              "values": [
+                "חסה",
+                "תרד",
+                "קינואה",
+                "אורז מלא"
+              ]
+            },
+            {
+              "name": "תוספות",
+              "values": [
+                "חזה עוף",
+                "ביצה קשה",
+                "אבוקדו",
+                "תירס",
+                "בטטה צלויה",
+                "קרוטונים",
+                "גבינת פטה",
+                "שקדים"
+              ]
+            },
+            {
+              "name": "רוטב",
+              "values": [
+                "ויניגרט הבית",
+                "טחינה",
+                "רוטב יוגורט",
+                "בלסמי דבש"
+              ]
+            }
+          ],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "house vinaigrette may carry honey or sugar (ויניגרט הבית)",
+              "certainty": "suspected",
+              "term": "ויניגרט הבית"
+            }
+          ],
+          "why": "Every carb is an option: choose greens, protein and tahini, not quinoa, rice, corn, sweet potato or honey balsamic.",
+          "evidence": [
+            "קינואה",
+            "אורז מלא",
+            "בטטה צלויה",
+            "בלסמי דבש"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "סלט קיסר עוף",
+          "description": "חסה רומית, חזה עוף בגריל, פרמזן, קרוטונים ורוטב קיסר",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Chicken Caesar; drop the croutons.",
+          "evidence": [
+            "חזה עוף",
+            "קרוטונים"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "סלט ניסואז",
+          "description": "טונה, ביצה, שעועית ירוקה, זיתים, תפוחי אדמה קטנים ועגבניות",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Tuna, egg and green beans; leave out the potatoes.",
+          "evidence": [
+            "טונה",
+            "תפוחי אדמה"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "סלט קינואה ועדשים",
+          "description": "קינואה, עדשים, עשבי תיבול ורימונים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Quinoa and lentils are the base.",
+          "evidence": [
+            "קינואה",
+            "עדשים"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "סלט עדשים שחורות",
+          "description": "עדשים שחורות, בטטה צלויה, רוקט ובצל סגול",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Lentils and sweet potato.",
+          "evidence": [
+            "עדשים שחורות",
+            "בטטה"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "סלט חלומי",
+          "description": "גבינת חלומי צרובה על מצע עלים, עגבניות שרי וסילאן",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [
+            {
+              "source": "silan, date syrup (סילאן)",
+              "certainty": "likely",
+              "term": "סילאן"
+            }
+          ],
+          "why": "Seared halloumi on leaves; leave out the silan.",
+          "evidence": [
+            "חלומי",
+            "סילאן"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "סלט טונה",
+          "description": "טונה במים, ביצה, מלפפון חמוץ ובצל סגול",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Tuna, egg and pickles.",
+          "evidence": [
+            "טונה",
+            "ביצה"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "סלט אסייתי",
+          "description": "כרוב, נבטים, בצל ירוק ואגוזי קשיו מסוכרים ברוטב ג׳ינג׳ר",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "ginger dressing is usually sweetened (רוטב ג׳ינג׳ר)",
+              "certainty": "likely",
+              "term": "רוטב ג׳ינג׳ר"
+            }
+          ],
+          "why": "Cabbage and sprouts; the candied cashews and the dressing are sugar.",
+          "evidence": [
+            "מסוכרים",
+            "רוטב ג׳ינג׳ר"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "סלט אבטיח ופטה",
+          "description": "אבטיח, פטה, נענע ובצל סגול",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Watermelon is the bulk of the bowl.",
+          "evidence": [
+            "אבטיח"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "סלט ירוק עם אבוקדו",
+          "description": "חסה, אבוקדו, מלפפון, נבטים ובזיליקום עם שמן זית ולימון",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Leaves and avocado in olive oil and lemon.",
+          "evidence": [
+            "אבוקדו",
+            "שמן זית"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "סלט עוף מזוגג",
+          "description": "רצועות עוף מזוגג בדבש וחרדל על מצע עלים ופקאן",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "honey-mustard glaze (מזוגג)",
+              "certainty": "likely",
+              "term": "מזוגג"
+            }
+          ],
+          "why": "Chicken and leaves are keto; ask for the chicken grilled without the honey glaze.",
+          "evidence": [
+            "מזוגג",
+            "דבש"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מרקים ולחם",
+      "dishes": [
+        {
+          "id": "d12",
+          "name": "מרק כתום",
+          "description": "מרק דלעת, גזר ובטטה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pumpkin, carrot and sweet potato.",
+          "evidence": [
+            "דלעת",
+            "בטטה"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "לחמניית מחמצת",
+          "description": "לחמניית מחמצת מקמח מלא",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Bread.",
+          "evidence": [
+            "לחמניית"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "רטבים ושתייה",
+      "dishes": [
+        {
+          "id": "d14",
+          "name": "רוטב בלסמי מצומצם",
+          "description": "בלסמי מצומצם לתוספת",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A balsamic reduction is mostly sugar.",
+          "evidence": [
+            "בלסמי מצומצם"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "מים בטעם אפרסק",
+          "description": "מים מינרליים בטעם אפרסק",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Israeli flavoured waters are usually sugared (בטעם אפרסק)",
+              "certainty": "likely",
+              "term": "בטעם אפרסק"
+            }
+          ],
+          "why": "Flavoured water here is a sweetened drink; ask for plain or soda water.",
+          "evidence": [
+            "בטעם אפרסק"
+          ]
+        }
+      ]
+    }
+  ]
+}

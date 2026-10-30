@@ -1,0 +1,264 @@
+{
+  "id": "il_breakfast_cafe",
+  "name": "קפה בוקר טוב",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Israeli breakfast café (ארוחת בוקר ישראלית, shakshuka) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "ארוחות בוקר",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "ארוחת בוקר ישראלית",
+          "description": "שתי ביצים לבחירה, סלט ירקות קצוץ, גבינה לבנה, לבנה, טחינה, סלט טונה, לחם הבית ומאפה קטן, מיץ תפוזים או שתייה חמה",
+          "options": [
+            {
+              "name": "ביצים לבחירה",
+              "values": [
+                "חביתה",
+                "עין",
+                "מקושקשת"
+              ]
+            },
+            {
+              "name": "שתייה",
+              "values": [
+                "מיץ תפוזים",
+                "הפוך",
+                "תה"
+              ]
+            }
+          ],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Eggs, cheeses, tahini and salad are keto; leave out the bread and pastry and take tea, not juice.",
+          "evidence": [
+            "לחם הבית",
+            "מאפה",
+            "מיץ תפוזים"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "שקשוקה קלאסית",
+          "description": "שתי ביצים ברוטב עגבניות ופלפלים, מוגשת עם חלה",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [
+            {
+              "source": "tomato sauce sometimes sweetened (רוטב עגבניות)",
+              "certainty": "suspected",
+              "term": "רוטב עגבניות"
+            }
+          ],
+          "why": "Eggs in tomato and pepper sauce; leave out the challah.",
+          "evidence": [
+            "שקשוקה",
+            "חלה"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "שקשוקה ירוקה",
+          "description": "ביצים על מצע תרד, מנגולד ועשבי תיבול עם פטה, ללא לחם",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Eggs on greens with feta, and the menu already says no bread.",
+          "evidence": [
+            "תרד",
+            "ללא לחם"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "חביתת ירק",
+          "description": "חביתה משלוש ביצים עם פטרוזיליה, בצל ירוק ושמיר, ליד סלט קטן",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A herb omelette with a side salad.",
+          "evidence": [
+            "חביתה",
+            "סלט"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "טוסט מחמצת עם אבוקדו",
+          "description": "פרוסת מחמצת קלויה, אבוקדו מעוך, ביצה עלומה וצ׳ילי",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Avocado and a poached egg on toast; ask for them without the bread.",
+          "evidence": [
+            "מחמצת",
+            "אבוקדו"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "פרנץ׳ טוסט",
+          "description": "חלה טבולה בביצה ומטוגנת בחמאה, עם סירופ מייפל ופירות יער",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fried challah with maple syrup.",
+          "evidence": [
+            "חלה",
+            "סירופ מייפל"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "בייגל לקס",
+          "description": "בייגל עם גבינת שמנת, סלמון מעושן, בצל סגול וצלפים",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Smoked salmon and cream cheese are keto; the bagel only carries them.",
+          "evidence": [
+            "בייגל",
+            "סלמון מעושן"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "וופל בלגי",
+          "description": "וופל חם עם קצפת ורוטב שוקולד",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A waffle with cream and chocolate sauce.",
+          "evidence": [
+            "וופל"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קערות וסלטים",
+      "dishes": [
+        {
+          "id": "d9",
+          "name": "גרנולה ביתית",
+          "description": "יוגורט יווני, גרנולה בדבש ופירות העונה",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Honey granola and fruit are the dish.",
+          "evidence": [
+            "גרנולה",
+            "דבש"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "יוגורט יווני עם אגוזים",
+          "description": "יוגורט יווני 10%, אגוזי מלך וקומץ פירות יער",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Full-fat yogurt with walnuts and a few berries.",
+          "evidence": [
+            "יוגורט יווני",
+            "אגוזי מלך"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "סלט בוקר",
+          "description": "חסה, עגבניות שרי, מלפפון, צנונית וגבינת פטה בוויניגרט הדרים",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "citrus vinaigrette may be sweetened (ויניגרט הדרים)",
+              "certainty": "suspected",
+              "term": "ויניגרט הדרים"
+            }
+          ],
+          "why": "Leaves, vegetables and feta; only the dressing is a question.",
+          "evidence": [
+            "חסה",
+            "ויניגרט הדרים"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "קרואסון חמאה",
+          "description": "קרואסון עם ריבה וחמאה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pastry with jam.",
+          "evidence": [
+            "קרואסון",
+            "ריבה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d13",
+          "name": "אמריקנו",
+          "description": "אספרסו כפול ומים חמים",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Black coffee.",
+          "evidence": [
+            "אספרסו"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "אייס קפה",
+          "description": "קפה קר מוקצף עם חלב וסוכר",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Israeli iced coffee is a sweetened milk drink; the menu says sugar.",
+          "evidence": [
+            "אייס קפה",
+            "סוכר"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "מיץ גזר",
+          "description": "גזר סחוט טרי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Carrot juice is sugar.",
+          "evidence": [
+            "מיץ גזר"
+          ]
+        }
+      ]
+    }
+  ]
+}

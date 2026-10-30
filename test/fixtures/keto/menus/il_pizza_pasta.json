@@ -1,0 +1,308 @@
+{
+  "id": "il_pizza_pasta",
+  "name": "פיצה ופסטה",
+  "source": "copied:test/fixtures/allergens/menus/il_pizza_pasta.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/il_pizza_pasta.json (synthetic Israeli pizza-and-pasta place written for the corpus from 11 §3, §5, §7 and 12 §1.4, §1.5, §5); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "פיצות",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "פיצה מרגריטה",
+          "description": "עגבניות, מוצרלה ובזיליקום",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pizza crust.",
+          "evidence": [
+            "פיצה"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "פיצה פטריות וזיתים",
+          "description": "רוטב עגבניות, מוצרלה, פטריות וזיתים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pizza crust.",
+          "evidence": [
+            "פיצה"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "פיצה בולגרית",
+          "description": "גבינה בולגרית, עגבניות שרי וזעתר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pizza crust.",
+          "evidence": [
+            "פיצה"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "פיצה ארבע גבינות",
+          "description": "מוצרלה, גורגונזולה, פרמזן וגאודה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pizza crust, however much cheese is on it.",
+          "evidence": [
+            "פיצה"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "פיצה פסטו וגבינת עיזים",
+          "description": "פסטו בזיליקום, גבינת עיזים ועגבניות שרי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pizza crust.",
+          "evidence": [
+            "פיצה"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "פיצה טבעונית",
+          "description": "גבינה טבעונית, ירקות צלויים ורוטב עגבניות",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pizza crust.",
+          "evidence": [
+            "פיצה"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "פיצה אנשובי",
+          "description": "רוטב עגבניות, מוצרלה, אנשובי וזיתים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pizza crust.",
+          "evidence": [
+            "פיצה"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "קלצונה",
+          "description": "בצק פיצה סגור במילוי ריקוטה, תרד ופרמזן",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Closed pizza dough.",
+          "evidence": [
+            "קלצונה",
+            "בצק פיצה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "פסטות",
+      "dishes": [
+        {
+          "id": "d9",
+          "name": "ספגטי עגבניות",
+          "description": "ספגטי ברוטב עגבניות ובזיליקום",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta.",
+          "evidence": [
+            "ספגטי"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "פטוצ׳יני אלפרדו",
+          "description": "פטוצ׳יני ברוטב שמנת ופרמזן",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta in a cream sauce is still pasta.",
+          "evidence": [
+            "פטוצ׳יני"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "ספגטי בולונז",
+          "description": "ספגטי ברוטב בשר, יין אדום וירקות",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta.",
+          "evidence": [
+            "ספגטי"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "פנה פסטו",
+          "description": "פנה ברוטב פסטו בזיליקום, צנוברים ופרמזן",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta.",
+          "evidence": [
+            "פנה"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "ספגטי קרבונרה",
+          "description": "ספגטי, ביצה, פנצ׳טה, פרמזן ופלפל שחור",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta.",
+          "evidence": [
+            "ספגטי"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "ניוקי גורגונזולה",
+          "description": "ניוקי תפוחי אדמה ברוטב גורגונזולה ואגוזי מלך",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Potato gnocchi.",
+          "evidence": [
+            "ניוקי",
+            "תפוחי אדמה"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "לזניה בולונז",
+          "description": "לזניה בשכבות עם בשר, בשמל וגבינה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Layers of pasta and béchamel.",
+          "evidence": [
+            "לזניה",
+            "בשמל"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "ריזוטו פטריות",
+          "description": "ריזוטו פטריות יער ביין לבן, חמאה ופרמזן",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Risotto is rice.",
+          "evidence": [
+            "ריזוטו"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סלטים ולחם",
+      "dishes": [
+        {
+          "id": "d17",
+          "name": "סלט קיסר",
+          "description": "חסה רומית, קרוטונים, פרמזן ורוטב קיסר",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Romaine, parmesan and Caesar dressing are keto; drop the croutons.",
+          "evidence": [
+            "חסה רומית",
+            "קרוטונים"
+          ]
+        },
+        {
+          "id": "d18",
+          "name": "סלט רוקט",
+          "description": "רוקט, פרמזן, עגבניות שרי, צנוברים וויניגרט",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "vinaigrette may carry honey or balsamic sugar (ויניגרט)",
+              "certainty": "suspected",
+              "term": "ויניגרט"
+            }
+          ],
+          "why": "Rocket, parmesan and pine nuts in vinaigrette.",
+          "evidence": [
+            "רוקט",
+            "ויניגרט"
+          ]
+        },
+        {
+          "id": "d19",
+          "name": "פוקאצ׳ה שום",
+          "description": "פוקאצ׳ה עם שום, רוזמרין ושמן זית",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Focaccia is bread.",
+          "evidence": [
+            "פוקאצ׳ה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוחים ושתייה",
+      "dishes": [
+        {
+          "id": "d20",
+          "name": "טירמיסו",
+          "description": "מסקרפונה, ביסקוויטים ספוגים בקפה וקקאו",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A dessert of biscuits and sugar.",
+          "evidence": [
+            "טירמיסו",
+            "ביסקוויטים"
+          ]
+        },
+        {
+          "id": "d21",
+          "name": "גלידת וניל",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Ice cream.",
+          "evidence": [
+            "גלידת"
+          ]
+        },
+        {
+          "id": "d22",
+          "name": "בירה",
+          "description": "בירה מהחבית",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Beer.",
+          "evidence": [
+            "בירה"
+          ]
+        }
+      ]
+    }
+  ]
+}

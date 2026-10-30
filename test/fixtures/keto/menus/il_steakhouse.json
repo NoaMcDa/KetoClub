@@ -1,0 +1,320 @@
+{
+  "id": "il_steakhouse",
+  "name": "הסטייק של אבי",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Israeli steakhouse (מסעדת בשרים) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "נתחים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "אנטריקוט 400 גרם",
+          "description": "נתח אנטריקוט מיושן על הגריל, מוגש עם תוספת לבחירה",
+          "options": [
+            {
+              "name": "תוספת לבחירה",
+              "values": [
+                "צ׳יפס",
+                "פירה",
+                "אורז",
+                "ירקות בגריל",
+                "סלט ירוק"
+              ]
+            }
+          ],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [],
+          "why": "Rib-eye; the side is a choice, so name the grilled vegetables or salad.",
+          "evidence": [
+            "אנטריקוט",
+            "צ׳יפס",
+            "ירקות בגריל"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "פילה בקר ברוטב יין",
+          "description": "פילה בקר צרוב ברוטב יין אדום מצומצם",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "red-wine reductions are often sweetened or flour-thickened (רוטב יין)",
+              "certainty": "likely",
+              "term": "רוטב יין"
+            }
+          ],
+          "why": "Beef fillet; ask for the wine sauce on the side.",
+          "evidence": [
+            "פילה בקר",
+            "רוטב יין"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "סינטה",
+          "description": "סינטה בגריל עם חמאת עשבים",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Sirloin with herb butter.",
+          "evidence": [
+            "סינטה",
+            "חמאת עשבים"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "צלעות בקר",
+          "description": "צלעות בקר בבישול ארוך בזיגוג ברביקיו",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "barbecue glaze is sugar (בזיגוג ברביקיו)",
+              "certainty": "likely",
+              "term": "בזיגוג ברביקיו"
+            },
+            {
+              "source": "barbecue rubs usually carry brown sugar",
+              "certainty": "suspected"
+            }
+          ],
+          "why": "Beef ribs; the barbecue glaze is sugar, ask whether they can be served unglazed.",
+          "evidence": [
+            "צלעות בקר",
+            "ברביקיו"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "אסאדו",
+          "description": "אסאדו בבישול איטי של 12 שעות ברוטב חום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "brown gravy is thickened with flour (רוטב חום)",
+              "certainty": "likely",
+              "term": "רוטב חום"
+            }
+          ],
+          "why": "Slow-cooked short rib; ask for it without the brown gravy.",
+          "evidence": [
+            "אסאדו",
+            "רוטב חום"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "שיפודי פרגית",
+          "description": "פרגיות במרינדת הבית על האש",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "house marinade may be sweetened (מרינדת הבית)",
+              "certainty": "suspected",
+              "term": "מרינדת הבית"
+            }
+          ],
+          "why": "Grilled chicken thigh.",
+          "evidence": [
+            "פרגיות",
+            "על האש"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "קבב בקר",
+          "description": "קבב בקר וכבש על האש עם טחינה, ללא לחם",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "bread or breadcrumb binder in minced kebab",
+              "certainty": "suspected"
+            }
+          ],
+          "why": "Kebab with tahini, served without bread.",
+          "evidence": [
+            "קבב",
+            "ללא לחם"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "נקניקיות מרגז",
+          "description": "נקניקיות מרגז בגריל עם חרדל",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "sausages often hold breadcrumb or starch filler (נקניקיות)",
+              "certainty": "suspected",
+              "term": "נקניקיות"
+            }
+          ],
+          "why": "Grilled merguez with mustard.",
+          "evidence": [
+            "מרגז",
+            "חרדל"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ראשונות",
+      "dishes": [
+        {
+          "id": "d9",
+          "name": "כבד אווז על בריוש",
+          "description": "כבד אווז צרוב על פרוסת בריוש עם ריבת תאנים",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Foie gras is keto; the brioche and fig jam are not.",
+          "evidence": [
+            "כבד אווז",
+            "בריוש",
+            "ריבת תאנים"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "המבורגר מעושן",
+          "description": "קציצת אנטריקוט 250 גרם, בצל מקורמל ובייקון טלה בלחמניית בריוש",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "caramelised onion is cooked down with sugar (בצל מקורמל)",
+              "certainty": "likely",
+              "term": "בצל מקורמל"
+            }
+          ],
+          "why": "A rib-eye patty; drop the brioche bun and the caramelised onion.",
+          "evidence": [
+            "קציצת אנטריקוט",
+            "בריוש"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "טבעות בצל",
+          "description": "טבעות בצל בבלילת בירה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Battered onion rings.",
+          "evidence": [
+            "בבלילת בירה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "תוספות",
+      "dishes": [
+        {
+          "id": "d12",
+          "name": "תפוח אדמה אפוי",
+          "description": "תפוח אדמה בתנור עם שמנת חמוצה ועירית",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A baked potato.",
+          "evidence": [
+            "תפוח אדמה"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "ירקות בגריל",
+          "description": "קישוא, חציל, פלפל ובצל על הגריל",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Grilled vegetables.",
+          "evidence": [
+            "קישוא",
+            "חציל"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוח ושתייה",
+      "dishes": [
+        {
+          "id": "d14",
+          "name": "סופלה שוקולד",
+          "description": "סופלה שוקולד חם עם גלידת וניל",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Dessert.",
+          "evidence": [
+            "סופלה שוקולד"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "וויסקי",
+          "description": "סינגל מאלט סקוטי, כוס",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A spirit, neat.",
+          "evidence": [
+            "סינגל מאלט"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "יין אדום הבית",
+          "description": "קברנה סוביניון, כוס",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "A dry red wine.",
+          "evidence": [
+            "קברנה סוביניון"
+          ]
+        }
+      ]
+    }
+  ]
+}

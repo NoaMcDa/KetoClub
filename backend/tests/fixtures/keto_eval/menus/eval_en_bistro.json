@@ -1,0 +1,103 @@
+{
+  "id": "eval_en_bistro",
+  "name": "Test bistro (English, hand-made)",
+  "source": "synthetic",
+  "language": "en",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. A hand-made test fixture for tools/keto_eval.py, not part of the keto corpus and not a real restaurant.",
+  "categories": [
+    {
+      "name": "Mains",
+      "dishes": [
+        {
+          "id": "en-01",
+          "name": "Ribeye steak 300g",
+          "description": "with mashed potatoes",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "The steak is keto; the mash is the carb side to swap.",
+          "evidence": [
+            "Ribeye",
+            "mashed potatoes"
+          ]
+        },
+        {
+          "id": "en-02",
+          "name": "Grilled salmon",
+          "description": "lemon butter, green salad",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Fish, butter and leaves.",
+          "evidence": [
+            "salmon",
+            "butter"
+          ]
+        },
+        {
+          "id": "en-03",
+          "name": "Spaghetti bolognese",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "The dish is the pasta.",
+          "evidence": [
+            "Spaghetti"
+          ]
+        },
+        {
+          "id": "en-04",
+          "name": "Teriyaki chicken",
+          "description": "glazed",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "teriyaki glaze",
+              "certainty": "likely",
+              "term": "Teriyaki"
+            }
+          ],
+          "why": "The glaze is sugar; without it the chicken is keto.",
+          "evidence": [
+            "Teriyaki",
+            "glazed"
+          ]
+        },
+        {
+          "id": "en-05",
+          "name": "Coleslaw",
+          "description": "",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [
+            {
+              "source": "sugar in the dressing",
+              "certainty": "likely"
+            }
+          ],
+          "why": "A deli coleslaw dressing is usually sweetened.",
+          "evidence": [
+            "Coleslaw"
+          ]
+        },
+        {
+          "id": "en-06",
+          "name": "Zucchini noodles with pesto",
+          "description": "spiralised zucchini, basil pesto, parmesan",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "The noodles are a vegetable.",
+          "evidence": [
+            "Zucchini noodles"
+          ]
+        }
+      ]
+    }
+  ]
+}

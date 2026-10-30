@@ -94,7 +94,7 @@ void main() {
         DishKind.drink,
       );
       expect(
-        dishKindOf(category: 'Beers & Burgers', dish: _dish('Goldstar')),
+        dishKindOf(category: 'Beers & Burgers', dish: _dish('Weihenstephan')),
         DishKind.food,
         reason: 'a brand name the vocabulary does not know stays food',
       );

@@ -32,6 +32,7 @@ pydantic string), so validating again could raise where Dart does not.
 import json
 import math
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Final, Literal, TypeGuard, get_args
 
@@ -368,14 +369,23 @@ def _content_words(name: str) -> set[str]:
     }
 
 
-def _find_source_dish(source: Menu, *, dish_id: str, name: str) -> Dish | None:
-    """Dart ``_findSourceDish`` (rule 3, #277): a matching id always wins;
-    only a missing or unknown id falls back to ``name``, first by an exact
-    normalised name (the first in menu order), then by the unique best
-    Jaccard overlap of content words at or over the threshold, in integers
-    as Dart counts it. A tie for the best is ambiguous: no match."""
+def _find_source_dish(
+    source: Menu, *, prompt_ids: Mapping[str, str], dish_id: str, name: str
+) -> Dish | None:
+    """Dart ``_findSourceDish`` (rule 3, #277): a matching id always wins,
+    a key of ``prompt_ids`` (the short ids the prompt sent) first, read as
+    the dish whose own id it maps to, then a dish's own id; only a missing
+    or unknown id falls back to ``name``, first by an exact normalised name
+    (the first in menu order), then by the unique best Jaccard overlap of
+    content words at or over the threshold, in integers as Dart counts it.
+    A tie for the best is ambiguous: no match."""
     all_dishes = source.all_dishes()
     if dish_id:
+        mapped = prompt_ids.get(dish_id)
+        if mapped is not None:
+            for dish in all_dishes:
+                if dish.id == mapped:
+                    return dish
         for dish in all_dishes:
             if dish.id == dish_id:
                 return dish
@@ -436,9 +446,14 @@ def parse(
     net_carb_limit_grams: int,
     analysed_at: str,
     extract: bool = False,
+    prompt_ids: Mapping[str, str] | None = None,
 ) -> ParseResult:
     """``MenuResponseParser.parse``: ``body``, the raw reply, against
     ``source``, the menu it was computed from (§9.4 rules 1-8).
+
+    ``prompt_ids`` is ``prompt.prompt_ids(source)``, the short ids the
+    request numbered ``source``'s dishes with: a reply's ``id`` is read
+    through it before it is compared with the dishes' own ids.
 
     With ``extract`` (ALG-03) each placed dish carries its ingredients;
     without it ``ingredients`` is never read. A model-sent ``concerns`` is
@@ -464,7 +479,9 @@ def parse(
         model_name = raw_name if isinstance(raw_name, str) else ""
         if not model_id and not model_name:
             continue
-        matched = _find_source_dish(source, dish_id=model_id, name=model_name)
+        matched = _find_source_dish(
+            source, prompt_ids=prompt_ids or {}, dish_id=model_id, name=model_name
+        )
         if matched is None:
             # An invention: never a verdict, but flagged by the model's name.
             if model_name:

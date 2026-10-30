@@ -274,6 +274,8 @@ async def _classify_batch(
     parsed = parser.parse(
         reply.content,
         source=batch,
+        # The short ids this batch's prompt numbered its dishes with.
+        prompt_ids=prompt.prompt_ids(batch),
         engine=LlmEngine(model=reply.model),
         net_carb_limit_grams=options.net_carb_limit_grams,
         analysed_at=analysed_at,

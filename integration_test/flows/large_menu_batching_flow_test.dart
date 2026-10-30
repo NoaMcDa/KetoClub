@@ -153,13 +153,21 @@ void main() {
       await enterText(tester, _woltUrl);
       await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
-      // Assert: three requests of 67, 67 and 66 dishes, in menu order.
+      // Assert: three requests of 67, 67 and 66 dishes, in menu order, each
+      // numbering its own dishes from 1 rather than sending their ids.
       expect(
         [for (final p in chat.userPrompts) p.split('\n').length],
         [67, 67, 66],
       );
-      expect(chat.userPrompts.first, startsWith('dish-0 | Grill 0 |'));
-      expect(chat.userPrompts.last.split('\n').last, startsWith('dish-199 |'));
+      expect(
+        chat.userPrompts.first,
+        startsWith('1 | Grill 0 | Grilled steak 0 |'),
+      );
+      expect(
+        chat.userPrompts.last.split('\n').last,
+        startsWith('66 | Grill 7 | Grilled steak 199 |'),
+      );
+      expect(chat.userPrompts.join('\n'), isNot(contains('dish-')));
 
       // Assert: one AI result covering every dish, no rules fallback.
       expect(find.text(_en.engineChipAi), findsOneWidget);

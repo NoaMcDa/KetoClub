@@ -1,0 +1,350 @@
+{
+  "id": "il_vegan_place",
+  "name": "המקום הטבעוני",
+  "source": "copied:test/fixtures/allergens/menus/il_vegan_place.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/il_vegan_place.json (synthetic Israeli vegan place (still tahini and soy heavy) written for the corpus from 12 §1.1, §1.3, §1.11, §2.1, §2.2); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "בפיתה ובלחמנייה",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "סביח טבעוני",
+          "description": "חציל צלוי, טחינה, עמבה וסלט ישראלי בפיתה, ללא ביצה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Roast eggplant, tahini and salad are keto; drop the pita and the amba.",
+          "evidence": [
+            "חציל צלוי",
+            "בפיתה",
+            "עמבה"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "פלאפל טבעוני",
+          "description": "כדורי פלאפל, חומוס, סלט וטחינה בלאפה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Falafel and hummus in a laffa.",
+          "evidence": [
+            "פלאפל",
+            "בלאפה"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "בורגר טבעוני",
+          "description": "קציצת סויה ואפונה, חסה, עגבנייה ומיונז טבעוני בלחמנייה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "soy and pea patties are bound with starch",
+              "certainty": "likely",
+              "term": "קציצת סויה ואפונה"
+            }
+          ],
+          "why": "A plant patty in a bun; drop the bun and ask what binds the patty.",
+          "evidence": [
+            "בלחמנייה",
+            "קציצת סויה"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "שניצל טבעוני",
+          "description": "שניצל מחלבון סויה בציפוי פירורי לחם",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A breaded schnitzel.",
+          "evidence": [
+            "שניצל",
+            "פירורי לחם"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "נקניקיות טבעוניות",
+          "description": "נקניקיות מחלבון חיטה וסויה בלחמנייה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "plant sausages often hold starch fillers",
+              "certainty": "suspected",
+              "term": "נקניקיות"
+            }
+          ],
+          "why": "Wheat-protein sausages in a bun; drop the bun.",
+          "evidence": [
+            "נקניקיות",
+            "בלחמנייה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מנות",
+      "dishes": [
+        {
+          "id": "d6",
+          "name": "גבינת קשיו",
+          "description": "גבינת קשיו מותססת עם עשבי תיבול ופריכיות",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "cashews are among the starchiest nuts (קשיו)",
+              "certainty": "likely",
+              "term": "קשיו"
+            }
+          ],
+          "why": "Cashew cheese is carb-heavier than it looks; skip the crackers and keep the portion small.",
+          "evidence": [
+            "קשיו",
+            "פריכיות"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "פסטה שמנת קשיו",
+          "description": "פסטה ברוטב שמנת קשיו וכרובית",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pasta.",
+          "evidence": [
+            "פסטה"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "טופו מוקפץ",
+          "description": "טופו, ירקות, רוטב סויה ושומשום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "stir-fry sauces are often sweetened or thickened with cornstarch",
+              "certainty": "likely",
+              "term": "רוטב סויה"
+            }
+          ],
+          "why": "Tofu and vegetables are keto; ask for the stir-fry with plain soy, no sweet sauce.",
+          "evidence": [
+            "טופו",
+            "רוטב סויה"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "מרק מיסו",
+          "description": "מרק מיסו עם טופו ואצות",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Miso broth with tofu.",
+          "evidence": [
+            "מרק מיסו"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "סלט קינואה",
+          "description": "קינואה, אפונה ירוקה, גרגירי חומוס ורוטב טחינה לימון",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Quinoa, peas and chickpeas.",
+          "evidence": [
+            "קינואה",
+            "גרגירי חומוס"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "כרובית בטחינה",
+          "description": "כרובית בתנור, טחינה גולמית, פטרוזיליה וצנוברים",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Roast cauliflower with tahini.",
+          "evidence": [
+            "כרובית",
+            "טחינה"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "חומוס פול",
+          "description": "חומוס עם פול מדמס, טחינה ושמן זית",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Chickpea purée with fava beans.",
+          "evidence": [
+            "חומוס",
+            "פול מדמס"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "שקשוקה טבעונית",
+          "description": "רוטב עגבניות חריף עם טופו מפורר ופיתה",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Tofu in tomato sauce; leave out the pita.",
+          "evidence": [
+            "טופו",
+            "פיתה"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "בורקס תפוחי אדמה טבעוני",
+          "description": "בצק עלים במרגרינה עם מילוי תפוחי אדמה, מצופה בשמן זית ושומשום",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Puff pastry with potato.",
+          "evidence": [
+            "בצק עלים",
+            "תפוחי אדמה"
+          ]
+        },
+        {
+          "id": "d20",
+          "name": "טופו מקושקש",
+          "description": "טופו מקושקש עם כורכום, ירקות וטוסט",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Scrambled tofu with vegetables; leave out the toast.",
+          "evidence": [
+            "טופו מקושקש",
+            "טוסט"
+          ]
+        },
+        {
+          "id": "d21",
+          "name": "פנקייק קמח חומוס",
+          "description": "פנקייק מקמח חומוס וקמח אורז עם סירופ תמרים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Chickpea and rice flour pancakes with date syrup.",
+          "evidence": [
+            "קמח חומוס",
+            "סירופ תמרים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוחים ושתייה",
+      "dishes": [
+        {
+          "id": "d15",
+          "name": "גלידת קוקוס טבעונית",
+          "description": "גלידה טבעונית על בסיס קוקוס",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Ice cream.",
+          "evidence": [
+            "גלידה"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "עוגת שוקולד טבעונית",
+          "description": "עוגת שוקולד ללא ביצים וללא חמאה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Chocolate cake.",
+          "evidence": [
+            "עוגת שוקולד"
+          ]
+        },
+        {
+          "id": "d17",
+          "name": "שייק שקדים בננה",
+          "description": "בננה, חמאת שקדים וחלב שקדים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A banana shake.",
+          "evidence": [
+            "בננה"
+          ]
+        },
+        {
+          "id": "d18",
+          "name": "לאטה סויה",
+          "description": "אספרסו וחלב סויה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "soy milk may be the sweetened kind (חלב סויה)",
+              "certainty": "suspected",
+              "term": "חלב סויה"
+            }
+          ],
+          "why": "A latte; ask for unsweetened soy or almond milk.",
+          "evidence": [
+            "לאטה",
+            "חלב סויה"
+          ]
+        },
+        {
+          "id": "d19",
+          "name": "סמוזי ירוק",
+          "description": "תרד, בננה, תפוח ומים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Banana and apple.",
+          "evidence": [
+            "בננה",
+            "תפוח"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,320 @@
+{
+  "id": "il_georgian_khachapuri",
+  "name": "חצ׳פורי בית",
+  "source": "copied:test/fixtures/allergens/menus/il_georgian_khachapuri.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/il_georgian_khachapuri.json (synthetic Georgian khachapuri place written for the corpus from 12 §1.2, §1.4, §1.5); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "חצ׳פורי ומאפים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "חצ׳פורי אג׳ארולי",
+          "description": "בצק בצורת סירה במילוי גבינת סולוגוני ומוצרלה, חלמון וחמאה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A boat of bread dough filled with cheese.",
+          "evidence": [
+            "חצ׳פורי",
+            "בצק"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "חצ׳פורי אימרולי",
+          "description": "בצק עגול במילוי גבינה לבנה וגבינה מלוחה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Round bread dough filled with cheese.",
+          "evidence": [
+            "חצ׳פורי",
+            "בצק עגול"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "חצ׳פורי מגרולי",
+          "description": "חצ׳פורי עם גבינה בפנים ומעל, וביצה עין",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Khachapuri is bread dough.",
+          "evidence": [
+            "חצ׳פורי"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "לוביאני",
+          "description": "לחם במילוי שעועית אדומה, בצל ותבלינים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Bread filled with red beans.",
+          "evidence": [
+            "לחם",
+            "שעועית"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "חינקלי (5 יח׳)",
+          "description": "כיסוני בצק ממולאים בבשר בקר וכבש ובמרק, פלפל שחור",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Dough dumplings.",
+          "evidence": [
+            "כיסוני בצק"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מנות עיקריות",
+      "dishes": [
+        {
+          "id": "d6",
+          "name": "חרצ׳ו",
+          "description": "מרק בקר חריף עם אורז, אגוזי מלך וכוסברה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Beef soup with walnuts, but rice is in the pot; ask for it without the rice.",
+          "evidence": [
+            "מרק בקר",
+            "אורז"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "סאציבי",
+          "description": "עוף ברוטב אגוזי מלך, שום וכוסברה",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "flour sometimes thickens a walnut sauce",
+              "certainty": "suspected",
+              "term": "רוטב אגוזי מלך"
+            }
+          ],
+          "why": "Chicken in walnut and garlic sauce.",
+          "evidence": [
+            "עוף",
+            "רוטב אגוזי מלך"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "באדריג׳ני נוהוני",
+          "description": "חציל ממולא בממרח אגוזי מלך ורימונים",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Eggplant with walnut paste; the pomegranate is a garnish.",
+          "evidence": [
+            "חציל",
+            "אגוזי מלך"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "שישליק בקר",
+          "description": "שיפודי בקר בגריל עם בצל סגול וסומק",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Grilled beef skewers with onion and sumac.",
+          "evidence": [
+            "שיפודי בקר"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "מצוואדי כבש",
+          "description": "שיפודי כבש בגריל על קרשי עץ",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Grilled lamb skewers.",
+          "evidence": [
+            "שיפודי כבש"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "קבב ג׳ורג׳י",
+          "description": "קבב כבש עם בצל וכוסברה ולחם לאבש",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Lamb kebab with onion and coriander; the lavash only carries it.",
+          "evidence": [
+            "קבב כבש",
+            "לחם לאבש"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "טבקה",
+          "description": "עוף שלם מוקפץ בחמאה, שום ותבלינים",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A whole chicken fried in butter and garlic.",
+          "evidence": [
+            "עוף שלם",
+            "בחמאה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סלטים ותוספות",
+      "dishes": [
+        {
+          "id": "d9",
+          "name": "פחאלי",
+          "description": "ממרח תרד וסלק עם אגוזים ושום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [],
+          "why": "Spinach and walnut are keto; beet is a root vegetable to leave out.",
+          "evidence": [
+            "תרד",
+            "סלק"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "פטריות בקרם",
+          "description": "פטריות מוקפצות ברוטב שמנת וחמאה",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "cream sauces are sometimes thickened with flour (רוטב שמנת)",
+              "certainty": "suspected",
+              "term": "רוטב שמנת"
+            }
+          ],
+          "why": "Mushrooms in cream and butter.",
+          "evidence": [
+            "פטריות",
+            "רוטב שמנת"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "סלט ג׳ורג׳י",
+          "description": "עגבנייה, מלפפון, בצל סגול ואגוזי מלך ברוטב שמן חמניות",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Tomato, cucumber, onion and walnuts in oil.",
+          "evidence": [
+            "עגבנייה",
+            "מלפפון"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "גבינת סולוגוני בגריל",
+          "description": "גבינה מותכת בגריל עם נענע",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Grilled cheese with mint.",
+          "evidence": [
+            "גבינת סולוגוני"
+          ]
+        },
+        {
+          "id": "d17",
+          "name": "פירה תפוחי אדמה",
+          "description": "פירה חם עם עשבי תיבול",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Mashed potatoes.",
+          "evidence": [
+            "פירה תפוחי אדמה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d18",
+          "name": "יין אדום גאורגי (כוס)",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Georgian reds are often semi-sweet (Kindzmarauli, Khvanchkara)",
+              "certainty": "suspected",
+              "term": "יין אדום גאורגי"
+            }
+          ],
+          "why": "A glass of red wine; dry is fine, semi-sweet is not.",
+          "evidence": [
+            "יין אדום"
+          ]
+        },
+        {
+          "id": "d19",
+          "name": "לימונדה טרחון",
+          "description": "לימון, טרחון וסוכר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Lemonade made with sugar.",
+          "evidence": [
+            "לימונדה",
+            "סוכר"
+          ]
+        },
+        {
+          "id": "d20",
+          "name": "יין לבן גאורגי (מכיל סולפיטים)",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "A glass of white wine; dry is fine.",
+          "evidence": [
+            "יין לבן"
+          ]
+        }
+      ]
+    }
+  ]
+}

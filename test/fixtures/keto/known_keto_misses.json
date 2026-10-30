@@ -1,0 +1,44 @@
+[
+  {
+    "menu": "golden_hebrew",
+    "dish": "d10",
+    "expected": "modifiable",
+    "got": "orderAsIs",
+    "reason": "needs the model: a fried fish's flour dusting is implied, not named (\"בשמן קנולה\" names only the oil)"
+  },
+  {
+    "menu": "il_juice_bar",
+    "dish": "d12",
+    "expected": "nonKeto",
+    "got": "orderAsIs",
+    "reason": "label question: kombucha's residual sugar varies by brew; whether a fermented tea is red is the owner's call"
+  },
+  {
+    "menu": "il_moroccan",
+    "dish": "d15",
+    "expected": "nonKeto",
+    "got": "orderAsIs",
+    "reason": "label question: Moroccan mint tea is tea; whether \"מוגש מתוק\" (served sweet) reddens it or yellows it with an ask for no sugar is the owner's call"
+  },
+  {
+    "menu": "il_sushi_bar",
+    "dish": "d15",
+    "expected": "modifiable",
+    "got": "orderAsIs",
+    "reason": "hidden carb: the sugar is in a ready-made wakame salad and its sesame dressing, which the menu never names; no rules trigger can see it without flagging every salad"
+  },
+  {
+    "menu": "il_sushi_bar",
+    "dish": "d19",
+    "expected": "nonKeto",
+    "got": "orderAsIs",
+    "reason": "label question: sake is a rice wine with residual carbs, a dry sake close to a dry wine; red or yellow is the owner's call"
+  },
+  {
+    "menu": "il_vegan_place",
+    "dish": "d6",
+    "expected": "modifiable",
+    "got": "orderAsIs",
+    "reason": "label question: cashew cheese is a portion question, not a carb trigger; the crackers (\"פריכיות\") could be a yellow modifier if the owner agrees"
+  }
+]

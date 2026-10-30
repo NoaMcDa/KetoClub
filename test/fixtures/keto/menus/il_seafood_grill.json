@@ -1,0 +1,355 @@
+{
+  "id": "il_seafood_grill",
+  "name": "גריל הים יפו",
+  "source": "copied:test/fixtures/allergens/menus/il_seafood_grill.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/il_seafood_grill.json (synthetic Israeli seafood grill written for the corpus from 11 §8-10 and 12 §1.7); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "דגים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "דניס בגריל",
+          "description": "דניס שלם בגריל עם שמן זית, לימון ועשבי תיבול",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Whole grilled sea bream with olive oil and lemon.",
+          "evidence": [
+            "דניס",
+            "בגריל"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "פילה סלמון בגלייז",
+          "description": "פילה סלמון בתנור בגלייז סויה־דבש וסומסום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "soy-honey glaze (גלייז)",
+              "certainty": "likely",
+              "term": "גלייז"
+            }
+          ],
+          "why": "Salmon is keto; the soy-honey glaze is sugar, ask for it plain.",
+          "evidence": [
+            "סלמון",
+            "דבש"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "לברק בחמאת לימון",
+          "description": "פילה לברק צרוב ברוטב חמאה ולימון",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Sea bass in butter and lemon.",
+          "evidence": [
+            "לברק",
+            "חמאה"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "סרדינים בגריל",
+          "description": "סרדינים טריים בגריל עם פטרוזיליה ולימון",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Grilled sardines.",
+          "evidence": [
+            "סרדינים"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "פיש אנד צ׳יפס",
+          "description": "דג פריך בציפוי בירה עם צ׳יפס ורוטב טרטר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Beer-battered fish with fries.",
+          "evidence": [
+            "בציפוי בירה",
+            "צ׳יפס"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "חריימה",
+          "description": "דג חריף ברוטב עגבניות ופלפלים בסגנון טריפולי",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Fish in spicy tomato and pepper sauce.",
+          "evidence": [
+            "דג",
+            "רוטב עגבניות"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "קציצות דג",
+          "description": "קציצות דג לבן ברוטב עגבניות חריף",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs",
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "breadcrumb or matzah-meal binder in fish patties",
+              "certainty": "likely",
+              "term": "קציצות דג"
+            }
+          ],
+          "why": "Fish in tomato sauce, but fish patties usually hold breadcrumbs; ask.",
+          "evidence": [
+            "קציצות דג"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "גפילטע פיש",
+          "description": "כדורי דג מסורתיים בציר ירקות עם חזרת",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Polish-style gefilte fish is sweetened with sugar",
+              "certainty": "likely",
+              "term": "גפילטע פיש"
+            },
+            {
+              "source": "matzah-meal binder in gefilte fish",
+              "certainty": "likely",
+              "term": "כדורי דג"
+            },
+            {
+              "source": "chrain is grated beet with sugar (חזרת)",
+              "certainty": "likely",
+              "term": "חזרת"
+            }
+          ],
+          "why": "Fish balls bound with matzah meal, usually sweetened, served with sugared beet chrain.",
+          "evidence": [
+            "גפילטע פיש",
+            "חזרת"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "פירות ים",
+      "dishes": [
+        {
+          "id": "d6",
+          "name": "שרימפס בשום ויין",
+          "description": "שרימפס מוקפצים בשום, חמאה ויין לבן",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Shrimp in garlic, butter and white wine.",
+          "evidence": [
+            "שרימפס",
+            "חמאה"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "קלמרי מטוגן",
+          "description": "טבעות קלמרי בציפוי קמח, מוגש עם איולי ולימון",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Flour-coated fried calamari.",
+          "evidence": [
+            "קלמרי",
+            "בציפוי קמח"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "מולים ביין לבן",
+          "description": "מולים מאודים ברוטב יין לבן, שום ופטרוזיליה",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Mussels steamed in white wine and garlic.",
+          "evidence": [
+            "מולים"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "פירות ים בשמנת",
+          "description": "פירות ים ברוטב שמנת על ספגטי",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Seafood served on spaghetti; the pasta is the base.",
+          "evidence": [
+            "ספגטי"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "פאייה פירות ים",
+          "description": "אורז ספרדי עם שרימפס, קלמרי, מולים ופפריקה מעושנת",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Paella is rice.",
+          "evidence": [
+            "אורז"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סלטים ומרקים",
+      "dishes": [
+        {
+          "id": "d14",
+          "name": "מרק דגים",
+          "description": "מרק דגים חם עם ירקות שורש ועשבי תיבול",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [],
+          "why": "Fish soup, but root vegetables are in it; ask for the fish and broth.",
+          "evidence": [
+            "מרק דגים",
+            "ירקות שורש"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "סלט יווני",
+          "description": "עגבנייה, מלפפון, זיתים, בצל וגבינה בולגרית",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Greek salad with feta.",
+          "evidence": [
+            "זיתים",
+            "גבינה בולגרית"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "סלט קיסר שרימפס",
+          "description": "חסה, שרימפס, קרוטונים, פרמזן ורוטב קיסר",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Shrimp Caesar; drop the croutons.",
+          "evidence": [
+            "שרימפס",
+            "קרוטונים"
+          ]
+        },
+        {
+          "id": "d18",
+          "name": "מבחר סלטים",
+          "description": "חומוס, טחינה, סלט חצילים, סלק וכרוב",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Israeli cabbage salad is usually sweetened",
+              "certainty": "suspected",
+              "term": "כרוב"
+            }
+          ],
+          "why": "Tahini and eggplant are keto; hummus and beet are not, so choose.",
+          "evidence": [
+            "חומוס",
+            "סלק"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "תוספות",
+      "dishes": [
+        {
+          "id": "d17",
+          "name": "צ׳יפס",
+          "description": "צ׳יפס מטוגן בשמן נפרד מהדגים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fries.",
+          "evidence": [
+            "צ׳יפס"
+          ]
+        },
+        {
+          "id": "d19",
+          "name": "לחם מהתנור",
+          "description": "",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Bread.",
+          "evidence": [
+            "לחם"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוח ושתייה",
+      "dishes": [
+        {
+          "id": "d20",
+          "name": "מלבי",
+          "description": "מלבי חלב עם סירופ ורדים, שקדים ופיסטוק",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Milk pudding with rose syrup.",
+          "evidence": [
+            "מלבי",
+            "סירופ"
+          ]
+        },
+        {
+          "id": "d21",
+          "name": "יין לבן (כוס)",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "A glass of white wine; dry is fine.",
+          "evidence": [
+            "יין לבן"
+          ]
+        }
+      ]
+    }
+  ]
+}

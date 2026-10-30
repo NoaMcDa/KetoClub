@@ -1825,7 +1825,13 @@
           },
           {
             "dishId": "f8f3f63e7d7c1505dafac3f1",
-            "hiddenCarbs": [],
+            "hiddenCarbs": [
+              {
+                "certainty": "suspected",
+                "source": "קרמול",
+                "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+              }
+            ],
             "modification": "מבין האפשרויות, בלי בירה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "צ׳יזבורגר המוסד,  תוספת ושתייה",
             "netCarbsEstimate": null,
@@ -1897,7 +1903,13 @@
           },
           {
             "dishId": "d52acdb09af2f3b18ea995a2",
-            "hiddenCarbs": [],
+            "hiddenCarbs": [
+              {
+                "certainty": "suspected",
+                "source": "קרמול",
+                "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+              }
+            ],
             "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר.",
             "name": "צ׳יזבורגר המוסד",
             "netCarbsEstimate": null,
@@ -1978,7 +1990,13 @@
           },
           {
             "dishId": "86d535be8bd049294ee6c986",
-            "hiddenCarbs": [],
+            "hiddenCarbs": [
+              {
+                "certainty": "suspected",
+                "source": "קרמול",
+                "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+              }
+            ],
             "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "ארוחת צ׳יזבורגר המוסד",
             "netCarbsEstimate": null,
@@ -2131,12 +2149,18 @@
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e421",
-            "hiddenCarbs": [],
-            "modification": null,
+            "hiddenCarbs": [
+              {
+                "certainty": "likely",
+                "source": "רוטב מתוק",
+                "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+              }
+            ],
+            "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
             "name": "כנפיים | 8 יח׳",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+            "verdict": "modifiable",
+            "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
           },
           {
             "dishId": "6316e6412cc1aad2be5ed2c9",
@@ -2216,8 +2240,8 @@
             "modification": null,
             "name": "סאן מיגל",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e3fc",
@@ -2225,8 +2249,8 @@
             "modification": null,
             "name": "פרסקה סאן מיגל",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e3f3",
@@ -2322,11 +2346,11 @@
         "unclassified": []
       },
       "counts": {
-        "green": 2,
-        "hiddenCarbYellow": 0,
+        "green": 1,
+        "hiddenCarbYellow": 4,
         "red": 12,
-        "score": 3.6,
-        "yellow": 23
+        "score": 3.2,
+        "yellow": 24
       },
       "menu": {
         "categories": [
@@ -5738,8 +5762,8 @@
             "modification": null,
             "name": "Goldstar",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+            "verdict": "nonKeto",
+            "why": "Built on beer, which cannot be made keto."
           },
           {
             "dishId": "x14",
@@ -5772,10 +5796,10 @@
         "unclassified": []
       },
       "counts": {
-        "green": 4,
+        "green": 3,
         "hiddenCarbYellow": 0,
         "red": 5,
-        "score": 4.5,
+        "score": 4.0,
         "yellow": 2
       },
       "menu": {

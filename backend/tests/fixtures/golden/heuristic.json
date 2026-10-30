@@ -23,7 +23,13 @@
         },
         {
           "dishId": "f8f3f63e7d7c1505dafac3f1",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "מבין האפשרויות, בלי בירה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
           "name": "צ׳יזבורגר המוסד,  תוספת ושתייה",
           "netCarbsEstimate": null,
@@ -95,7 +101,13 @@
         },
         {
           "dishId": "d52acdb09af2f3b18ea995a2",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר.",
           "name": "צ׳יזבורגר המוסד",
           "netCarbsEstimate": null,
@@ -176,7 +188,13 @@
         },
         {
           "dishId": "86d535be8bd049294ee6c986",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
           "name": "ארוחת צ׳יזבורגר המוסד",
           "netCarbsEstimate": null,
@@ -329,12 +347,18 @@
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e421",
-          "hiddenCarbs": [],
-          "modification": null,
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב מתוק",
+              "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+            }
+          ],
+          "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
           "name": "כנפיים | 8 יח׳",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
         },
         {
           "dishId": "6316e6412cc1aad2be5ed2c9",
@@ -414,8 +438,8 @@
           "modification": null,
           "name": "סאן מיגל",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e3fc",
@@ -423,8 +447,8 @@
           "modification": null,
           "name": "פרסקה סאן מיגל",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e3f3",
@@ -2904,7 +2928,13 @@
         },
         {
           "dishId": "f8f3f63e7d7c1505dafac3f1",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "מבין האפשרויות, בלי בירה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?\nאפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?",
           "name": "צ׳יזבורגר המוסד,  תוספת ושתייה",
           "netCarbsEstimate": null,
@@ -2976,7 +3006,13 @@
         },
         {
           "dishId": "d52acdb09af2f3b18ea995a2",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר.\nאפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?",
           "name": "צ׳יזבורגר המוסד",
           "netCarbsEstimate": null,
@@ -3057,7 +3093,13 @@
         },
         {
           "dishId": "86d535be8bd049294ee6c986",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?\nאפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?",
           "name": "ארוחת צ׳יזבורגר המוסד",
           "netCarbsEstimate": null,
@@ -3210,12 +3252,18 @@
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e421",
-          "hiddenCarbs": [],
-          "modification": null,
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב מתוק",
+              "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+            }
+          ],
+          "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
           "name": "כנפיים | 8 יח׳",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
         },
         {
           "dishId": "6316e6412cc1aad2be5ed2c9",
@@ -3295,8 +3343,8 @@
           "modification": null,
           "name": "סאן מיגל",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e3fc",
@@ -3304,8 +3352,8 @@
           "modification": null,
           "name": "פרסקה סאן מיגל",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e3f3",
@@ -5791,7 +5839,13 @@
         },
         {
           "dishId": "f8f3f63e7d7c1505dafac3f1",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "מבין האפשרויות, בלי בירה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?\nאפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
           "name": "צ׳יזבורגר המוסד,  תוספת ושתייה",
           "netCarbsEstimate": null,
@@ -5863,7 +5917,13 @@
         },
         {
           "dishId": "d52acdb09af2f3b18ea995a2",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר.\nאפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
           "name": "צ׳יזבורגר המוסד",
           "netCarbsEstimate": null,
@@ -5944,7 +6004,13 @@
         },
         {
           "dishId": "86d535be8bd049294ee6c986",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?\nאפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
           "name": "ארוחת צ׳יזבורגר המוסד",
           "netCarbsEstimate": null,
@@ -6097,12 +6163,18 @@
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e421",
-          "hiddenCarbs": [],
-          "modification": null,
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב מתוק",
+              "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+            }
+          ],
+          "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
           "name": "כנפיים | 8 יח׳",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
         },
         {
           "dishId": "6316e6412cc1aad2be5ed2c9",
@@ -6182,8 +6254,8 @@
           "modification": null,
           "name": "סאן מיגל",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e3fc",
@@ -6191,8 +6263,8 @@
           "modification": null,
           "name": "פרסקה סאן מיגל",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e3f3",
@@ -8676,7 +8748,13 @@
         },
         {
           "dishId": "f8f3f63e7d7c1505dafac3f1",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "מבין האפשרויות, בלי בירה — בחרו סלט או ירקות במקום.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?\nאפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?\nאפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
           "name": "צ׳יזבורגר המוסד,  תוספת ושתייה",
           "netCarbsEstimate": null,
@@ -8748,7 +8826,13 @@
         },
         {
           "dishId": "d52acdb09af2f3b18ea995a2",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר.\nאפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?\nאפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
           "name": "צ׳יזבורגר המוסד",
           "netCarbsEstimate": null,
@@ -8829,7 +8913,13 @@
         },
         {
           "dishId": "86d535be8bd049294ee6c986",
-          "hiddenCarbs": [],
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "קרמול",
+              "waiterQuestion": "מוסיפים סוכר כדי לקרמל?"
+            }
+          ],
           "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?\nאפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?\nאפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
           "name": "ארוחת צ׳יזבורגר המוסד",
           "netCarbsEstimate": null,
@@ -8982,12 +9072,18 @@
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e421",
-          "hiddenCarbs": [],
-          "modification": null,
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב מתוק",
+              "waiterQuestion": "הרוטב ממותק בסוכר? אפשר בלעדיו?"
+            }
+          ],
+          "modification": "הרוטב ממותק בסוכר? אפשר בלעדיו?",
           "name": "כנפיים | 8 יח׳",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
         },
         {
           "dishId": "6316e6412cc1aad2be5ed2c9",
@@ -9067,8 +9163,8 @@
           "modification": null,
           "name": "סאן מיגל",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e3fc",
@@ -9076,8 +9172,8 @@
           "modification": null,
           "name": "פרסקה סאן מיגל",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
           "dishId": "61ecfdac853cef6ba4d5e3f3",
@@ -15390,8 +15486,8 @@
           "modification": null,
           "name": "Goldstar",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+          "verdict": "nonKeto",
+          "why": "Built on beer, which cannot be made keto."
         },
         {
           "dishId": "x14",
@@ -15735,8 +15831,8 @@
           "modification": null,
           "name": "Goldstar",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+          "verdict": "nonKeto",
+          "why": "Built on beer, which cannot be made keto."
         },
         {
           "dishId": "x14",
@@ -16086,8 +16182,8 @@
           "modification": null,
           "name": "Goldstar",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+          "verdict": "nonKeto",
+          "why": "Built on beer, which cannot be made keto."
         },
         {
           "dishId": "x14",
@@ -16435,8 +16531,8 @@
           "modification": null,
           "name": "Goldstar",
           "netCarbsEstimate": null,
-          "verdict": "orderAsIs",
-          "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+          "verdict": "nonKeto",
+          "why": "Built on beer, which cannot be made keto."
         },
         {
           "dishId": "x14",
@@ -16652,6 +16748,1280 @@
       }
     },
     "name": "mixed/allRules_limit2",
+    "options": {
+      "dietaryConstraints": [
+        "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.",
+        "Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto.",
+        "Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto."
+      ],
+      "netCarbLimitGrams": 2
+    }
+  },
+  {
+    "analysis": {
+      "analysedAt": "2026-01-01T00:00:00.000Z",
+      "dishes": [
+        {
+          "dishId": "hc1",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "house sauce",
+              "waiterQuestion": "Is there sugar or flour in the house sauce?"
+            }
+          ],
+          "modification": "Is there sugar or flour in the house sauce?",
+          "name": "Grilled salmon",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering."
+        },
+        {
+          "dishId": "hc2",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Crispy chicken thighs",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on crispy chicken, which cannot be made keto."
+        },
+        {
+          "dishId": "hc3",
+          "hiddenCarbs": [],
+          "modification": "Ask for the dish to be prepared without honey",
+          "name": "Honey-glazed salmon",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+        },
+        {
+          "dishId": "hc4",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Fettuccine",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on fettuccine, which cannot be made keto."
+        },
+        {
+          "dishId": "hc5",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "gravy",
+              "waiterQuestion": "Is the gravy thickened with flour? Can it come on the side?"
+            }
+          ],
+          "modification": "Is the gravy thickened with flour? Can it come on the side?",
+          "name": "Steak",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering."
+        },
+        {
+          "dishId": "hc6",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "glaze",
+              "waiterQuestion": "Is the glaze made with sugar or honey? Can it be left off?"
+            },
+            {
+              "certainty": "suspected",
+              "source": "house sauce",
+              "waiterQuestion": "Is there sugar or flour in the house sauce?"
+            },
+            {
+              "certainty": "likely",
+              "source": "gravy",
+              "waiterQuestion": "Is the gravy thickened with flour? Can it come on the side?"
+            }
+          ],
+          "modification": "Please leave out the amba; the mango pickle is sweetened.",
+          "name": "Ribeye",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+        },
+        {
+          "dishId": "hc7",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Grilled salmon",
+          "netCarbsEstimate": null,
+          "verdict": "orderAsIs",
+          "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+        },
+        {
+          "dishId": "hc8",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "marinade",
+              "waiterQuestion": "Is there sugar or honey in the marinade?"
+            }
+          ],
+          "modification": "Is there sugar or honey in the marinade?",
+          "name": "Chicken breast",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering."
+        },
+        {
+          "dishId": "hc9",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "מרינדה",
+              "waiterQuestion": "יש סוכר או דבש במרינדה?"
+            }
+          ],
+          "modification": "יש סוכר או דבש במרינדה?",
+          "name": "פרגית במרינדה",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
+        },
+        {
+          "dishId": "hc10",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "סלמון בעור קריספי",
+          "netCarbsEstimate": null,
+          "verdict": "orderAsIs",
+          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+        },
+        {
+          "dishId": "hc11",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב חום",
+              "waiterQuestion": "הרוטב החום מוסמך בקמח? אפשר אותו בצד?"
+            }
+          ],
+          "modification": "אפשר בבקשה להחליף את הפירה בסלט ירוק או בירקות מאודים?",
+          "name": "אנטריקוט",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+        },
+        {
+          "dishId": "hc12",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "שניצל",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על שניצל, ואי אפשר להפוך אותה לקטוגנית."
+        }
+      ],
+      "engine": {
+        "kind": "rules",
+        "reason": "notConfigured"
+      },
+      "options": {
+        "dietaryConstraints": [],
+        "netCarbLimitGrams": 6
+      },
+      "schemaVersion": 0,
+      "unclassified": []
+    },
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "House sauce",
+              "id": "hc1",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "With fries",
+              "id": "hc2",
+              "imageUrl": null,
+              "name": "Crispy chicken thighs",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "hc3",
+              "imageUrl": null,
+              "name": "Honey-glazed salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Creamy house sauce",
+              "id": "hc4",
+              "imageUrl": null,
+              "name": "Fettuccine",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Butter, gravy",
+              "id": "hc5",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Glazed, amba, house sauce, gravy and garlic sauce",
+              "id": "hc6",
+              "imageUrl": null,
+              "name": "Ribeye",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Sugar-free glaze",
+              "id": "hc7",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Marinated, with salad",
+              "id": "hc8",
+              "imageUrl": null,
+              "name": "Chicken breast",
+              "options": [
+                {
+                  "name": "Changes",
+                  "values": [
+                    "No marinade"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "hc-mains",
+          "name": "Mains"
+        },
+        {
+          "dishes": [
+            {
+              "description": "עם סלט ירוק",
+              "id": "hc9",
+              "imageUrl": null,
+              "name": "פרגית במרינדה",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "hc10",
+              "imageUrl": null,
+              "name": "סלמון בעור קריספי",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "ברוטב חום, עם פירה",
+              "id": "hc11",
+              "imageUrl": null,
+              "name": "אנטריקוט",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "קריספי, ברוטב שום",
+              "id": "hc12",
+              "imageUrl": null,
+              "name": "שניצל",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "hc-he",
+          "name": "עיקריות"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "hidden",
+        "source": "scan"
+      }
+    },
+    "name": "hidden_carbs/defaults",
+    "options": {
+      "dietaryConstraints": [],
+      "netCarbLimitGrams": 6
+    }
+  },
+  {
+    "analysis": {
+      "analysedAt": "2026-01-01T00:00:00.000Z",
+      "dishes": [
+        {
+          "dishId": "hc1",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "house sauce",
+              "waiterQuestion": "Is there sugar or flour in the house sauce?"
+            }
+          ],
+          "modification": "Is there sugar or flour in the house sauce?",
+          "name": "Grilled salmon",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering."
+        },
+        {
+          "dishId": "hc2",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Crispy chicken thighs",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on crispy chicken, which cannot be made keto."
+        },
+        {
+          "dishId": "hc3",
+          "hiddenCarbs": [],
+          "modification": "Ask for the dish to be prepared without honey",
+          "name": "Honey-glazed salmon",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+        },
+        {
+          "dishId": "hc4",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Fettuccine",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on fettuccine, which cannot be made keto."
+        },
+        {
+          "dishId": "hc5",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "gravy",
+              "waiterQuestion": "Is the gravy thickened with flour? Can it come on the side?"
+            }
+          ],
+          "modification": "Please make it with no dairy: no cheese, cream, butter, milk or yogurt.",
+          "name": "Steak",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "This dish is keto, but it breaks one of the rules you turned on in Settings. Ask for the change below."
+        },
+        {
+          "dishId": "hc6",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "glaze",
+              "waiterQuestion": "Is the glaze made with sugar or honey? Can it be left off?"
+            },
+            {
+              "certainty": "suspected",
+              "source": "house sauce",
+              "waiterQuestion": "Is there sugar or flour in the house sauce?"
+            },
+            {
+              "certainty": "likely",
+              "source": "gravy",
+              "waiterQuestion": "Is the gravy thickened with flour? Can it come on the side?"
+            }
+          ],
+          "modification": "Please leave out the amba; the mango pickle is sweetened.",
+          "name": "Ribeye",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+        },
+        {
+          "dishId": "hc7",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Grilled salmon",
+          "netCarbsEstimate": null,
+          "verdict": "orderAsIs",
+          "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+        },
+        {
+          "dishId": "hc8",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "marinade",
+              "waiterQuestion": "Is there sugar or honey in the marinade?"
+            }
+          ],
+          "modification": "Is there sugar or honey in the marinade?",
+          "name": "Chicken breast",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering."
+        },
+        {
+          "dishId": "hc9",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "מרינדה",
+              "waiterQuestion": "יש סוכר או דבש במרינדה?"
+            }
+          ],
+          "modification": "יש סוכר או דבש במרינדה?",
+          "name": "פרגית במרינדה",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני ההזמנה."
+        },
+        {
+          "dishId": "hc10",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "סלמון בעור קריספי",
+          "netCarbsEstimate": null,
+          "verdict": "orderAsIs",
+          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+        },
+        {
+          "dishId": "hc11",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב חום",
+              "waiterQuestion": "הרוטב החום מוסמך בקמח? אפשר אותו בצד?"
+            }
+          ],
+          "modification": "אפשר בבקשה להחליף את הפירה בסלט ירוק או בירקות מאודים?",
+          "name": "אנטריקוט",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+        },
+        {
+          "dishId": "hc12",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "שניצל",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על שניצל, ואי אפשר להפוך אותה לקטוגנית."
+        }
+      ],
+      "engine": {
+        "kind": "rules",
+        "reason": "notConfigured"
+      },
+      "options": {
+        "dietaryConstraints": [
+          "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.",
+          "Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto."
+        ],
+        "netCarbLimitGrams": 6
+      },
+      "schemaVersion": 0,
+      "unclassified": []
+    },
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "House sauce",
+              "id": "hc1",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "With fries",
+              "id": "hc2",
+              "imageUrl": null,
+              "name": "Crispy chicken thighs",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "hc3",
+              "imageUrl": null,
+              "name": "Honey-glazed salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Creamy house sauce",
+              "id": "hc4",
+              "imageUrl": null,
+              "name": "Fettuccine",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Butter, gravy",
+              "id": "hc5",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Glazed, amba, house sauce, gravy and garlic sauce",
+              "id": "hc6",
+              "imageUrl": null,
+              "name": "Ribeye",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Sugar-free glaze",
+              "id": "hc7",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Marinated, with salad",
+              "id": "hc8",
+              "imageUrl": null,
+              "name": "Chicken breast",
+              "options": [
+                {
+                  "name": "Changes",
+                  "values": [
+                    "No marinade"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "hc-mains",
+          "name": "Mains"
+        },
+        {
+          "dishes": [
+            {
+              "description": "עם סלט ירוק",
+              "id": "hc9",
+              "imageUrl": null,
+              "name": "פרגית במרינדה",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "hc10",
+              "imageUrl": null,
+              "name": "סלמון בעור קריספי",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "ברוטב חום, עם פירה",
+              "id": "hc11",
+              "imageUrl": null,
+              "name": "אנטריקוט",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "קריספי, ברוטב שום",
+              "id": "hc12",
+              "imageUrl": null,
+              "name": "שניצל",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "hc-he",
+          "name": "עיקריות"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "hidden",
+        "source": "scan"
+      }
+    },
+    "name": "hidden_carbs/seedOilFree_dairyFree",
+    "options": {
+      "dietaryConstraints": [
+        "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.",
+        "Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto."
+      ],
+      "netCarbLimitGrams": 6
+    }
+  },
+  {
+    "analysis": {
+      "analysedAt": "2026-01-01T00:00:00.000Z",
+      "dishes": [
+        {
+          "dishId": "hc1",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "house sauce",
+              "waiterQuestion": "Is there sugar or flour in the house sauce?"
+            }
+          ],
+          "modification": "Is there sugar or flour in the house sauce?",
+          "name": "Grilled salmon",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering."
+        },
+        {
+          "dishId": "hc2",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Crispy chicken thighs",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on crispy chicken, which cannot be made keto."
+        },
+        {
+          "dishId": "hc3",
+          "hiddenCarbs": [],
+          "modification": "Ask for the dish to be prepared without honey",
+          "name": "Honey-glazed salmon",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+        },
+        {
+          "dishId": "hc4",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Fettuccine",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on fettuccine, which cannot be made keto."
+        },
+        {
+          "dishId": "hc5",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "gravy",
+              "waiterQuestion": "Is the gravy thickened with flour? Can it come on the side?"
+            }
+          ],
+          "modification": "Is the gravy thickened with flour? Can it come on the side?",
+          "name": "Steak",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering."
+        },
+        {
+          "dishId": "hc6",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "glaze",
+              "waiterQuestion": "Is the glaze made with sugar or honey? Can it be left off?"
+            },
+            {
+              "certainty": "suspected",
+              "source": "house sauce",
+              "waiterQuestion": "Is there sugar or flour in the house sauce?"
+            },
+            {
+              "certainty": "likely",
+              "source": "gravy",
+              "waiterQuestion": "Is the gravy thickened with flour? Can it come on the side?"
+            }
+          ],
+          "modification": "Please leave out the amba; the mango pickle is sweetened.",
+          "name": "Ribeye",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+        },
+        {
+          "dishId": "hc7",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Grilled salmon",
+          "netCarbsEstimate": null,
+          "verdict": "orderAsIs",
+          "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+        },
+        {
+          "dishId": "hc8",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "marinade",
+              "waiterQuestion": "Is there sugar or honey in the marinade?"
+            }
+          ],
+          "modification": "Please serve only the meat, fish or eggs, with no vegetables, salad or other plants on the plate.",
+          "name": "Chicken breast",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "This dish is keto, but it breaks one of the rules you turned on in Settings. Ask for the change below."
+        },
+        {
+          "dishId": "hc9",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "מרינדה",
+              "waiterQuestion": "יש סוכר או דבש במרינדה?"
+            }
+          ],
+          "modification": "אפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
+          "name": "פרגית במרינדה",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן."
+        },
+        {
+          "dishId": "hc10",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "סלמון בעור קריספי",
+          "netCarbsEstimate": null,
+          "verdict": "orderAsIs",
+          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+        },
+        {
+          "dishId": "hc11",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב חום",
+              "waiterQuestion": "הרוטב החום מוסמך בקמח? אפשר אותו בצד?"
+            }
+          ],
+          "modification": "אפשר בבקשה להחליף את הפירה בסלט ירוק או בירקות מאודים?",
+          "name": "אנטריקוט",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+        },
+        {
+          "dishId": "hc12",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "שניצל",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על שניצל, ואי אפשר להפוך אותה לקטוגנית."
+        }
+      ],
+      "engine": {
+        "kind": "rules",
+        "reason": "notConfigured"
+      },
+      "options": {
+        "dietaryConstraints": [
+          "Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto."
+        ],
+        "netCarbLimitGrams": 10
+      },
+      "schemaVersion": 0,
+      "unclassified": []
+    },
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "House sauce",
+              "id": "hc1",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "With fries",
+              "id": "hc2",
+              "imageUrl": null,
+              "name": "Crispy chicken thighs",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "hc3",
+              "imageUrl": null,
+              "name": "Honey-glazed salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Creamy house sauce",
+              "id": "hc4",
+              "imageUrl": null,
+              "name": "Fettuccine",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Butter, gravy",
+              "id": "hc5",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Glazed, amba, house sauce, gravy and garlic sauce",
+              "id": "hc6",
+              "imageUrl": null,
+              "name": "Ribeye",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Sugar-free glaze",
+              "id": "hc7",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Marinated, with salad",
+              "id": "hc8",
+              "imageUrl": null,
+              "name": "Chicken breast",
+              "options": [
+                {
+                  "name": "Changes",
+                  "values": [
+                    "No marinade"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "hc-mains",
+          "name": "Mains"
+        },
+        {
+          "dishes": [
+            {
+              "description": "עם סלט ירוק",
+              "id": "hc9",
+              "imageUrl": null,
+              "name": "פרגית במרינדה",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "hc10",
+              "imageUrl": null,
+              "name": "סלמון בעור קריספי",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "ברוטב חום, עם פירה",
+              "id": "hc11",
+              "imageUrl": null,
+              "name": "אנטריקוט",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "קריספי, ברוטב שום",
+              "id": "hc12",
+              "imageUrl": null,
+              "name": "שניצל",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "hc-he",
+          "name": "עיקריות"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "hidden",
+        "source": "scan"
+      }
+    },
+    "name": "hidden_carbs/carnivoreOnly_limit10",
+    "options": {
+      "dietaryConstraints": [
+        "Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto."
+      ],
+      "netCarbLimitGrams": 10
+    }
+  },
+  {
+    "analysis": {
+      "analysedAt": "2026-01-01T00:00:00.000Z",
+      "dishes": [
+        {
+          "dishId": "hc1",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "house sauce",
+              "waiterQuestion": "Is there sugar or flour in the house sauce?"
+            }
+          ],
+          "modification": "Is there sugar or flour in the house sauce?",
+          "name": "Grilled salmon",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "Nothing starchy is named, but a sauce, glaze or coating here can hide sugar or flour. Ask the question below before ordering."
+        },
+        {
+          "dishId": "hc2",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Crispy chicken thighs",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on crispy chicken, which cannot be made keto."
+        },
+        {
+          "dishId": "hc3",
+          "hiddenCarbs": [],
+          "modification": "Ask for the dish to be prepared without honey",
+          "name": "Honey-glazed salmon",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+        },
+        {
+          "dishId": "hc4",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Fettuccine",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on fettuccine, which cannot be made keto."
+        },
+        {
+          "dishId": "hc5",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "gravy",
+              "waiterQuestion": "Is the gravy thickened with flour? Can it come on the side?"
+            }
+          ],
+          "modification": "Please make it with no dairy: no cheese, cream, butter, milk or yogurt.",
+          "name": "Steak",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "This dish is keto, but it breaks one of the rules you turned on in Settings. Ask for the change below."
+        },
+        {
+          "dishId": "hc6",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "glaze",
+              "waiterQuestion": "Is the glaze made with sugar or honey? Can it be left off?"
+            },
+            {
+              "certainty": "suspected",
+              "source": "house sauce",
+              "waiterQuestion": "Is there sugar or flour in the house sauce?"
+            },
+            {
+              "certainty": "likely",
+              "source": "gravy",
+              "waiterQuestion": "Is the gravy thickened with flour? Can it come on the side?"
+            }
+          ],
+          "modification": "Please leave out the amba; the mango pickle is sweetened.",
+          "name": "Ribeye",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+        },
+        {
+          "dishId": "hc7",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Grilled salmon",
+          "netCarbsEstimate": null,
+          "verdict": "orderAsIs",
+          "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+        },
+        {
+          "dishId": "hc8",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "marinade",
+              "waiterQuestion": "Is there sugar or honey in the marinade?"
+            }
+          ],
+          "modification": "Please serve only the meat, fish or eggs, with no vegetables, salad or other plants on the plate.",
+          "name": "Chicken breast",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "This dish is keto, but it breaks one of the rules you turned on in Settings. Ask for the change below."
+        },
+        {
+          "dishId": "hc9",
+          "hiddenCarbs": [
+            {
+              "certainty": "suspected",
+              "source": "מרינדה",
+              "waiterQuestion": "יש סוכר או דבש במרינדה?"
+            }
+          ],
+          "modification": "אפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
+          "name": "פרגית במרינדה",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן."
+        },
+        {
+          "dishId": "hc10",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "סלמון בעור קריספי",
+          "netCarbsEstimate": null,
+          "verdict": "orderAsIs",
+          "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+        },
+        {
+          "dishId": "hc11",
+          "hiddenCarbs": [
+            {
+              "certainty": "likely",
+              "source": "רוטב חום",
+              "waiterQuestion": "הרוטב החום מוסמך בקמח? אפשר אותו בצד?"
+            }
+          ],
+          "modification": "אפשר בבקשה להחליף את הפירה בסלט ירוק או בירקות מאודים?",
+          "name": "אנטריקוט",
+          "netCarbsEstimate": null,
+          "verdict": "modifiable",
+          "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+        },
+        {
+          "dishId": "hc12",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "שניצל",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "המנה מבוססת על שניצל, ואי אפשר להפוך אותה לקטוגנית."
+        }
+      ],
+      "engine": {
+        "kind": "rules",
+        "reason": "notConfigured"
+      },
+      "options": {
+        "dietaryConstraints": [
+          "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.",
+          "Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto.",
+          "Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto."
+        ],
+        "netCarbLimitGrams": 2
+      },
+      "schemaVersion": 0,
+      "unclassified": []
+    },
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "House sauce",
+              "id": "hc1",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "With fries",
+              "id": "hc2",
+              "imageUrl": null,
+              "name": "Crispy chicken thighs",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "hc3",
+              "imageUrl": null,
+              "name": "Honey-glazed salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Creamy house sauce",
+              "id": "hc4",
+              "imageUrl": null,
+              "name": "Fettuccine",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Butter, gravy",
+              "id": "hc5",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Glazed, amba, house sauce, gravy and garlic sauce",
+              "id": "hc6",
+              "imageUrl": null,
+              "name": "Ribeye",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Sugar-free glaze",
+              "id": "hc7",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "Marinated, with salad",
+              "id": "hc8",
+              "imageUrl": null,
+              "name": "Chicken breast",
+              "options": [
+                {
+                  "name": "Changes",
+                  "values": [
+                    "No marinade"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "hc-mains",
+          "name": "Mains"
+        },
+        {
+          "dishes": [
+            {
+              "description": "עם סלט ירוק",
+              "id": "hc9",
+              "imageUrl": null,
+              "name": "פרגית במרינדה",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "hc10",
+              "imageUrl": null,
+              "name": "סלמון בעור קריספי",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "ברוטב חום, עם פירה",
+              "id": "hc11",
+              "imageUrl": null,
+              "name": "אנטריקוט",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "קריספי, ברוטב שום",
+              "id": "hc12",
+              "imageUrl": null,
+              "name": "שניצל",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "hc-he",
+          "name": "עיקריות"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "hidden",
+        "source": "scan"
+      }
+    },
+    "name": "hidden_carbs/allRules_limit2",
     "options": {
       "dietaryConstraints": [
         "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.",

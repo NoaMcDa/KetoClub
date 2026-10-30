@@ -228,6 +228,20 @@ def test_ingredients_by_dish_keys_ingredients_by_menu_position() -> None:
     assert ev.ingredients_by_dish(body, menu) == {1: [{"name": "tahini"}], 0: []}
 
 
+def test_ingredients_by_dish_reads_the_prompts_short_ids() -> None:
+    menu = _menu("A", "B")
+    body = json.dumps(
+        {
+            "dishes": [
+                {"id": "2", "ingredients": [{"name": "tahini"}]},
+                {"id": "1", "ingredients": []},
+                {"id": "3", "ingredients": [{"name": "x"}]},
+            ]
+        }
+    )
+    assert ev.ingredients_by_dish(body, menu) == {1: [{"name": "tahini"}], 0: []}
+
+
 @pytest.mark.parametrize("body", ["", "not json", "[]", '{"dishes": 3}', "null"])
 def test_ingredients_by_dish_reads_a_bad_reply_as_nothing(body: str) -> None:
     assert ev.ingredients_by_dish(body, _menu("A")) == {}

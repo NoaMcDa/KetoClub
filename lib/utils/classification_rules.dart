@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/foundation.dart';
+import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
@@ -26,6 +27,17 @@ typedef _CompiledBase = ({String key, RegExp pattern});
 /// A compiled carb-modifier trigger: its dictionary key (for guard and
 /// suppression lookups), its pattern, and its waiter sentence.
 typedef _CompiledModifier = ({String key, RegExp pattern, String sentence});
+
+/// A compiled hidden-carb trigger (issue #213 on the rules path): its
+/// dictionary key (for its per-trigger guard), its pattern, and its flag.
+typedef _CompiledHidden = ({
+  String key,
+  RegExp pattern,
+  HiddenCarbTrigger flag,
+});
+
+/// One unguarded hidden-carb occurrence; `end` is exclusive.
+typedef _HiddenOccurrence = ({int start, int end, HiddenCarbTrigger flag});
 
 /// One surviving (unguarded) carb-modifier occurrence, in match order.
 /// `end` is exclusive, so `start`..`end` is the matched span — which the
@@ -131,6 +143,31 @@ List<_CompiledBase> _compileDietaryHe(List<String> triggers) => triggers
     )
     .toList(growable: false);
 
+/// Compiles [hiddenCarbTriggersEn] with the Latin word boundary, each key
+/// normalised at compile time like every other table.
+List<_CompiledHidden> _compileHiddenEn() => hiddenCarbTriggersEn.entries
+    .map(
+      (entry) => (
+        key: entry.key,
+        pattern: latinTriggerPattern(TextNormaliser.normalise(entry.key)),
+        flag: entry.value,
+      ),
+    )
+    .toList(growable: false);
+
+/// Compiles [hiddenCarbTriggersHe] through [hebrewTriggerPattern]'s
+/// unicode lookaround, with the permissive prefix (`במרינדה`, `ברוטב
+/// שום`) for every entry.
+List<_CompiledHidden> _compileHiddenHe() => hiddenCarbTriggersHe.entries
+    .map(
+      (entry) => (
+        key: entry.key,
+        pattern: hebrewTriggerPattern(TextNormaliser.normalise(entry.key)),
+        flag: entry.value,
+      ),
+    )
+    .toList(growable: false);
+
 /// Compiled once, on first use of this library (Dart top-level `final`
 /// fields initialise lazily).
 final List<_CompiledBase> _baseEn = _compileBasesEn();
@@ -143,6 +180,31 @@ final List<_CompiledModifier> _carbEn = _compileCarbEn();
 
 /// See [_baseEn].
 final List<_CompiledModifier> _carbHe = _compileCarbHe();
+
+/// See [_baseEn]; the hidden-carb triggers (issue #213).
+final List<_CompiledHidden> _hiddenEn = _compileHiddenEn();
+
+/// See [_hiddenEn].
+final List<_CompiledHidden> _hiddenHe = _compileHiddenHe();
+
+/// The hidden-carb guard phrases, both languages, that answer a flag of
+/// [concern] (`sugar`, `flour` or `sugarOrFlour`; issue #213): the `any`
+/// phrases, the `sugar` ones unless the flag is about flour alone, and
+/// the `flour` ones unless it is about sugar alone.
+List<String> _hiddenGuardPhrasesFor(String concern) => <String>[
+  for (final table in [hiddenCarbGuardPhrasesEn, hiddenCarbGuardPhrasesHe])
+    for (final MapEntry(key: answers, value: phrases) in table.entries)
+      if (answers == 'any' ||
+          (answers == 'sugar' && concern != 'flour') ||
+          (answers == 'flour' && concern != 'sugar'))
+        ...phrases,
+];
+
+/// [_hiddenGuardPhrasesFor] each concern, computed once.
+final Map<String, List<String>> _hiddenGuardPhrases = <String, List<String>>{
+  for (final concern in const ['sugar', 'flour', 'sugarOrFlour'])
+    concern: _hiddenGuardPhrasesFor(concern),
+};
 
 /// See [_baseEn]; the seed-oil rule's triggers (issue #56).
 final List<_CompiledBase> _seedOilEn = _compileDietaryEn(seedOilTriggersEn);
@@ -359,6 +421,149 @@ List<_Occurrence> _unguardedModifierOccurrences(
   return occurrences;
 }
 
+/// The occurrences [triggerSuppresses] leaves standing, in their order:
+/// the ones whose sentences [_sentencesAfterSuppression] keeps.
+List<_Occurrence> _unsuppressed(List<_Occurrence> occurrences) {
+  final suppressedKeys = <String>{};
+  for (final occurrence in occurrences) {
+    final victims = triggerSuppresses[occurrence.key];
+    if (victims != null) suppressedKeys.addAll(victims);
+  }
+  return <_Occurrence>[
+    for (final occurrence in occurrences)
+      if (!suppressedKeys.contains(occurrence.key)) occurrence,
+  ];
+}
+
+/// The words around the match spanning [start]-[end] in [haystack]: up to
+/// [count] words before it and up to [count] after it, read the way
+/// [_isGuarded] reads its window, and the offsets where that window
+/// starts and ends (the match's own offsets on a side with no words).
+({List<String> before, List<String> after, int start, int end}) _window(
+  String haystack,
+  int start,
+  int end,
+  int count,
+) {
+  var before = const <String>[];
+  var windowStart = start;
+  final beforeText = haystack.substring(0, start).trimRight();
+  if (beforeText.isNotEmpty) {
+    final words = beforeText.split(' ');
+    before = words.length <= count
+        ? words
+        : words.sublist(words.length - count);
+    windowStart = beforeText.length - before.join(' ').length;
+  }
+  var after = const <String>[];
+  var windowEnd = end;
+  final rest = haystack.substring(end);
+  final afterText = rest.trimLeft();
+  if (afterText.isNotEmpty) {
+    final words = afterText.split(' ');
+    after = words.length <= count ? words : words.sublist(0, count);
+    windowEnd = end + rest.length - afterText.length + after.join(' ').length;
+  }
+  return (before: before, after: after, start: windowStart, end: windowEnd);
+}
+
+/// The hidden-carb flags in [haystack] (issue #213 on the rules path;
+/// architecture.md §9.4 rule 5a), written in Hebrew when [hebrew] and in
+/// English otherwise. [modifiers] are the surviving carb-modifier
+/// occurrences in the same [haystack].
+///
+/// In order: a trigger is dropped when its per-trigger guard
+/// ([hiddenCarbTriggerGuardsEn]/`He`, D-V1's two-word window) or a guard
+/// phrase answering its concern ([hiddenCarbGuardPhrasesEn]/`He`,
+/// [hiddenCarbWindowWords] words either side) cancels it; of overlapping
+/// triggers the earliest, and at
+/// one start the longest, is kept; a trigger is **covered**, and dropped,
+/// when a carb modifier's match overlaps it, or when its flag is about
+/// sugar alone and a sweetener modifier ([hiddenCarbCoveringModifiers])
+/// sits in its window, because that modifier's sentence already asks for
+/// the sugar to go; flags with the same source are kept once; at most
+/// [maxHiddenCarbsPerDish] survive, in text order.
+List<HiddenCarb> _hiddenCarbsIn(
+  String haystack, {
+  required List<_Occurrence> modifiers,
+  required bool hebrew,
+}) {
+  final found = <_HiddenOccurrence>[];
+  void scan(List<_CompiledHidden> table, Map<String, GuardWords> guards) {
+    for (final entry in table) {
+      for (final match in entry.pattern.allMatches(haystack)) {
+        if (_isGuarded(haystack, match.start, match.end, guards[entry.key])) {
+          continue;
+        }
+        final window = _window(
+          haystack,
+          match.start,
+          match.end,
+          hiddenCarbWindowWords,
+        );
+        final phrases =
+            _hiddenGuardPhrases[entry.flag.concern] ?? const <String>[];
+        if (_windowContainsAnyPhrase(window.before, phrases) ||
+            _windowContainsAnyPhrase(window.after, phrases)) {
+          continue;
+        }
+        found.add((start: match.start, end: match.end, flag: entry.flag));
+      }
+    }
+  }
+
+  scan(_hiddenEn, hiddenCarbTriggerGuardsEn);
+  scan(_hiddenHe, hiddenCarbTriggerGuardsHe);
+  // A total order (no two triggers share a span), so the result never
+  // depends on the sort's stability.
+  found.sort(
+    (a, b) => a.start != b.start
+        ? a.start.compareTo(b.start)
+        : b.end.compareTo(a.end),
+  );
+
+  final kept = <_HiddenOccurrence>[];
+  for (final occurrence in found) {
+    final overlapsKept = kept.any(
+      (other) => occurrence.start < other.end && other.start < occurrence.end,
+    );
+    if (!overlapsKept) kept.add(occurrence);
+  }
+
+  final flags = <HiddenCarb>[];
+  final sources = <String>{};
+  for (final occurrence in kept) {
+    if (flags.length >= maxHiddenCarbsPerDish) break;
+    final flag = occurrence.flag;
+    final window = _window(
+      haystack,
+      occurrence.start,
+      occurrence.end,
+      hiddenCarbWindowWords,
+    );
+    final covered = modifiers.any(
+      (modifier) =>
+          (modifier.start < occurrence.end &&
+              occurrence.start < modifier.end) ||
+          (flag.concern == 'sugar' &&
+              hiddenCarbCoveringModifiers.contains(modifier.key) &&
+              modifier.start < window.end &&
+              window.start < modifier.end),
+    );
+    if (covered) continue;
+    final source = hebrew ? flag.sourceHe : flag.sourceEn;
+    if (!sources.add(source)) continue;
+    flags.add(
+      HiddenCarb(
+        source: source,
+        certainty: HiddenCarbCertainty.values.byName(flag.certainty),
+        waiterQuestion: hebrew ? flag.questionHe : flag.questionEn,
+      ),
+    );
+  }
+  return flags;
+}
+
 /// Applies [triggerSuppresses] to [occurrences] and returns the
 /// deduplicated sentence list, in match-start order: the more specific
 /// phrase's trigger wins, so `sweet potato` does not also emit the bare
@@ -388,6 +593,7 @@ final class RuleMatch {
     required this.isNonKeto,
     required this.instructions,
     this.baseLabel,
+    this.hiddenCarbs = const <HiddenCarb>[],
   });
 
   /// True when a non-keto base matched, which makes the dish red.
@@ -402,21 +608,34 @@ final class RuleMatch {
   /// Empty when [isNonKeto] or when nothing matched.
   final List<String> instructions;
 
+  /// The hidden-carb flags the vocabulary raised (issue #213 on the rules
+  /// path), in the language of the dish text, none covered by one of
+  /// [instructions], at most [maxHiddenCarbsPerDish]. Empty when
+  /// [isNonKeto]: a red drops its flags (§9.4 rule 5a). A flag never adds
+  /// to [instructions]; the heuristic classifier decides what it does to
+  /// the verdict.
+  final List<HiddenCarb> hiddenCarbs;
+
   @override
   bool operator ==(Object other) =>
       other is RuleMatch &&
       other.isNonKeto == isNonKeto &&
       other.baseLabel == baseLabel &&
-      _listEquals(other.instructions, instructions);
+      _listEquals(other.instructions, instructions) &&
+      _listEquals(other.hiddenCarbs, hiddenCarbs);
 
   @override
-  int get hashCode =>
-      Object.hash(isNonKeto, baseLabel, Object.hashAll(instructions));
+  int get hashCode => Object.hash(
+    isNonKeto,
+    baseLabel,
+    Object.hashAll(instructions),
+    Object.hashAll(hiddenCarbs),
+  );
 
   @override
   String toString() => isNonKeto
       ? 'RuleMatch(nonKeto: $baseLabel)'
-      : 'RuleMatch(modifiers: $instructions)';
+      : 'RuleMatch(modifiers: $instructions, hiddenCarbs: $hiddenCarbs)';
 }
 
 /// Element-wise list equality. Not shared with other files in this
@@ -621,6 +840,11 @@ abstract final class ClassificationRules {
     return RuleMatch(
       isNonKeto: false,
       instructions: _sentencesAfterSuppression(occurrences),
+      hiddenCarbs: _hiddenCarbsIn(
+        haystack,
+        modifiers: _unsuppressed(occurrences),
+        hebrew: TextNormaliser.containsHebrew(rawText),
+      ),
     );
   }
 
@@ -645,6 +869,10 @@ abstract final class ClassificationRules {
   /// substitute guard (issue #273) with the dish's own name: "Pizza with
   /// cauliflower crust" is not red, and a name with `keto` in it rescues
   /// the description's `rice` too.
+  ///
+  /// A dish that is not red also carries its hidden-carb flags (issue
+  /// #213 on the rules path), read from the same rules text as step 3 and
+  /// written in that text's language; see [RuleMatch.hiddenCarbs].
   ///
   /// [match] stays for callers with only a string; the heuristic
   /// classifier uses this. Never throws.
@@ -671,11 +899,14 @@ abstract final class ClassificationRules {
       );
     }
 
-    final occurrences = _unguardedModifierOccurrences(
-      TextNormaliser.dishRulesText(dish),
-      name: name,
-    );
+    final rulesText = TextNormaliser.dishRulesText(dish);
+    final occurrences = _unguardedModifierOccurrences(rulesText, name: name);
     final sentences = _sentencesAfterSuppression(occurrences);
+    final hiddenCarbs = _hiddenCarbsIn(
+      rulesText,
+      modifiers: _unsuppressed(occurrences),
+      hebrew: TextNormaliser.containsHebrew(rulesText),
+    );
 
     // A red base offered only as an option ("Choice of side: pasta or
     // salad") is something to steer around, not a reason to skip the
@@ -694,10 +925,15 @@ abstract final class ClassificationRules {
           template.replaceAll('{base}', optionBase.label),
           ...sentences,
         ],
+        hiddenCarbs: hiddenCarbs,
       );
     }
 
-    return RuleMatch(isNonKeto: false, instructions: sentences);
+    return RuleMatch(
+      isNonKeto: false,
+      instructions: sentences,
+      hiddenCarbs: hiddenCarbs,
+    );
   }
 
   /// Whether [dish]'s description or non-removal option values name a

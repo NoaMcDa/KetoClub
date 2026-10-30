@@ -550,6 +550,31 @@ const Map<String, String> carbModifiersEn = <String, String>{
       'in sugar.',
   'syrup': 'Please leave out the flavoured syrup.',
   'flavoured syrup': 'Please leave out the flavoured syrup.',
+
+  // The Israeli keto corpus's false greens (`test/fixtures/keto/`): a
+  // removable sugar or starch the vocabulary had no word for. Raisins
+  // and dried fruit are sugar like `dates`; candied nuts are sugar like
+  // `צנוברים מסוכרים`; `injera` carries a stew the way `pita` carries a
+  // falafel (D-V3), and is the whole dish when named alone; amba is a
+  // sweet mango pickle; white or kidney beans are a starch like
+  // `lentils`. `crouton` is the singular `croutons` missed.
+  'raisin': 'Please leave out the raisins.',
+  'raisins': 'Please leave out the raisins.',
+  'dried fruit': 'Please leave out the dried fruit; it is concentrated sugar.',
+  'candied': 'Please leave out the candied nuts or fruit; they are sugared.',
+  'crouton': 'Please prepare it without the crouton.',
+  'injera': 'Please serve the stew in a bowl, without the injera.',
+  'amba': 'Please leave out the amba; the mango pickle is sweetened.',
+  'banana': 'Please leave out the banana.',
+  'bananas': 'Please leave out the banana.',
+  'watermelon': 'Please leave out the watermelon; it is high in sugar.',
+  'balsamic reduction':
+      'Please leave out the balsamic reduction; it is reduced to sugar.',
+  'sweet and sour':
+      'Please leave out the sweet and sour sauce; it is mostly sugar.',
+  'white beans': 'Please leave out the beans and add vegetables instead.',
+  'kidney beans': 'Please leave out the beans and add vegetables instead.',
+  'baked beans': 'Please leave out the baked beans; they are sweetened.',
 };
 
 // ---------------------------------------------------------------------------
@@ -735,7 +760,587 @@ const Map<String, String> carbModifiersHe = <String, String>{
   'קפה קר': 'אפשר בבקשה קפה קר בלי סוכר ובלי סירופ?',
   'סירופ': 'אפשר בבקשה בלי הסירופ?',
   'טוניק': 'אפשר בבקשה לשים סודה במקום הטוניק? הטוניק עתיר סוכר.',
+
+  // The Israeli keto corpus's false greens, mirroring the English
+  // additions. `סילאן` is the spelling with an alef `סילן` misses; the
+  // candied forms are guarded against `לא`/`ללא` ("not sugared"), and
+  // `צנוברים מסוכרים` suppresses the bare form ([triggerSuppresses]).
+  'צימוקים': 'אפשר בבקשה בלי הצימוקים?',
+  'פירות יבשים': 'אפשר בבקשה בלי הפירות היבשים? הם סוכר מרוכז.',
+  'פירות מיובשים': 'אפשר בבקשה בלי הפירות המיובשים? הם סוכר מרוכז.',
+  'מסוכרים': 'אפשר בבקשה בלי האגוזים או הפירות המסוכרים?',
+  'מסוכרות': 'אפשר בבקשה בלי האגוזים או הפירות המסוכרים?',
+  'מסוכר': 'אפשר בבקשה בלי האגוזים או הפירות המסוכרים?',
+  'מסוכרת': 'אפשר בבקשה בלי האגוזים או הפירות המסוכרים?',
+  'קרוטון': 'אפשר בבקשה בלי הקרוטון?',
+  "אינג'רה": "אפשר בבקשה את התבשיל בקערה, בלי האינג'רה?",
+  'עמבה': 'אפשר בבקשה בלי העמבה? יש בה סוכר.',
+  'בננה': 'אפשר בבקשה בלי הבננה?',
+  'בננות': 'אפשר בבקשה בלי הבננה?',
+  'אבטיח': 'אפשר בבקשה בלי האבטיח? יש בו הרבה סוכר.',
+  'בלסמי מצומצם': 'אפשר בבקשה בלי הבלסמי המצומצם? הוא מצטמצם לסוכר.',
+  'רדוקציית בלסמי': 'אפשר בבקשה בלי רדוקציית הבלסמי? היא מצטמצמת לסוכר.',
+  'חמוץ מתוק': 'אפשר בבקשה בלי הרוטב החמוץ־מתוק? הוא כמעט כולו סוכר.',
+  'שעועית לבנה': 'אפשר בבקשה בלי השעועית, ועם ירקות במקום?',
+  'שעועית אדומה': 'אפשר בבקשה בלי השעועית, ועם ירקות במקום?',
+  'סילאן': 'אפשר בבקשה בלי הסילאן? הוא סוכר כמעט לגמרי.',
 };
+
+// ---------------------------------------------------------------------------
+// Hidden carbs on the rules path (issue #213, architecture.md §9.4 rule 5a)
+// ---------------------------------------------------------------------------
+//
+// The model flags a sauce, glaze or coating that may hide sugar or flour
+// with a `hidden_carbs` entry; these tables let the rule engine do the
+// same, so a rules result (no consent, no network, no key) carries flags
+// too. A flag is a question, not a swap: the trigger names something that
+// *may* carry carbs, and only the kitchen knows. Where a source is already
+// a [carbModifiersEn]/[carbModifiersHe] trigger (house dressing, thousand
+// island, vinaigrette, sweet chili, honey, silan, maple, teriyaki, BBQ,
+// ketchup, hoisin, tamarind, `רוטב הבית`, `אלף האיים`, `ויניגרט`), the
+// modifier's sentence already asks for it and no flag doubles it.
+
+/// One hidden-carb trigger's flag, in both languages: the flag is written
+/// in the **dish's** language (architecture.md §12), like a waiter script,
+/// so an English trigger in a Hebrew dish still gets the Hebrew source and
+/// question.
+///
+/// - `sourceEn`/`sourceHe`: the `HiddenCarb` source, a short name of what
+///   may hide the carbs.
+/// - `certainty`: `likely` (a glaze, a gravy, a sweet-and-sour sauce: the
+///   carbs are the recipe) or `suspected` (a house sauce, a marinade, a
+///   crisp coating: they may or may not be), the `HiddenCarbCertainty`
+///   wire names.
+/// - `questionEn`/`questionHe`: the waiter question, which becomes the
+///   whole instruction of a dish the flag alone made yellow (§9.4 rule
+///   5a), so each is at most [maxModificationLength] characters.
+/// - `concern`: what the carbs may be — `sugar` (a marinade, a glaze),
+///   `flour` (a gravy, a crisp coating) or `sugarOrFlour` (a house
+///   sauce; a sweet-and-sour sauce's sugar and cornstarch). A guard phrase
+///   cancels the flag only when it answers that concern
+///   ([hiddenCarbGuardPhrasesEn]), and a sweetener's carb modifier covers
+///   only a `sugar` flag ([hiddenCarbCoveringModifiers]).
+typedef HiddenCarbTrigger = ({
+  String sourceEn,
+  String sourceHe,
+  String certainty,
+  String questionEn,
+  String questionHe,
+  String concern,
+});
+
+/// The most hidden-carb flags one dish carries, on either engine: the
+/// model path's cap in `MenuResponseParser` (issue #213) and the rules
+/// path's.
+const int maxHiddenCarbsPerDish = 3;
+
+/// How many words either side of a hidden-carb trigger the rules read for
+/// a [hiddenCarbGuardPhrasesEn]/[hiddenCarbGuardPhrasesHe] phrase and for
+/// a covering sweetener ([hiddenCarbCoveringModifiers]). Three, not D-V1's
+/// two, so "no added sugar" and `ללא תוספת סוכר` fit whole.
+const int hiddenCarbWindowWords = 3;
+
+const HiddenCarbTrigger _hcHouseSauce = (
+  sourceEn: 'house sauce',
+  sourceHe: 'רוטב הבית',
+  certainty: 'suspected',
+  questionEn: 'Is there sugar or flour in the house sauce?',
+  questionHe: 'יש סוכר או קמח ברוטב הבית?',
+  concern: 'sugarOrFlour',
+);
+const HiddenCarbTrigger _hcSpecialSauce = (
+  sourceEn: 'special sauce',
+  sourceHe: 'רוטב מיוחד',
+  certainty: 'suspected',
+  questionEn: 'Is there sugar or flour in the special sauce?',
+  questionHe: 'יש סוכר או קמח ברוטב המיוחד?',
+  concern: 'sugarOrFlour',
+);
+const HiddenCarbTrigger _hcSecretSauce = (
+  sourceEn: 'secret sauce',
+  sourceHe: 'רוטב סודי',
+  certainty: 'suspected',
+  questionEn: 'Is there sugar or flour in the secret sauce?',
+  questionHe: 'יש סוכר או קמח ברוטב הסודי?',
+  concern: 'sugarOrFlour',
+);
+const HiddenCarbTrigger _hcChefSauce = (
+  sourceEn: "chef's sauce",
+  sourceHe: 'רוטב השף',
+  certainty: 'suspected',
+  questionEn: "Is there sugar or flour in the chef's sauce?",
+  questionHe: 'יש סוכר או קמח ברוטב של השף?',
+  concern: 'sugarOrFlour',
+);
+const HiddenCarbTrigger _hcMarinade = (
+  sourceEn: 'marinade',
+  sourceHe: 'מרינדה',
+  certainty: 'suspected',
+  questionEn: 'Is there sugar or honey in the marinade?',
+  questionHe: 'יש סוכר או דבש במרינדה?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcSweetMarinade = (
+  sourceEn: 'sweet marinade',
+  sourceHe: 'מרינדה מתוקה',
+  certainty: 'likely',
+  questionEn: 'Can it be made without the sweet marinade?',
+  questionHe: 'אפשר להכין את המנה בלי המרינדה המתוקה?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcGlaze = (
+  sourceEn: 'glaze',
+  sourceHe: 'זיגוג',
+  certainty: 'likely',
+  questionEn: 'Is the glaze made with sugar or honey? Can it be left off?',
+  questionHe: 'יש בזיגוג סוכר או דבש? אפשר בלי הזיגוג?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcGravy = (
+  sourceEn: 'gravy',
+  sourceHe: 'רוטב גרייבי',
+  certainty: 'likely',
+  questionEn: 'Is the gravy thickened with flour? Can it come on the side?',
+  questionHe: 'הרוטב מוסמך בקמח? אפשר אותו בצד?',
+  concern: 'flour',
+);
+const HiddenCarbTrigger _hcBrownSauce = (
+  sourceEn: 'brown sauce',
+  sourceHe: 'רוטב חום',
+  certainty: 'likely',
+  questionEn:
+      'Is the brown sauce thickened with flour? Can it come on the '
+      'side?',
+  questionHe: 'הרוטב החום מוסמך בקמח? אפשר אותו בצד?',
+  concern: 'flour',
+);
+const HiddenCarbTrigger _hcDemiGlace = (
+  sourceEn: 'demi-glace',
+  sourceHe: 'דמי גלאס',
+  certainty: 'likely',
+  questionEn:
+      'Is the demi-glace thickened with flour? Can it come on the '
+      'side?',
+  questionHe: 'הדמי גלאס מוסמך בקמח? אפשר אותו בצד?',
+  concern: 'flour',
+);
+const HiddenCarbTrigger _hcBechamel = (
+  sourceEn: 'béchamel',
+  sourceHe: 'רוטב בשמל',
+  certainty: 'likely',
+  questionEn: 'Béchamel is made with flour. Can the dish come without it?',
+  questionHe: 'רוטב בשמל עשוי מקמח. אפשר את המנה בלעדיו?',
+  concern: 'flour',
+);
+const HiddenCarbTrigger _hcKungPao = (
+  sourceEn: 'kung pao sauce',
+  sourceHe: 'רוטב קונג פאו',
+  certainty: 'likely',
+  questionEn: 'Is the kung pao sauce made with sugar or cornstarch?',
+  questionHe: 'יש ברוטב הקונג פאו סוכר או עמילן?',
+  concern: 'sugarOrFlour',
+);
+const HiddenCarbTrigger _hcGeneralTso = (
+  sourceEn: "General Tso's sauce",
+  sourceHe: 'רוטב גנרל טסו',
+  certainty: 'likely',
+  questionEn: "Is General Tso's sauce made with sugar or cornstarch?",
+  questionHe: 'יש ברוטב גנרל טסו סוכר או עמילן?',
+  concern: 'sugarOrFlour',
+);
+const HiddenCarbTrigger _hcOysterSauce = (
+  sourceEn: 'oyster sauce',
+  sourceHe: 'רוטב צדפות',
+  certainty: 'likely',
+  questionEn:
+      'Oyster sauce has sugar and cornstarch. Can it be made without '
+      'it?',
+  questionHe: 'ברוטב צדפות יש סוכר ועמילן. אפשר להכין בלעדיו?',
+  concern: 'sugarOrFlour',
+);
+const HiddenCarbTrigger _hcSweetSoy = (
+  sourceEn: 'sweet soy sauce',
+  sourceHe: 'סויה מתוקה',
+  certainty: 'likely',
+  questionEn:
+      'Sweet soy sauce is mostly sugar. Can it be made with plain soy '
+      'sauce?',
+  questionHe: 'סויה מתוקה היא בעיקר סוכר. אפשר עם סויה רגילה במקום?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcWokSauce = (
+  sourceEn: 'wok sauce',
+  sourceHe: 'רוטב ווק',
+  certainty: 'suspected',
+  questionEn: 'Is there sugar or cornstarch in the wok sauce?',
+  questionHe: 'יש סוכר או עמילן ברוטב הווק?',
+  concern: 'sugarOrFlour',
+);
+const HiddenCarbTrigger _hcSweetSauce = (
+  sourceEn: 'sweet sauce',
+  sourceHe: 'רוטב מתוק',
+  certainty: 'likely',
+  questionEn: 'Is the sauce sweetened with sugar? Can it be left off?',
+  questionHe: 'הרוטב ממותק בסוכר? אפשר בלעדיו?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcCrispy = (
+  sourceEn: 'crispy coating',
+  sourceHe: 'ציפוי קריספי',
+  certainty: 'suspected',
+  questionEn:
+      'Is it coated in flour or batter to make it crispy? Can it come '
+      'without the coating?',
+  questionHe: 'יש ציפוי קמח או בלילה שעושה אותו קריספי? אפשר בלי הציפוי?',
+  concern: 'flour',
+);
+const HiddenCarbTrigger _hcRub = (
+  sourceEn: 'spice rub',
+  sourceHe: 'ראב תבלינים',
+  certainty: 'suspected',
+  questionEn: 'Is there sugar in the spice rub?',
+  questionHe: 'יש סוכר בתערובת התבלינים (הראב)?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcGarlicSauce = (
+  sourceEn: 'garlic sauce',
+  sourceHe: 'רוטב שום',
+  certainty: 'suspected',
+  questionEn: 'Is there sugar in the garlic sauce?',
+  questionHe: 'יש סוכר ברוטב השום?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcDressingOfTheDay = (
+  sourceEn: 'dressing of the day',
+  sourceHe: 'רוטב היום',
+  certainty: 'suspected',
+  questionEn: "Is there sugar or honey in today's dressing?",
+  questionHe: 'יש סוכר או דבש ברוטב של היום?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcCaramelized = (
+  sourceEn: 'caramelizing',
+  sourceHe: 'קרמול',
+  certainty: 'suspected',
+  questionEn: 'Is sugar added to caramelize it?',
+  questionHe: 'מוסיפים סוכר כדי לקרמל?',
+  concern: 'sugar',
+);
+const HiddenCarbTrigger _hcPeanutSauce = (
+  sourceEn: 'peanut sauce',
+  sourceHe: 'רוטב בוטנים',
+  certainty: 'likely',
+  questionEn: 'Is there sugar in the peanut sauce? Can it come on the side?',
+  questionHe: 'יש סוכר ברוטב הבוטנים? אפשר אותו בצד?',
+  concern: 'sugar',
+);
+
+/// Hidden-carb triggers in English (issue #213 on the rules path): the
+/// trigger (natural spelling, normalised at compile time, matched with
+/// `latinTriggerPattern`) and its flag. A longer trigger that overlaps a
+/// shorter one at the same place wins ("sweet marinade" over "marinade").
+const Map<String, HiddenCarbTrigger> hiddenCarbTriggersEn =
+    <String, HiddenCarbTrigger>{
+      // Sauces only the kitchen can describe.
+      'house sauce': _hcHouseSauce,
+      'special sauce': _hcSpecialSauce,
+      'secret sauce': _hcSecretSauce,
+      'signature sauce': _hcSpecialSauce,
+      "chef's sauce": _hcChefSauce,
+      // Marinades: sweet ones are a recipe, plain ones a question.
+      'marinade': _hcMarinade,
+      'marinated': _hcMarinade,
+      'sweet marinade': _hcSweetMarinade,
+      // Glazes are almost always sugar, honey or a reduction.
+      'glaze': _hcGlaze,
+      'glazed': _hcGlaze,
+      // Flour-thickened sauces.
+      'gravy': _hcGravy,
+      'brown sauce': _hcBrownSauce,
+      'demi-glace': _hcDemiGlace,
+      'béchamel': _hcBechamel,
+      // Cornstarch-thickened, sweetened Asian sauces (`hoisin`,
+      // `sweet chili` and `sweet and sour` are carb modifiers already).
+      'kung pao': _hcKungPao,
+      'general tso': _hcGeneralTso,
+      "general tso's": _hcGeneralTso,
+      'oyster sauce': _hcOysterSauce,
+      'sweet soy': _hcSweetSoy,
+      'kecap manis': _hcSweetSoy,
+      'wok sauce': _hcWokSauce,
+      'stir-fry sauce': _hcWokSauce,
+      'sweet sauce': _hcSweetSauce,
+      // A crisp coating with no breading word (`battered`, `tempura` and
+      // `crispy coating` are red bases; `crispy onion` a carb modifier).
+      // Round 11 took bare `קריספי` out of the reds, because crispy skin
+      // and bacon carry no coating: a suspected flag is the honest signal,
+      // and [hiddenCarbTriggerGuardsEn] keeps the skin and the bacon out.
+      'crispy': _hcCrispy,
+      // Rubs, condiments and dressings that may carry sugar.
+      'rub': _hcRub,
+      'rubbed': _hcRub,
+      'garlic sauce': _hcGarlicSauce,
+      'dressing of the day': _hcDressingOfTheDay,
+      'caramelized': _hcCaramelized,
+      'caramelised': _hcCaramelized,
+      'peanut sauce': _hcPeanutSauce,
+      'satay': _hcPeanutSauce,
+    };
+
+/// [hiddenCarbTriggersEn] in Hebrew, matched with `hebrewTriggerPattern`
+/// (permissive prefix, strict right — never `\b`). Inflected and
+/// construct forms are their own keys, since the right boundary is strict.
+const Map<String, HiddenCarbTrigger> hiddenCarbTriggersHe =
+    <String, HiddenCarbTrigger>{
+      // `רוטב הבית` is a carb modifier already.
+      'רוטב מיוחד': _hcSpecialSauce,
+      'רוטב סודי': _hcSecretSauce,
+      'רוטב השף': _hcChefSauce,
+      'מרינדה': _hcMarinade,
+      'מרינדת': _hcMarinade,
+      'מרינדה מתוקה': _hcSweetMarinade,
+      'זיגוג': _hcGlaze,
+      'גלייז': _hcGlaze,
+      'מזוגג': _hcGlaze,
+      'מזוגגת': _hcGlaze,
+      'מזוגגים': _hcGlaze,
+      'מזוגגות': _hcGlaze,
+      'רוטב חום': _hcBrownSauce,
+      'גרייבי': _hcGravy,
+      'דמי גלאס': _hcDemiGlace,
+      'בשמל': _hcBechamel,
+      'קונג פאו': _hcKungPao,
+      'גנרל טסו': _hcGeneralTso,
+      'רוטב צדפות': _hcOysterSauce,
+      'רוטב אויסטר': _hcOysterSauce,
+      'סויה מתוקה': _hcSweetSoy,
+      'סויה מתוק': _hcSweetSoy,
+      'רוטב ווק': _hcWokSauce,
+      'רוטב מתוק': _hcSweetSauce,
+      'רוטב מתקתק': _hcSweetSauce,
+      'קריספי': _hcCrispy,
+      'קריספית': _hcCrispy,
+      'קריספיים': _hcCrispy,
+      'ראב': _hcRub,
+      'רוטב שום': _hcGarlicSauce,
+      'רוטב היום': _hcDressingOfTheDay,
+      'רוטב של היום': _hcDressingOfTheDay,
+      'מקורמל': _hcCaramelized,
+      'מקורמלת': _hcCaramelized,
+      'מקורמלים': _hcCaramelized,
+      'מקורמלות': _hcCaramelized,
+      'רוטב בוטנים': _hcPeanutSauce,
+      'סאטה': _hcPeanutSauce,
+    };
+
+/// Phrases that cancel a hidden-carb flag within [hiddenCarbWindowWords]
+/// words of its trigger, English, by what they answer: the menu already
+/// says ("sugar-free glaze", "house sauce, no added sugar", "keto
+/// gravy"). A `sugar` phrase cancels a `sugar` or `sugarOrFlour` flag, a
+/// `flour` phrase a `flour` or `sugarOrFlour` one, and an `any` phrase
+/// every flag; so "sugar-free" never answers a gravy's flour. Normalised
+/// before comparison, so "sugar-free" is "sugar free".
+const Map<String, List<String>> hiddenCarbGuardPhrasesEn =
+    <String, List<String>>{
+      'sugar': <String>[
+        'sugar free',
+        'sugarfree',
+        'no sugar',
+        'no added sugar',
+        'without sugar',
+        'zero sugar',
+        'unsweetened',
+      ],
+      'flour': <String>['no flour', 'flourless', 'without flour'],
+      'any': <String>['keto', 'low carb', 'lowcarb'],
+    };
+
+/// [hiddenCarbGuardPhrasesEn] in Hebrew, with the ו-prefixed forms of the
+/// commonest ones (a phrase is compared as whole words).
+const Map<String, List<String>> hiddenCarbGuardPhrasesHe =
+    <String, List<String>>{
+      'sugar': <String>[
+        'ללא סוכר',
+        'וללא סוכר',
+        'בלי סוכר',
+        'ובלי סוכר',
+        'ללא תוספת סוכר',
+        'בלי תוספת סוכר',
+        'ללא סוכרים',
+        'נטול סוכר',
+        'נטולת סוכר',
+      ],
+      'flour': <String>['ללא קמח', 'וללא קמח', 'בלי קמח'],
+      'any': <String>['קטו', 'קטוגני', 'קטוגנית', 'דל פחמימות', 'דלת פחמימות'],
+    };
+
+/// Words after `crispy` that mean the crunch is the ingredient's own, not
+/// a coating: crispy skin, bacon, greens and garnishes.
+const List<String> _crispyOwnCrunchEn = <String>[
+  'skin',
+  'bacon',
+  'pancetta',
+  'prosciutto',
+  'pork belly',
+  'crackling',
+  'lettuce',
+  'salad',
+  'greens',
+  'leaves',
+  'kale',
+  'cucumber',
+  'cucumbers',
+  'shallots',
+  'garlic',
+  'capers',
+  'sage',
+  'leeks',
+  'seaweed',
+  'nori',
+  'parmesan',
+  'edges',
+];
+
+/// Words after `marinated` that mean an antipasto marinade of oil and
+/// herbs, not a sweet one.
+const List<String> _oilMarinatedEn = <String>[
+  'olives',
+  'olive',
+  'feta',
+  'artichoke',
+  'artichokes',
+  'mushrooms',
+  'peppers',
+  'labneh',
+  'cheese',
+  'eggplant',
+];
+
+/// Per-trigger guards for [hiddenCarbTriggersEn], read in D-V1's two-word
+/// window (`ClassificationRules.isGuarded`): a word that makes this one
+/// trigger a different thing ("crispy skin", "marinated olives").
+const Map<String, GuardWords> hiddenCarbTriggerGuardsEn = <String, GuardWords>{
+  'crispy': (before: <String>[], after: _crispyOwnCrunchEn),
+  'marinated': (before: <String>[], after: _oilMarinatedEn),
+};
+
+/// Words beside `קריספי` that mean the crunch is the ingredient's own.
+/// Both sides: a Hebrew adjective follows its noun (`עור קריספי`), and a
+/// garnish may follow it (`קריספי עם עלי מרווה`).
+const List<String> _crispyOwnCrunchHe = <String>[
+  'עור',
+  'בעור',
+  'העור',
+  'בייקון',
+  'פנצטה',
+  'פרושוטו',
+  'חסה',
+  'סלט',
+  'עלים',
+  'מלפפון',
+  'שאלוט',
+  'שום',
+  'צלפים',
+  'מרווה',
+  'כרישה',
+  'אצות',
+  'פרמזן',
+];
+
+/// Words beside `מרינדה` that mean an antipasto marinade of oil and herbs.
+const List<String> _oilMarinatedHe = <String>[
+  'זיתים',
+  'פטה',
+  'ארטישוק',
+  'פטריות',
+  'פלפלים',
+  'לבנה',
+  'גבינה',
+  'חצילים',
+];
+
+/// [hiddenCarbTriggerGuardsEn] in Hebrew, applied on both sides.
+const Map<String, GuardWords> hiddenCarbTriggerGuardsHe = <String, GuardWords>{
+  'קריספי': (before: _crispyOwnCrunchHe, after: _crispyOwnCrunchHe),
+  'קריספית': (before: _crispyOwnCrunchHe, after: _crispyOwnCrunchHe),
+  'קריספיים': (before: _crispyOwnCrunchHe, after: _crispyOwnCrunchHe),
+  'מרינדה': (before: _oilMarinatedHe, after: _oilMarinatedHe),
+  'מרינדת': (before: _oilMarinatedHe, after: _oilMarinatedHe),
+};
+
+/// The carb modifiers that name a sweetener or a sweet sauce, both
+/// languages: within [hiddenCarbWindowWords] words of a flag whose
+/// `concern` is `sugar` ("honey marinade", "teriyaki glaze",
+/// `מזוגג בדבש`), the modifier's sentence already asks for the sugar to
+/// go, so the flag would only repeat it. Any carb modifier whose match
+/// overlaps a flag's trigger covers it whatever the flag ("crispy onion").
+const Set<String> hiddenCarbCoveringModifiers = <String>{
+  'teriyaki',
+  'honey',
+  'bbq',
+  'barbecue',
+  'barbeque',
+  'bbqed',
+  'maple',
+  'balsamic glaze',
+  'silan',
+  'date honey',
+  'sweet tahini',
+  'sweet chili',
+  'ketchup',
+  'thousand island',
+  'house dressing',
+  'vinaigrette',
+  'tamarind',
+  'hoisin',
+  'cranberry sauce',
+  'port wine reduction',
+  'port reduction',
+  'port wine sauce',
+  'port sauce',
+  'port wine glaze',
+  'syrup',
+  'flavoured syrup',
+  'טריאקי',
+  'טריקי',
+  'דבש',
+  'זיגוג דבש',
+  'חרדל דבש',
+  'ברביקיו',
+  'בבקיו',
+  'רוטב ברביקיו',
+  'סילן',
+  'דבש תמרים',
+  'טחינה מתוקה',
+  "צ'ילי מתוק",
+  'קטשופ',
+  'אלף האיים',
+  'רוטב הבית',
+  'ויניגרט',
+  'תמרינד',
+  'הויסין',
+  'רוטב חמוציות',
+  'רוטב יין פורט',
+  'רוטב פורט',
+  'רדוקציית פורט',
+  'רדוקציית יין פורט',
+  'מייפל',
+  'זיגוג בלסמי',
+  'סירופ',
+};
+
+/// Shown for a dish only a hidden-carb flag made yellow, English (§9.4
+/// rule 5a on the rules path): nothing on the menu is a carb by name, but
+/// the flag's question decides it.
+const String hiddenCarbWhyEn =
+    'Nothing starchy is named, but a sauce, glaze or coating here can hide '
+    'sugar or flour. Ask the question below before ordering.';
+
+/// Shown for a dish only a hidden-carb flag made yellow, Hebrew.
+const String hiddenCarbWhyHe =
+    'לא מופיעות פחמימות בשם המנה, אבל רוטב, זיגוג או ציפוי '
+    'עלולים להסתיר סוכר או קמח. שאלו את השאלה שמופיעה כאן לפני '
+    'ההזמנה.';
 
 /// The drink entries of [nonKetoBasesEn] — red (#216): sugary drinks that
 /// cannot be made keto. Spread into [nonKetoBasesEn] at the position they
@@ -769,6 +1374,26 @@ const List<String> nonKetoDrinkBasesEn = <String>[
   'sweet wine',
   'moscato',
   'port wine',
+  // The Israeli keto corpus's false greens: sweet drinks the list had no
+  // word for — hot chocolate, a slush, flavoured water (sweetened on an
+  // Israeli menu unless it says otherwise; the sugar-free guards rescue
+  // the rest), a dessert wine (the `sweet wine` family) — and the beer
+  // brands an Israeli menu prints instead of the word `beer`.
+  'hot chocolate',
+  'chocolate milk',
+  'slush',
+  'slushie',
+  'flavoured water',
+  'flavored water',
+  'dessert wine',
+  'sauternes',
+  'san miguel',
+  'goldstar',
+  'carlsberg',
+  'tuborg',
+  'heineken',
+  'stella artois',
+  'guinness',
 ];
 
 // ---------------------------------------------------------------------------
@@ -848,6 +1473,19 @@ const List<String> nonKetoBasesEn = <String>[
   // `pastry base`, both of which are red anyway.
   'danish', 'pastry', 'pastries', 'rugelach', 'muffin', 'scone',
 
+  // The Israeli keto corpus's false greens (`test/fixtures/keto/`):
+  // doughs, pastries, desserts and starch-built dishes with no trigger.
+  // Khachapuri, khinkali, pelmeni, blini, quiche, kubaneh and sfenj are
+  // dough; falafel is fried chickpea (guarded against a cauliflower or
+  // keto falafel); gefilte fish is bound with matzah meal and sugar;
+  // firfir is torn injera; a flour coating is breading (D-V2). Bamba
+  // and Bissli are the corn and wheat snacks.
+  'khachapuri', 'khinkali', 'pelmeni', 'blini', 'blinchiki', 'quiche',
+  'shortcrust', 'kubaneh', 'sfenj', 'mufleta', 'falafel', 'gefilte',
+  'firfir', 'fir fir', 'flour coating', 'flour coated', 'bean stew',
+  'sorbet', 'chocolate mousse', 'petit four', 'petits fours', 'praline',
+  'sweet and sour chicken', 'bamba', 'bissli',
+
   // Drink bases — red (#216): see [nonKetoDrinkBasesEn].
   ...nonKetoDrinkBasesEn,
 
@@ -880,6 +1518,22 @@ const List<String> nonKetoDrinkBasesHe = <String>[
   'ליקר', // liqueur
   'סמוטי', // smoothie
   'יין מתוק', // sweet wine
+  // The Israeli keto corpus's false greens, mirroring the English
+  // additions. `שוקו` is chocolate milk (the strict right boundary keeps
+  // it out of `שוקולד`); `ברד` is a slush ("קפה ברד", "ברד ענבים");
+  // `סמוזי` is the spelling `סמוטי` misses.
+  'שוקו', // chocolate milk / hot chocolate
+  'ברד', // slush
+  'מים בטעם', // flavoured water
+  'יין קינוח', // dessert wine
+  'סמוזי', // smoothie
+  'סאן מיגל', // San Miguel (beer)
+  'גולדסטאר', // Goldstar (beer)
+  'קרלסברג', // Carlsberg (beer)
+  'טובורג', // Tuborg (beer)
+  'הייניקן', // Heineken (beer)
+  'סטלה ארטואה', // Stella Artois (beer)
+  'גינס', // Guinness (beer)
 ];
 
 // ---------------------------------------------------------------------------
@@ -896,7 +1550,10 @@ const List<String> nonKetoDrinkBasesHe = <String>[
 /// gap CLAUDE.md warns about. `penne`'s transliteration (`פנה`) is
 /// deliberately absent: it is an ordinary Hebrew word ("turned"), so a
 /// bare trigger would redden unrelated dishes; Israeli menus print
-/// *Penne* in Latin and `פסטה` catches the rest.
+/// *Penne* in Latin, `פסטה` catches the rest, and the keto corpus's
+/// `פנה פסטו` brought in the two-word dish names `פנה` heads
+/// (`פנה ברוטב`, `פנה רוזה`, ...), which no other sense of the word
+/// forms.
 const List<String> nonKetoBasesHe = <String>[
   'פסטה', 'פסטות', 'ספגטי', 'ספאגטי', "פטוצ'יני", 'פטוצייני', 'ניוקי',
   'גנוקי',
@@ -985,6 +1642,22 @@ const List<String> nonKetoBasesHe = <String>[
   // itself, which on an Israeli menu is always the breaded one.
   "קריספי צ'יקן", "צ'יקן קריספי", 'עוף קריספי',
   "פיש נ' צ'יפס", // fish 'n' chips
+  // The Israeli keto corpus's false greens, mirroring the English
+  // additions. Spellings: the geresh is deleted by the normaliser, so
+  // `חצ'פורי` also finds `חצ׳פורי` and `חצפורי`; the alef spellings
+  // (`חצ'אפורי`, `פוקאצ'ה`) are entries of their own. `כיסוני` is the
+  // construct form of `כיסונים` ("כיסוני בצק"), guarded against lettuce
+  // and cabbage cups. `פנה` alone stays out (see this list's doc
+  // comment); the dish names it heads are spelled out instead.
+  "חצ'פורי", "חצ'אפורי", "חאצ'אפורי", 'חינקלי', 'פלמני', "בלינצ'יקי",
+  'בליני', 'חביתיות', 'חביתית', 'כיסוני', 'קיש', 'בצק פריך', 'קובנה',
+  "ספינג'", 'מופלטה', "פוקאצ'ה", 'פלאפל', 'גפילטע', 'פיר פיר',
+  "קרעי אינג'רה", 'ציפוי קמח', 'תבשיל שעועית', 'עוף חמוץ מתוק', 'במבה',
+  'ביסלי',
+  'גלידת', 'גלידות', 'סורבה', 'סורבט', 'מוס שוקולד', 'פטי פור', 'פרלינים',
+  'פרלינה', 'פרלין',
+  'פנה ברוטב', 'פנה פסטו', 'פנה רוזה', 'פנה ארביאטה', 'פנה אלפרדו',
+  'פנה בולונז', 'פנה פומודורו',
   // Drink bases — red (#216): see [nonKetoDrinkBasesHe].
   ...nonKetoDrinkBasesHe,
 ];
@@ -1375,6 +2048,9 @@ const Set<String> carbOnlyEligibleTriggers = <String>{
   'לחמנית', 'באגט', 'טורטייה', 'טורטיה',
   // Issue #274, mirroring the English additions.
   'פיתות', 'טורטיות', 'האש בראון', 'טבעות בצל', 'נאן',
+  // The Israeli keto corpus: injera is a bread ("אינג'רה" alone is the
+  // bread basket), and a plate of dried fruit is nothing but its sugar.
+  'injera', "אינג'רה", 'dried fruit', 'פירות יבשים', 'פירות מיובשים',
 };
 
 /// Display labels for a carb-only red's `{base}` (issue #191), for the
@@ -1592,6 +2268,23 @@ const Map<String, String> nonKetoBaseLabelsEn = <String, String>{
   'fish chips': 'battered fish',
   'fish n chips': 'battered fish',
   'noodle': 'noodles',
+  // The keto corpus: one label per dish however it is spelled.
+  'flour coated': 'flour coating',
+  'fir fir': 'firfir',
+  'petit four': 'petits fours',
+  // A dessert wine is a sweet wine and a beer brand is a beer: "Built on
+  // goldstar" would read the brand as an ingredient.
+  'dessert wine': 'sweet wine',
+  'sauternes': 'sweet wine',
+  'slushie': 'slush',
+  'flavored water': 'flavoured water',
+  'san miguel': 'beer',
+  'goldstar': 'beer',
+  'carlsberg': 'beer',
+  'tuborg': 'beer',
+  'heineken': 'beer',
+  'stella artois': 'beer',
+  'guinness': 'beer',
 };
 
 /// Display labels for [nonKetoBasesHe] triggers, for rendering `{base}`
@@ -1625,6 +2318,33 @@ const Map<String, String> nonKetoBaseLabelsHe = <String, String>{
   'בחלבה': 'חלבה',
   'בבלילה': 'בלילה',
   'בבלילת': 'בלילה',
+  // The keto corpus: construct and plural forms read as the absolute
+  // form, the spellings as one, and the `פנה` dish names as the pasta.
+  'גלידת': 'גלידה',
+  'גלידות': 'גלידה',
+  'כיסוני': 'כיסונים',
+  'חביתיות': 'חביתית',
+  "קרעי אינג'רה": "אינג'רה",
+  "חצ'אפורי": "חצ'פורי",
+  "חאצ'אפורי": "חצ'פורי",
+  'סורבט': 'סורבה',
+  'פרלינים': 'פרלין',
+  'פרלינה': 'פרלין',
+  'פנה ברוטב': 'פסטה',
+  'פנה פסטו': 'פסטה',
+  'פנה רוזה': 'פסטה',
+  'פנה ארביאטה': 'פסטה',
+  'פנה אלפרדו': 'פסטה',
+  'פנה בולונז': 'פסטה',
+  'פנה פומודורו': 'פסטה',
+  'יין קינוח': 'יין מתוק',
+  'סאן מיגל': 'בירה',
+  'גולדסטאר': 'בירה',
+  'קרלסברג': 'בירה',
+  'טובורג': 'בירה',
+  'הייניקן': 'בירה',
+  'סטלה ארטואה': 'בירה',
+  'גינס': 'בירה',
 };
 
 // ---------------------------------------------------------------------------
@@ -1726,6 +2446,31 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'fried chicken': (before: ['pan', 'stir', 'air'], after: []),
   // Crispy chicken skin is skin, not a coating.
   'crispy chicken': (before: [], after: ['skin']),
+
+  // The Israeli keto corpus's additions: a cauliflower or keto falafel
+  // and a crustless quiche are the keto versions; an almond-flour or
+  // coconut-flour coating is not wheat; the sweet drinks keep the
+  // sugar-free rescue the colas have, and the dessert wines and beer
+  // brands the cooked-in rescue `port wine` and `beer` have.
+  'falafel': (before: ['cauliflower', 'broccoli', 'keto'], after: []),
+  'quiche': (before: ['crustless', 'keto'], after: []),
+  'flour coating': (before: ['almond', 'coconut', 'no', 'without'], after: []),
+  'flour coated': (before: ['almond', 'coconut', 'no', 'without'], after: []),
+  'hot chocolate': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'chocolate milk': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'slush': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'slushie': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'flavoured water': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'flavored water': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'dessert wine': (before: _cookedInWords, after: _cookedInWords),
+  'sauternes': (before: _cookedInWords, after: _cookedInWords),
+  'san miguel': (before: _beerCookedWords, after: _beerCookedWords),
+  'goldstar': (before: _beerCookedWords, after: _beerCookedWords),
+  'carlsberg': (before: _beerCookedWords, after: _beerCookedWords),
+  'tuborg': (before: _beerCookedWords, after: _beerCookedWords),
+  'heineken': (before: _beerCookedWords, after: _beerCookedWords),
+  'stella artois': (before: _beerCookedWords, after: _beerCookedWords),
+  'guinness': (before: _beerCookedWords, after: _beerCookedWords),
 };
 
 /// The keto-substitute words before `noodle` and `pasta` (issue #273):
@@ -1797,7 +2542,8 @@ const List<String> _sugarFreeWords = <String>[
 
 /// Builds a Hebrew guard's [GuardWords] from one word list, applied on
 /// **both** sides. Unlike the English table, Hebrew guards are
-/// bidirectional (the cheeses of [_heChipsGuard] are the one exception):
+/// bidirectional (the exceptions are the cheeses of [_heChipsGuard] and
+/// the left-only rescues of `ציפוי קמח` and [_heUnsweetenedGuard]):
 /// Hebrew adjectives conventionally
 /// follow the noun they qualify ("פיצה כרובית", pizza cauliflower-ish,
 /// not "כרובית פיצה"), the mirror image of the English word order these
@@ -1984,7 +2730,42 @@ final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
 
   // Issue #274: sushi-grade fish (`טונה באיכות סושי`) is raw fish.
   'סושי': _heGuard(const ['איכות', 'באיכות']),
+
+  // The Israeli keto corpus's additions, mirroring the English guards.
+  // `ציפוי קמח` and the candied forms are guarded on the left only: a
+  // word after them ("ציפוי קמח ללא גלוטן") does not take the flour or
+  // the sugar away, while "ללא ציפוי קמח" and "נקי מסוכר" ("free of
+  // sugar", the מ particle on `סוכר`) do. `כיסוני חסה` are lettuce cups.
+  'פלאפל': _heGuard(const ['כרובית', 'ברוקולי', 'קטו']),
+  'קיש': _heGuard(const ['ללא בצק', 'בלי בצק', 'קטו']),
+  'כיסוני': _heGuard(const ['חסה', 'כרוב']),
+  'ציפוי קמח': (
+    before: const <String>['ללא', 'בלי', 'שקדים', 'קוקוס'],
+    after: const <String>['שקדים', 'קוקוס'],
+  ),
+  'מסוכרים': _heUnsweetenedGuard,
+  'מסוכרות': _heUnsweetenedGuard,
+  'מסוכר': _heUnsweetenedGuard,
+  'מסוכרת': _heUnsweetenedGuard,
+  'שוקו': _heDrinkGuard,
+  'ברד': _heDrinkGuard,
+  'מים בטעם': _heDrinkGuard,
+  'יין קינוח': _heGuard(_heCookedInWords),
+  'סאן מיגל': _heBeerGuard,
+  'גולדסטאר': _heBeerGuard,
+  'קרלסברג': _heBeerGuard,
+  'טובורג': _heBeerGuard,
+  'הייניקן': _heBeerGuard,
+  'סטלה ארטואה': _heBeerGuard,
+  'גינס': _heBeerGuard,
 };
+
+/// See [ketoQualifierGuardsHe] — the candied forms (`מסוכרים`): "not",
+/// "without" and "free of" before them mean no sugar was added.
+const GuardWords _heUnsweetenedGuard = (
+  before: <String>['לא', 'ללא', 'נקי', 'נקייה', 'נקיים', 'נקיות'],
+  after: <String>[],
+);
 
 // ---------------------------------------------------------------------------
 // Keto substitutes named anywhere in the dish name (issue #273)
@@ -2016,6 +2797,8 @@ const Map<String, List<String>> ketoSubstituteNameWordsEn =
       'spaghetti': _konjacNameWordsEn,
       'rice': _ketoNameWordsEn,
       'risotto': _ketoNameWordsEn,
+      // The keto corpus: a keto falafel is baked from a substitute.
+      'falafel': _ketoNameWordsEn,
     };
 
 /// The words that mark a whole dish name as adapted (issue #273).
@@ -2042,6 +2825,8 @@ const Map<String, List<String>> ketoSubstituteNameWordsHe =
       'אטריות': _heKonjacNameWords,
       'אורז': _heKetoNameWords,
       'ריזוטו': _heKetoNameWords,
+      // The keto corpus, mirroring the English `falafel`.
+      'פלאפל': _heKetoNameWords,
     };
 
 /// The words that mark a whole Hebrew dish name as adapted (issue #273).
@@ -2102,6 +2887,8 @@ const Map<String, List<String>> triggerSuppresses = <String, List<String>>{
   'דבש תמרים': ['דבש'],
   // Issue #274: the sauce sentence already names the cranberries.
   'רוטב חמוציות': ['חמוציות'],
+  // The keto corpus: the candied pine nuts' sentence already names them.
+  'צנוברים מסוכרים': ['מסוכרים'],
 };
 
 // ---------------------------------------------------------------------------

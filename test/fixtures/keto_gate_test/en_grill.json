@@ -1,0 +1,47 @@
+{
+  "id": "gate_en_grill",
+  "name": "Gate Test Grill",
+  "source": "synthetic",
+  "language": "en",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic, written for keto_scoring_test.dart; not part of the keto corpus.",
+  "categories": [
+    {
+      "name": "Mains",
+      "dishes": [
+        {
+          "id": "steak",
+          "name": "Entrecote steak",
+          "description": "Grilled entrecote with herb butter",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Meat and butter.",
+          "evidence": ["entrecote", "butter"]
+        },
+        {
+          "id": "carbonara",
+          "name": "Spaghetti carbonara",
+          "description": "Spaghetti with egg yolk, guanciale and pecorino",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A pasta base.",
+          "evidence": ["spaghetti"]
+        },
+        {
+          "id": "chicken",
+          "name": "Chicken breast",
+          "description": "Grilled chicken breast",
+          "options": [
+            {"name": "Choice of side", "values": ["Mashed potatoes", "Green salad"]}
+          ],
+          "expected": "nonKeto",
+          "acceptable": ["modifiable"],
+          "hiddenCarbs": [],
+          "why": "A synthetic label so the fixture exercises acceptable: yellow is also right.",
+          "evidence": ["mashed potatoes"]
+        }
+      ]
+    }
+  ]
+}

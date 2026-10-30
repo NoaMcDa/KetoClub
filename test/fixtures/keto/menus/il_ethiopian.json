@@ -1,0 +1,215 @@
+{
+  "id": "il_ethiopian",
+  "name": "מסעדת אדיס",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Ethiopian restaurant (injera, wat) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "תבשילים",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "דורו וואט",
+          "description": "תבשיל עוף חריף ברוטב ברברה עם ביצה קשה, מוגש על אינג׳רה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Chicken and egg stew; ask for it in a bowl without the injera.",
+          "evidence": [
+            "תבשיל עוף",
+            "אינג׳רה"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "קיי וואט",
+          "description": "תבשיל בקר חריף ברוטב ברברה ובצל, מוגש עם אינג׳רה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Beef stew; leave out the injera.",
+          "evidence": [
+            "תבשיל בקר",
+            "אינג׳רה"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "טיבס בקר",
+          "description": "קוביות בקר מוקפצות עם בצל, פלפל חריף וחמאה מתובלת",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Beef sautéed in spiced butter.",
+          "evidence": [
+            "קוביות בקר",
+            "חמאה מתובלת"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "קיטפו",
+          "description": "בקר טחון נא מתובל בחמאה מתובלת ומיטמיטה",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Raw minced beef in spiced butter.",
+          "evidence": [
+            "בקר טחון",
+            "חמאה"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "מיסיר וואט",
+          "description": "תבשיל עדשים אדומות חריף",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A lentil stew.",
+          "evidence": [
+            "עדשים"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "שירו",
+          "description": "תבשיל קמח חומוס עם שום ובצל",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A stew of chickpea flour.",
+          "evidence": [
+            "קמח חומוס"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "גומן",
+          "description": "עלי כרוב ירוק מבושלים עם שום וג׳ינג׳ר",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Braised collard greens.",
+          "evidence": [
+            "עלי כרוב"
+          ]
+        },
+        {
+          "id": "d8",
+          "name": "אטקילט",
+          "description": "כרוב, גזר ותפוחי אדמה מבושלים בכורכום",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Potato and carrot are half the pot.",
+          "evidence": [
+            "תפוחי אדמה",
+            "גזר"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "פיר פיר",
+          "description": "קרעי אינג׳רה ספוגים ברוטב ברברה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Torn injera is the dish.",
+          "evidence": [
+            "קרעי אינג׳רה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "לחם וקטנות",
+      "dishes": [
+        {
+          "id": "d10",
+          "name": "אינג׳רה",
+          "description": "לחם טף חמוץ",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Teff bread.",
+          "evidence": [
+            "לחם טף"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "סמבוסה עדשים",
+          "description": "כיסוני בצק מטוגנים במילוי עדשים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fried pastry with lentils.",
+          "evidence": [
+            "כיסוני בצק"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "אייב",
+          "description": "גבינה טרייה מפוררת עם עשבים",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Fresh crumbled cheese.",
+          "evidence": [
+            "גבינה טרייה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d13",
+          "name": "בונה",
+          "description": "קפה אתיופי שחור מבושל בג׳בנה",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Ethiopian coffee is traditionally served with sugar (בונה)",
+              "certainty": "suspected",
+              "term": "בונה"
+            }
+          ],
+          "why": "Black coffee; ask for it without sugar.",
+          "evidence": [
+            "קפה אתיופי"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "טלה",
+          "description": "בירה ביתית משעורה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Home-brewed barley beer.",
+          "evidence": [
+            "בירה"
+          ]
+        }
+      ]
+    }
+  ]
+}

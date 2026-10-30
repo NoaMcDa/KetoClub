@@ -1,0 +1,265 @@
+{
+  "id": "il_russian_deli",
+  "name": "מעדניית סשה",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Russian deli and eatery written for the keto corpus.",
+  "categories": [
+    {
+      "name": "מנות חמות",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "פלמני",
+          "description": "כיסוני בצק במילוי בשר, עם שמנת חמוצה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Dough dumplings.",
+          "evidence": [
+            "כיסוני בצק"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "וארניקי",
+          "description": "כיסונים במילוי תפוחי אדמה ובצל מטוגן",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Potato dumplings.",
+          "evidence": [
+            "כיסונים",
+            "תפוחי אדמה"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "בלינצ׳יקי בשר",
+          "description": "חביתיות ממולאות בשר טחון",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Flour crêpes around meat.",
+          "evidence": [
+            "חביתיות"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "קוטלטים",
+          "description": "קציצות עוף מטוגנות, מוגשות עם פירה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "kotleti are made with soaked bread",
+              "certainty": "likely",
+              "term": "קציצות עוף"
+            }
+          ],
+          "why": "Chicken patties; swap the mash and ask whether the patties hold bread.",
+          "evidence": [
+            "קציצות עוף",
+            "פירה"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "בורשט",
+          "description": "מרק סלק עם כרוב, תפוחי אדמה ושמנת",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Beet and potato soup.",
+          "evidence": [
+            "סלק",
+            "תפוחי אדמה"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "סולנקה",
+          "description": "מרק בשרים חמוץ עם נקניקים, מלפפון חמוץ, זיתים ולימון",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "deli sausages may hold starch fillers (נקניקים)",
+              "certainty": "suspected",
+              "term": "נקניקים"
+            }
+          ],
+          "why": "A sour meat soup with pickles and olives.",
+          "evidence": [
+            "מרק בשרים",
+            "מלפפון חמוץ"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "פירוז׳קי",
+          "description": "מאפה שמרים מטוגן במילוי כרוב",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fried yeast pastry.",
+          "evidence": [
+            "מאפה שמרים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סלטים ודגים",
+      "dishes": [
+        {
+          "id": "d8",
+          "name": "סלט אוליבייה",
+          "description": "תפוחי אדמה, גזר, אפונה, נקניק, מלפפון חמוץ ומיונז",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Potato salad with carrot and peas.",
+          "evidence": [
+            "תפוחי אדמה",
+            "אפונה"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "הרינג במלח",
+          "description": "פילה הרינג במלח עם בצל ושמן",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Salted herring with onion and oil.",
+          "evidence": [
+            "הרינג במלח"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "הרינג בשמנת",
+          "description": "פילה הרינג במרינדה בשמנת ובצל",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "herring marinades are sweetened with sugar (במרינדה)",
+              "certainty": "likely",
+              "term": "במרינדה"
+            }
+          ],
+          "why": "Marinated herring is usually sugared; ask for the salted herring instead.",
+          "evidence": [
+            "הרינג",
+            "במרינדה"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "שובה",
+          "description": "הרינג, סלק, תפוחי אדמה, גזר וביצה בשכבות מיונז",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Layers of beet, potato and carrot.",
+          "evidence": [
+            "סלק",
+            "תפוחי אדמה"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "כרוב כבוש",
+          "description": "כרוב כבוש ביתי עם גזר",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Sauerkraut.",
+          "evidence": [
+            "כרוב כבוש"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "מלפפונים חמוצים",
+          "description": "מלפפונים במלח ושמיר",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Salt pickles.",
+          "evidence": [
+            "מלפפונים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "מעדנייה",
+      "dishes": [
+        {
+          "id": "d14",
+          "name": "נקניק מעושן",
+          "description": "נקניק בקר מעושן פרוס, 100 גרם",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "deli sausage may carry starch or sugar (נקניק)",
+              "certainty": "suspected",
+              "term": "נקניק"
+            }
+          ],
+          "why": "Sliced smoked beef sausage.",
+          "evidence": [
+            "נקניק בקר"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d15",
+          "name": "קוואס",
+          "description": "משקה לחם מותסס",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fermented bread drink with sugar.",
+          "evidence": [
+            "קוואס",
+            "משקה לחם"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "וודקה",
+          "description": "צ׳ייסר וודקה קרה",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "A spirit.",
+          "evidence": [
+            "וודקה"
+          ]
+        }
+      ]
+    }
+  ]
+}

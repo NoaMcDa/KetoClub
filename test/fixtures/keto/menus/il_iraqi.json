@@ -1,0 +1,269 @@
+{
+  "id": "il_iraqi",
+  "name": "מטבח בגדאד",
+  "source": "synthetic",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Synthetic Iraqi restaurant (amba, tbit, kubbeh) written for the keto corpus.",
+  "categories": [
+    {
+      "name": "עיקריות",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "טבית",
+          "description": "עוף ממולא אורז בבישול לילה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Rice stuffed and cooked overnight with chicken.",
+          "evidence": [
+            "אורז"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "קובה אורז מטוגנת",
+          "description": "קובה אורז מטוגנת ממולאת בשר ושקדים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Fried rice-shell kubbeh.",
+          "evidence": [
+            "קובה אורז"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "מסגוף",
+          "description": "דג קרפיון פתוח בגריל עם כורכום, עגבנייה ועמבה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Grilled carp; leave out the amba.",
+          "evidence": [
+            "דג קרפיון",
+            "עמבה"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "שיפודי כבד",
+          "description": "כבד עוף על האש, בצל ופטרוזיליה, מוגש עם עמבה בצד",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Grilled chicken liver; the amba comes on the side, so ask for the plate without it.",
+          "evidence": [
+            "כבד עוף",
+            "עמבה בצד"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "בצלים ממולאים",
+          "description": "בצלים ממולאים באורז ובשר בסילאן ותמרהינדי",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "silan, date syrup (סילאן)",
+              "certainty": "likely",
+              "term": "בסילאן"
+            }
+          ],
+          "why": "Rice-stuffed onions in date syrup.",
+          "evidence": [
+            "ממולאים באורז",
+            "בסילאן"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "שווארמה עיראקית",
+          "description": "שווארמה טלה ועגל על הגריל עם עמבה, בצל סגול וסומאק, בלאפה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Shawarma; drop the laffa and the amba.",
+          "evidence": [
+            "שווארמה",
+            "בלאפה",
+            "עמבה"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "כבאב עיראקי",
+          "description": "כבאב בשר בקר וטלה על פיתה, עם סלט עגבניות ובצל",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "bread or breadcrumb binder in minced kebab",
+              "certainty": "suspected"
+            }
+          ],
+          "why": "Kebab with tomato salad; ask for it without the pita.",
+          "evidence": [
+            "כבאב",
+            "פיתה"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סלטים ותוספות",
+      "dishes": [
+        {
+          "id": "d8",
+          "name": "סלט חצילים עיראקי",
+          "description": "חציל קלוי עם טחינה ועמבה",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "amba, mango pickle usually cooked with sugar (עמבה)",
+              "certainty": "likely",
+              "term": "עמבה"
+            }
+          ],
+          "why": "Eggplant and tahini; ask for it without the amba.",
+          "evidence": [
+            "חציל קלוי",
+            "עמבה"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "עמבה ביתית",
+          "description": "רוטב מנגו כבוש עם חילבה וכורכום",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "house amba is cooked with sugar (מנגו כבוש)",
+              "certainty": "likely",
+              "term": "מנגו כבוש"
+            }
+          ],
+          "why": "A side of amba is a sweet mango sauce.",
+          "evidence": [
+            "מנגו כבוש"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "אורז עם שעריה",
+          "description": "אורז לבן עם אטריות שעריה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Rice and vermicelli.",
+          "evidence": [
+            "אורז",
+            "שעריה"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "קיצ׳רי",
+          "description": "אורז ועדשים כתומות",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Rice and lentils.",
+          "evidence": [
+            "אורז ועדשים"
+          ]
+        },
+        {
+          "id": "d12",
+          "name": "חמוצים עיראקיים",
+          "description": "ירקות כבושים ולפת ורודה",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Pickled vegetables and turnip.",
+          "evidence": [
+            "ירקות כבושים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "קינוח ושתייה",
+      "dishes": [
+        {
+          "id": "d13",
+          "name": "בקלאווה",
+          "description": "בקלאווה פיסטוק בסירופ סוכר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Filo, nuts and sugar syrup.",
+          "evidence": [
+            "בקלאווה",
+            "סירופ סוכר"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "תה עיראקי",
+          "description": "תה שחור עם הל",
+          "options": [],
+          "expected": "orderAsIs",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Iraqi tea is usually served heavily sugared",
+              "certainty": "suspected",
+              "term": "תה עיראקי"
+            }
+          ],
+          "why": "Black tea with cardamom; ask for it unsweetened.",
+          "evidence": [
+            "תה שחור"
+          ]
+        }
+      ]
+    }
+  ]
+}

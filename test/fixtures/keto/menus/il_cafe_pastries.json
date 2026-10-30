@@ -1,0 +1,386 @@
+{
+  "id": "il_cafe_pastries",
+  "name": "קפה מאפה",
+  "source": "copied:test/fixtures/allergens/menus/il_cafe_pastries.json",
+  "language": "he",
+  "note": "Unreviewed desk labelling — not reviewed by a dietitian. Dish texts copied unchanged from test/fixtures/allergens/menus/il_cafe_pastries.json (synthetic Israeli cafe with pastries and lattes written for the corpus from 11 §3, §7.5 and 12 §1.1-1.6); dish ids are the source order (d1 = first dish), categories added for the corpus.",
+  "categories": [
+    {
+      "name": "מאפים ועוגות",
+      "dishes": [
+        {
+          "id": "d1",
+          "name": "קרואסון חמאה",
+          "description": "קרואסון פריך אפוי במקום",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A croissant is pastry; the dough is the dish.",
+          "evidence": [
+            "קרואסון"
+          ]
+        },
+        {
+          "id": "d2",
+          "name": "קרואסון שוקולד",
+          "description": "קרואסון במילוי שוקולד מריר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pastry filled with chocolate.",
+          "evidence": [
+            "קרואסון",
+            "שוקולד"
+          ]
+        },
+        {
+          "id": "d3",
+          "name": "קרואסון שקדים",
+          "description": "קרואסון במילוי קרם שקדים ועם פתיתי שקדים",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pastry with sweet almond cream.",
+          "evidence": [
+            "קרואסון",
+            "קרם שקדים"
+          ]
+        },
+        {
+          "id": "d4",
+          "name": "דניש גבינה",
+          "description": "דניש שמרים עם קרם גבינה ופירורי סוכר",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Yeast pastry topped with sugar crumbs.",
+          "evidence": [
+            "דניש",
+            "סוכר"
+          ]
+        },
+        {
+          "id": "d5",
+          "name": "רוגלך אגוזים",
+          "description": "רוגלך בצק שמרים במילוי אגוזי מלך וקינמון",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Yeast-dough pastry.",
+          "evidence": [
+            "רוגלך",
+            "בצק שמרים"
+          ]
+        },
+        {
+          "id": "d6",
+          "name": "עוגת גבינה אפויה",
+          "description": "עוגת גבינה על בסיס ביסקוויט",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A dessert on a biscuit base.",
+          "evidence": [
+            "עוגת גבינה",
+            "ביסקוויט"
+          ]
+        },
+        {
+          "id": "d7",
+          "name": "עוגת שוקולד ללא קמח",
+          "description": "עוגת שוקולד מריר וביצים, ללא קמח",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [
+            {
+              "source": "sugar in a flourless cake",
+              "certainty": "likely",
+              "term": "עוגת שוקולד"
+            }
+          ],
+          "why": "Flourless is not sugarless: a chocolate cake is still a dessert.",
+          "evidence": [
+            "עוגת שוקולד",
+            "ללא קמח"
+          ]
+        },
+        {
+          "id": "d16",
+          "name": "פנקייק בננה",
+          "description": "פנקייק עם בננה, סירופ מייפל וחמאה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Pancakes with banana and maple syrup.",
+          "evidence": [
+            "פנקייק",
+            "סירופ מייפל"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "כריכים וטוסטים",
+      "dishes": [
+        {
+          "id": "d8",
+          "name": "טוסט אבוקדו וביצה עלומה",
+          "description": "לחם מחמצת, אבוקדו, ביצה עלומה וגרגירי שומשום",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Avocado and a poached egg on sourdough; drop the bread and keep the topping.",
+          "evidence": [
+            "טוסט",
+            "לחם מחמצת",
+            "אבוקדו"
+          ]
+        },
+        {
+          "id": "d9",
+          "name": "כריך אבוקדו וזעתר",
+          "description": "לחם כוסמין עם אבוקדו, זעתר ושמן זית",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "A sandwich: spelt bread with a smear of avocado; without the bread little is left.",
+          "evidence": [
+            "כריך",
+            "לחם כוסמין"
+          ]
+        },
+        {
+          "id": "d10",
+          "name": "טוסט גבינה צהובה",
+          "description": "לחם אחיד וגבינה צהובה נמסה",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "White bread with melted cheese; the bread is the dish.",
+          "evidence": [
+            "טוסט",
+            "לחם אחיד"
+          ]
+        },
+        {
+          "id": "d11",
+          "name": "כריך טונה",
+          "description": "טונה, מיונז, חמוצים וביצה קשה על בגט",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "A baguette sandwich; tuna, mayo and egg could be ordered as a plate.",
+          "evidence": [
+            "כריך",
+            "בגט"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "סלטים וביצים",
+      "dishes": [
+        {
+          "id": "d12",
+          "name": "סלט קפרזה",
+          "description": "עגבניות, מוצרלה, בזיליקום וחמאת פסטו",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Tomato, mozzarella and basil with pesto butter.",
+          "evidence": [
+            "עגבניות",
+            "מוצרלה"
+          ]
+        },
+        {
+          "id": "d13",
+          "name": "סלט וולדורף",
+          "description": "סלרי, תפוחים, אגוזי מלך וצימוקים ברוטב מיונז",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [],
+          "why": "Celery, walnuts and mayo are keto; apples and raisins are not.",
+          "evidence": [
+            "תפוחים",
+            "צימוקים"
+          ]
+        },
+        {
+          "id": "d14",
+          "name": "ביצים בנדיקט",
+          "description": "ביצים עלומות על מאפין אנגלי עם רוטב הולנדייז",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "Poached eggs and hollandaise are keto; the English muffin is not.",
+          "evidence": [
+            "ביצים עלומות",
+            "מאפין אנגלי"
+          ]
+        },
+        {
+          "id": "d15",
+          "name": "גרנולה ויוגורט",
+          "description": "יוגורט עם גרנולה, פירות יער ודבש",
+          "options": [],
+          "expected": "nonKeto",
+          "acceptable": [
+            "modifiable"
+          ],
+          "hiddenCarbs": [],
+          "why": "Granola and honey are the dish; plain yogurt with berries would be a different order.",
+          "evidence": [
+            "גרנולה",
+            "דבש"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "שתייה",
+      "dishes": [
+        {
+          "id": "d17",
+          "name": "הפוך",
+          "description": "אספרסו וחלב מוקצף",
+          "options": [],
+          "expected": "modifiable",
+          "hiddenCarbs": [],
+          "why": "A latte: a cup of milk; ask for a small one with cream or almond milk.",
+          "evidence": [
+            "הפוך",
+            "חלב"
+          ]
+        },
+        {
+          "id": "d18",
+          "name": "הפוך שיבולת שועל",
+          "description": "אספרסו ומשקה שיבולת שועל",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "nonKeto"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "oat drink carries malt sugars (שיבולת שועל)",
+              "certainty": "likely",
+              "term": "שיבולת שועל"
+            }
+          ],
+          "why": "Oat drink is a starch drink; swap it for unsweetened almond milk.",
+          "evidence": [
+            "שיבולת שועל"
+          ]
+        },
+        {
+          "id": "d19",
+          "name": "אייס קפה שקדים",
+          "description": "אספרסו, קרח וחלב שקדים",
+          "options": [],
+          "expected": "modifiable",
+          "acceptable": [
+            "orderAsIs"
+          ],
+          "hiddenCarbs": [
+            {
+              "source": "Israeli iced coffee is usually a sweetened slush (אייס קפה)",
+              "certainty": "likely",
+              "term": "אייס קפה"
+            },
+            {
+              "source": "almond milk may be the sweetened kind (חלב שקדים)",
+              "certainty": "suspected",
+              "term": "חלב שקדים"
+            }
+          ],
+          "why": "Espresso, ice and almond milk read clean, but the Israeli iced coffee is often sweetened; ask for it unsweetened.",
+          "evidence": [
+            "אייס קפה",
+            "חלב שקדים"
+          ]
+        },
+        {
+          "id": "d20",
+          "name": "שוקו חם",
+          "description": "חלב חם וקקאו",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Hot chocolate milk is a sweet drink.",
+          "evidence": [
+            "שוקו",
+            "קקאו"
+          ]
+        },
+        {
+          "id": "d23",
+          "name": "מיץ תפוזים סחוט",
+          "description": "תפוזים סחוטים במקום",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "Orange juice is sugar.",
+          "evidence": [
+            "מיץ תפוזים"
+          ]
+        },
+        {
+          "id": "d24",
+          "name": "תה צמחים",
+          "description": "",
+          "options": [],
+          "expected": "orderAsIs",
+          "hiddenCarbs": [],
+          "why": "Herbal tea.",
+          "evidence": [
+            "תה צמחים"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "חטיפים",
+      "dishes": [
+        {
+          "id": "d21",
+          "name": "עוגיית חמאת בוטנים",
+          "description": "עוגיית חמאת בוטנים עם שבבי שוקולד",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A cookie.",
+          "evidence": [
+            "עוגיית"
+          ]
+        },
+        {
+          "id": "d22",
+          "name": "חטיף במבה במילוי נוגט",
+          "description": "חטיף במבה במילוי קרם נוגט",
+          "options": [],
+          "expected": "nonKeto",
+          "hiddenCarbs": [],
+          "why": "A corn-puff snack filled with nougat cream.",
+          "evidence": [
+            "במבה",
+            "נוגט"
+          ]
+        }
+      ]
+    }
+  ]
+}

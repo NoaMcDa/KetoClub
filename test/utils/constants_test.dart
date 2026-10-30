@@ -338,10 +338,22 @@ void main() {
       }
     });
 
-    test("every guard but צ'יפס is bidirectional (before equals after)", () {
+    test('every guard but the left-only ones is bidirectional (before '
+        'equals after)', () {
+      // The documented exceptions: `צ'יפס`'s cheeses, and the flour
+      // coating and candied forms, which only a word on the left rescues
+      // ("ללא ציפוי קמח", "נקי מסוכר"; the keto corpus).
+      const leftOnly = <String>{
+        "צ'יפס",
+        'ציפוי קמח',
+        'מסוכרים',
+        'מסוכרות',
+        'מסוכר',
+        'מסוכרת',
+      };
       // Act, Assert
       for (final entry in ketoQualifierGuardsHe.entries) {
-        if (entry.key == "צ'יפס") continue;
+        if (leftOnly.contains(entry.key)) continue;
         expect(
           entry.value.before,
           equals(entry.value.after),
