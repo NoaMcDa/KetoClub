@@ -69,6 +69,11 @@ const int venueEstimateConcurrency = 3;
 /// automatic run off, which the tests of the explicit action use.
 const int venueAutoEstimateLimit = 12;
 
+/// The distances, in whole kilometres, the Discovery screen's distance
+/// chip offers (issue #443), nearest first. "Any distance" is the absence
+/// of one, so it is not in the list.
+const List<int> discoveryRadiusOptionsKm = <int>[1, 2, 5, 10];
+
 // ---------------------------------------------------------------------------
 // Cache and LLM request tuning (architecture.md §6.4, §9.3, §9.4)
 // ---------------------------------------------------------------------------

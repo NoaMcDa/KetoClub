@@ -304,6 +304,7 @@ ketoclub/
 │   │   ├── note_editor_sheet.dart        # personal, local-only notes on a dish (#131)
 │   │   ├── rules_reason_banner.dart      # why a menu fell back to the rule engine (#125)
 │   │   ├── rename_menu_dialog.dart       # a scanned menu's name and city (#315, D23)
+│   │   ├── location_picker_sheet.dart    # Discovery's location picker: the device, or a city (#443, D26)
 │   │   └── mobile_qr_scanner.dart        # MobileQrScanner + its camera page; the ONLY file importing
 │   │                                     # package:mobile_scanner (#182); here, not in services/, since it owns a page
 │   │
@@ -384,6 +385,7 @@ ketoclub/
 │   │   ├── venue.dart
 │   │   ├── menu.dart                     # Menu, MenuCategory, Dish, DishOption
 │   │   ├── analysis.dart                 # DishVerdict, AnalysedDish, MenuAnalysis (sealed)
+│   │   ├── place.dart                    # KnownPlace: a city the user can look around (#443, D26)
 │   │   └── failures.dart                 # MenuFetchFailureReason, MenuAnalysisFailureReason
 │   │
 │   ├── utils/
@@ -394,6 +396,8 @@ ketoclub/
 │   │   ├── wolt_headers.dart             # wolt.com's web-client header set (#168)
 │   │   ├── venue_route.dart              # venueRoutePath + VenueOpenHint {name, city}, the venue
 │   │   │                                 # route's arguments; replaced a bare String (D23, #307)
+│   │   ├── known_places.dart             # the bundled list of Israeli cities the location picker
+│   │   │                                 # offers, lookup by id and a bilingual search (#443, D26)
 │   │   └── keto_score.dart               # menu-level score from the dish verdicts, for KetoScoreBadge
 │   │
 │   └── l10n/
@@ -1084,6 +1088,20 @@ gracefully to "type an address or a venue name" on denial or on web without HTTP
    server on the way to Wolt, as the web build's always did (D11): the routes
    share the discovery proxy's cache rows (a coordinate key at four decimals,
    no install id beside it) and its 20/minute bucket.
+
+   *(D26, issue #443)* **The position need not be the device's.** "Choose a
+   location" on the Discovery screen opens `LocationPickerSheet`: "Use my
+   current location", or a city from `utils/known_places.dart`, a bundled
+   list of Israeli cities with approximate centres. `VenueSearchController.
+   choosePlace` runs the same `nearby` call at the city's centre, so nothing
+   downstream — the Wolt service, the backend routes, the fallback chain —
+   knows the difference. The choice is stored as `AppSettings.discoveryPlaceId`
+   (an id, never coordinates) and the first `load` of the next launch restores
+   it and lists its venues; a device position that is found replaces it. The
+   same decision adds the distance filter: `VenueSearchController.radiusKm`
+   (1, 2, 5 or 10 km, `discoveryRadiusOptionsKm`) narrows `visibleResults` by
+   the haversine distance from the search position, on the device, from
+   coordinates the search already returned.
 
 Venues are not persisted beyond "last opened" until Phase 3 adds a community
 directory.
@@ -2988,6 +3006,79 @@ Dart logic; a second test suite that replays them; six new client files
 architecture-test host-string boundaries; one `AppDependencies` field for the
 estimate repository and one for `backendConfigured`; and `MenuFetched.analysis`
 now meaning "the backend answered with this" as well as "a website PDF was read".
+
+### D26 — Discovery looks around a place the user chooses, and filters by distance
+
+*(Issue #443. Extends D13 and §6.5; reverses nothing.)*
+
+**What changed.** Discovery could look around one place only: wherever the
+device said it was. That left search by name as the only way in whenever
+location was refused, unavailable (a browser on `http`), or simply not where
+the user meant to eat. And a nearby list was sorted nearest first but could
+not be narrowed to "walking distance". Two decisions:
+
+1. **A chosen place stands in for the device position.** The header's
+   "Choose a location" action, and the same action on the location-denied and
+   location-unavailable cards, opens `LocationPickerSheet`: "Use my current
+   location" above a searchable list of cities. `VenueSearchController.
+   choosePlace(KnownPlace)` sets `position` to the city's centre and runs the
+   ordinary `VenueSearchService.nearby` there, so the remembered nearby list,
+   card distances, the bias of a search by name, the quick score (D21) and
+   the D25 fallback chain all behave as they do for a device position. The
+   header names the city in the UI language. The choice is written to
+   `AppSettings.discoveryPlaceId` and restored by the controller's first
+   `load`, which then lists the city's venues once, only while the screen is
+   untouched. `locate` returning a position clears both the chosen place and
+   the saved id; a refusal or failure leaves them, and — because the denied
+   card has no room while a list is on screen — the screen says so in a snack
+   bar. No permission is requested anywhere on this path.
+2. **A distance filter, kept apart from the chips.** Once there is a position
+   of either kind, the chip row starts with a chip reading "Any distance" or
+   "Within N km" that opens a menu of `discoveryRadiusOptionsKm` (1, 2, 5,
+   10). `radiusKm` is not a `DiscoveryChip`: it is a number, not an on/off,
+   and it survives a new result list where the chips are cleared, because a
+   filter about where the user is should not drop when they type a name. A
+   venue with no coordinates is hidden while a distance is picked. Changing it
+   cancels a running quick score and starts the automatic one over what is
+   now in view, exactly as a chip change does, so no menu is fetched twice.
+
+**Why a bundled list and not a typed address.** Turning an address into
+coordinates needs a geocoder. None is in use; adding one would be a new
+outside host (and a new architecture-test boundary), a new failure mode on a
+screen whose point is to work when location does not, and would send what the
+user types to another company. §6.5 already defers reverse geocoding for the
+same reason. A list of 42 cities works offline, on every platform, with no
+permission and no dependency, and covers the area Wolt Israel and 10bis
+serve. Place names are data — a proper noun in each UI language on the model
+itself — not UI copy, the same exception to "no user-facing literal in Dart"
+that the keto vocabulary makes (§12).
+
+**What it accepts.**
+
+- **A city centre, not a street.** Coordinates are approximate centres, so
+  "Within 1 km" around a chosen city means the middle of town. A user who
+  wants their own street still uses the device position.
+- **Israel only.** A Wolt link from another country still opens by paste; the
+  picker does not offer its cities.
+- **The picked distance is not saved across launches**, where the chosen city
+  is: filters are session state everywhere in the app, and a restored list
+  that opens already narrowed would read as "few restaurants here".
+- **A saved id the list no longer holds is ignored**, not migrated. An id
+  already shipped must never be reused for another place
+  (`known_places.dart` says so).
+- **With a backend URL the city's centre reaches KetoClub's server** on the
+  way to Wolt, as a device position does (D25, §17.7). It is a published city
+  centre, not the user's whereabouts.
+- **Evidence.** Unit, widget and flow tests against fakes only. No phone or
+  browser has run the picker, and no live Wolt search has been made at a
+  city centre: whether Wolt answers a centre with as full a list as it does a
+  residential address is unobserved.
+
+**What it costs.** Two small files of data and model (`models/place.dart`,
+`utils/known_places.dart`), one widget (`location_picker_sheet.dart`), one
+`AppSettings` field decoded by the "added later" rule, three controller
+members (`choosePlace`, `setRadius`, the restoring `load`), eight ARB keys in
+each language, and `locate` now completing with the device's answer.
 
 ---
 

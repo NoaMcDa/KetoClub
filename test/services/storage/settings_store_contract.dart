@@ -37,11 +37,23 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
         dairyFree: true,
         lastFilter: MenuFilter.yellowOnly,
         disclosureSeen: true,
+        discoveryPlaceId: 'haifa',
       );
 
       await store.write(settings);
 
       expect(await store.read(), equals(settings));
+    });
+
+    test('write then read round-trips the chosen place, and its removal '
+        '(issue #443)', () async {
+      final store = build();
+
+      await store.write(const AppSettings(discoveryPlaceId: 'tel-aviv'));
+      expect((await store.read()).discoveryPlaceId, equals('tel-aviv'));
+
+      await store.write((await store.read()).copyWith(discoveryPlaceId: null));
+      expect((await store.read()).discoveryPlaceId, isNull);
     });
 
     test('write then read round-trips every combination of the dietary '

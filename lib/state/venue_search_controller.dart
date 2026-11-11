@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
@@ -14,6 +15,7 @@ import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/geo.dart';
+import 'package:ketoclub/utils/known_places.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
@@ -77,6 +79,24 @@ typedef VenueCardNumbers = ({
 /// gets one, lists the venues around it. Anything other than a position
 /// is kept in [locationOutcome] for the screen's copy, and the screen
 /// degrades to search by name.
+///
+/// **A place of the user's own choosing stands in for the device's
+/// position (issue #443).** [choosePlace] lists the venues around a
+/// [KnownPlace] exactly as [locate] lists them around a position: the
+/// same nearby search, the same remembered nearby list, the same
+/// [position] for card distances and for biasing a search by name. The
+/// choice is saved as `AppSettings.discoveryPlaceId` and restored by the
+/// first [load]; a [locate] that finds a position replaces it and clears
+/// the saved one, and one that does not leaves it alone. No permission is
+/// involved anywhere on this path.
+///
+/// **The distance filter is not a chip in [activeChips]** (issue #443):
+/// [radiusKm] holds a number of kilometres rather than an on/off, and it
+/// stays through later result lists until [setRadius] changes it, where
+/// the chips are cleared by each new list. A filter about where the user
+/// is should not drop because they typed a name. It applies only while
+/// there is a [position] to measure from, and it hides a venue with no
+/// coordinates, which cannot be shown to be within anything.
 ///
 /// **D13, amended by D21: the quick score runs on its own, bounded.** A
 /// card's numbers come from [MenuRepository.cached], read once per result
@@ -159,6 +179,11 @@ final class VenueSearchController extends ChangeNotifier {
   DiscoveryPhase _phase = DiscoveryPhase.idle;
   LocationResult? _locationOutcome;
   ({double latitude, double longitude})? _position;
+  KnownPlace? _place;
+  int? _radiusKm;
+  // Whether [load] has already looked for a saved place: it is restored
+  // once per controller, never again on a later return to the tab.
+  bool _placeRestored = false;
   List<Venue> _results = const <Venue>[];
   List<Venue>? _nearbyResults;
   Map<VenueRef, VenueCardNumbers> _nearbyNumbers =
@@ -235,13 +260,25 @@ final class VenueSearchController extends ChangeNotifier {
   /// Which step of finding venues is in progress.
   DiscoveryPhase get phase => _phase;
 
-  /// The answer of the last [locate], or null before the first one. A
-  /// [LocationDenied] or [LocationUnavailable] here is what the screen
-  /// explains; a [LocationFound] means [results] are nearby ones.
+  /// The answer of the last [locate], or null before the first one and
+  /// once [choosePlace] has put a place in its stead. A [LocationDenied]
+  /// or [LocationUnavailable] here is what the screen explains; a
+  /// [LocationFound] means [results] are nearby ones.
   LocationResult? get locationOutcome => _locationOutcome;
 
-  /// The position the last successful [locate] read, or null.
+  /// Where nearby search looks around and card distances are measured
+  /// from: the position the last successful [locate] read, or the centre
+  /// of [chosenPlace]; null before either.
   ({double latitude, double longitude})? get position => _position;
+
+  /// The place the user chose to look around (issue #443), or null when
+  /// [position] is the device's own or there is none.
+  KnownPlace? get chosenPlace => _place;
+
+  /// The distance filter (issue #443): only venues within this many
+  /// kilometres of [position] are in [visibleResults]. Null, the default,
+  /// is "any distance".
+  int? get radiusKm => _radiusKm;
 
   /// Every venue the last successful search found, in the order the
   /// search service gave (nearest first when it had a position).
@@ -283,9 +320,10 @@ final class VenueSearchController extends ChangeNotifier {
   /// *Keto 8+* chip, which would otherwise always filter to nothing (D13).
   bool get hasAnyNumbers => _results.any((v) => _numbers.containsKey(v.ref));
 
-  /// [results] narrowed by every chip in [activeChips], in the same order.
+  /// [results] narrowed by every chip in [activeChips] and by [radiusKm],
+  /// in the same order.
   List<Venue> get visibleResults {
-    if (_activeChips.isEmpty) return _results;
+    if (_activeChips.isEmpty && _activeRadiusKm == null) return _results;
     final cuisine = _activeChips.contains(DiscoveryChip.cuisine)
         ? topCuisine
         : null;
@@ -397,7 +435,15 @@ final class VenueSearchController extends ChangeNotifier {
 
   /// Reads one position and, when there is one, lists the venues around
   /// it in [language]. Anything else is kept in [locationOutcome].
-  Future<void> locate({required String language}) async {
+  ///
+  /// A position replaces [chosenPlace] and clears the saved one (issue
+  /// #443): the user asked to look around where they are. A refusal or a
+  /// failure leaves the chosen place, its [position] and its list alone.
+  ///
+  /// Completes with what the device answered, or null when a newer
+  /// search, locate or clear superseded this one before it did — so the
+  /// screen can say why nothing changed when a list is already showing.
+  Future<LocationResult?> locate({required String language}) async {
     _cancelEstimate();
     _debounceTimer?.cancel();
     _debounceTimer = null;
@@ -407,11 +453,15 @@ final class VenueSearchController extends ChangeNotifier {
     _notify();
 
     final result = await _location.current();
-    if (_isStale(generation)) return;
+    if (_isStale(generation)) return null;
     _locationOutcome = result;
     switch (result) {
       case LocationFound(:final latitude, :final longitude):
+        _place = null;
         _position = (latitude: latitude, longitude: longitude);
+        // Also when no place is chosen in memory: one saved by an earlier
+        // launch must not come back after the user asked for their own.
+        final saving = _savePlace(null);
         await _run(
           () => _search.nearby(
             latitude: latitude,
@@ -421,10 +471,57 @@ final class VenueSearchController extends ChangeNotifier {
           generation: generation,
           isNearby: true,
         );
+        await saving;
       case LocationDenied() || LocationUnavailable():
         _phase = DiscoveryPhase.idle;
         _notify();
     }
+    return result;
+  }
+
+  /// Looks around [place] instead of the device's position (issue #443):
+  /// lists the venues around its centre in [language], as [locate] does
+  /// for a position it read, and saves the choice so the first [load] of
+  /// the next launch restores it.
+  ///
+  /// [position] and [chosenPlace] change at once, before the search
+  /// answers, and stay changed if it fails: [retry] then repeats the
+  /// search around the same place. [locationOutcome] is cleared, since a
+  /// refusal the user has just worked around is no longer what the screen
+  /// should explain.
+  Future<void> choosePlace(KnownPlace place, {required String language}) async {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+    final generation = ++_generation;
+    _place = place;
+    _position = (latitude: place.latitude, longitude: place.longitude);
+    _locationOutcome = null;
+    final saving = _savePlace(place.id);
+    await _run(
+      () => _search.nearby(
+        latitude: place.latitude,
+        longitude: place.longitude,
+        language: language,
+      ),
+      generation: generation,
+      isNearby: true,
+    );
+    await saving;
+  }
+
+  /// Sets the distance filter to [km] kilometres, or to "any distance"
+  /// with null (issue #443). Notifies listeners; a no-op when it is
+  /// already [km].
+  ///
+  /// As with [toggleChip], a running quick score is cancelled and a new
+  /// automatic run covers what is now in view (D21), fetching only venues
+  /// no run has fetched in this result set.
+  void setRadius(int? km) {
+    if (km == _radiusKm) return;
+    _cancelEstimate();
+    _radiusKm = km;
+    _notify();
+    unawaited(_autoEstimate());
   }
 
   /// Repeats the last search, nearby or by name. A no-op before any.
@@ -459,8 +556,17 @@ final class VenueSearchController extends ChangeNotifier {
   /// screen calls it now that this controller lives as long as the app
   /// (issue #233): it touches only the "Continue with…" row, never the
   /// query, the results or the chip, and starts no search.
-  Future<void> load() async {
-    final lastVenue = (await _settings.read()).lastVenue;
+  ///
+  /// The one exception is the first call (issue #443): it also restores
+  /// the place saved as `AppSettings.discoveryPlaceId`, when the list
+  /// still holds it and nothing has set a [position] meanwhile. Given a
+  /// [language], and only while the screen is still untouched — nothing
+  /// typed, nothing searched, nothing in flight — it then lists the venues
+  /// around that place, so a launch opens on the place the user chose.
+  /// Later calls never do either.
+  Future<void> load({String? language}) async {
+    final settings = await _settings.read();
+    final lastVenue = settings.lastVenue;
     _lastVenue = lastVenue;
     final known = lastVenue == null ? null : await _knownFor(lastVenue);
     _lastVenueHint = known;
@@ -469,7 +575,46 @@ final class VenueSearchController extends ChangeNotifier {
         : known?.name ??
               VenueRefResolver.websiteHost(lastVenue) ??
               lastVenue.platformId;
+    final restored = _restorePlace(settings.discoveryPlaceId);
     _notify();
+    if (restored == null || language == null) return;
+    if (_phase != DiscoveryPhase.idle ||
+        _hasSearched ||
+        _failure != null ||
+        _input.trim().isNotEmpty) {
+      return;
+    }
+    await _run(
+      () => _search.nearby(
+        latitude: restored.latitude,
+        longitude: restored.longitude,
+        language: language,
+      ),
+      generation: ++_generation,
+      isNearby: true,
+    );
+  }
+
+  /// On the first call only, makes the place saved under [savedId] the
+  /// [chosenPlace] and its centre the [position], unless something has set
+  /// a position already. Returns the place it restored, else null.
+  KnownPlace? _restorePlace(String? savedId) {
+    if (_placeRestored) return null;
+    _placeRestored = true;
+    if (savedId == null || _position != null) return null;
+    final place = knownPlaceById(savedId);
+    if (place == null) return null;
+    _place = place;
+    _position = (latitude: place.latitude, longitude: place.longitude);
+    return place;
+  }
+
+  /// Saves [placeId] as `AppSettings.discoveryPlaceId`, or clears it with
+  /// null, leaving every other setting as it is.
+  Future<void> _savePlace(String? placeId) async {
+    final settings = await _settings.read();
+    if (settings.discoveryPlaceId == placeId) return;
+    await _settings.write(settings.copyWith(discoveryPlaceId: placeId));
   }
 
   /// "Quick score the rest" (issue #42, D13, D21): fetches the menu of
@@ -714,9 +859,20 @@ final class VenueSearchController extends ChangeNotifier {
 
   bool _isEstimateStale(int run) => _disposed || run != _estimateRun;
 
-  /// Whether [venue] passes every active chip; [cuisine] is
-  /// [topCuisine] when that chip is on, and a null one filters nothing.
+  /// [radiusKm] while there is a [position] to measure it from, else null:
+  /// without one every distance is unknown, and the filter would hide the
+  /// whole list.
+  int? get _activeRadiusKm => _position == null ? null : _radiusKm;
+
+  /// Whether [venue] passes the distance filter and every active chip;
+  /// [cuisine] is [topCuisine] when that chip is on, and a null one
+  /// filters nothing.
   bool _passes(Venue venue, String? cuisine) {
+    final radius = _activeRadiusKm;
+    if (radius != null) {
+      final distance = distanceKmTo(venue);
+      if (distance == null || distance > radius) return false;
+    }
     for (final chip in _activeChips) {
       final passes = switch (chip) {
         DiscoveryChip.ketoEightPlus =>

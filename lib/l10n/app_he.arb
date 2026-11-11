@@ -262,7 +262,7 @@
 
   "discoveryTitle": "איפה לאכול",
   "discoveryEmptyTitle": "מצאו איפה לאכול",
-  "discoveryEmptyBody": "השתמשו במיקום שלכם כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.",
+  "discoveryEmptyBody": "השתמשו במיקום שלכם או בחרו עיר כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.",
   "discoveryDrinksGuideCard": "מזמינים משקה? מדריך בר וקפה",
   "discoveryLookingAround": "מחפשים סביב",
   "discoveryAroundYou": "המיקום שלך",
@@ -271,6 +271,17 @@
   "discoveryChipKetoEightPlus": "קטו 8+",
   "discoveryChipKetoEightPlusHint": "צריך ציונים קודם: הם מופיעים כשהרשימה מדורגת, או כשפותחים מסעדה.",
   "discoveryChipOpenNow": "פתוח עכשיו",
+  "discoveryChooseLocation": "בחר מיקום",
+  "discoveryChipAnyDistance": "כל מרחק",
+  "discoveryChipWithinKm": "עד {km} ק״מ",
+  "@discoveryChipWithinKm": {
+    "placeholders": { "km": { "type": "int" } }
+  },
+  "discoveryChipDistanceTooltip": "סינון לפי מרחק",
+  "locationPickerTitle": "איפה תרצו לאכול?",
+  "locationPickerUseDevice": "השתמש במיקום הנוכחי שלי",
+  "locationPickerSearchLabel": "חיפוש עיר",
+  "locationPickerNoMatch": "לא נמצאה עיר מתאימה. נסו איות אחר.",
   "discoveryLocating": "מאתר את המיקום שלך…",
   "discoverySearching": "מחפש מסעדות…",
   "discoveryLocationDeniedTitle": "המיקום כבוי עבור קטוקלאב",
