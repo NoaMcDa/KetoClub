@@ -19,6 +19,7 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/dish_kind.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
@@ -317,8 +318,9 @@ final class MenuController extends ChangeNotifier {
 
   /// How many *food* dishes in [analysis] were classified
   /// [DishVerdict.orderAsIs] (green); 0 when there is no [MenuAnalysed]
-  /// result. A drink, an extra or a notice line (D21, `dishKindOf`) is
-  /// still listed under its verdict but never counted here.
+  /// result. A drink or an extra (D21, `dishKindOf`) is still listed under
+  /// its verdict but never counted here; a notice line is neither counted
+  /// nor listed (issue #445, [restaurantNotices]).
   int get greenCount => _counts.green;
 
   /// How many food dishes in [analysis] were classified
@@ -363,29 +365,65 @@ final class MenuController extends ChangeNotifier {
 
   ({Menu menu, MenuAnalysed analysis, VerdictCounts counts})? _countsMemo;
 
+  /// The kind of every dish on [menu] ([dishKindsOf], D21), computed once
+  /// per menu rather than per getter: it is a regex pass over the whole
+  /// menu, and a build reads it through several getters. Computed, never
+  /// stored: nothing here reaches `Dish` or the cache.
+  Map<String, DishKind> get _kinds {
+    final currentMenu = _menu;
+    if (currentMenu == null) return const <String, DishKind>{};
+    final memo = _kindsMemo;
+    if (memo != null && identical(memo.menu, currentMenu)) return memo.kinds;
+    final kinds = dishKindsOf(currentMenu);
+    _kindsMemo = (menu: currentMenu, kinds: kinds);
+    return kinds;
+  }
+
+  ({Menu menu, Map<String, DishKind> kinds})? _kindsMemo;
+
+  /// Whether [dish] is a notice to the customer printed as a menu line
+  /// ([DishKind.notice]) rather than something to order.
+  bool _isNotice(Dish dish) => _kinds[dish.id] == DishKind.notice;
+
+  /// The restaurant's own notices on [menu], in menu order (issue #445):
+  /// the lines whose kind is [DishKind.notice], such as an allergen note
+  /// under a "שימו לב" heading or a "Dear customers" line.
+  ///
+  /// Nobody can order one, so none is a row in [visibleRows] or
+  /// [unclassifiedRows], none has a category chip in [visibleCategories]
+  /// and none is counted. They are kept here so the menu screen can still
+  /// offer them in one quiet place: an allergen notice matters to some
+  /// diners even though it is not a dish. A line listed under two
+  /// categories appears once. Empty before a menu is loaded.
+  List<Dish> get restaurantNotices {
+    final currentMenu = _menu;
+    if (currentMenu == null) return const <Dish>[];
+    final seen = <String>{};
+    return <Dish>[
+      for (final dish in currentMenu.allDishes)
+        if (_isNotice(dish) && seen.add(dish.id)) dish,
+    ];
+  }
+
   /// How many dish names [analysis] saw on the menu but could not place;
   /// 0 when there is no [MenuAnalysed] result. Same source as
   /// [unclassifiedNames]'s length, exposed as a count for a summary line
   /// that does not need the names themselves.
-  int get unclassifiedCount {
-    final currentAnalysis = _analysis;
-    return currentAnalysis is MenuAnalysed
-        ? currentAnalysis.unclassified.length
-        : 0;
-  }
+  int get unclassifiedCount => unclassifiedRows.length;
 
-  /// The total number of dishes on [menu], across every category; 0
-  /// before a menu is loaded.
+  /// The number of dishes [menu] lists, across every category; 0 before
+  /// a menu is loaded. A notice line is not a dish and is left out (issue
+  /// #445), so this is what [visibleRows] holds under [MenuFilter.all]
+  /// with no search.
   ///
   /// This counts dishes on the raw menu, not verdicts, so it stays
-  /// meaningful even when [analysis] failed: [greenCount] + [yellowCount]
-  /// + [redCount] + [unclassifiedCount] equals this only once a
-  /// [MenuAnalysed] result exists, since a failed analysis places no
-  /// dish at all.
+  /// meaningful even when [analysis] failed. It is not the sum of the
+  /// verdict counts: those cover food only (D21), while a drink or an
+  /// extra is still a listed dish.
   int get totalDishCount {
     final currentMenu = _menu;
     if (currentMenu == null) return 0;
-    return currentMenu.allDishes.length;
+    return currentMenu.allDishes.where((dish) => !_isNotice(dish)).length;
   }
 
   /// The net-carb limit in grams [analysis] was produced under (issue #57),
@@ -489,6 +527,9 @@ final class MenuController extends ChangeNotifier {
   /// stably sorted by [Dish.page], unknown pages last, so each page's
   /// dishes sit together in their transcribed order. A one-page scan and
   /// every platform menu keep menu order exactly.
+  ///
+  /// **A notice line is never a row (issue #445)**, analysed or not and
+  /// whatever the filter: it is in [restaurantNotices] instead.
   List<DishRow> get visibleRows {
     final currentMenu = _menu;
     if (currentMenu == null) return const <DishRow>[];
@@ -503,6 +544,7 @@ final class MenuController extends ChangeNotifier {
       rows = <DishRow>[];
       for (final category in currentMenu.categories) {
         for (final dish in category.dishes) {
+          if (_isNotice(dish)) continue;
           final verdict = analysedById[dish.id];
           if (!_matchesFilter(verdict)) continue;
           if (!_matchesQuery(dish, normalisedQuery)) continue;
@@ -558,11 +600,12 @@ final class MenuController extends ChangeNotifier {
     return ordered;
   }
 
-  /// Every dish in [menu] as an unjudged row, in category order.
+  /// Every dish in [menu] as an unjudged row, in category order; a notice
+  /// line is not a dish and has no row (issue #445).
   List<DishRow> _allRows(Menu menu) => <DishRow>[
     for (final category in menu.categories)
       for (final dish in category.dishes)
-        DishRow(dish: dish, category: category.name),
+        if (!_isNotice(dish)) DishRow(dish: dish, category: category.name),
   ];
 
   /// Whether [dish]'s name or description contains [normalisedQuery] once
@@ -582,13 +625,12 @@ final class MenuController extends ChangeNotifier {
 
   /// Dish names [analysis] saw on the menu but could not place, shown
   /// under their own heading regardless of [filter] (architecture.md
-  /// §6.6, constraint 8 — unclassified is rendered, never dropped).
-  List<String> get unclassifiedNames {
-    final currentAnalysis = _analysis;
-    return currentAnalysis is MenuAnalysed
-        ? currentAnalysis.unclassified
-        : const <String>[];
-  }
+  /// §6.6, constraint 8 — unclassified is rendered, never dropped). A
+  /// name that is one of the menu's notice lines is not a dish the
+  /// classifier failed to place and is left out (issue #445).
+  List<String> get unclassifiedNames => <String>[
+    for (final row in unclassifiedRows) row.dish.name,
+  ];
 
   /// [unclassifiedNames] resolved to rows, so the menu screen can draw each
   /// one as a `DishCard` (issue #244) with its description, price and photo.
@@ -599,9 +641,16 @@ final class MenuController extends ChangeNotifier {
   /// read) still gets a row, a bare one built from the name alone: an
   /// unclassified dish is never dropped (architecture.md §6.6, constraint
   /// 8). Every row has a null [DishRow.analysis].
+  ///
+  /// The one exception is a name that resolves to a notice line (issue
+  /// #445): it was never a dish to place, so it is skipped here and shown
+  /// with [restaurantNotices] instead.
   List<DishRow> get unclassifiedRows {
     final currentMenu = _menu;
-    final names = unclassifiedNames;
+    final currentAnalysis = _analysis;
+    final names = currentAnalysis is MenuAnalysed
+        ? currentAnalysis.unclassified
+        : const <String>[];
     if (names.isEmpty) return const <DishRow>[];
     final unused = <DishRow>[
       if (currentMenu != null)
@@ -613,7 +662,8 @@ final class MenuController extends ChangeNotifier {
     for (final name in names) {
       final index = unused.indexWhere((row) => row.dish.name == name);
       if (index >= 0) {
-        rows.add(unused.removeAt(index));
+        final row = unused.removeAt(index);
+        if (!_isNotice(row.dish)) rows.add(row);
       } else {
         rows.add(
           DishRow(

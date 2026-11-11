@@ -15,7 +15,8 @@ import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// The kinds a menu line can be. Only [food] counts toward the keto score
-/// and the verdict counts; every kind is still classified and listed.
+/// and the verdict counts. Every kind is still classified, and every kind
+/// but [notice] is listed on the menu screen (issue #445).
 enum DishKind {
   /// Something to eat: the default, and the only kind that is counted.
   food,
@@ -28,7 +29,8 @@ enum DishKind {
   extra,
 
   /// A notice to the customer printed as a menu line, such as a Wolt
-  /// "Dear customers" category or a "coming soon" placeholder.
+  /// "Dear customers" category or a "coming soon" placeholder. Not drawn
+  /// as a dish: the menu screen keeps it behind one quiet line instead.
   notice,
 }
 

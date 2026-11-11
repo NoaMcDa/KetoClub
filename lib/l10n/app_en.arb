@@ -416,6 +416,10 @@
   "@menuFiltersActive": {
     "placeholders": { "count": { "type": "num" } }
   },
+  "menuRestaurantNotices": "{count, plural, one{1 note from the restaurant} other{{count} notes from the restaurant}}",
+  "@menuRestaurantNotices": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "menuSearchHint": "Search dishes",
   "menuSearchSemanticLabel": "Search dishes by name or description",
   "menuSearchClear": "Clear search",

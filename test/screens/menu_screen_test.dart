@@ -46,6 +46,7 @@ import 'package:ketoclub/widgets/menu_filters_row.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/restaurant_notices_row.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/scanned_page_chips.dart';
 import 'package:ketoclub/widgets/scanned_page_header.dart';
@@ -4129,6 +4130,102 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
       expect(find.text('Old name'), findsOneWidget);
       expect(history.renameCalls, isEmpty);
+    });
+  });
+
+  group('MenuScreen and a menu notice (issue #445)', () {
+    const noticeHeading = 'שימו לב! 💙';
+    const noticeName = 'מידע לאלרגנים! 💙';
+    const noticeText = 'למידע על אלרגנים יש ליצור קשר עם המסעדה!!';
+
+    // The menu the issue was reported on, in small: a notice-only
+    // category ahead of the real dishes.
+    Menu menuWithNotice() => Menu(
+      venueRef: _ref,
+      currency: 'ILS',
+      fetchedAt: DateTime.utc(2026),
+      categories: <MenuCategory>[
+        const MenuCategory(
+          id: 'c0',
+          name: noticeHeading,
+          dishes: [
+            Dish(
+              id: 'notice',
+              name: noticeName,
+              description: noticeText,
+              price: 0,
+              options: <DishOption>[],
+            ),
+          ],
+        ),
+        MenuCategory(
+          id: 'c1',
+          name: 'Mains',
+          dishes: [_dish('Steak', id: 'steak')],
+        ),
+      ],
+    );
+
+    MenuController controllerOver(Menu menu) => _controllerFor(
+      repository: FakeMenuRepository()..stub(_ref, MenuFetched(menu: menu)),
+    );
+
+    testWidgets('the notice is not a dish card and its heading is neither a '
+        'chip nor a section header', (tester) async {
+      // Act
+      await _pump(tester, controllerOver(menuWithNotice()));
+      await tester.pumpAndSettle();
+
+      // Assert: one card, for the steak; nothing of the notice on screen.
+      expect(find.byType(DishCard), findsOneWidget);
+      expect(find.text(noticeName), findsNothing);
+      expect(find.text(noticeText), findsNothing);
+      expect(find.text(noticeHeading), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(CategoryChips),
+          matching: find.text('Mains'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text(_en.menuShowingAll(1)), findsOneWidget);
+    });
+
+    testWidgets('one quiet row offers the notice and opens on a tap', (
+      tester,
+    ) async {
+      // Arrange
+      await _pump(tester, controllerOver(menuWithNotice()));
+      await tester.pumpAndSettle();
+      expect(find.byType(RestaurantNoticesRow), findsOneWidget);
+      final label = find.text(_en.menuRestaurantNotices(1));
+      expect(label, findsOneWidget);
+
+      // Act
+      await tester.tap(label);
+      await tester.pumpAndSettle();
+
+      // Assert: the restaurant's own words, and still one dish card.
+      expect(find.text(noticeName), findsOneWidget);
+      expect(find.text(noticeText), findsOneWidget);
+      expect(find.byType(DishCard), findsOneWidget);
+
+      // Act: a second tap closes it again.
+      await tester.tap(label);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(noticeName), findsNothing);
+    });
+
+    testWidgets('a menu with no notice has no notices row', (tester) async {
+      // Act
+      await _pump(tester, controllerOver(_menuOf([_dish('Steak')])));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(RestaurantNoticesRow), findsNothing);
+      expect(find.byType(DishCard), findsOneWidget);
     });
   });
 }

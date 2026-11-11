@@ -53,6 +53,37 @@ MenuAnalysed _analysisOf(List<AnalysedDish> dishes) => MenuAnalysed(
 
 void main() {
   group('MenuShareText.build', () {
+    test('leaves a notice line out even when it was judged green '
+        '(issue #445)', () {
+      // Arrange: "Please note" is a notice heading, so its line is not a
+      // dish, whatever verdict the classifier gave it.
+      final steak = _dish('Grilled Steak');
+      final notice = _dish('Allergen information', id: 'n1');
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: <MenuCategory>[
+          MenuCategory(id: 'c0', name: 'Please note', dishes: [notice]),
+          MenuCategory(id: 'c1', name: 'Mains', dishes: [steak]),
+        ],
+      );
+
+      // Act
+      final text = MenuShareText.build(
+        venueName: 'Cafe',
+        menu: menu,
+        analysis: _analysisOf([
+          _verdictFor(notice, DishVerdict.orderAsIs),
+          _verdictFor(steak, DishVerdict.orderAsIs),
+        ]),
+      );
+
+      // Assert
+      expect(text, contains('- Grilled Steak'));
+      expect(text, isNot(contains('Allergen information')));
+    });
+
     test('lists green dishes under an English heading for an English menu', () {
       // Arrange
       final steak = _dish('Grilled Steak');

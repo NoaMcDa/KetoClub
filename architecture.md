@@ -2094,8 +2094,8 @@ Three options were compared:
 `10 × (green + 0.5 × yellow) / (green + yellow + red)`, rounded to one
 decimal, with unclassified dishes in neither numerator nor denominator, and
 null — nothing rendered — when no dish was placed. Since D21 only *food*
-dishes feed those counts: a drink, a sauce or add-on, or a notice line is
-listed but not counted. The card reuses that
+dishes feed those counts: a drink or a sauce or add-on is listed but not
+counted, and a notice line is neither (issue #445). The card reuses that
 function; there is no second formula. Its status is stated plainly: **it is a
 UI ranking heuristic with no nutrition basis, never a health claim.** No
 source says a dish needing one swap is worth half a safe one; #41 was meant
@@ -2492,9 +2492,17 @@ quick score has only ever run `HeuristicMenuClassifier`). Two decisions:
    soon") — from the category heading first and the dish name second, never
    the description, and `utils/verdict_counts.dart` is the one place an
    analysis is reduced to counts: the menu header and tiles, the Discovery
-   card and the Recent tab all read it. A non-food line is still classified
+   card and the Recent tab all read it. A drink or an extra is still classified
    and listed under its heading and its verdict filter; it just moves no
-   number. On doubt a dish is food, and a dish the menu does not hold is
+   number. **A notice is not listed at all (issue #445):** nobody can order
+   "for allergen information contact the restaurant", so the menu screen
+   draws no dish card for it, no chip or header for a category holding
+   only notices, and leaves it out of the search, the unclassified list,
+   the dish total and the share text. It is not thrown away either, since
+   an allergen notice matters to some diners: `MenuController.restaurantNotices`
+   feeds one collapsed line under the Filters row (`RestaurantNoticesRow`,
+   "1 note from the restaurant") that shows the restaurant's own words on
+   a tap. On doubt a dish is food, and a dish the menu does not hold is
    food. The kind is computed, never stored: no field on `Dish`, no cache
    schema change.
 

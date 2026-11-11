@@ -1556,6 +1556,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{Filters · 1 active} other{Filters · {count} active}}'**
   String menuFiltersActive(num count);
 
+  /// No description provided for @menuRestaurantNotices.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 note from the restaurant} other{{count} notes from the restaurant}}'**
+  String menuRestaurantNotices(num count);
+
   /// No description provided for @menuSearchHint.
   ///
   /// In en, this message translates to:

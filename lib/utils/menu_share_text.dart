@@ -7,6 +7,7 @@ library;
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/dish_kind.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// Builds a plain-text, human-readable summary of a classified menu's safe
@@ -26,7 +27,8 @@ abstract final class MenuShareText {
   /// [AnalysedDish.modification], the same waiter script the Waiter Card
   /// shows — under a yellow heading. [DishVerdict.nonKeto] dishes and
   /// names in [MenuAnalysed.unclassified] are left out entirely: this is
-  /// "what is safe to order here", not a full menu transcript. A group
+  /// "what is safe to order here", not a full menu transcript. A notice
+  /// line (`DishKind.notice`, issue #445) is left out too. A group
   /// with no dishes is omitted — heading included — rather than printed
   /// empty; when both groups are empty the result is [venueName] alone.
   ///
@@ -47,12 +49,19 @@ abstract final class MenuShareText {
     required MenuAnalysed analysis,
   }) {
     final isHebrew = _menuIsHebrew(menu);
-    final green = <AnalysedDish>[
+    // A notice line ("for allergen information contact the restaurant")
+    // is not something to order, whatever verdict it was given (#445).
+    final kinds = dishKindsOf(menu);
+    final dishes = <AnalysedDish>[
       for (final dish in analysis.dishes)
+        if (kinds[dish.dishId] != DishKind.notice) dish,
+    ];
+    final green = <AnalysedDish>[
+      for (final dish in dishes)
         if (dish.verdict == DishVerdict.orderAsIs) dish,
     ];
     final yellow = <AnalysedDish>[
-      for (final dish in analysis.dishes)
+      for (final dish in dishes)
         if (dish.verdict == DishVerdict.modifiable) dish,
     ];
 

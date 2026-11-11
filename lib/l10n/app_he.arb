@@ -413,6 +413,10 @@
   "@menuFiltersActive": {
     "placeholders": { "count": { "type": "num" } }
   },
+  "menuRestaurantNotices": "{count, plural, one{הודעה אחת מהמסעדה} other{{count} הודעות מהמסעדה}}",
+  "@menuRestaurantNotices": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "menuSearchHint": "חפשו מנות",
   "menuSearchSemanticLabel": "חיפוש מנות לפי שם או תיאור",
   "menuSearchClear": "נקה חיפוש",

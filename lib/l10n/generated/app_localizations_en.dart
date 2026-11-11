@@ -965,6 +965,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String menuRestaurantNotices(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count notes from the restaurant',
+      one: '1 note from the restaurant',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get menuSearchHint => 'Search dishes';
 
   @override

@@ -41,6 +41,7 @@ import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rename_menu_dialog.dart';
+import 'package:ketoclub/widgets/restaurant_notices_row.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/scanned_page_chips.dart';
 import 'package:ketoclub/widgets/scanned_page_header.dart';
@@ -210,6 +211,11 @@ class _MenuScreenState extends State<MenuScreen> {
   /// reason as [_legendExpanded]; collapsed by default so the first dish
   /// card is on screen when the menu opens.
   bool _filtersExpanded = false;
+
+  /// Whether the restaurant's own notices (issue #445) are shown
+  /// under their one line. Local UI state, as [_filtersExpanded];
+  /// collapsed by default, since a notice is not a dish.
+  bool _restaurantNoticesExpanded = false;
 
   /// Bumped on every retry action on this screen — the failed-fetch
   /// retry, the [RulesReasonBanner] retry, and pull-to-refresh — so the
@@ -645,6 +651,16 @@ class _MenuScreenState extends State<MenuScreen> {
         ],
       ),
       _filtersRow(context, l10n, controller, analysed: analysed),
+      // The restaurant's own notices (issue #445) are not dish cards: they
+      // sit behind one quiet line, shown only when the menu carries any.
+      if (controller.restaurantNotices.isNotEmpty)
+        RestaurantNoticesRow(
+          notices: controller.restaurantNotices,
+          expanded: _restaurantNoticesExpanded,
+          onToggle: () => setState(
+            () => _restaurantNoticesExpanded = !_restaurantNoticesExpanded,
+          ),
+        ),
       const SizedBox(height: 4),
     ];
     final notices = <Widget>[
