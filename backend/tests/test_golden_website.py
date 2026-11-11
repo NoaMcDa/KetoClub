@@ -334,7 +334,28 @@ def test_reversed_hebrew_is_rejected_whichever_way_it_was_read() -> None:
 
 @pytest.mark.parametrize(
     ("text", "reversed_"),
-    [("שלום", False), ("םולש", True), ("hello", False), ("", False), ("a ףב", True)],
+    [
+        ("שלום", False),
+        ("םולש", True),
+        ("hello", False),
+        ("", False),
+        ("a ףב", True),
+        # A geresh inside a loanword is part of the word (#442).
+        ("פרמז'ן", False),
+        ("קרפצ'יו", False),
+        ("מנצ'גו", False),
+        ("פרמז׳ן", False),
+        ("פרמז’ן", False),
+        # So is an acronym's gershayim, and a mark on a pointed letter.
+        ('תנ"ך', False),
+        ("תנ״ך", False),
+        ("שָׁלוֹם", False),
+        # Reversed text stays reversed, with a geresh or inside quotes.
+        ("ן'זמרפ", True),
+        ("'ץיוודנס", True),
+        ('סלט "ןמש"', True),
+        ("it's ם", True),
+    ],
 )
 def test_looks_character_reversed(text: str, reversed_: bool) -> None:
     assert looks_character_reversed(text) is reversed_

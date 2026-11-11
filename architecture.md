@@ -2363,7 +2363,9 @@ often appear on neither.
   options with `ClassificationOptions.fromSettings`. Any text that is read (page
   text or JSON-LD) is rejected as `menuNotFound` when a Hebrew word in it starts
   with a final-form letter (ך ם ן ף ץ) — `utils/hebrew_order.dart` — since that
-  is proof of reversed text.
+  is proof of reversed text. A geresh or gershayim between two letters is part
+  of the word (פרמז'ן, תנ"ך), so a loanword's final letter is not read as the
+  start of one (issue #442).
 - **Fetching it (crawl hygiene).** Web goes through the backend's new
   `POST /v1/website/fetch` (`{"url"}` in the body, so no URL reaches a request
   log; answers `{kind: html|pdf, content_type, body, final_url}`, a PDF's body in

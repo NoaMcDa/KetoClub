@@ -33,7 +33,14 @@ from app.website.html import DartUri, is_javascript_only, reserves_ai
 from app.website.locator import JsonLdMenuFound, MenuLinkFound, locate, menu_text
 
 _CURRENCY: Final = "ILS"
-_HEBREW_WORD: Final = re.compile("[א-ת]+")
+# A Hebrew letter, or a niqqud or cantillation mark written on one.
+_LETTER: Final = "[א-ת\\u0591-\\u05BD\\u05BF\\u05C1\\u05C2\\u05C4\\u05C5\\u05C7]"
+# A geresh or gershayim: the Hebrew marks, and the ASCII and curly quotes
+# that stand in for them.
+_GERESH: Final = "['\"\\u05F3\\u05F4\\u2018\\u2019\\u201C\\u201D]"
+# One Hebrew word. A geresh or gershayim between two letters is part of it
+# (#442): a loanword's (פרמז'ן) or an acronym's (תנ"ך) must not split.
+_HEBREW_WORD: Final = re.compile(f"{_LETTER}+(?:{_GERESH}{_LETTER}+)*")
 _FINAL_FORMS: Final = "ךםןףץ"
 _HEBREW_LETTER: Final = re.compile("[א-ת]")
 
@@ -49,7 +56,8 @@ def looks_character_reversed(text: str) -> bool:
     can come out with every word's letters backwards. Hebrew writes a
     final-form letter only at the end of a word, so a word that *starts* with
     one is proof the text is reversed, and one such word rejects the whole
-    text. Text with no Hebrew is never reversed by this test.
+    text. Text with no Hebrew is never reversed by this test, and neither is
+    a loanword whose geresh comes before a final letter, nor pointed text.
     """
     return any(
         match.group(0)[0] in _FINAL_FORMS for match in _HEBREW_WORD.finditer(text)
