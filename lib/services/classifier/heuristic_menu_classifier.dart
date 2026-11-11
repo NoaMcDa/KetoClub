@@ -84,7 +84,7 @@ final class HeuristicMenuClassifier implements MenuClassifier {
   AnalysedDish _analyse(Dish dish, ClassificationOptions options) {
     // The rules read the dish minus its removal options (issue #192), and
     // judge it as a whole dish rather than one flat string (issue #191):
-    // see ClassificationRules.matchDish for the three-step order.
+    // see ClassificationRules.matchDish for the order of its steps.
     final text = TextNormaliser.dishRulesText(dish);
     // The script a waiter script is read in follows the dish's own
     // text, not the UI locale (architecture.md §12): a Hebrew menu

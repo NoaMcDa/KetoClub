@@ -168,6 +168,13 @@ final List<_CompiledBase> _baseEn = _compileBasesEn();
 /// See [_baseEn].
 final List<_CompiledBase> _baseHe = _compileBasesHe();
 
+/// See [_baseEn]; the dough words alone ([doughBasesEn]), for telling a
+/// choice-of-dough option group from any other.
+final List<_CompiledBase> _doughEn = _compileDietaryEn(doughBasesEn);
+
+/// See [_doughEn].
+final List<_CompiledBase> _doughHe = _compileDietaryHe(doughBasesHe);
+
 /// See [_baseEn].
 final List<_CompiledModifier> _carbEn = _compileCarbEn();
 
@@ -287,6 +294,68 @@ bool _isGuarded(String haystack, int start, int end, GuardWords? guard) {
   scan(_baseEn, ketoQualifierGuardsEn, nonKetoBaseLabelsEn);
   scan(_baseHe, ketoQualifierGuardsHe, nonKetoBaseLabelsHe);
   return best;
+}
+
+/// The label of the first dough word ([doughBasesEn], [doughBasesHe])
+/// that survives its guards in [haystack], English table first, or null
+/// when [haystack] names no dough or only a rescued one ("בצק כרובית").
+String? _unguardedDoughLabel(String haystack) {
+  String? scan(
+    List<_CompiledBase> table,
+    Map<String, GuardWords> guards,
+    Map<String, String> labels,
+  ) {
+    for (final entry in table) {
+      for (final match in entry.pattern.allMatches(haystack)) {
+        if (!_isGuarded(haystack, match.start, match.end, guards[entry.key])) {
+          return labels[entry.key] ?? entry.key;
+        }
+      }
+    }
+    return null;
+  }
+
+  return scan(_doughEn, ketoQualifierGuardsEn, nonKetoBaseLabelsEn) ??
+      scan(_doughHe, ketoQualifierGuardsHe, nonKetoBaseLabelsHe);
+}
+
+/// Whether a dough word in [haystack] is rescued by one of its guards: a
+/// cauliflower, almond or keto dough is named there.
+bool _namesRescuedDough(String haystack) {
+  bool scan(List<_CompiledBase> table, Map<String, GuardWords> guards) {
+    for (final entry in table) {
+      for (final match in entry.pattern.allMatches(haystack)) {
+        if (_isGuarded(haystack, match.start, match.end, guards[entry.key])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  return scan(_doughEn, ketoQualifierGuardsEn) ||
+      scan(_doughHe, ketoQualifierGuardsHe);
+}
+
+/// Every choice-of-dough option group of [dish], in option order: the
+/// label of the dough word its **name** holds unguarded, and whether one
+/// of its non-removal values offers a rescued dough. Each value is read
+/// after the group's name, so a guard word reaches the name's dough word
+/// too ("בחרו סוג בצק" with a bare "כרובית" among its values).
+Iterable<({String label, bool offersRescued})> _doughChoices(Dish dish) sync* {
+  for (final option in dish.options) {
+    final name = TextNormaliser.normalise(option.name);
+    final label = _unguardedDoughLabel(name);
+    if (label == null) continue;
+    yield (
+      label: label,
+      offersRescued: option.values.any(
+        (value) =>
+            !TextNormaliser.isRemovalOptionValue(value) &&
+            _namesRescuedDough('$name ${TextNormaliser.normalise(value)}'),
+      ),
+    );
+  }
 }
 
 /// Whether any trigger in [tables] — each paired with its guard map —
@@ -445,7 +514,11 @@ abstract final class ClassificationRules {
   ///    the name and description only. Option text can make a dish
   ///    yellow, never red: an option group named after a red base is
   ///    something the dish can be ordered *as*, not what it is.
-  /// 3. Carb modifiers are matched on [TextNormaliser.dishRulesText],
+  /// 3. The one exception: a choice of dough ([doughChoiceBase]). An
+  ///    option group named "בחרו סוג בצק" does not offer dough beside
+  ///    something else, it asks which dough the dish is made of, so the
+  ///    dish is red — a pizza listed by its toppings alone.
+  /// 4. Carb modifiers are matched on [TextNormaliser.dishRulesText],
   ///    which keeps a "choice of side" value and drops removal values
   ///    ("ללא אלף האיים"), so a burger is not told to swap a dressing it
   ///    only ever had the option to leave off.
@@ -471,6 +544,15 @@ abstract final class ClassificationRules {
       );
     }
 
+    final dough = doughChoiceBase(dish);
+    if (dough != null) {
+      return RuleMatch(
+        isNonKeto: true,
+        baseLabel: dough,
+        instructions: const <String>[],
+      );
+    }
+
     final occurrences = _unguardedModifierOccurrences(
       TextNormaliser.dishRulesText(dish),
     );
@@ -478,24 +560,53 @@ abstract final class ClassificationRules {
 
     // A red base offered only as an option ("Choice of side: pasta or
     // salad") is something to steer around, not a reason to skip the
-    // dish: yellow, with the ask to pick the other option, first.
-    final optionBase = _firstUnguardedBaseMatch(
-      TextNormaliser.dishOptionRulesText(dish),
-    );
+    // dish: yellow, with the ask to pick the other option, first. A
+    // choice of dough that reaches this line offers a rescued one, and is
+    // steered around the same way even when the joined option text reads
+    // as guarded ("בחרו סוג בצק" + "קלאסי" + "כרובית").
+    final optionBase =
+        _firstUnguardedBaseMatch(TextNormaliser.dishOptionRulesText(dish))
+            ?.label ??
+        _doughChoices(dish).firstOrNull?.label;
     if (optionBase != null) {
-      final template = TextNormaliser.containsHebrew(optionBase.label)
+      final template = TextNormaliser.containsHebrew(optionBase)
           ? optionBaseModificationHe
           : optionBaseModificationEn;
       return RuleMatch(
         isNonKeto: false,
         instructions: <String>[
-          template.replaceAll('{base}', optionBase.label),
+          template.replaceAll('{base}', optionBase),
           ...sentences,
         ],
       );
     }
 
     return RuleMatch(isNonKeto: false, instructions: sentences);
+  }
+
+  /// The dough [dish] is built on, when one of its option groups is a
+  /// choice of dough: the group's **name** holds an unguarded dough word
+  /// ([doughBasesEn], [doughBasesHe]) — "בחרו סוג בצק - MIX", "בצק -
+  /// אישית", "Choose your dough". Null for every other dish.
+  ///
+  /// This is how a pizzeria's menu on Wolt says "pizza" when the name is
+  /// a topping mix and the description lists toppings: fourteen dishes on
+  /// one real Domino's menu were green without it. Only the group's name
+  /// is read, never its values, so a dough stick offered as an add-on
+  /// ("תרצו משהו נוסף?" → "מקלות בצק") stays the yellow that issue #192
+  /// gave it.
+  ///
+  /// A group that offers a rescued dough among its values — "בצק
+  /// כרובית", or a bare "כרובית" under "בחרו סוג בצק" — is not a red:
+  /// the dish can be ordered keto, and [matchDish] goes on to make it a
+  /// yellow that asks for the other option. A dish with several dough
+  /// groups (a two-pizza deal) is red as soon as one of them offers no
+  /// rescued dough.
+  static String? doughChoiceBase(Dish dish) {
+    for (final choice in _doughChoices(dish)) {
+      if (!choice.offersRescued) return choice.label;
+    }
+    return null;
   }
 
   /// Whether [dish]'s description or non-removal option values name a

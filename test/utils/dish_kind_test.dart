@@ -80,6 +80,24 @@ void main() {
       expect(categoryKindOf('סלטים ורטבים'), DishKind.food);
     });
 
+    test('dips are extras: "דיפים", and a real "דיפים ורטבים" heading '
+        'whose sauces word carries a prefix', () {
+      // Arrange: the heading of a real Domino's menu on Wolt, whose six
+      // dips were counted as food before `דיפים` was an extras word.
+      const heading = 'דיפים ורטבים 🍯';
+      // Act, Assert
+      expect(categoryKindOf('דיפים'), DishKind.extra);
+      expect(categoryKindOf(heading), DishKind.extra);
+      expect(
+        dishKindOf(category: heading, dish: _dish('דיפ עגבניות שום')),
+        DishKind.extra,
+      );
+      // A food word beside it still wins, and a heading is never matched
+      // with a prefix.
+      expect(categoryKindOf('תוספות ודיפים'), DishKind.food);
+      expect(categoryKindOf('נשנושים ודיפים'), DishKind.food);
+    });
+
     test('a mixed food-and-drink heading decides nothing, so each dish is '
         'read by its name', () {
       expect(categoryKindOf('קפה ומאפה'), DishKind.food);

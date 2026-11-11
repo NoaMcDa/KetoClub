@@ -7886,6 +7886,18 @@
   },
   {
     "containsHebrew": false,
+    "in": "dough",
+    "isRemovalOptionValue": false,
+    "normalised": "dough",
+    "words": [
+      "dough"
+    ],
+    "wordsMin3": [
+      "dough"
+    ]
+  },
+  {
+    "containsHebrew": false,
     "in": "cola",
     "isRemovalOptionValue": false,
     "normalised": "cola",
@@ -9525,6 +9537,66 @@
     ],
     "wordsMin3": [
       "סקונ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "עוגת",
+    "isRemovalOptionValue": false,
+    "normalised": "עוגת",
+    "words": [
+      "עוגת"
+    ],
+    "wordsMin3": [
+      "עוגת"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "עוגות",
+    "isRemovalOptionValue": false,
+    "normalised": "עוגות",
+    "words": [
+      "עוגות"
+    ],
+    "wordsMin3": [
+      "עוגות"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "גלידת",
+    "isRemovalOptionValue": false,
+    "normalised": "גלידת",
+    "words": [
+      "גלידת"
+    ],
+    "wordsMin3": [
+      "גלידת"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "גלידות",
+    "isRemovalOptionValue": false,
+    "normalised": "גלידות",
+    "words": [
+      "גלידות"
+    ],
+    "wordsMin3": [
+      "גלידות"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "בצק",
+    "isRemovalOptionValue": false,
+    "normalised": "בצק",
+    "words": [
+      "בצק"
+    ],
+    "wordsMin3": [
+      "בצק"
     ]
   },
   {
@@ -13979,6 +14051,19 @@
   },
   {
     "containsHebrew": true,
+    "in": "דל פחמימות",
+    "isRemovalOptionValue": false,
+    "normalised": "דל פחמימות",
+    "words": [
+      "דל",
+      "פחמימות"
+    ],
+    "wordsMin3": [
+      "פחמימות"
+    ]
+  },
+  {
+    "containsHebrew": true,
     "in": "זירו",
     "isRemovalOptionValue": false,
     "normalised": "זירו",
@@ -14953,6 +15038,30 @@
     ],
     "wordsMin3": [
       "מטבלימ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "דיפים",
+    "isRemovalOptionValue": false,
+    "normalised": "דיפימ",
+    "words": [
+      "דיפימ"
+    ],
+    "wordsMin3": [
+      "דיפימ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "דיפ",
+    "isRemovalOptionValue": false,
+    "normalised": "דיפ",
+    "words": [
+      "דיפ"
+    ],
+    "wordsMin3": [
+      "דיפ"
     ]
   },
   {

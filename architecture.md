@@ -667,7 +667,19 @@ issues #191, #192), in this order:
    `TextNormaliser.dishCoreText` — the dish's name and description only,
    never its options — so an option group named after a red base (an "ארוחת
    נאגטס" meal upgrade on a burger) can never redden the dish on its own.
-3. Otherwise, `CARB_MODIFIERS` is matched against
+3. Otherwise, a **choice of dough** is red (`doughChoiceBase`, amending D14):
+   an option group whose *name* holds an unguarded dough word
+   (`doughBases{En,He}`: `dough`, `בצק`) — "בחרו סוג בצק - MIX", "בצק -
+   אישית" — does not offer dough beside something else, it asks which dough
+   the dish is made of. This is how a pizzeria's Wolt menu says "pizza" when
+   a dish is named by its topping mix and described by its toppings; one real
+   Domino's menu had fourteen such dishes green. Only the group's name is
+   read, so dough sticks offered as an add-on stay step 4's yellow, and a
+   group that offers a rescued dough ("בצק כרובית") makes the dish a yellow
+   too, never a red. Dough in the name or description is step 2's red, like
+   any base: `בצק` and `dough` are in `NON_KETO_BASES`, guarded by the keto
+   words and, before the word only, by `ללא`/`בלי` ("קיש ללא בצק").
+4. Otherwise, `CARB_MODIFIERS` is matched against
    `TextNormaliser.dishRulesText`: the core text plus every option group's
    name and non-removal values (a "choice of side" value still counts, per
    §6.1) but with every removal value dropped — one whose first word is

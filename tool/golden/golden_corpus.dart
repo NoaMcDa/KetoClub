@@ -580,6 +580,107 @@ final List<Dish> ruleDishes = <Dish>[
       ),
     ],
   ),
+  // A pizzeria's dishes as Wolt lists them (a real Domino's menu): the
+  // name is a topping mix, and only the choice of dough says "pizza".
+  ruleDish(
+    '\u202Bבקרנה MIX משפחתית',
+    description: "פרוסות חזה בקר, כדורי בייבי מוצרלה, גבינת פרמז'ן",
+    options: const <DishOption>[
+      DishOption(
+        name: '\u202Bבחרו סוג בצק - MIX',
+        values: <String>['בצק קלאסי', 'בצק קלאסי דק', 'צ׳יזי קראסט מוצרלה'],
+      ),
+    ],
+  ),
+  ruleDish(
+    '\u202Bגריק MIX אישית',
+    description: 'קוביות עגבניות, בצל סגול, זיתי קלמטה וגבינה בולגרית',
+    options: const <DishOption>[
+      DishOption(name: 'בצק - אישית', values: <String>['בצק קלאסי']),
+    ],
+  ),
+  ruleDish('משפחתית בהרכבה', description: 'בחרו סוג בצק ותוספות'),
+  ruleDish(
+    'משפחתית יוונית',
+    options: const <DishOption>[
+      DishOption(
+        name: 'בחרו סוג בצק',
+        values: <String>['בצק קלאסי', '\u202Bבצק ללא גלוטן  \u{1F33E}'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'משפחתית יוונית',
+    options: const <DishOption>[
+      DishOption(
+        name: 'בחרו סוג בצק',
+        values: <String>['בצק קלאסי', 'בצק כרובית'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'משפחתית יוונית',
+    options: const <DishOption>[
+      DishOption(name: 'בחרו סוג בצק', values: <String>['קלאסי', 'כרובית']),
+    ],
+  ),
+  ruleDish(
+    'משפחתית יוונית',
+    options: const <DishOption>[
+      DishOption(
+        name: 'בחרו סוג בצק',
+        values: <String>['קלאסי', 'דק', 'ללא גלוטן', 'קטו'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'משפחתית יוונית',
+    options: const <DishOption>[
+      DishOption(name: 'בחרו בצק קטו', values: <String>['דק', 'עבה']),
+    ],
+  ),
+  ruleDish(
+    'סלט יווני',
+    options: const <DishOption>[
+      DishOption(
+        name: 'תרצו משהו נוסף?',
+        values: <String>['מקלות בצק', 'לחם שום'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'Veggie mix',
+    options: const <DishOption>[
+      DishOption(name: 'Choose your dough', values: <String>['Classic']),
+    ],
+  ),
+  ruleDish(
+    'Veggie mix',
+    options: const <DishOption>[
+      DishOption(
+        name: 'Choose your dough',
+        values: <String>['Classic', 'Cauliflower dough'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'אצבעות מוצרלה',
+    description: 'אצבעות בצק וגבינה 100% מוצרלה + דיפ עגבניות ושום',
+  ),
+  ruleDish('קיש ללא בצק', description: 'ברוקולי, גבינות ושמנת'),
+  ruleDish('קיש ברוקולי', description: 'קיש מבצק פריך, גבינות ורויאל'),
+  ruleDish('פונדנט שוקולד', description: 'עוגת שוקולד חמה'),
+  ruleDish('פיינט וניל - 500 מ״ל', description: 'גלידת וניל משובחת'),
+  ruleDish(
+    'דומינו׳ס ווינגס',
+    description: 'יחידות חצאי כנפיים מעולות ברוטב לבחירה',
+    options: const <DishOption>[
+      DishOption(
+        name: 'בחרו רטבים לכנפיים',
+        values: <String>['רוטב סוויט צ׳ילי אריזונה', 'ללא רוטב'],
+      ),
+    ],
+  ),
 ];
 
 // ---------------------------------------------------------------------------
@@ -847,6 +948,9 @@ const List<String> dishKindHeadings = <String>[
   'קפה ומאפה',
   'Coffee & Pastries',
   'Beers & Burgers',
+  '\u202Bדיפים ורטבים \u{1F36F}',
+  'דיפים',
+  'נשנושים ודיפים',
   'משקאות קלים',
   'שתייה חמה וקרה',
   'רטבים ומטבלים',

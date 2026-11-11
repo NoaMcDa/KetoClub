@@ -288,6 +288,8 @@ class Vocabulary:
     carb_modifiers_he: tuple[tuple[str, str], ...]
     non_keto_drink_bases_en: tuple[str, ...]
     non_keto_drink_bases_he: tuple[str, ...]
+    dough_bases_en: tuple[str, ...]
+    dough_bases_he: tuple[str, ...]
     non_keto_bases_en: tuple[str, ...]
     non_keto_bases_he: tuple[str, ...]
     non_keto_base_labels_en: Mapping[str, str]
@@ -364,6 +366,8 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         carb_modifiers_he=_pairs(root["carbModifiersHe"], "carbModifiersHe"),
         non_keto_drink_bases_en=strs("nonKetoDrinkBasesEn"),
         non_keto_drink_bases_he=strs("nonKetoDrinkBasesHe"),
+        dough_bases_en=strs("doughBasesEn"),
+        dough_bases_he=strs("doughBasesHe"),
         non_keto_bases_en=strs("nonKetoBasesEn"),
         non_keto_bases_he=strs("nonKetoBasesHe"),
         non_keto_base_labels_en=_str_map(root["nonKetoBaseLabelsEn"], "labelsEn"),

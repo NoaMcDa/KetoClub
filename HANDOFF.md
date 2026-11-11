@@ -463,6 +463,17 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   only**, so "Bun, no sesame" — a removal that is not the first word — is
   still read as an ingredient, not dropped. **`מאפה` is red** even for a
   crustless "מאפה חצילים", accepted as the rarer reading.
+- **A pizza is red through its dough, not its heading.** A dish with an
+  option group named after dough ("בחרו סוג בצק"), or with `בצק`/`dough` in
+  its name or description, is red (`doughChoiceBase`; found on a Domino's
+  card that read "29 dishes as-is", now 3). The category heading is still
+  never read by the rule engine, so a pizza named only "Capra Piccante"
+  under a "פיצות" heading, with no dough group and no dough word, is still
+  green; so is a filled dough roll whose description never says dough ("מיט
+  רולס"). Reading the heading was left out on purpose: "ליד הפיצה" (beside
+  the pizza) holds the wings. A dough group that offers a keto dough gets
+  the generic "skip the dough, choose a salad" script, not "choose the
+  cauliflower dough": there is no template for that yet.
 - **The web build cannot fetch menus only without the backend running.** The
   restaurant APIs send no CORS headers, so live fetching needed a CORS-forwarding
   proxy (§13, D9); D11 shipped one (`backend/`'s `/v1/proxy/wolt/…` route). With

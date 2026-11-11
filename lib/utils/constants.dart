@@ -647,6 +647,23 @@ const List<String> nonKetoDrinkBasesEn = <String>[
   'port wine',
 ];
 
+/// Dough, English: a dish built on dough — a pizza, a calzone, dough
+/// sticks, a filled roll — cannot be made keto by leaving something off.
+/// Spread into [nonKetoBasesEn], and read on their own by
+/// `ClassificationRules.matchDish`, which treats an option group *named*
+/// after one ("Choose your dough") as what the dish is made of rather
+/// than something it can be ordered with. `sourdough` and `doughnut` are
+/// other words to the word-boundary pattern and never match. Guards in
+/// [ketoQualifierGuardsEn] rescue a cauliflower, almond or keto dough.
+const List<String> doughBasesEn = <String>['dough'];
+
+/// [doughBasesEn] in Hebrew. A real Domino's menu on Wolt lists fourteen
+/// pizzas ("בקרנה MIX משפחתית") whose name and description hold toppings
+/// only; the one thing that says "pizza" is the option group "בחרו סוג
+/// בצק". Guards in [ketoQualifierGuardsHe] rescue "בצק כרובית" and "ללא
+/// בצק" (a crustless quiche).
+const List<String> doughBasesHe = <String>['בצק'];
+
 // ---------------------------------------------------------------------------
 // nonKetoBases — English (100 triggers)
 // ---------------------------------------------------------------------------
@@ -706,6 +723,9 @@ const List<String> nonKetoBasesEn = <String>[
   // `pastry base`, both of which are red anyway.
   'danish', 'pastry', 'pastries', 'rugelach', 'muffin', 'muffins',
   'scone', 'scones',
+
+  // Dough itself: see [doughBasesEn].
+  ...doughBasesEn,
 
   // Drink bases — red (#216): see [nonKetoDrinkBasesEn].
   ...nonKetoDrinkBasesEn,
@@ -813,6 +833,15 @@ const List<String> nonKetoBasesHe = <String>[
   'עוגיה', // cookie (singular; עוגיות is above)
   'מאפין', 'מאפינס', // muffin / muffins
   'סקון', // scone
+  // The construct and plural forms of `עוגה` and `גלידה`. A menu writes
+  // "עוגת שוקולד חמה" and "גלידת וניל", which the dictionary forms above
+  // never match: the pattern is strict on the right. Found green on a
+  // real Domino's menu (a chocolate fondant and three pints of ice cream).
+  'עוגת', 'עוגות', // cake of / cakes
+  'גלידת', 'גלידות', // ice cream of / ice creams
+  // Dough itself: see [doughBasesHe]. After `בצק עלים` in this list, so
+  // that longer trigger keeps its own label where both start together.
+  ...doughBasesHe,
   // Drink bases — red (#216): see [nonKetoDrinkBasesHe].
   ...nonKetoDrinkBasesHe,
 ];
@@ -901,11 +930,16 @@ const List<String> extraCategoryWordsEn = <String>[
 /// [extraCategoryWordsEn] in Hebrew. **Not `תוספות`**: on an Israeli menu
 /// it means sides (fries, salad, rice) — food — far more often than
 /// add-ons; the test suite pins its absence. `סכום` is `סכו"ם` once the
-/// normaliser has dropped the gershayim.
+/// normaliser has dropped the gershayim. `דיפים`/`דיפ` is how a menu
+/// transliterates [extraCategoryWordsEn]'s `dips`/`dip`: a real Domino's
+/// "דיפים ורטבים" category counted six dips as food without it (`ורטבים`
+/// carries a prefix a heading is never matched with).
 const List<String> extraCategoryWordsHe = <String>[
   'רטבים',
   'רוטב',
   'מטבלים',
+  'דיפים',
+  'דיפ',
   'סכום',
   'פיקדון',
   'משלוח',
@@ -1396,6 +1430,11 @@ const Map<String, String> nonKetoBaseLabelsHe = <String, String>{
   'רזוטו': 'ריזוטו',
   'רמן': 'ראמן',
   'פיצות': 'פיצה',
+  // The construct and plural forms read aloud as the dish they inflect.
+  'עוגת': 'עוגה',
+  'עוגות': 'עוגה',
+  'גלידת': 'גלידה',
+  'גלידות': 'גלידה',
   // #12 audit addition (agent 1D), mirroring [nonKetoBaseLabelsEn]'s
   // `fish and chips`/`fish chips` → `battered fish`: names the batter,
   // not the chips.
@@ -1470,6 +1509,12 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'muffin': (before: ['egg', 'keto', 'almond', 'coconut'], after: []),
   'muffins': (before: ['egg', 'keto', 'almond', 'coconut'], after: []),
   // A lettuce-wrapped or keto burger already has no bun (issue #190).
+  // A cauliflower, almond-flour or keto dough is the substitute a keto
+  // diner is looking for; "dough-free" normalises to `dough free`.
+  'dough': (
+    before: ['cauliflower', 'keto', 'almond', 'fathead', 'low carb', 'lowcarb'],
+    after: ['free'],
+  ),
   'burger': (before: _bunlessBurgerWords, after: []),
   'burgers': (before: _bunlessBurgerWords, after: []),
   'hamburger': (before: _bunlessBurgerWords, after: []),
@@ -1553,6 +1598,24 @@ final GuardWords _hePizzaGuard = _heGuard(const [
   'דלת פחמימות',
 ]);
 
+/// The keto words that rescue `בצק` on either side: "בצק כרובית", "בצק
+/// קמח שקדים", "בצק דל פחמימות".
+const List<String> _heKetoDoughWords = <String>[
+  'כרובית',
+  'קטו',
+  'שקדים',
+  'דל פחמימות',
+];
+
+/// See [ketoQualifierGuardsHe] — `בצק`. The one guard that is not built
+/// by [_heGuard]: besides the keto words on both sides, a removal word
+/// ([optionRemovalWordsHe]) *before* the dough rescues it — "קיש ללא בצק"
+/// is a crustless quiche. Never after: "בצק ללא גלוטן" is still dough.
+const GuardWords _heDoughGuard = (
+  before: <String>[..._heKetoDoughWords, ...optionRemovalWordsHe],
+  after: _heKetoDoughWords,
+);
+
 /// See [ketoQualifierGuardsHe] — `ריזוטו`.
 final GuardWords _heRisottoGuard = _heGuard(const ['כרובית', 'קטו']);
 
@@ -1597,7 +1660,8 @@ final GuardWords _heDrinkGuard = _heGuard(const [
 
 /// Keto-substitute guards, Hebrew (`vocabulary_spec.md` "Guards
 /// (D-V1)"). See [_heGuard] for why every entry is bidirectional here,
-/// unlike [ketoQualifierGuardsEn].
+/// unlike [ketoQualifierGuardsEn]; `בצק` alone adds removal words on its
+/// `before` side ([_heDoughGuard]).
 final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
   'אורז': _heCauliflowerLikeGuard,
   'נודלס': _heNoodleGuard,
@@ -1614,6 +1678,7 @@ final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
   'בורגר': _heBurgerGuard,
   "צ'יזבורגר": _heBurgerGuard,
   'שמרים': _heYeastGuard,
+  'בצק': _heDoughGuard,
 
   // Drink guards (#216): זירו/דיאט/ללא סוכר rescue the drink bases.
   'קולה': _heDrinkGuard,

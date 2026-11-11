@@ -136,6 +136,18 @@ def _bases_he() -> tuple[_Compiled, ...]:
     return _hebrew(vocabulary().non_keto_bases_he, honour_no_prefix=True)
 
 
+@cache
+def _dough_en() -> tuple[_Compiled, ...]:
+    return _latin(vocabulary().dough_bases_en)
+
+
+@cache
+def _dough_he() -> tuple[_Compiled, ...]:
+    # Dart compiles the dough table with ``_compileDietaryHe``: always the
+    # permissive prefix, whatever ``noPrefixHebrewTriggers`` says.
+    return _hebrew(vocabulary().dough_bases_he, honour_no_prefix=False)
+
+
 def _modifiers(
     pairs: Sequence[tuple[str, str]], compiled: tuple[_Compiled, ...]
 ) -> tuple[_Compiled, ...]:
@@ -260,6 +272,41 @@ def _first_unguarded_base_match(haystack: str) -> tuple[int, str] | None:
     return best
 
 
+def _unguarded_dough_label(haystack: str) -> str | None:
+    """The label of the first dough word that survives its guards in
+    ``haystack``, English table first; ``None`` when it names no dough or
+    only a rescued one."""
+    vocab = vocabulary()
+    for table, guards, labels in (
+        (_dough_en(), vocab.keto_qualifier_guards_en, vocab.non_keto_base_labels_en),
+        (_dough_he(), vocab.keto_qualifier_guards_he, vocab.non_keto_base_labels_he),
+    ):
+        for entry in table:
+            for found in entry.pattern.finditer(haystack):
+                if not _is_guarded(
+                    haystack, found.start(), found.end(), guards.get(entry.key)
+                ):
+                    return labels.get(entry.key, entry.key)
+    return None
+
+
+def _names_rescued_dough(haystack: str) -> bool:
+    """Whether a dough word in ``haystack`` is rescued by one of its
+    guards: a cauliflower, almond or keto dough is named there."""
+    vocab = vocabulary()
+    for table, guards in (
+        (_dough_en(), vocab.keto_qualifier_guards_en),
+        (_dough_he(), vocab.keto_qualifier_guards_he),
+    ):
+        for entry in table:
+            for found in entry.pattern.finditer(haystack):
+                if _is_guarded(
+                    haystack, found.start(), found.end(), guards.get(entry.key)
+                ):
+                    return True
+    return False
+
+
 def _any_unguarded_match(
     haystack: str,
     tables: Sequence[tuple[tuple[_Compiled, ...], Mapping[str, GuardWords]]],
@@ -333,7 +380,9 @@ def match_dish(dish: Dish) -> RuleMatch:
        red, unless the description or an option names a filling
        (:func:`describes_filling`).
     2. A non-keto base in the name or description is red.
-    3. Carb modifiers are read from the rules text (options included,
+    3. A choice of dough among the options (:func:`dough_choice_base`) is
+       red: the group asks which dough the dish is made of.
+    4. Carb modifiers are read from the rules text (options included,
        removals dropped). A non-keto base offered only as an option makes
        the dish yellow with ``optionBaseModification`` first.
     """
@@ -345,12 +394,19 @@ def match_dish(dish: Dish) -> RuleMatch:
     if base is not None:
         return RuleMatch(is_non_keto=True, base_label=base[1])
 
+    dough = dough_choice_base(dish)
+    if dough is not None:
+        return RuleMatch(is_non_keto=True, base_label=dough)
+
     sentences = _sentences_after_suppression(
         _unguarded_modifier_occurrences(dish_rules_text(dish))
     )
     option_base = _first_unguarded_base_match(dish_option_rules_text(dish))
-    if option_base is not None:
-        label = option_base[1]
+    # A choice of dough that reaches this line offers a rescued one; it is
+    # steered around like any option base, even when the joined option text
+    # reads as guarded.
+    label = option_base[1] if option_base is not None else _first_dough_choice(dish)
+    if label is not None:
         templates = vocabulary().templates
         template = (
             templates.option_base_modification_he
@@ -362,6 +418,51 @@ def match_dish(dish: Dish) -> RuleMatch:
             instructions=(template.replace("{base}", label), *sentences),
         )
     return RuleMatch(is_non_keto=False, instructions=tuple(sentences))
+
+
+def dough_choice_base(dish: Dish) -> str | None:
+    """``ClassificationRules.doughChoiceBase``: the dough ``dish`` is built
+    on when one of its option groups is a choice of dough.
+
+    The group's **name** must hold an unguarded dough word ("בחרו סוג בצק -
+    MIX", "Choose your dough"); its values are never what makes it one. A
+    group that offers a rescued dough among its non-removal values ("בצק
+    כרובית", or a bare "כרובית") is skipped, and :func:`match_dish` makes
+    the dish a yellow instead; a dish with several dough groups is red as
+    soon as one of them offers none.
+    """
+    for label, offers_rescued in _dough_choices(dish):
+        if not offers_rescued:
+            return label
+    return None
+
+
+def _dough_choices(dish: Dish) -> list[tuple[str, bool]]:
+    """Dart ``_doughChoices``: every choice-of-dough option group of
+    ``dish`` in option order, as ``(label, offers_rescued)``."""
+    choices: list[tuple[str, bool]] = []
+    for option in dish.options:
+        name = normalise(option.name)
+        label = _unguarded_dough_label(name)
+        if label is None:
+            continue
+        choices.append(
+            (
+                label,
+                any(
+                    not is_removal_option_value(value)
+                    and _names_rescued_dough(f"{name} {normalise(value)}")
+                    for value in option.values
+                ),
+            )
+        )
+    return choices
+
+
+def _first_dough_choice(dish: Dish) -> str | None:
+    """The label of ``dish``'s first choice-of-dough group, or ``None``."""
+    choices = _dough_choices(dish)
+    return choices[0][0] if choices else None
 
 
 def describes_filling(dish: Dish) -> bool:

@@ -307,14 +307,31 @@ void main() {
       }
     });
 
-    test('every guard is bidirectional (before equals after)', () {
+    test('every guard is bidirectional (before equals after), and only '
+        'בצק adds removal words before it', () {
       // Act, Assert
       for (final entry in ketoQualifierGuardsHe.entries) {
+        final before = entry.key == 'בצק'
+            ? entry.value.before
+                  .where((word) => !optionRemovalWordsHe.contains(word))
+                  .toList()
+            : entry.value.before;
         expect(
-          entry.value.before,
+          before,
           equals(entry.value.after),
           reason: 'ketoQualifierGuardsHe["${entry.key}"] must be symmetric',
         );
+      }
+    });
+
+    test('בצק is rescued by a removal word before it, never after it', () {
+      // Act
+      final guard = ketoQualifierGuardsHe['בצק'];
+      // Assert: "קיש ללא בצק" is crustless; "בצק ללא גלוטן" is still dough.
+      expect(guard, isNotNull);
+      expect(guard!.before, containsAll(optionRemovalWordsHe));
+      for (final word in optionRemovalWordsHe) {
+        expect(guard.after, isNot(contains(word)), reason: word);
       }
     });
   });
@@ -546,6 +563,25 @@ void main() {
       for (final key in yellowDrinkTriggersHe) {
         expect(carbModifiersHe, contains(key), reason: key);
       }
+    });
+
+    test('the dough bases stay inside nonKetoBases, once each, and בצק '
+        'comes after בצק עלים so the longer trigger keeps its label', () {
+      for (final base in doughBasesEn) {
+        expect(nonKetoBasesEn.where((b) => b == base), hasLength(1));
+      }
+      for (final base in doughBasesHe) {
+        expect(nonKetoBasesHe.where((b) => b == base), hasLength(1));
+      }
+      expect(
+        nonKetoBasesHe.indexOf('בצק עלים'),
+        lessThan(nonKetoBasesHe.indexOf('בצק')),
+      );
+    });
+
+    test('the Hebrew extras headings name dips, as the English ones do', () {
+      expect(extraCategoryWordsEn, containsAll(<String>['dips', 'dip']));
+      expect(extraCategoryWordsHe, containsAll(<String>['דיפים', 'דיפ']));
     });
 
     test('the drink bases stay inside nonKetoBases, once each', () {

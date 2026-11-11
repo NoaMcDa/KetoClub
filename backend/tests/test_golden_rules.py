@@ -3,7 +3,8 @@
 Every section is replayed entry by entry: ``texts`` through
 :func:`~app.keto.rules.match`, ``dishes`` through
 :func:`~app.keto.rules.match_dish` (with ``carbOnlyBase``,
-``describesFilling`` and the four normaliser texts the entry also records),
+``doughChoiceBase``, ``describesFilling`` and the four normaliser texts the
+entry also records),
 ``mentions`` through the three ``mentions_*`` checks and ``carbOnly`` through
 :func:`~app.keto.rules.carb_only_base`.
 """
@@ -25,6 +26,7 @@ from app.keto.rules import (
     RuleMatch,
     carb_only_base,
     describes_filling,
+    dough_choice_base,
     match,
     match_dish,
     mentions_dairy,
@@ -93,6 +95,7 @@ def test_every_golden_dish_matches_as_dart_does(entry: dict[str, Any]) -> None:
         "dish",
         "match",
         "carbOnlyBase",
+        "doughChoiceBase",
         "describesFilling",
         "coreText",
         "rulesText",
@@ -102,6 +105,7 @@ def test_every_golden_dish_matches_as_dart_does(entry: dict[str, Any]) -> None:
     dish = _dish(entry["dish"])
     assert _record(match_dish(dish)) == entry["match"]
     assert carb_only_base(dish.name) == entry["carbOnlyBase"]
+    assert dough_choice_base(dish) == entry["doughChoiceBase"]
     assert describes_filling(dish) is entry["describesFilling"]
     assert dish_core_text(dish) == entry["coreText"]
     assert dish_rules_text(dish) == entry["rulesText"]
