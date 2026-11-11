@@ -1006,6 +1006,8 @@ const List<String> dishKindNoticeNames = <String>[
   'שימו לב: המטבח נסגר ב-22:00',
   'Coming soon',
   'חשוב',
+  'Allergen information: ask your waiter',
+  'מידע לאלרגנים! \u{1F499}',
 ];
 
 // ---------------------------------------------------------------------------

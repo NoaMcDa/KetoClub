@@ -1000,6 +1000,9 @@ const List<String> noticeCategoryWordsEn = <String>[
   'please note',
   'coming soon',
   'important',
+  'allergen information',
+  'allergy information',
+  'allergen info',
 ];
 
 /// [noticeCategoryWordsEn] in Hebrew.
@@ -1009,6 +1012,9 @@ const List<String> noticeCategoryWordsHe = <String>[
   'שימו לב',
   'בקרוב',
   'חשוב',
+  'מידע לאלרגנים',
+  'מידע על אלרגנים',
+  'מידע אלרגני',
 ];
 
 /// The drink keys of [carbModifiersEn] — yellow drinks with a swap script

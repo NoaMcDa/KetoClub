@@ -15487,6 +15487,48 @@
     ]
   },
   {
+    "containsHebrew": false,
+    "in": "allergen information",
+    "isRemovalOptionValue": false,
+    "normalised": "allergen information",
+    "words": [
+      "allergen",
+      "information"
+    ],
+    "wordsMin3": [
+      "allergen",
+      "information"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "allergy information",
+    "isRemovalOptionValue": false,
+    "normalised": "allergy information",
+    "words": [
+      "allergy",
+      "information"
+    ],
+    "wordsMin3": [
+      "allergy",
+      "information"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "allergen info",
+    "isRemovalOptionValue": false,
+    "normalised": "allergen info",
+    "words": [
+      "allergen",
+      "info"
+    ],
+    "wordsMin3": [
+      "allergen",
+      "info"
+    ]
+  },
+  {
     "containsHebrew": true,
     "in": "לקוחות יקרים",
     "isRemovalOptionValue": false,
@@ -15547,6 +15589,49 @@
     ],
     "wordsMin3": [
       "חשוב"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "מידע לאלרגנים",
+    "isRemovalOptionValue": false,
+    "normalised": "מידע לאלרגנימ",
+    "words": [
+      "מידע",
+      "לאלרגנימ"
+    ],
+    "wordsMin3": [
+      "מידע",
+      "לאלרגנימ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "מידע על אלרגנים",
+    "isRemovalOptionValue": false,
+    "normalised": "מידע על אלרגנימ",
+    "words": [
+      "מידע",
+      "על",
+      "אלרגנימ"
+    ],
+    "wordsMin3": [
+      "מידע",
+      "אלרגנימ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "מידע אלרגני",
+    "isRemovalOptionValue": false,
+    "normalised": "מידע אלרגני",
+    "words": [
+      "מידע",
+      "אלרגני"
+    ],
+    "wordsMin3": [
+      "מידע",
+      "אלרגני"
     ]
   },
   {

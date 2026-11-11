@@ -223,6 +223,35 @@ void main() {
       );
     });
 
+    test('an allergen-information line is a notice under any heading', () {
+      expect(
+        dishKindOf(
+          category: 'המבורגר',
+          dish: _dish('מידע לאלרגנים! \u{1F499}', price: 0),
+        ),
+        DishKind.notice,
+      );
+      expect(
+        dishKindOf(
+          category: 'Mains',
+          dish: _dish('Allergen information: ask your waiter', price: 0),
+        ),
+        DishKind.notice,
+      );
+      expect(
+        dishKindOf(
+          category: 'המבורגר',
+          dish: _dish('מידע לאלרגנים! \u{1F499}'),
+        ),
+        DishKind.food,
+      );
+      expect(categoryKindOf('Allergen information'), DishKind.notice);
+      expect(
+        dishKindOf(category: 'Mains', dish: _dish('Halloumi burger')),
+        DishKind.food,
+      );
+    });
+
     test('anything else is food, an empty name included', () {
       expect(dishKindOf(category: 'Mains', dish: _dish('')), DishKind.food);
       expect(

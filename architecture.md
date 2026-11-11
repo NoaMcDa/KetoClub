@@ -2489,7 +2489,7 @@ quick score has only ever run `HeuristicMenuClassifier`). Two decisions:
 2. **Scores and counts cover food only.** `utils/dish_kind.dart` reads
    each dish's kind — food, drink, extra (sauces, add-ons, cutlery,
    deposits, delivery, gift cards) or notice ("לקוחות יקרים", "coming
-   soon") — from the category heading first and the dish name second, never
+   soon", a zero-priced allergen-information line) — from the category heading first and the dish name second, never
    the description, and `utils/verdict_counts.dart` is the one place an
    analysis is reduced to counts: the menu header and tiles, the Discovery
    card and the Recent tab all read it. A drink or an extra is still classified

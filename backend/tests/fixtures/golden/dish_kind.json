@@ -4257,7 +4257,9 @@
         "free-1": "notice",
         "free-2": "notice",
         "free-3": "notice",
-        "free-4": "notice"
+        "free-4": "notice",
+        "free-5": "notice",
+        "free-6": "notice"
       },
       "menu": {
         "categories": [
@@ -4298,6 +4300,24 @@
                 "options": [],
                 "page": null,
                 "price": 0.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "free-5",
+                "imageUrl": null,
+                "name": "Allergen information: ask your waiter",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "free-6",
+                "imageUrl": null,
+                "name": "מידע לאלרגנים! 💙",
+                "options": [],
+                "page": null,
+                "price": 0.0
               }
             ],
             "id": "free",
@@ -4319,7 +4339,9 @@
         "priced-1": "food",
         "priced-2": "food",
         "priced-3": "food",
-        "priced-4": "food"
+        "priced-4": "food",
+        "priced-5": "food",
+        "priced-6": "food"
       },
       "menu": {
         "categories": [
@@ -4357,6 +4379,24 @@
                 "id": "priced-4",
                 "imageUrl": null,
                 "name": "חשוב",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "priced-5",
+                "imageUrl": null,
+                "name": "Allergen information: ask your waiter",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "priced-6",
+                "imageUrl": null,
+                "name": "מידע לאלרגנים! 💙",
                 "options": [],
                 "page": null,
                 "price": 40.0
