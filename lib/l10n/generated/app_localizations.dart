@@ -1061,7 +1061,7 @@ abstract class AppLocalizations {
   /// No description provided for @discoveryEmptyBody.
   ///
   /// In en, this message translates to:
-  /// **'Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.'**
+  /// **'Use your location or choose a city to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.'**
   String get discoveryEmptyBody;
 
   /// No description provided for @discoveryDrinksGuideCard.
@@ -1111,6 +1111,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open now'**
   String get discoveryChipOpenNow;
+
+  /// No description provided for @discoveryChooseLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a location'**
+  String get discoveryChooseLocation;
+
+  /// No description provided for @discoveryChipAnyDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Any distance'**
+  String get discoveryChipAnyDistance;
+
+  /// No description provided for @discoveryChipWithinKm.
+  ///
+  /// In en, this message translates to:
+  /// **'Within {km} km'**
+  String discoveryChipWithinKm(int km);
+
+  /// No description provided for @discoveryChipDistanceTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by distance'**
+  String get discoveryChipDistanceTooltip;
+
+  /// No description provided for @locationPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do you want to eat?'**
+  String get locationPickerTitle;
+
+  /// No description provided for @locationPickerUseDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my current location'**
+  String get locationPickerUseDevice;
+
+  /// No description provided for @locationPickerSearchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a city'**
+  String get locationPickerSearchLabel;
+
+  /// No description provided for @locationPickerNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No city matches that. Try another spelling.'**
+  String get locationPickerNoMatch;
 
   /// No description provided for @discoveryLocating.
   ///

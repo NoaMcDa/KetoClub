@@ -51,8 +51,9 @@ enum AppThemeMode {
 /// filter default, AI-estimation consent, the last venue opened, the
 /// appearance (issue #58), the net-carb limit (issue #57), the
 /// last-used filter (issue #55), the three "Your keto rules"
-/// toggles (issue #56), and whether the first-launch AI disclosure
-/// banner has been seen (D16, issue #167).
+/// toggles (issue #56), whether the first-launch AI disclosure
+/// banner has been seen (D16, issue #167), and the place chosen to look
+/// around on the Discovery screen (issue #443).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -77,6 +78,7 @@ final class AppSettings {
     this.carnivoreOnly = false,
     this.lastFilter,
     this.disclosureSeen = false,
+    this.discoveryPlaceId,
   });
 
   /// Reads settings written by [toJson].
@@ -105,6 +107,10 @@ final class AppSettings {
   /// [themeMode] and [netCarbLimitGrams]: a missing key, or one whose
   /// value [MenuFilter.tryParse] does not recognise, decodes to null —
   /// "no last-used filter yet" — rather than invalidating the record.
+  ///
+  /// [discoveryPlaceId] (issue #443) follows the same rule: a missing key,
+  /// or a value that is not a non-empty string, decodes to null — "no
+  /// place chosen".
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -139,6 +145,10 @@ final class AppSettings {
     final lastFilter = rawLastFilter is String
         ? MenuFilter.tryParse(rawLastFilter)
         : null;
+    final rawPlaceId = json['discoveryPlaceId'];
+    final discoveryPlaceId = rawPlaceId is String && rawPlaceId.isNotEmpty
+        ? rawPlaceId
+        : null;
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
@@ -154,6 +164,7 @@ final class AppSettings {
       carnivoreOnly: json['carnivoreOnly'] == true,
       lastFilter: lastFilter,
       disclosureSeen: json['disclosureSeen'] == true,
+      discoveryPlaceId: discoveryPlaceId,
     );
   }
 
@@ -211,11 +222,22 @@ final class AppSettings {
   /// `lib/widgets/consent_disclosure_banner.dart`.
   final bool disclosureSeen;
 
+  /// The id of the place the user chose to look around on the Discovery
+  /// screen instead of the device's own position (issue #443) — a
+  /// `KnownPlace.id` from `utils/known_places.dart` — or null when none is
+  /// chosen.
+  ///
+  /// Only the id is stored, never coordinates: the list is the one source
+  /// of where a place is. An id the list no longer holds is read back as
+  /// it was written and simply not restored by `VenueSearchController`.
+  final String? discoveryPlaceId;
+
   /// Returns a copy with the given fields replaced.
   ///
-  /// Omitting [languageTag], [lastVenue] or [lastFilter] leaves the
-  /// current value in place; passing `null` explicitly for any of them
-  /// clears it. This is done by defaulting all three to a private
+  /// Omitting [languageTag], [lastVenue], [lastFilter] or
+  /// [discoveryPlaceId] leaves the current value in place; passing `null`
+  /// explicitly for any of them clears it. This is done by defaulting each
+  /// of them to a private
   /// sentinel distinct from `null`, so "not passed" and "passed null" can
   /// be told apart. [themeMode] has no such "clear it" meaning — it
   /// always names a real mode — so it uses the ordinary "omit to keep"
@@ -233,6 +255,7 @@ final class AppSettings {
     bool? carnivoreOnly,
     Object? lastFilter = _unset,
     bool? disclosureSeen,
+    Object? discoveryPlaceId = _unset,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -252,6 +275,9 @@ final class AppSettings {
         ? this.lastFilter
         : lastFilter as MenuFilter?,
     disclosureSeen: disclosureSeen ?? this.disclosureSeen,
+    discoveryPlaceId: identical(discoveryPlaceId, _unset)
+        ? this.discoveryPlaceId
+        : discoveryPlaceId as String?,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -267,6 +293,7 @@ final class AppSettings {
     'carnivoreOnly': carnivoreOnly,
     'lastFilter': lastFilter?.name,
     'disclosureSeen': disclosureSeen,
+    'discoveryPlaceId': discoveryPlaceId,
   };
 
   @override
@@ -282,7 +309,8 @@ final class AppSettings {
       other.dairyFree == dairyFree &&
       other.carnivoreOnly == carnivoreOnly &&
       other.lastFilter == lastFilter &&
-      other.disclosureSeen == disclosureSeen;
+      other.disclosureSeen == disclosureSeen &&
+      other.discoveryPlaceId == discoveryPlaceId;
 
   @override
   int get hashCode => Object.hash(
@@ -297,6 +325,7 @@ final class AppSettings {
     carnivoreOnly,
     lastFilter,
     disclosureSeen,
+    discoveryPlaceId,
   );
 
   @override
@@ -306,7 +335,8 @@ final class AppSettings {
       'netCarbLimit: ${netCarbLimitGrams}g, lastFilter: $lastFilter, '
       'seedOilFree: $seedOilFree, dairyFree: $dairyFree, '
       'carnivoreOnly: $carnivoreOnly, '
-      'disclosureSeen: $disclosureSeen)';
+      'disclosureSeen: $disclosureSeen, '
+      'discoveryPlace: $discoveryPlaceId)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

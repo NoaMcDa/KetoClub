@@ -265,7 +265,7 @@
 
   "discoveryTitle": "Where to eat",
   "discoveryEmptyTitle": "Find somewhere to eat",
-  "discoveryEmptyBody": "Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.",
+  "discoveryEmptyBody": "Use your location or choose a city to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.",
   "discoveryDrinksGuideCard": "Ordering a drink? Bar and coffee guide",
   "discoveryLookingAround": "Looking around",
   "discoveryAroundYou": "Your location",
@@ -274,6 +274,17 @@
   "discoveryChipKetoEightPlus": "Keto 8+",
   "discoveryChipKetoEightPlusHint": "Needs scores first: they appear as the list is scored, or when you open a restaurant.",
   "discoveryChipOpenNow": "Open now",
+  "discoveryChooseLocation": "Choose a location",
+  "discoveryChipAnyDistance": "Any distance",
+  "discoveryChipWithinKm": "Within {km} km",
+  "@discoveryChipWithinKm": {
+    "placeholders": { "km": { "type": "int" } }
+  },
+  "discoveryChipDistanceTooltip": "Filter by distance",
+  "locationPickerTitle": "Where do you want to eat?",
+  "locationPickerUseDevice": "Use my current location",
+  "locationPickerSearchLabel": "Search for a city",
+  "locationPickerNoMatch": "No city matches that. Try another spelling.",
   "discoveryLocating": "Finding your location…",
   "discoverySearching": "Looking for restaurants…",
   "discoveryLocationDeniedTitle": "Location is off for KetoClub",

@@ -89,6 +89,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > skipped when the analysis came with the fetch. With no URL the app is exactly
 > the pre-D25 graph. D25 amends D2, D11, D15, D17, D19 and D24.
 >
+> **D26 (#443) lets Discovery look around a place the user chooses.** "Choose a
+> location" (the header, and the location-denied and -unavailable cards) opens
+> `LocationPickerSheet`: the device's position, or a city from a bundled list
+> (`utils/known_places.dart`, 42 Israeli cities, no geocoder). A chosen city
+> runs the ordinary nearby search at its centre, names the header, is saved as
+> `AppSettings.discoveryPlaceId` and restored on the next launch; a device
+> position that is found replaces it. The chip row gains a distance filter
+> ("Any distance" / "Within 1, 2, 5 or 10 km", `VenueSearchController.radiusKm`),
+> which is not a `DiscoveryChip` and survives a new result list.
+>
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
 > architecture.md wins. **`HANDOFF.md` is the fastest way in**: what exists, what is
@@ -234,12 +244,14 @@ lib/
 ├── app.dart                   # MaterialApp, localisation delegates, generateRoute
 ├── l10n/                      # app_en.arb, app_he.arb + committed generated/ output
 ├── models/                    # venue, menu, analysis, failures, scanned_menu (the pages of
-│                              # one scan, in memory only) — plain immutable Dart
+│                              # one scan, in memory only), place (KnownPlace, a city the
+│                              # user can look around, D26) — plain immutable Dart
 ├── utils/                     # constants (the keto vocabulary), text_normaliser,
 │                              # classification_rules, price_format, keto_score,
 │                              # wolt_headers (the web-client header set, #168),
 │                              # venue_route (venueRoutePath + VenueOpenHint {name, city},
-│                              # the venue route's arguments, D23)
+│                              # the venue route's arguments, D23),
+│                              # known_places (the cities the location picker offers, D26)
 ├── services/
 │   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness,
 │   │                          # scan_budget (a scan's image bytes fitted into one request, D22),
@@ -289,7 +301,8 @@ lib/
 │                              # the menu screen, D22),
 │                              # scan_failure_copy, mobile_qr_scanner (the QR camera page and
 │                              # its QrScanner, the one file over mobile_scanner, #182),
-│                              # rename_menu_dialog (a scan's name and city, #315)
+│                              # rename_menu_dialog (a scan's name and city, #315),
+│                              # location_picker_sheet (the device, or a city, #443, D26)
 └── screens/                   # venue_search (the Discovery screen, D13), menu,
                                # waiter_card_sheet, settings (a Gemini key section on
                                # phones only, D17), saved (the Recent tab: the visit
@@ -417,6 +430,9 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
 - **Quick score reads `estimateMenuRepository`, never `menuRepository`
   (D25).** It is the same cache over the direct adapters; routing it through
   the backend would classify every Discovery card on the server.
+- **A `KnownPlace.id` is stored on the device (D26); never change or reuse
+  one.** And the distance filter is `radiusKm`, not a `DiscoveryChip`: do not
+  clear it where `_activeChips` is cleared.
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
 
@@ -685,6 +701,13 @@ Built, but not confirmed end to end, and not to be reported as done:
   a phone's is unobserved, and a non-2xx from Wolt is 502 `platformChanged`,
   which does **not** fall back to the phone. The `wolt_venues` and `tenbis_menu`
   goldens replay synthetic payloads (#38, #44).
+- **The location picker and distance filter (D26, #443) are evidenced by
+  fakes only.** No phone or browser has run the picker, and no live Wolt
+  search has been made at a bundled city centre, so whether Wolt answers a
+  centre with as full a list as it does a residential address is unobserved.
+  The 42 coordinates are approximate centres, checked only to lie inside
+  Israel. The new flow (`discovery_choose_location_flow_test.dart`) passed
+  under `flutter-tester`.
 - **`flutter drive` could not complete in this environment** (a
   chromedriver/Chromium mismatch; runs hang after "Debug service listening",
   including flows that predate D25), so the two new flows
@@ -710,7 +733,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
    scan issue (#88; §16's Phase 4 steps). §14 has the decisions
-   log D1–D25, §17 the open questions with the default the code follows.
+   log D1–D26, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

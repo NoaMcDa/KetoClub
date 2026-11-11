@@ -618,7 +618,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoveryEmptyBody =>
-      'Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.';
+      'Use your location or choose a city to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.';
 
   @override
   String get discoveryDrinksGuideCard =>
@@ -645,6 +645,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoveryChipOpenNow => 'Open now';
+
+  @override
+  String get discoveryChooseLocation => 'Choose a location';
+
+  @override
+  String get discoveryChipAnyDistance => 'Any distance';
+
+  @override
+  String discoveryChipWithinKm(int km) {
+    return 'Within $km km';
+  }
+
+  @override
+  String get discoveryChipDistanceTooltip => 'Filter by distance';
+
+  @override
+  String get locationPickerTitle => 'Where do you want to eat?';
+
+  @override
+  String get locationPickerUseDevice => 'Use my current location';
+
+  @override
+  String get locationPickerSearchLabel => 'Search for a city';
+
+  @override
+  String get locationPickerNoMatch =>
+      'No city matches that. Try another spelling.';
 
   @override
   String get discoveryLocating => 'Finding your location…';

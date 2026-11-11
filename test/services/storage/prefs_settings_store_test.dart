@@ -439,6 +439,60 @@ void main() {
       expect(decoded!.disclosureSeen, isFalse);
     });
 
+    test('AppSettings.tryFrom round-trips discoveryPlaceId through toJson '
+        'and back (issue #443)', () {
+      // Arrange
+      const settings = AppSettings(discoveryPlaceId: 'haifa');
+
+      // Act
+      final json = settings.toJson();
+      final decoded = AppSettings.tryFrom(json);
+
+      // Assert
+      expect(json['discoveryPlaceId'], 'haifa');
+      expect(decoded, equals(settings));
+    });
+
+    test('AppSettings.tryFrom reads a missing, empty or non-string '
+        'discoveryPlaceId as null and keeps every other field (issue '
+        '#443)', () {
+      for (final raw in <Object?>[null, '', 7, true]) {
+        // Act
+        final decoded = AppSettings.tryFrom(<String, Object?>{
+          'languageTag': 'he',
+          'filter': 'all',
+          'estimationConsentGiven': true,
+          'lastVenue': null,
+          // Left out altogether for null: the missing-key case.
+          'discoveryPlaceId': ?raw,
+        });
+
+        // Assert
+        expect(decoded, isNotNull, reason: '$raw');
+        expect(decoded!.discoveryPlaceId, isNull, reason: '$raw');
+        expect(decoded.languageTag, 'he', reason: '$raw');
+      }
+    });
+
+    test('AppSettings.copyWith keeps discoveryPlaceId when it is omitted '
+        'and clears it when null is passed (issue #443)', () {
+      // Arrange
+      const settings = AppSettings(discoveryPlaceId: 'haifa');
+
+      // Act
+      final kept = settings.copyWith(languageTag: 'he');
+      final cleared = settings.copyWith(discoveryPlaceId: null);
+      final changed = settings.copyWith(discoveryPlaceId: 'eilat');
+
+      // Assert
+      expect(kept.discoveryPlaceId, 'haifa');
+      expect(cleared.discoveryPlaceId, isNull);
+      expect(changed.discoveryPlaceId, 'eilat');
+      expect(settings, isNot(equals(cleared)));
+      expect(settings.hashCode, isNot(cleared.hashCode));
+      expect(settings.toString(), contains('haifa'));
+    });
+
     test(
       'an install that persisted settings before issue #55 added '
       'lastFilter decodes lastFilter as null and keeps every other field',

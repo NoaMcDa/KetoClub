@@ -14,6 +14,7 @@ import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/known_places.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 
 import '../fakes/fake_clock.dart';
@@ -1535,6 +1536,648 @@ void main() {
         // Assert
         expect(repository.loadCalls, isEmpty);
         expect(controller.hasVisibleToEstimate, isTrue);
+      });
+    });
+
+    group('choosePlace (issue #443)', () {
+      final telAviv = knownPlaceById('tel-aviv')!;
+      final haifa = knownPlaceById('haifa')!;
+
+      test('lists the venues around the place in the given language, with '
+          'no call to the location service', () async {
+        // Arrange
+        search.queueFound([_venue('a'), _venue('b')]);
+
+        // Act
+        await controller.choosePlace(haifa, language: 'he');
+
+        // Assert
+        final call = search.nearbyCalls.single;
+        expect(call.latitude, haifa.latitude);
+        expect(call.longitude, haifa.longitude);
+        expect(call.language, 'he');
+        expect(location.currentCallCount, 0);
+        expect(controller.chosenPlace, haifa);
+        expect(controller.position?.latitude, haifa.latitude);
+        expect(controller.position?.longitude, haifa.longitude);
+        expect(controller.results.map((v) => v.name), ['a', 'b']);
+        expect(controller.hasSearched, isTrue);
+        expect(controller.phase, DiscoveryPhase.idle);
+      });
+
+      test('passes through searching, never locating', () async {
+        // Arrange
+        final phases = <DiscoveryPhase>[];
+        controller.addListener(() => phases.add(controller.phase));
+
+        // Act
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Assert
+        expect(phases, isNot(contains(DiscoveryPhase.locating)));
+        expect(phases.first, DiscoveryPhase.searching);
+        expect(phases.last, DiscoveryPhase.idle);
+      });
+
+      test('saves the place, leaving every other setting as it was', () async {
+        // Arrange
+        await settings.write(
+          const AppSettings(languageTag: 'he', netCarbLimitGrams: 9),
+        );
+
+        // Act
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Assert
+        expect(
+          await settings.read(),
+          const AppSettings(
+            languageTag: 'he',
+            netCarbLimitGrams: 9,
+            discoveryPlaceId: 'haifa',
+          ),
+        );
+      });
+
+      test('choosing the place already saved writes nothing', () async {
+        // Arrange
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+        final writesBefore = settings.writeCallCount;
+
+        // Act
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Assert
+        expect(settings.writeCallCount, writesBefore);
+      });
+
+      test('measures card distances from the place', () async {
+        // Arrange
+        await controller.choosePlace(telAviv, language: 'en');
+
+        // Act
+        final km = controller.distanceKmTo(
+          _venue('a', latitude: telAviv.latitude, longitude: telAviv.longitude),
+        );
+
+        // Assert
+        expect(km, closeTo(0, 0.001));
+      });
+
+      test('a search by name is then ranked around the place', () async {
+        // Arrange
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Act
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Assert
+        final call = search.byNameCalls.single;
+        expect(call.latitude, haifa.latitude);
+        expect(call.longitude, haifa.longitude);
+      });
+
+      test("clearing a search puts the place's list back without a new "
+          'request', () async {
+        // Arrange
+        search.queueFound([_venue('near-haifa')]);
+        await controller.choosePlace(haifa, language: 'en');
+        search.queueFound([_venue('by-name')]);
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Act
+        controller.clearSearch();
+
+        // Assert
+        expect(controller.results.map((v) => v.name), ['near-haifa']);
+        expect(search.nearbyCalls, hasLength(1));
+      });
+
+      test('a failed search keeps the place, and retry asks around it '
+          'again', () async {
+        // Arrange
+        search
+          ..queueFailed(VenueSearchFailureReason.offline)
+          ..queueFound([_venue('a')]);
+
+        // Act
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Assert
+        expect(controller.failure, VenueSearchFailureReason.offline);
+        expect(controller.chosenPlace, haifa);
+        expect(controller.position?.latitude, haifa.latitude);
+
+        // Act
+        await controller.retry();
+
+        // Assert
+        expect(controller.failure, isNull);
+        expect(search.nearbyCalls, hasLength(2));
+        expect(search.nearbyCalls.last.latitude, haifa.latitude);
+        expect(controller.results.map((v) => v.name), ['a']);
+      });
+
+      test('clears a denial the user has just worked around', () async {
+        // Arrange
+        location.result = const LocationDenied(permanently: true);
+        await controller.locate(language: 'en');
+        expect(controller.locationOutcome, isA<LocationDenied>());
+
+        // Act
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Assert
+        expect(controller.locationOutcome, isNull);
+      });
+
+      test('choosing another place replaces the first', () async {
+        // Arrange
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Act
+        await controller.choosePlace(telAviv, language: 'en');
+
+        // Assert
+        expect(controller.chosenPlace, telAviv);
+        expect(search.nearbyCalls.last.latitude, telAviv.latitude);
+        expect((await settings.read()).discoveryPlaceId, 'tel-aviv');
+      });
+
+      test('a later choice wins over an earlier one still in flight', () async {
+        // Arrange: the first search hangs.
+        final gate = Completer<void>();
+        search
+          ..gate = gate.future
+          ..queueFound([_venue('haifa-venue')])
+          ..queueFound([_venue('tel-aviv-venue')]);
+        final first = controller.choosePlace(haifa, language: 'en');
+        final second = controller.choosePlace(telAviv, language: 'en');
+
+        // Act
+        gate.complete();
+        await Future.wait([first, second]);
+
+        // Assert: only the second answer is shown.
+        expect(controller.chosenPlace, telAviv);
+        expect(controller.results.map((v) => v.name), ['tel-aviv-venue']);
+      });
+
+      test('a found device position replaces the place and clears the '
+          'saved one', () async {
+        // Arrange
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Act
+        final result = await controller.locate(language: 'en');
+
+        // Assert
+        expect(result, isA<LocationFound>());
+        expect(controller.chosenPlace, isNull);
+        expect(controller.position?.latitude, 32.0809);
+        expect((await settings.read()).discoveryPlaceId, isNull);
+      });
+
+      test('a found device position clears a place saved by an earlier '
+          'launch that was never restored', () async {
+        // Arrange: saved, but load has not run.
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+
+        // Act
+        await controller.locate(language: 'en');
+
+        // Assert
+        expect((await settings.read()).discoveryPlaceId, isNull);
+      });
+
+      test('a found device position with no place saved writes '
+          'nothing', () async {
+        // Act
+        await controller.locate(language: 'en');
+
+        // Assert
+        expect(settings.writeCallCount, 0);
+      });
+
+      test('a refused or failed device position leaves the place, its '
+          'position, its list and the saved choice alone', () async {
+        for (final refusal in const <LocationResult>[
+          LocationDenied(permanently: false),
+          LocationUnavailable(reason: LocationUnavailableReason.timeout),
+        ]) {
+          // Arrange
+          search.queueFound([_venue('near-haifa')]);
+          await controller.choosePlace(haifa, language: 'en');
+          location.result = refusal;
+
+          // Act
+          final result = await controller.locate(language: 'en');
+
+          // Assert
+          expect(result, refusal);
+          expect(controller.locationOutcome, refusal);
+          expect(controller.chosenPlace, haifa);
+          expect(controller.position?.latitude, haifa.latitude);
+          expect(controller.results.map((v) => v.name), ['near-haifa']);
+          expect((await settings.read()).discoveryPlaceId, 'haifa');
+        }
+      });
+
+      test('locate completes with null when a newer search superseded '
+          'it', () async {
+        // Arrange: the device takes its time.
+        final gate = Completer<void>();
+        location.gate = gate.future;
+        final locating = controller.locate(language: 'en');
+
+        // Act: the user picks a place meanwhile.
+        await controller.choosePlace(haifa, language: 'en');
+        gate.complete();
+
+        // Assert: the late position changes nothing.
+        expect(await locating, isNull);
+        expect(controller.chosenPlace, haifa);
+        expect(controller.locationOutcome, isNull);
+      });
+    });
+
+    group('load restores the chosen place (issue #443)', () {
+      final haifa = knownPlaceById('haifa')!;
+
+      test('makes the saved place the chosen one and lists the venues '
+          'around it when given a language', () async {
+        // Arrange
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+        search.queueFound([_venue('near-haifa')]);
+
+        // Act
+        await controller.load(language: 'he');
+
+        // Assert
+        expect(controller.chosenPlace, haifa);
+        expect(controller.position?.latitude, haifa.latitude);
+        final call = search.nearbyCalls.single;
+        expect(call.latitude, haifa.latitude);
+        expect(call.longitude, haifa.longitude);
+        expect(call.language, 'he');
+        expect(controller.results.map((v) => v.name), ['near-haifa']);
+        expect(location.currentCallCount, 0);
+      });
+
+      test('without a language it restores the place and searches '
+          'nothing', () async {
+        // Arrange
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+
+        // Act
+        await controller.load();
+
+        // Assert
+        expect(controller.chosenPlace, haifa);
+        expect(controller.position?.longitude, haifa.longitude);
+        expect(search.nearbyCalls, isEmpty);
+        expect(controller.hasSearched, isFalse);
+      });
+
+      test('with nothing saved it restores nothing and searches '
+          'nothing', () async {
+        // Act
+        await controller.load(language: 'en');
+
+        // Assert
+        expect(controller.chosenPlace, isNull);
+        expect(controller.position, isNull);
+        expect(search.nearbyCalls, isEmpty);
+      });
+
+      test('an id the list no longer holds is ignored', () async {
+        // Arrange
+        await settings.write(const AppSettings(discoveryPlaceId: 'atlantis'));
+
+        // Act
+        await controller.load(language: 'en');
+
+        // Assert
+        expect(controller.chosenPlace, isNull);
+        expect(controller.position, isNull);
+        expect(search.nearbyCalls, isEmpty);
+      });
+
+      test('only the first load restores: a return to Explore searches '
+          'nothing more', () async {
+        // Arrange
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+        await controller.load(language: 'en');
+
+        // Act
+        await controller.load(language: 'en');
+        await controller.load(language: 'en');
+
+        // Assert
+        expect(search.nearbyCalls, hasLength(1));
+      });
+
+      test('a place saved after the first load is not picked up by a later '
+          'one', () async {
+        // Arrange: the first load found nothing saved.
+        await controller.load(language: 'en');
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+
+        // Act
+        await controller.load(language: 'en');
+
+        // Assert
+        expect(controller.chosenPlace, isNull);
+        expect(search.nearbyCalls, isEmpty);
+      });
+
+      test('a position the device already gave is not replaced', () async {
+        // Arrange: located before the first load answers. The locate
+        // itself clears the saved place, so save it again afterwards.
+        await controller.locate(language: 'en');
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+
+        // Act
+        await controller.load(language: 'en');
+
+        // Assert
+        expect(controller.chosenPlace, isNull);
+        expect(controller.position?.latitude, 32.0809);
+        expect(search.nearbyCalls, hasLength(1));
+      });
+
+      test('restores the place but does not search over a query already '
+          'typed', () async {
+        // Arrange
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+        controller.setInput('sushi');
+
+        // Act
+        await controller.load(language: 'en');
+
+        // Assert
+        expect(controller.chosenPlace, haifa);
+        expect(search.nearbyCalls, isEmpty);
+        expect(controller.input, 'sushi');
+      });
+
+      test('a restored search that fails can be retried', () async {
+        // Arrange
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+        search
+          ..queueFailed(VenueSearchFailureReason.offline)
+          ..queueFound([_venue('near-haifa')]);
+        await controller.load(language: 'en');
+        expect(controller.failure, VenueSearchFailureReason.offline);
+
+        // Act
+        await controller.retry();
+
+        // Assert
+        expect(controller.failure, isNull);
+        expect(controller.results.map((v) => v.name), ['near-haifa']);
+      });
+    });
+
+    group('distance filter (issue #443)', () {
+      final telAviv = knownPlaceById('tel-aviv')!;
+
+      /// A venue [km] kilometres due north of Tel Aviv's centre.
+      Venue at(String slug, double km, {bool? isOnline}) => _venue(
+        slug,
+        isOnline: isOnline,
+        // One degree of latitude is about 111.2 km.
+        latitude: telAviv.latitude + km / 111.2,
+        longitude: telAviv.longitude,
+      );
+
+      late Venue near;
+      late Venue walk;
+      late Venue drive;
+      late Venue far;
+      late Venue unplaced;
+
+      setUp(() {
+        near = at('near', 0.5, isOnline: true);
+        walk = at('walk', 1.5, isOnline: false);
+        drive = at('drive', 4, isOnline: true);
+        far = at('far', 20, isOnline: true);
+        unplaced = _venue('unplaced', isOnline: true);
+      });
+
+      Future<void> list() async {
+        search.queueFound([near, walk, drive, far, unplaced]);
+        await controller.choosePlace(telAviv, language: 'en');
+      }
+
+      test('is "any distance" by default, and every result shows', () async {
+        // Act
+        await list();
+
+        // Assert
+        expect(controller.radiusKm, isNull);
+        expect(controller.visibleResults, [near, walk, drive, far, unplaced]);
+      });
+
+      test('keeps only venues within the radius, in the same order', () async {
+        // Arrange
+        await list();
+
+        // Act and assert: each offered distance.
+        controller.setRadius(1);
+        expect(controller.visibleResults, [near]);
+        controller.setRadius(2);
+        expect(controller.visibleResults, [near, walk]);
+        controller.setRadius(5);
+        expect(controller.visibleResults, [near, walk, drive]);
+        controller.setRadius(10);
+        expect(controller.visibleResults, [near, walk, drive]);
+      });
+
+      test('hides a venue with no coordinates while a radius is set', () async {
+        // Arrange
+        await list();
+
+        // Act
+        controller.setRadius(10);
+
+        // Assert
+        expect(controller.visibleResults, isNot(contains(unplaced)));
+      });
+
+      test('null puts every result back', () async {
+        // Arrange
+        await list();
+        controller.setRadius(1);
+        expect(controller.visibleResults, [near]);
+
+        // Act
+        controller.setRadius(null);
+
+        // Assert
+        expect(controller.radiusKm, isNull);
+        expect(controller.visibleResults, [near, walk, drive, far, unplaced]);
+      });
+
+      test('combines with the chips: a venue must pass both', () async {
+        // Arrange
+        await list();
+
+        // Act
+        controller
+          ..setRadius(2)
+          ..toggleChip(DiscoveryChip.openNow);
+
+        // Assert: walk is within 2 km but closed.
+        expect(controller.visibleResults, [near]);
+      });
+
+      test('can match nothing', () async {
+        // Arrange
+        search.queueFound([far]);
+        await controller.choosePlace(telAviv, language: 'en');
+
+        // Act
+        controller.setRadius(1);
+
+        // Assert
+        expect(controller.results, [far]);
+        expect(controller.visibleResults, isEmpty);
+      });
+
+      test('notifies once per change and not at all when unchanged', () async {
+        // Arrange
+        await list();
+        var notifyCount = 0;
+
+        // Act: listen, then two changes with a repeat in between.
+        controller
+          ..addListener(() => notifyCount++)
+          ..setRadius(2)
+          ..setRadius(2)
+          ..setRadius(5);
+
+        // Assert
+        expect(notifyCount, 2);
+      });
+
+      test('stays through a new result list, where the chips are '
+          'cleared', () async {
+        // Arrange
+        await list();
+        controller
+          ..setRadius(2)
+          ..toggleChip(DiscoveryChip.openNow);
+
+        // Act: a search by name answers.
+        search.queueFound([near, far]);
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Assert
+        expect(controller.activeChips, isEmpty);
+        expect(controller.radiusKm, 2);
+        expect(controller.visibleResults, [near]);
+      });
+
+      test('stays when a cleared search puts the nearby list back', () async {
+        // Arrange
+        await list();
+        controller.setRadius(2);
+        search.queueFound([far]);
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Act
+        controller.clearSearch();
+
+        // Assert
+        expect(controller.radiusKm, 2);
+        expect(controller.visibleResults, [near, walk]);
+      });
+
+      test('measures from the device position as it does from a chosen '
+          'place', () async {
+        // Arrange: the fake device sits at 32.0809, 34.7806.
+        final here = _venue('here', latitude: 32.0809, longitude: 34.7806);
+        final away = _venue('away', latitude: 32.5, longitude: 34.7806);
+        search.queueFound([here, away]);
+        await controller.locate(language: 'en');
+
+        // Act
+        controller.setRadius(5);
+
+        // Assert
+        expect(controller.visibleResults, [here]);
+      });
+
+      test('filters nothing while there is no position to measure '
+          'from', () async {
+        // Arrange: a search by name before any position.
+        search.queueFound([near, unplaced]);
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Act
+        controller.setRadius(1);
+
+        // Assert
+        expect(controller.position, isNull);
+        expect(controller.visibleResults, [near, unplaced]);
+      });
+
+      test('cancels a running quick score, as a chip change does', () async {
+        // Arrange: a tapped quick score hangs on its first menus.
+        for (final venue in [near, walk, drive, far]) {
+          repository.stub(venue.ref, _fetchedWithOneDish(venue.ref));
+        }
+        await list();
+        final gate = Completer<void>();
+        repository.loadGate = gate.future;
+        final run = controller.estimateVisible();
+        await pumpEventQueue();
+        expect(controller.isEstimating, isTrue);
+
+        // Act
+        controller.setRadius(1);
+        gate.complete();
+        await run;
+
+        // Assert: the run stopped and its late answers were dropped.
+        expect(controller.isEstimating, isFalse);
+        expect(controller.cardNumbers(near), isNull);
+      });
+
+      test('the automatic quick score then covers what is in view, '
+          'fetching no venue twice (D21)', () async {
+        // Arrange: the automatic run covers the first two of the list.
+        controller.dispose();
+        controller = build(autoEstimateLimit: 2);
+        for (final venue in [near, walk, drive, far]) {
+          repository.stub(venue.ref, _fetchedWithOneDish(venue.ref));
+        }
+        await list();
+        while (controller.isEstimating) {
+          await pumpEventQueue();
+        }
+        expect(repository.loadCalls.map((c) => c.ref), [near.ref, walk.ref]);
+
+        // Act: widen to 5 km, which brings `drive` into the first cards
+        // without numbers.
+        controller.setRadius(5);
+        while (controller.isEstimating) {
+          await pumpEventQueue();
+        }
+
+        // Assert: only the venue no run had fetched was fetched.
+        expect(repository.loadCalls.map((c) => c.ref), [
+          near.ref,
+          walk.ref,
+          drive.ref,
+        ]);
+        expect(controller.cardNumbers(drive)?.score, 10.0);
       });
     });
 

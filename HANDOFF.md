@@ -24,6 +24,19 @@ request.
 
 ## What shipped
 
+**D26 — Discovery looks around a place the user chooses, and filters by
+distance (#443).** "Choose a location", in the Discovery header and on the
+location-denied and location-unavailable cards, opens `LocationPickerSheet`:
+"Use my current location" above a searchable, bilingual list of 42 Israeli
+cities (`utils/known_places.dart`; a bundled list, because a typed address
+would need a geocoder). `VenueSearchController.choosePlace` runs the ordinary
+nearby search at the city's centre, so everything downstream is unchanged. The
+choice is saved as `AppSettings.discoveryPlaceId` and restored, with its list,
+by the first `load` of the next launch; a device position that is found
+replaces it. The chip row starts with a distance filter ("Any distance" or
+"Within 1, 2, 5 or 10 km"): `radiusKm` is kept apart from the chips and
+survives a new result list. Evidence is fakes only; see `architecture.md` D26.
+
 **D25 — the backend serves complete results on every platform; the device is
 the fallback (#318, #319; sub-issues #320–#335, waves 0–4 on
 `claude/d25-wave-4`).** Read `architecture.md` D25 first; `backend_plan.md`
@@ -690,7 +703,7 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D25, each
+- `architecture.md` §14 — the decisions log, now D1 to D26, each
   recording what was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately

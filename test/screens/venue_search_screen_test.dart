@@ -18,10 +18,12 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/known_places.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/location_picker_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
@@ -118,11 +120,19 @@ AppLocalizations _l10n(WidgetTester tester) =>
     AppLocalizations.of(tester.element(find.byType(VenueSearchScreen)))!;
 
 /// A Wolt venue addressed by [slug].
-Venue _venue(String slug, {bool? isOnline, String? address}) => Venue(
+Venue _venue(
+  String slug, {
+  bool? isOnline,
+  String? address,
+  double? latitude,
+  double? longitude,
+}) => Venue(
   ref: VenueRef(source: MenuSource.wolt, platformId: slug),
   name: 'Venue $slug',
   isOnline: isOnline,
   address: address,
+  latitude: latitude,
+  longitude: longitude,
 );
 
 /// A fetched menu for [ref] holding one dish, so the quick score has
@@ -391,7 +401,8 @@ void main() {
       );
       expect(find.text(l10n.discoveryEmptyTitle), findsOneWidget);
       expect(find.text(l10n.discoveryEmptyBody), findsOneWidget);
-      // Exactly one visible location action: the header's, not the body's.
+      // The device-location action is the header's alone, never repeated
+      // in the body; "Choose a location" sits beside it (issue #443).
       expect(find.byIcon(Icons.my_location), findsOneWidget);
       expect(find.byTooltip(l10n.discoveryUseLocation), findsOneWidget);
       expect(find.text(l10n.discoveryUseLocation), findsNothing);
@@ -1588,6 +1599,566 @@ void main() {
         expect(l10n.localeName, 'he');
         expect(find.text(l10n.discoveryEstimateList), findsOneWidget);
         expect(find.text(l10n.discoveryEstimateHint), findsOneWidget);
+      });
+    });
+
+    group('choose a location (issue #443)', () {
+      final haifa = knownPlaceById('haifa')!;
+
+      /// Taps the header's "Choose a location" button and settles on the
+      /// open sheet.
+      Future<void> openPicker(WidgetTester tester) async {
+        await tester.tap(find.byTooltip(_l10n(tester).discoveryChooseLocation));
+        await tester.pumpAndSettle();
+      }
+
+      /// Taps the row of the open sheet naming [name] and settles.
+      Future<void> pick(WidgetTester tester, String name) async {
+        await tester.tap(find.widgetWithText(ListTile, name));
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('before a position the header offers "Choose a location" '
+          'beside the location button, and opens nothing by itself', (
+        tester,
+      ) async {
+        // Act
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        final l10n = _l10n(tester);
+
+        // Assert
+        expect(find.byTooltip(l10n.discoveryChooseLocation), findsOneWidget);
+        expect(find.byTooltip(l10n.discoveryUseLocation), findsOneWidget);
+        expect(find.byType(LocationPickerSheet), findsNothing);
+        expect(search.nearbyCalls, isEmpty);
+      });
+
+      testWidgets('picking a city lists the restaurants around it and names '
+          'it in the header, without asking the device', (tester) async {
+        // Arrange
+        search.queueFound([_venue('haifa-grill', address: 'Ben Gurion 12')]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        final l10n = _l10n(tester);
+
+        // Act
+        await openPicker(tester);
+        await pick(tester, 'Haifa');
+
+        // Assert: the city, not the nearest venue's address.
+        expect(find.byType(LocationPickerSheet), findsNothing);
+        expect(search.nearbyCalls.single.latitude, haifa.latitude);
+        expect(search.nearbyCalls.single.longitude, haifa.longitude);
+        expect(search.nearbyCalls.single.language, 'en');
+        expect(location.currentCallCount, 0);
+        expect(
+          find.text(l10n.discoveryLookingAround.toUpperCase()),
+          findsOneWidget,
+        );
+        expect(find.text('Haifa'), findsOneWidget);
+        expect(find.text('Ben Gurion 12'), findsNothing);
+        expect(find.text('Venue haifa-grill'), findsOneWidget);
+        expect(find.text(l10n.discoveryLocationInvite), findsNothing);
+        // Both actions stay, to change the place or go back to the device.
+        expect(find.byTooltip(l10n.discoveryChooseLocation), findsOneWidget);
+        expect(find.byTooltip(l10n.discoveryUseLocation), findsOneWidget);
+      });
+
+      testWidgets('picking a city saves it', (tester) async {
+        // Arrange
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+
+        // Act
+        await openPicker(tester);
+        await pick(tester, 'Haifa');
+
+        // Assert
+        expect((await settingsStore.read()).discoveryPlaceId, 'haifa');
+      });
+
+      testWidgets('under Hebrew the sheet and the header name the city in '
+          'Hebrew, and the search is made in Hebrew', (tester) async {
+        // Arrange
+        search.queueFound([_venue('haifa-grill')]);
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          locale: const Locale('he'),
+        );
+        await tester.pumpAndSettle();
+        final l10n = _l10n(tester);
+
+        // Act
+        await openPicker(tester);
+
+        // Assert
+        expect(l10n.localeName, 'he');
+        expect(find.text(l10n.locationPickerTitle), findsOneWidget);
+
+        // Act
+        await pick(tester, 'חיפה');
+
+        // Assert
+        expect(find.text('חיפה'), findsOneWidget);
+        expect(find.text('Haifa'), findsNothing);
+        expect(search.nearbyCalls.single.language, 'he');
+      });
+
+      testWidgets('"Use my current location" in the sheet asks the device', (
+        tester,
+      ) async {
+        // Arrange
+        search.queueFound([_venue('ember-vine')]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        final l10n = _l10n(tester);
+
+        // Act
+        await openPicker(tester);
+        await tester.tap(find.text(l10n.locationPickerUseDevice));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(location.currentCallCount, 1);
+        expect(controller.chosenPlace, isNull);
+        expect(find.byType(VenueCard), findsOneWidget);
+      });
+
+      testWidgets('dismissing the sheet changes nothing', (tester) async {
+        // Arrange
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        final l10n = _l10n(tester);
+
+        // Act
+        await openPicker(tester);
+        await tester.tapAt(const Offset(10, 10));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(LocationPickerSheet), findsNothing);
+        expect(search.nearbyCalls, isEmpty);
+        expect(location.currentCallCount, 0);
+        expect(find.text(l10n.discoveryLocationInvite), findsOneWidget);
+      });
+
+      testWidgets('tapping the place in the header opens the sheet with the '
+          'chosen city marked', (tester) async {
+        // Arrange
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        await openPicker(tester);
+        await pick(tester, 'Haifa');
+
+        // Act
+        await tester.tap(find.text('Haifa'));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(LocationPickerSheet), findsOneWidget);
+        expect(
+          tester
+              .widget<ListTile>(
+                find.descendant(
+                  of: find.byType(LocationPickerSheet),
+                  matching: find.widgetWithText(ListTile, 'Haifa'),
+                ),
+              )
+              .selected,
+          isTrue,
+        );
+      });
+
+      testWidgets('picking another city replaces the first', (tester) async {
+        // Arrange
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        await openPicker(tester);
+        await pick(tester, 'Haifa');
+
+        // Act
+        await openPicker(tester);
+        await pick(tester, 'Jerusalem');
+
+        // Assert
+        expect(find.text('Jerusalem'), findsOneWidget);
+        expect(find.text('Haifa'), findsNothing);
+        expect(search.nearbyCalls, hasLength(2));
+        expect((await settingsStore.read()).discoveryPlaceId, 'jerusalem');
+      });
+
+      testWidgets('a city saved by an earlier launch is listed on open, with '
+          'no tap and no location prompt', (tester) async {
+        // Arrange
+        await settingsStore.write(const AppSettings(discoveryPlaceId: 'haifa'));
+        search.queueFound([_venue('haifa-grill')]);
+
+        // Act
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text('Haifa'), findsOneWidget);
+        expect(find.text('Venue haifa-grill'), findsOneWidget);
+        expect(search.nearbyCalls.single.latitude, haifa.latitude);
+        expect(location.currentCallCount, 0);
+      });
+
+      testWidgets('the denied card offers "Choose a location", and picking a '
+          'city replaces the card with its restaurants', (tester) async {
+        // Arrange
+        location.result = const LocationDenied(permanently: true);
+        search.queueFound([_venue('haifa-grill')]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        final l10n = _l10n(tester);
+        expect(find.text(l10n.discoveryLocationDeniedTitle), findsOneWidget);
+
+        // Act: the card's action, since the header has stepped aside.
+        expect(find.byTooltip(l10n.discoveryChooseLocation), findsNothing);
+        await tester.tap(find.text(l10n.discoveryChooseLocation));
+        await tester.pumpAndSettle();
+        await pick(tester, 'Haifa');
+
+        // Assert
+        expect(find.text(l10n.discoveryLocationDeniedTitle), findsNothing);
+        expect(find.text('Venue haifa-grill'), findsOneWidget);
+        expect(find.text('Haifa'), findsOneWidget);
+      });
+
+      testWidgets('the unavailable card offers "Choose a location" too', (
+        tester,
+      ) async {
+        // Arrange
+        location.result = const LocationUnavailable(
+          reason: LocationUnavailableReason.unsupported,
+        );
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        final l10n = _l10n(tester);
+
+        // Act
+        await tester.tap(find.text(l10n.discoveryChooseLocation));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(LocationPickerSheet), findsOneWidget);
+      });
+
+      for (final entry in <LocationResult, String Function(AppLocalizations)>{
+        const LocationDenied(permanently: false): (l10n) =>
+            l10n.discoveryLocationDeniedTitle,
+        const LocationUnavailable(reason: LocationUnavailableReason.timeout): (
+          l10n,
+        ) => l10n.discoveryLocationUnavailableTitle,
+      }.entries) {
+        testWidgets("with a city's list on screen, a location that comes "
+            'back ${entry.key} says so in a snack bar and keeps the list', (
+          tester,
+        ) async {
+          // Arrange
+          search.queueFound([_venue('haifa-grill')]);
+          await _pump(tester, controller: controller, pushedNames: pushedNames);
+          await tester.pumpAndSettle();
+          await openPicker(tester);
+          await pick(tester, 'Haifa');
+          final l10n = _l10n(tester);
+          location.result = entry.key;
+
+          // Act
+          await tester.tap(find.byTooltip(l10n.discoveryUseLocation));
+          await tester.pump();
+          await tester.pump();
+
+          // Assert: the tap is never a silent no-op, and nothing is lost.
+          expect(
+            find.widgetWithText(SnackBar, entry.value(l10n)),
+            findsOneWidget,
+          );
+          expect(find.text('Venue haifa-grill'), findsOneWidget);
+          expect(find.text('Haifa'), findsOneWidget);
+        });
+      }
+
+      testWidgets('a refused location with nothing on screen shows the '
+          'card, not a snack bar', (tester) async {
+        // Arrange
+        location.result = const LocationDenied(permanently: false);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+        // Act
+        await locate(tester);
+
+        // Assert
+        expect(find.byType(SnackBar), findsNothing);
+        expect(
+          find.text(_l10n(tester).discoveryLocationDeniedTitle),
+          findsOneWidget,
+        );
+      });
+    });
+
+    group('distance filter (issue #443)', () {
+      final telAviv = knownPlaceById('tel-aviv')!;
+
+      /// A venue [km] kilometres due north of Tel Aviv's centre.
+      Venue at(String slug, double km) => _venue(
+        slug,
+        // One degree of latitude is about 111.2 km.
+        latitude: telAviv.latitude + km / 111.2,
+        longitude: telAviv.longitude,
+      );
+
+      /// The distance chip, whatever it reads.
+      Finder distanceChip(WidgetTester tester) =>
+          find.byTooltip(_l10n(tester).discoveryChipDistanceTooltip);
+
+      /// Lists [venues] around Tel Aviv, as picking it in the sheet does.
+      Future<void> listAround(WidgetTester tester, List<Venue> venues) async {
+        search.queueFound(venues);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        await controller.choosePlace(telAviv, language: 'en');
+        await tester.pumpAndSettle();
+      }
+
+      /// Opens the chip's menu and taps the entry reading [label].
+      Future<void> choose(WidgetTester tester, String label) async {
+        await tester.tap(distanceChip(tester));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(MenuItemButton, label));
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('reads "Any distance", unselected, once a list around a '
+          'place is showing', (tester) async {
+        // Act
+        await listAround(tester, [at('near', 0.5), at('far', 20)]);
+        final l10n = _l10n(tester);
+
+        // Assert
+        final chip = find.widgetWithText(
+          FilterChip,
+          l10n.discoveryChipAnyDistance,
+        );
+        expect(chip, findsOneWidget);
+        expect(tester.widget<FilterChip>(chip).selected, isFalse);
+        expect(find.byType(MenuItemButton), findsNothing);
+      });
+
+      testWidgets('is the first chip in the row', (tester) async {
+        // Act
+        await listAround(tester, [at('near', 0.5)]);
+        final l10n = _l10n(tester);
+
+        // Assert
+        final chips = tester.widgetList<FilterChip>(find.byType(FilterChip));
+        expect(chips.first.tooltip, l10n.discoveryChipDistanceTooltip);
+      });
+
+      testWidgets('is absent while there is no position to measure from', (
+        tester,
+      ) async {
+        // Arrange
+        search.queueFound([at('near', 0.5)]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+        // Act: a search by name, before any position.
+        await _type(tester, 'sushi');
+        await tester.pumpAndSettle();
+
+        // Assert: the other chips are there; this one is not.
+        expect(find.byType(VenueCard), findsOneWidget);
+        expect(
+          find.widgetWithText(FilterChip, _l10n(tester).discoveryChipOpenNow),
+          findsOneWidget,
+        );
+        expect(distanceChip(tester), findsNothing);
+      });
+
+      testWidgets('is there after the device gives a position, too', (
+        tester,
+      ) async {
+        // Arrange
+        search.queueFound([_venue('ember-vine')]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+        // Act
+        await locate(tester);
+
+        // Assert
+        expect(distanceChip(tester), findsOneWidget);
+      });
+
+      testWidgets('tapping it opens a menu of "Any distance" and every '
+          'offered distance, with the current one ticked', (tester) async {
+        // Arrange
+        await listAround(tester, [at('near', 0.5)]);
+        final l10n = _l10n(tester);
+
+        // Act
+        await tester.tap(distanceChip(tester));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(
+          find.widgetWithText(MenuItemButton, l10n.discoveryChipAnyDistance),
+          findsOneWidget,
+        );
+        for (final km in discoveryRadiusOptionsKm) {
+          expect(
+            find.widgetWithText(MenuItemButton, l10n.discoveryChipWithinKm(km)),
+            findsOneWidget,
+          );
+        }
+        final ticks = tester
+            .widgetList<Visibility>(
+              find.descendant(
+                of: find.byType(MenuItemButton),
+                matching: find.byType(Visibility),
+              ),
+            )
+            .map((v) => v.visible)
+            .toList();
+        expect(ticks, [true, false, false, false, false]);
+      });
+
+      testWidgets('picking a distance keeps only the restaurants within it, '
+          'and the chip says which', (tester) async {
+        // Arrange
+        await listAround(tester, [
+          at('near', 0.5),
+          at('walk', 1.5),
+          at('far', 20),
+        ]);
+        final l10n = _l10n(tester);
+
+        // Act
+        await choose(tester, l10n.discoveryChipWithinKm(2));
+
+        // Assert
+        expect(find.byType(MenuItemButton), findsNothing);
+        expect(find.text('Venue near'), findsOneWidget);
+        expect(find.text('Venue walk'), findsOneWidget);
+        expect(find.text('Venue far'), findsNothing);
+        final chip = find.widgetWithText(
+          FilterChip,
+          l10n.discoveryChipWithinKm(2),
+        );
+        expect(tester.widget<FilterChip>(chip).selected, isTrue);
+        expect(find.text(l10n.discoveryChipAnyDistance), findsNothing);
+      });
+
+      testWidgets('picking "Any distance" again puts every restaurant '
+          'back', (tester) async {
+        // Arrange
+        await listAround(tester, [at('near', 0.5), at('far', 20)]);
+        final l10n = _l10n(tester);
+        await choose(tester, l10n.discoveryChipWithinKm(1));
+        expect(find.text('Venue far'), findsNothing);
+
+        // Act
+        await choose(tester, l10n.discoveryChipAnyDistance);
+
+        // Assert
+        expect(find.text('Venue near'), findsOneWidget);
+        expect(find.text('Venue far'), findsOneWidget);
+        expect(
+          tester
+              .widget<FilterChip>(
+                find.widgetWithText(FilterChip, l10n.discoveryChipAnyDistance),
+              )
+              .selected,
+          isFalse,
+        );
+      });
+
+      testWidgets('combines with Open now', (tester) async {
+        // Arrange
+        search.queueFound([
+          _venue(
+            'near-open',
+            isOnline: true,
+            latitude: telAviv.latitude,
+            longitude: telAviv.longitude,
+          ),
+          _venue(
+            'near-closed',
+            isOnline: false,
+            latitude: telAviv.latitude,
+            longitude: telAviv.longitude,
+          ),
+          _venue(
+            'far-open',
+            isOnline: true,
+            latitude: telAviv.latitude + 0.5,
+            longitude: telAviv.longitude,
+          ),
+        ]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        await controller.choosePlace(telAviv, language: 'en');
+        await tester.pumpAndSettle();
+        final l10n = _l10n(tester);
+
+        // Act
+        await choose(tester, l10n.discoveryChipWithinKm(5));
+        await tester.tap(
+          find.widgetWithText(FilterChip, l10n.discoveryChipOpenNow),
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text('Venue near-open'), findsOneWidget);
+        expect(find.text('Venue near-closed'), findsNothing);
+        expect(find.text('Venue far-open'), findsNothing);
+      });
+
+      testWidgets('a distance nothing is within says so, with the chip '
+          'still there to widen it', (tester) async {
+        // Arrange
+        await listAround(tester, [at('far', 20)]);
+        final l10n = _l10n(tester);
+
+        // Act
+        await choose(tester, l10n.discoveryChipWithinKm(1));
+
+        // Assert
+        expect(find.byType(VenueCard), findsNothing);
+        expect(find.text(l10n.discoveryNoChipResults), findsOneWidget);
+        expect(distanceChip(tester), findsOneWidget);
+      });
+
+      testWidgets('under Hebrew the chip and its menu read in Hebrew', (
+        tester,
+      ) async {
+        // Arrange
+        search.queueFound([at('near', 0.5)]);
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          locale: const Locale('he'),
+        );
+        await tester.pumpAndSettle();
+        await controller.choosePlace(telAviv, language: 'he');
+        await tester.pumpAndSettle();
+        final l10n = _l10n(tester);
+
+        // Act
+        await choose(tester, l10n.discoveryChipWithinKm(5));
+
+        // Assert
+        expect(l10n.localeName, 'he');
+        expect(l10n.discoveryChipWithinKm(5), 'עד 5 ק״מ');
+        expect(
+          find.widgetWithText(FilterChip, l10n.discoveryChipWithinKm(5)),
+          findsOneWidget,
+        );
+        expect(controller.radiusKm, 5);
       });
     });
 

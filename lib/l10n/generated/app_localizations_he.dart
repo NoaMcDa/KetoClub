@@ -625,7 +625,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get discoveryEmptyBody =>
-      'השתמשו במיקום שלכם כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.';
+      'השתמשו במיקום שלכם או בחרו עיר כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.';
 
   @override
   String get discoveryDrinksGuideCard => 'מזמינים משקה? מדריך בר וקפה';
@@ -651,6 +651,32 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get discoveryChipOpenNow => 'פתוח עכשיו';
+
+  @override
+  String get discoveryChooseLocation => 'בחר מיקום';
+
+  @override
+  String get discoveryChipAnyDistance => 'כל מרחק';
+
+  @override
+  String discoveryChipWithinKm(int km) {
+    return 'עד $km ק״מ';
+  }
+
+  @override
+  String get discoveryChipDistanceTooltip => 'סינון לפי מרחק';
+
+  @override
+  String get locationPickerTitle => 'איפה תרצו לאכול?';
+
+  @override
+  String get locationPickerUseDevice => 'השתמש במיקום הנוכחי שלי';
+
+  @override
+  String get locationPickerSearchLabel => 'חיפוש עיר';
+
+  @override
+  String get locationPickerNoMatch => 'לא נמצאה עיר מתאימה. נסו איות אחר.';
 
   @override
   String get discoveryLocating => 'מאתר את המיקום שלך…';

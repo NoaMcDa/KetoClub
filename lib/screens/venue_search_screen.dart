@@ -15,6 +15,7 @@ import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/location_picker_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
@@ -53,6 +54,15 @@ const double _logoSize = 28;
 /// "Rothschild 22" is the user's own street, which needs reverse
 /// geocoding that no anonymous Wolt endpoint provides
 /// (`phase2_discovery_research.md` §6) — deferred, not dropped.
+///
+/// **A place of the user's own choosing (issue #443).** "Choose a
+/// location", beside the location button and on the denied and
+/// unavailable cards, opens `LocationPickerSheet`: the device's position,
+/// or a city from a bundled list. A chosen city is looked around exactly
+/// as a position is, names the header, needs no permission, and is
+/// restored on the next launch. Once there is a position of either kind,
+/// the chip row starts with the distance filter, "Any distance" or
+/// "Within N km".
 ///
 /// **Card numbers follow D13 as amended by D21**: a score and counts from
 /// an analysis cached on the device, or from the quick score — the rule
@@ -138,7 +148,11 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     _field.text = context.read<VenueSearchController>().input;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(context.read<VenueSearchController>().load());
+      // With the language, so the first load can list the venues around a
+      // place saved by an earlier launch (issue #443).
+      unawaited(
+        context.read<VenueSearchController>().load(language: _language),
+      );
     });
   }
 
@@ -175,10 +189,43 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     );
   }
 
-  void _locate() {
-    unawaited(
-      context.read<VenueSearchController>().locate(language: _language),
+  /// Asks the device where it is and lists the venues around it.
+  ///
+  /// A refusal or a failure normally shows as a card in the body. While a
+  /// list is on screen — typically one around a chosen place (issue #443)
+  /// — that card has no room, so a snack bar says why nothing changed
+  /// rather than leaving the tap silent.
+  Future<void> _locate() async {
+    final controller = context.read<VenueSearchController>();
+    final result = await controller.locate(language: _language);
+    if (!mounted || !controller.hasSearched) return;
+    final l10n = AppLocalizations.of(context)!;
+    final message = switch (result) {
+      LocationDenied() => l10n.discoveryLocationDeniedTitle,
+      LocationUnavailable() => l10n.discoveryLocationUnavailableTitle,
+      LocationFound() || null => null,
+    };
+    if (message == null) return;
+    ScaffoldMessenger.maybeOf(context)
+        ?.showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Opens the location picker (issue #443) and acts on the answer: the
+  /// device's own position through [_locate], or the venues around the
+  /// place picked from the list.
+  Future<void> _chooseLocation() async {
+    final controller = context.read<VenueSearchController>();
+    final pick = await showLocationPickerSheet(
+      context,
+      selected: controller.chosenPlace,
     );
+    if (pick == null || !mounted) return;
+    switch (pick) {
+      case LocationPickDevice():
+        await _locate();
+      case LocationPickPlace(:final place):
+        await controller.choosePlace(place, language: _language);
+    }
   }
 
   void _onSubmitted(String value) {
@@ -319,9 +366,14 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   /// end once a position exists; before one, an invitation to tap instead
   /// of a "Location not set" that reads as an error (issue #228).
   ///
-  /// The page carries one location action at a time. While the body shows
-  /// a denied or unavailable card, that card owns the retry (see
-  /// [_bodyOwnsLocate]), so the header steps aside rather than repeat it.
+  /// Beside it sits "Choose a location" (issue #443), which opens the
+  /// picker; once a position exists the place name is a second target for
+  /// the same sheet.
+  ///
+  /// The page carries each location action once. While the body shows a
+  /// denied or unavailable card, that card owns the retry and the picker
+  /// (see [_bodyOwnsLocate]), so the header steps aside rather than repeat
+  /// them.
   Widget _header(
     BuildContext context,
     AppLocalizations l10n,
@@ -331,10 +383,22 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     final locating = controller.phase == DiscoveryPhase.locating;
     final invited = controller.position == null;
     if (invited && _bodyOwnsLocate(controller)) return const SizedBox.shrink();
-    final button = IconButton.filled(
-      tooltip: l10n.discoveryUseLocation,
-      icon: const Icon(Icons.my_location),
-      onPressed: locating ? null : _locate,
+    // Two ways to say where to look (issue #443): the device's position,
+    // the filled button, and a place of the user's own choosing beside it.
+    final button = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          tooltip: l10n.discoveryChooseLocation,
+          icon: const Icon(Icons.edit_location_alt_outlined),
+          onPressed: locating ? null : _chooseLocation,
+        ),
+        IconButton.filled(
+          tooltip: l10n.discoveryUseLocation,
+          icon: const Icon(Icons.my_location),
+          onPressed: locating ? null : _locate,
+        ),
+      ],
     );
     if (invited) {
       // The words are a second target for the same tap, hidden from
@@ -361,26 +425,33 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         ],
       );
     }
+    // The place is a second target for "Choose a location". Its text is
+    // still read out, since it says where the list is from; only the tap
+    // is left out of the semantics, so the button is the one named action.
     return Row(
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                // Presentational upper case, as in the artboard; a no-op
-                // on the Hebrew string, which has no case.
-                l10n.discoveryLookingAround.toUpperCase(),
-                style: textTheme.labelSmall?.copyWith(letterSpacing: 1),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                _place(l10n, controller),
-                style: textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
+          child: InkWell(
+            onTap: locating ? null : _chooseLocation,
+            excludeFromSemantics: true,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  // Presentational upper case, as in the artboard; a no-op
+                  // on the Hebrew string, which has no case.
+                  l10n.discoveryLookingAround.toUpperCase(),
+                  style: textTheme.labelSmall?.copyWith(letterSpacing: 1),
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  _place(l10n, controller),
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         button,
@@ -400,9 +471,12 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     return outcome is LocationDenied || outcome is LocationUnavailable;
   }
 
-  /// The header's place once a position exists: the nearest result's
-  /// address, or "Your location" without one.
+  /// The header's place once a position exists: the chosen place's name
+  /// in the UI language (issue #443), else the nearest result's address,
+  /// or "Your location" without one.
   String _place(AppLocalizations l10n, VenueSearchController controller) {
+    final chosen = controller.chosenPlace;
+    if (chosen != null) return chosen.nameFor(_language);
     for (final venue in controller.results) {
       final address = venue.address;
       if (address != null && address.trim().isNotEmpty) return address;
@@ -432,6 +506,12 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
+          // Distance needs somewhere to measure from (issue #443).
+          if (controller.position != null)
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8),
+              child: _distanceChip(l10n, controller),
+            ),
           for (final (chip, label, enabled) in chips)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: 8),
@@ -448,6 +528,47 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  /// The distance filter (issue #443): a chip reading "Any distance" or
+  /// "Within N km" that opens a menu of [discoveryRadiusOptionsKm], shown
+  /// selected while a distance is picked. A menu rather than one chip per
+  /// distance, so the row stays short; the choice goes to
+  /// [VenueSearchController.setRadius].
+  Widget _distanceChip(
+    AppLocalizations l10n,
+    VenueSearchController controller,
+  ) {
+    final radius = controller.radiusKm;
+    Widget item(int? km) => MenuItemButton(
+      // Kept in the layout when unticked, so the labels stay aligned.
+      leadingIcon: Visibility.maintain(
+        visible: km == radius,
+        child: const Icon(Icons.check),
+      ),
+      onPressed: () => controller.setRadius(km),
+      child: Text(
+        km == null
+            ? l10n.discoveryChipAnyDistance
+            : l10n.discoveryChipWithinKm(km),
+      ),
+    );
+    return MenuAnchor(
+      menuChildren: [
+        item(null),
+        for (final km in discoveryRadiusOptionsKm) item(km),
+      ],
+      builder: (context, menu, _) => FilterChip(
+        tooltip: l10n.discoveryChipDistanceTooltip,
+        label: Text(
+          radius == null
+              ? l10n.discoveryChipAnyDistance
+              : l10n.discoveryChipWithinKm(radius),
+        ),
+        selected: radius != null,
+        onSelected: (_) => menu.isOpen ? menu.close() : menu.open(),
       ),
     );
   }
@@ -631,6 +752,10 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           onPressed: _fieldFocus.requestFocus,
           child: Text(l10n.discoveryTypeNameInstead),
         ),
+        TextButton(
+          onPressed: _chooseLocation,
+          child: Text(l10n.discoveryChooseLocation),
+        ),
         if (outcome.permanently)
           OutlinedButton(
             onPressed: () => unawaited(_openSettings(servicesOff: false)),
@@ -674,6 +799,10 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         TextButton(
           onPressed: _fieldFocus.requestFocus,
           child: Text(l10n.discoveryTypeNameInstead),
+        ),
+        TextButton(
+          onPressed: _chooseLocation,
+          child: Text(l10n.discoveryChooseLocation),
         ),
         if (reason == LocationUnavailableReason.servicesOff)
           OutlinedButton(
