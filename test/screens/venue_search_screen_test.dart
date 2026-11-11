@@ -2162,6 +2162,163 @@ void main() {
       });
     });
 
+    group('lazy venue list (issue #446)', () {
+      /// Every venue card in the element tree, on screen or in the scroll
+      /// view's cache beyond it.
+      final builtCards = find.byType(VenueCard, skipOffstage: false);
+
+      /// Lists [count] venues named `Venue v0`, `Venue v1`, … on a
+      /// phone-sized surface: one column, an 800px-tall window.
+      Future<void> listMany(WidgetTester tester, int count) async {
+        search.queueFound([for (var i = 0; i < count; i++) _venue('v$i')]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        tester.view.physicalSize = const Size(390, 800);
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('a list of hundreds builds only the cards on or near the '
+          'screen', (tester) async {
+        // Act
+        await listMany(tester, 334);
+
+        // Assert: the controller holds them all; the page built a
+        // screenful and the cache beyond it.
+        expect(controller.visibleResults, hasLength(334));
+        final built = builtCards.evaluate().length;
+        expect(built, greaterThan(0));
+        expect(built, lessThan(30));
+        expect(find.text('Venue v0'), findsOneWidget);
+        expect(find.text('Venue v333', skipOffstage: false), findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('only the built cards have a photo tile, so only their '
+          'photos are asked for', (tester) async {
+        // Act
+        await listMany(tester, 334);
+
+        // Assert
+        expect(
+          find.byType(PhotoTile, skipOffstage: false).evaluate().length,
+          builtCards.evaluate().length,
+        );
+      });
+
+      testWidgets('scrolling down builds the cards that come into view and '
+          'lets go of the ones left behind', (tester) async {
+        // Arrange
+        await listMany(tester, 334);
+        expect(find.text('Venue v40', skipOffstage: false), findsNothing);
+
+        // Act: fling far down the list.
+        await tester.fling(
+          find.byType(CustomScrollView),
+          const Offset(0, -3000),
+          6000,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert: later cards exist now, the first is gone, and the page
+        // still holds a bounded number.
+        expect(find.text('Venue v0', skipOffstage: false), findsNothing);
+        final lastBuilt = tester
+            .widgetList<VenueCard>(builtCards)
+            .map((card) => int.parse(card.venue.name.split('v').last))
+            .reduce((a, b) => a > b ? a : b);
+        expect(lastBuilt, greaterThan(20));
+        expect(builtCards.evaluate().length, lessThan(30));
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('the page scrolls as one: the header and the search field '
+          'leave with the cards', (tester) async {
+        // Arrange
+        await listMany(tester, 60);
+        expect(find.text(_l10n(tester).discoveryTitle), findsOneWidget);
+
+        // Act
+        await tester.drag(
+          find.byType(CustomScrollView),
+          const Offset(0, -1500),
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_l10n(tester).discoveryTitle), findsNothing);
+        expect(find.byType(TextField), findsNothing);
+        expect(find.byType(VenueCard), findsWidgets);
+      });
+
+      testWidgets('a card scrolled into view opens its own venue', (
+        tester,
+      ) async {
+        // Arrange
+        await listMany(tester, 60);
+
+        // Act: scroll until a card far down the list is built, then tap.
+        // It is first built in the cache below the fold, so bring it on
+        // screen, and let a frame lay the page out, before the tap.
+        await tester.scrollUntilVisible(
+          find.text('Venue v25'),
+          400,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(find.text('Venue v25'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Venue v25'));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(pushedNames, contains('/venue/wolt/v25'));
+      });
+
+      testWidgets('a chip that narrows the list rebuilds it from the top of '
+          'what is left', (tester) async {
+        // Arrange: every third venue is open.
+        search.queueFound([
+          for (var i = 0; i < 90; i++) _venue('v$i', isOnline: i % 3 == 0),
+        ]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        final l10n = _l10n(tester);
+
+        // Act
+        await tester.tap(
+          find.widgetWithText(FilterChip, l10n.discoveryChipOpenNow),
+        );
+        await tester.pumpAndSettle();
+
+        // Assert: only open venues among the built cards.
+        final names = tester
+            .widgetList<VenueCard>(builtCards)
+            .map((card) => card.venue.name)
+            .toList();
+        expect(names.take(3), ['Venue v0', 'Venue v3', 'Venue v6']);
+        expect(controller.visibleResults, hasLength(30));
+      });
+
+      testWidgets('a quick score landing while the list shows updates the '
+          'card on screen and builds no more cards', (tester) async {
+        // Arrange: the automatic run scores the first venue.
+        controller = buildController(autoEstimateLimit: 1);
+        final venues = [for (var i = 0; i < 200; i++) _venue('v$i')];
+        repository.stub(
+          venues.first.ref,
+          _fetchedWithOneDish(venues.first.ref),
+        );
+        search.queueFound(venues);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+        // Act
+        await locate(tester);
+
+        // Assert
+        expect(find.text('10.0'), findsOneWidget);
+        expect(builtCards.evaluate().length, lessThan(40));
+      });
+    });
+
     group('search autofocus (issue #264)', () {
       /// Whether the pumped screen's search field holds primary focus.
       bool searchFocused(WidgetTester tester) => tester

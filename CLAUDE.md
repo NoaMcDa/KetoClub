@@ -99,6 +99,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > ("Any distance" / "Within 1, 2, 5 or 10 km", `VenueSearchController.radiusKm`),
 > which is not a `DiscoveryChip` and survives a new result list.
 >
+> **D27 (#446) builds the Discovery list lazily.** A nearby search answers
+> hundreds of venues (334 around Herzliya), and the page built, laid out and
+> painted every card at once, and again on every controller notification,
+> freezing for seconds. The page is now a `CustomScrollView` whose cards are a
+> `SliverVenueGrid` (the same 1/2/3-column layout, built row by row); the eager
+> `VenueGrid` is left for the loading skeletons. Measured on that list: main
+> thread blocked 21 s → 2.3 s in a debug build and 8.5 s → 0.4 s in release,
+> photos requested on arrival 328 → 15.
+>
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
 > architecture.md wins. **`HANDOFF.md` is the fastest way in**: what exists, what is
@@ -386,6 +395,11 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   invoked on first use, as the Hive and preferences wiring does; `di_test` asserts it.
 - **A `ListView` builds lazily**, so widgets below the fold are absent from the element
   tree and `find.text` finds nothing. Scroll first, or use a `Column` for short screens.
+  The Discovery list is lazy too since D27 (`SliverVenueGrid`, #446). **And a
+  sliver wholly below the fold is "offstage" to a finder even when its children
+  are built** in the cache extent: `find.text` skips them unless you pass
+  `skipOffstage: false` or bring the list into view first (`showVenueList` in
+  `flow_support.dart`).
 - **A web flow test's imports must be same-directory or `package:`** — `flutter drive`
   roots the compile at the test file's own directory. Only `flutter drive` catches a
   violation; `flutter test` and `flutter build web --target=…` both pass regardless.
@@ -733,7 +747,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
    scan issue (#88; §16's Phase 4 steps). §14 has the decisions
-   log D1–D26, §17 the open questions with the default the code follows.
+   log D1–D27, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

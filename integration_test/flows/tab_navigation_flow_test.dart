@@ -149,9 +149,13 @@ void main() {
           _en.discoveryChipOpenNow,
         );
         await tester.ensureVisible(openNow);
+        // The page is a sliver scroll view (issue #446): a scroll moves
+        // the chip only once a frame has laid the page out again.
+        await tester.pumpAndSettle();
         await tapAndSettle(tester, openNow);
 
         // Assert
+        await showVenueList(tester);
         expect(find.text(open.name), findsOneWidget);
         expect(find.text(closed.name), findsNothing);
 
@@ -169,9 +173,10 @@ void main() {
           ),
           findsOneWidget,
         );
+        expect(tester.widget<FilterChip>(openNow).selected, isTrue);
+        await showVenueList(tester);
         expect(find.byType(VenueCard), findsOneWidget);
         expect(find.text(open.name), findsOneWidget);
-        expect(tester.widget<FilterChip>(openNow).selected, isTrue);
         expect(fakes.venueSearchService.byNameCalls, ['sushi']);
       },
     );

@@ -92,10 +92,16 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Haifa'), findsOneWidget);
+      await showVenueList(tester);
       expect(find.byType(VenueCard), findsNWidgets(3));
 
       // Act: within 5 km.
-      final distance = find.byTooltip(_en.discoveryChipDistanceTooltip);
+      // Found off screen too: once the list is scrolled into view on a
+      // short window, the chip row above it has scrolled out.
+      final distance = find.byTooltip(
+        _en.discoveryChipDistanceTooltip,
+        skipOffstage: false,
+      );
       await _tapVisible(tester, distance);
       await tapAndSettle(
         tester,
@@ -103,6 +109,7 @@ void main() {
       );
 
       // Assert: the out-of-town one is gone and the chip says why.
+      await showVenueList(tester);
       expect(find.text(near.name), findsOneWidget);
       expect(find.text(across.name), findsOneWidget);
       expect(find.text(far.name), findsNothing);
@@ -123,6 +130,7 @@ void main() {
       );
 
       // Assert
+      await showVenueList(tester);
       expect(find.text(near.name), findsOneWidget);
       expect(find.text(across.name), findsNothing);
 
@@ -134,6 +142,7 @@ void main() {
       );
 
       // Assert: the whole list is back.
+      await showVenueList(tester);
       expect(find.byType(VenueCard), findsNWidgets(3));
     });
 
@@ -158,6 +167,7 @@ void main() {
       await _pickHaifa(tester);
 
       // Assert: restaurants, with no permission involved.
+      await showVenueList(tester);
       expect(find.text(_en.discoveryLocationDeniedTitle), findsNothing);
       expect(find.text('Haifa'), findsOneWidget);
       expect(find.text(near.name), findsOneWidget);

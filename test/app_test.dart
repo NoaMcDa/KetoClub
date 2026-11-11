@@ -206,7 +206,11 @@ void main() {
       await tester.enterText(find.byType(TextField), 'sushi');
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
-      expect(find.text('Sushi Bar'), findsOneWidget);
+      // The list is a sliver (issue #446), and on this 800x600 surface the
+      // first-launch banner leaves it just under the fold: built, in the
+      // scroll view's cache, but offstage to a finder.
+      final sushiBar = find.text('Sushi Bar', skipOffstage: false);
+      expect(sushiBar, findsOneWidget);
 
       // Act: away to Saved, which disposes the Explore route, and back.
       Finder tab(String label) => find.descendant(
@@ -225,7 +229,7 @@ void main() {
         tester.widget<TextField>(find.byType(TextField)).controller?.text,
         'sushi',
       );
-      expect(find.text('Sushi Bar'), findsOneWidget);
+      expect(sushiBar, findsOneWidget);
       expect(fakes.venueSearchService.byNameCalls, hasLength(1));
     });
 
