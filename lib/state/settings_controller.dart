@@ -175,8 +175,7 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(estimationConsentGiven: given);
-    await _settings.write(_appSettings);
+    await _change((latest) => latest.copyWith(estimationConsentGiven: given));
 
     _isBusy = false;
     notifyListeners();
@@ -193,8 +192,7 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(languageTag: tag);
-    await _settings.write(_appSettings);
+    await _change((latest) => latest.copyWith(languageTag: tag));
 
     _isBusy = false;
     notifyListeners();
@@ -205,8 +203,7 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(filter: filter);
-    await _settings.write(_appSettings);
+    await _change((latest) => latest.copyWith(filter: filter));
 
     _isBusy = false;
     notifyListeners();
@@ -217,8 +214,7 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(themeMode: mode);
-    await _settings.write(_appSettings);
+    await _change((latest) => latest.copyWith(themeMode: mode));
 
     _isBusy = false;
     notifyListeners();
@@ -235,10 +231,10 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(
-      netCarbLimitGrams: clampNetCarbLimitGrams(grams),
+    await _change(
+      (latest) =>
+          latest.copyWith(netCarbLimitGrams: clampNetCarbLimitGrams(grams)),
     );
-    await _settings.write(_appSettings);
 
     _isBusy = false;
     notifyListeners();
@@ -251,17 +247,17 @@ final class SettingsController extends ChangeNotifier {
   /// cached result; see `MenuController.open`. Named rather than
   /// positional for the reason [setConsent] gives.
   Future<void> setSeedOilFree({required bool enabled}) =>
-      _update(_appSettings.copyWith(seedOilFree: enabled));
+      _update((latest) => latest.copyWith(seedOilFree: enabled));
 
   /// Turns the "Dairy-free keto" rule on or off (issue #56). See
   /// [setSeedOilFree].
   Future<void> setDairyFree({required bool enabled}) =>
-      _update(_appSettings.copyWith(dairyFree: enabled));
+      _update((latest) => latest.copyWith(dairyFree: enabled));
 
   /// Turns the "Carnivore only" rule on or off (issue #56). See
   /// [setSeedOilFree].
   Future<void> setCarnivoreOnly({required bool enabled}) =>
-      _update(_appSettings.copyWith(carnivoreOnly: enabled));
+      _update((latest) => latest.copyWith(carnivoreOnly: enabled));
 
   /// Records that the first-launch AI-disclosure banner has been
   /// dismissed with "OK" (D16, issue #167). Leaves
@@ -269,7 +265,7 @@ final class SettingsController extends ChangeNotifier {
   /// but did not refuse — and persists [disclosureSeen] as true so the
   /// banner is never shown twice on the same install.
   Future<void> acknowledgeDisclosure() =>
-      _update(_appSettings.copyWith(disclosureSeen: true));
+      _update((latest) => latest.copyWith(disclosureSeen: true));
 
   /// Records that the first-launch AI-disclosure banner has been
   /// dismissed with "Turn off" (D16, issue #167): consent is set to
@@ -277,20 +273,29 @@ final class SettingsController extends ChangeNotifier {
   /// router stops sending dish text and the banner is never shown
   /// twice.
   Future<void> declineDisclosure() => _update(
-    _appSettings.copyWith(estimationConsentGiven: false, disclosureSeen: true),
+    (latest) =>
+        latest.copyWith(estimationConsentGiven: false, disclosureSeen: true),
   );
 
-  /// Replaces the held settings with [next] and persists them, marking
-  /// [isBusy] around the write exactly as every other setter here does.
-  Future<void> _update(AppSettings next) async {
+  /// Applies [change] and persists it, marking [isBusy] around the write
+  /// exactly as every other setter here does.
+  Future<void> _update(AppSettings Function(AppSettings latest) change) async {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = next;
-    await _settings.write(_appSettings);
+    await _change(change);
 
     _isBusy = false;
     notifyListeners();
+  }
+
+  /// Applies [change] to the **latest stored** settings, not to the copy
+  /// this controller read when Settings opened, and holds what was saved
+  /// (issue #287): a field another screen wrote since — the last venue,
+  /// the last filter, the disclosure banner's choice — is never reverted
+  /// by a toggle here.
+  Future<void> _change(AppSettings Function(AppSettings latest) change) async {
+    _appSettings = await _settings.update(change);
   }
 
   /// Forgets every cached menu and analysis, through the repository, and
@@ -307,8 +312,9 @@ final class SettingsController extends ChangeNotifier {
     await _repository.clearCache();
     await _history.clear();
     _cachedMenuCount = await _repository.cachedMenuCount();
-    _appSettings = _appSettings.copyWith(lastVenue: null, lastFilter: null);
-    await _settings.write(_appSettings);
+    await _change(
+      (latest) => latest.copyWith(lastVenue: null, lastFilter: null),
+    );
 
     _isBusy = false;
     notifyListeners();

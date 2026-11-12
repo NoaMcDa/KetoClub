@@ -386,8 +386,21 @@ abstract interface class SettingsStore {
 
   /// Saves [settings], replacing any previously stored value.
   ///
+  /// Replaces every field, so a [settings] read before another write
+  /// lands undoes that write. A caller that changes some fields of what it
+  /// read earlier uses [update] instead (issue #287).
+  ///
   /// Never throws.
   Future<void> write(AppSettings settings);
+
+  /// Applies [change] to the latest stored settings and saves the result,
+  /// answering what was saved (issue #287): a read-modify-write, so a
+  /// change to one field never reverts a field someone else wrote after
+  /// the caller last read. An implementation runs one [update] at a time,
+  /// in call order, so two overlapping updates both land.
+  ///
+  /// Never throws, unless [change] itself does.
+  Future<AppSettings> update(AppSettings Function(AppSettings latest) change);
 }
 
 /// The shared_preferences key [AppSettings] is stored under, as one JSON
@@ -420,8 +433,36 @@ final class PrefsSettingsStore implements SettingsStore {
   /// and reusing that result on every later call.
   Future<SharedPreferences> _preferences() => _prefs ??= load();
 
+  /// The last queued operation; each [read], [write] and [update] runs
+  /// after it, so they settle one at a time and in call order.
+  Future<void> _tail = Future<void>.value();
+
+  /// Runs [task] after every operation queued before it.
+  Future<T> _serialised<T>(Future<T> Function() task) {
+    final result = _tail.then((_) => task());
+    // A failed task (only a throwing `update` change can fail) must not
+    // stall the queue behind it.
+    _tail = result.then<void>((_) {}, onError: (Object _) {});
+    return result;
+  }
+
   @override
-  Future<AppSettings> read() async {
+  Future<AppSettings> read() => _serialised(_read);
+
+  @override
+  Future<void> write(AppSettings settings) =>
+      _serialised(() => _write(settings));
+
+  @override
+  Future<AppSettings> update(AppSettings Function(AppSettings latest) change) =>
+      _serialised(() async {
+        final next = change(await _read());
+        await _write(next);
+        return next;
+      });
+
+  /// The stored settings; see [read].
+  Future<AppSettings> _read() async {
     final SharedPreferences prefs;
     try {
       prefs = await _preferences();
@@ -441,8 +482,8 @@ final class PrefsSettingsStore implements SettingsStore {
     return AppSettings.tryFrom(decoded) ?? const AppSettings();
   }
 
-  @override
-  Future<void> write(AppSettings settings) async {
+  /// Saves [settings]; see [write].
+  Future<void> _write(AppSettings settings) async {
     final SharedPreferences prefs;
     try {
       prefs = await _preferences();
