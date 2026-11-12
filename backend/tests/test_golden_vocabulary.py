@@ -84,6 +84,7 @@ def test_the_trigger_pattern_sources_are_the_dart_sources() -> None:
     )
     latin = vocabulary().latin_trigger_pattern_example
     assert latin_trigger_source(latin.trigger) == latin.pattern
+    assert latin_trigger_source(latin.trigger, allow_plural=True) == latin.with_plural
     assert latin.case_sensitive is False
     assert latin.unicode is False
 

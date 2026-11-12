@@ -8,9 +8,18 @@ import 'package:ketoclub/utils/constants.dart';
 /// `_noPrefixHebrewTriggers`): folded `חלה` also spells a common verb
 /// form, and its prefixed form (`החלה`) is itself an ordinary word
 /// ("commencement"); `משמרים` is "preservatives"; `הפוך` collides with
-/// "to flip" (e.g. `להפוך`). All three are excluded from the prefix
-/// half of the generated Hebrew trigger tests below.
-const Set<String> _noPrefixTriggers = <String>{'חלה', 'שמרים', 'הפוך'};
+/// "to flip" (e.g. `להפוך`); `מחלבה` is "dairy" (issue #273), so `חלבה`
+/// and its spelled-out particles are prefix-free too. All of them are
+/// excluded from the prefix half of the generated Hebrew trigger tests
+/// below.
+const Set<String> _noPrefixTriggers = <String>{
+  'חלה',
+  'שמרים',
+  'הפוך',
+  'חלבה',
+  'וחלבה',
+  'בחלבה',
+};
 
 /// A neutral English wrapper containing no guard vocabulary, so every
 /// `carbModifiersEn`/`nonKetoBasesEn` trigger can be dropped in as-is.
