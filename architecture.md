@@ -3857,9 +3857,10 @@ protection: nothing merges red, and nothing merges without a review.
 
 | Job | Steps | Purpose |
 |---|---|---|
-| `quality` | `flutter pub get` · `dart format --output=none --set-exit-if-changed` · `flutter analyze --fatal-infos --fatal-warnings` | style and static correctness |
+| `quality` | `flutter pub get` · `dart format --output=none --set-exit-if-changed` · `tool/flow_shard.sh --verify 4` · `flutter analyze --fatal-infos --fatal-warnings` | style and static correctness; every flow file in exactly one shard |
 | `test` | generate the all-imports helper · `flutter test --coverage` (unit + flow + architecture) · `tool/coverage_gate.sh` · upload `lcov.info` | behaviour and the 80% gate |
-| `integration` | headless Chrome + chromedriver · `flutter drive` for every file in `integration_test/` | the real build on a real browser |
+| `integration-shard` (×4) | headless Chrome + chromedriver · `tool/flow_shard.sh <n> 4` writes one entry importing a quarter of `integration_test/flows/*_flow_test.dart` · one `flutter drive` of that entry | the real build on a real browser, one compile per machine (#453) |
+| `integration` | waits for the four shards; green only if all four are | one stable check name for the shards |
 | `build` | `flutter build web --release` · `flutter build apk --debug` | the app still compiles for the shipping targets |
 | `ios` | `flutter build ios --no-codesign` on macOS, on pushes to `main` only | catches iOS-only breakage without spending macOS minutes on every push |
 

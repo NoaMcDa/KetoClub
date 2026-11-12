@@ -445,28 +445,39 @@ flutter test integration_test/ -d chrome
 
 ## CI/CD Integration
 
-Flow tests should run on real devices/emulators in CI:
+CI drives the flows in headless Chrome, in **four parallel shards** (issue #453;
+`.github/workflows/ci.yml`, jobs `integration-shard` and `integration`):
 
-```yaml
-# .github/workflows/integration_test.yml
-name: Integration Tests
-on: [push, pull_request]
+1. `tool/flow_shard.sh <index> 4` deals every `integration_test/flows/*_flow_test.dart`
+   out round-robin in sorted order and writes
+   `integration_test/flows/flow_shard_<index>_test.dart`, which imports its share
+   and runs each file's `main()` in a `group`. The entries are generated, ignored
+   by git and never edited.
+2. Each shard machine runs one `flutter drive` of its entry: one web compile, one
+   Chrome, then its flows back to back. Driving every file on its own cost about
+   50 s a file, 3 s of it testing.
+3. The `integration` job passes only when all four shards do.
 
-jobs:
-  integration_test:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
-      - run: flutter pub get
-      
-      # Run on iOS simulator
-      - run: flutter test integration_test/ -d ios
-      
-      # Run on Android emulator (requires AVD setup)
-      - name: Run Android tests
-        run: |
-          flutter test integration_test/ -d android
+What this asks of a flow file:
+
+- **Name it `*_flow_test.dart`** and keep it in `integration_test/flows/`, or no
+  shard picks it up. `tool/flow_shard.sh --verify 4` (in the `quality` job) checks
+  that every flow file lands in exactly one shard.
+- **Leave nothing behind.** Flows in a shard share one app process and one browser
+  tab. Build every fake in the test itself (`FakeAppDependencies()`), and undo any
+  change to `tester.view` with `addTearDown`.
+- A flow file still runs on its own, exactly as before:
+
+```bash
+flutter drive --driver=test_driver/integration_test.dart   --target=integration_test/flows/menu_display_flow_test.dart   -d web-server --browser-name=chrome --headless
+```
+
+To run a shard as CI does (chromedriver listening on port 4444, matching your
+Chrome's major version):
+
+```bash
+tool/flow_shard.sh 3 4
+flutter drive --driver=test_driver/integration_test.dart   --target=integration_test/flows/flow_shard_3_test.dart   -d web-server --browser-name=chrome --headless
 ```
 
 ## Debugging Flow Tests

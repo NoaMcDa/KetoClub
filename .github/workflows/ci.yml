@@ -47,6 +47,8 @@ jobs:
       - run: flutter pub get
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test integration_test test_driver
+      - name: Check every flow test lands in exactly one integration shard
+        run: tool/flow_shard.sh --verify 4
       - name: Analyze (infos and warnings are fatal)
         run: flutter analyze --fatal-infos --fatal-warnings
 
@@ -75,9 +77,24 @@ jobs:
           path: coverage/lcov.info
           if-no-files-found: ignore
 
-  integration:
-    name: Integration tests (headless Chrome)
+  # The flow tests, split across parallel machines (issue #453). Each shard
+  # drives one generated entry (tool/flow_shard.sh) that imports its share of
+  # integration_test/flows/*_flow_test.dart, so a machine compiles the app for
+  # the web once and starts Chrome once. Driving every file on its own cost
+  # about 50 s a file, 3 s of it testing: 28 minutes for 33 files.
+  #
+  # Past about four shards a machine's fixed cost (checkout, Flutter, pub get,
+  # one compile: ~2.5 minutes) is all that is left, so more buy nothing. Keep
+  # FLOW_SHARDS, the matrix and the quality job's --verify count equal.
+  integration-shard:
+    name: Integration tests, shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    env:
+      FLOW_SHARDS: 4
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -113,23 +130,33 @@ jobs:
         run: |
           "$CHROMEDRIVER" --port=4444 &
           sleep 2
-      - name: Drive every integration test on web-server
+      - name: Write this shard's entry
         run: |
           set -euo pipefail
-          mapfile -t files < <(find integration_test -name '*_test.dart' | sort)
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No integration tests found under integration_test/." >&2
-            exit 1
-          fi
-          for f in "${files[@]}"; do
-            echo "=== $f"
-            flutter drive \
-              --driver=test_driver/integration_test.dart \
-              --target="$f" \
-              -d web-server \
-              --browser-name=chrome \
-              --headless
-          done
+          tool/flow_shard.sh --verify "$FLOW_SHARDS"
+          echo "ENTRY=$(tool/flow_shard.sh ${{ matrix.shard }} "$FLOW_SHARDS")" >> "$GITHUB_ENV"
+      - name: Drive this shard's flows on web-server
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target="$ENTRY" \
+            -d web-server \
+            --browser-name=chrome \
+            --headless
+
+  # One stable check for the shards above: green only when every shard is.
+  # Reviewers, and any branch rule, look for this name.
+  integration:
+    name: Integration tests (headless Chrome)
+    runs-on: ubuntu-latest
+    needs: integration-shard
+    if: always()
+    steps:
+      - name: Every shard passed
+        run: |
+          result="${{ needs.integration-shard.result }}"
+          echo "integration shards: $result"
+          [ "$result" = "success" ]
 
   build:
     name: Build ${{ matrix.target }}
