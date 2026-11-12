@@ -34,6 +34,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
+import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
@@ -51,6 +52,7 @@ import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -148,6 +150,7 @@ final class FakeAppDependencies {
       qrScanner = FlowFakeQrScanner(),
       visitHistory = FlowFakeVisitHistoryStore(),
       menuStoreClient = FlowFakeMenuStoreClient(),
+      placeSearchService = FlowFakePlaceSearchService(),
       scannedPages = ScannedPagesRegistry();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
@@ -211,6 +214,10 @@ final class FakeAppDependencies {
   /// The faked shared menu store (issue #312); inspect
   /// [FlowFakeMenuStoreClient.uploads].
   final FlowFakeMenuStoreClient menuStoreClient;
+
+  /// The faked street search behind the location picker (issue
+  /// #449); set [FlowFakePlaceSearchService.result].
+  final FlowFakePlaceSearchService placeSearchService;
 
   /// The in-memory scanned-pages registry (issue #89) — the real one, as
   /// it does no I/O, shared by the Scan tab and the menu screen.
@@ -294,6 +301,7 @@ final class FakeAppDependencies {
     menuQuestionAnswerer: questionAnswerer,
     visitHistory: visitHistory,
     menuStoreClient: menuStoreClient,
+    placeSearchService: placeSearchService,
   );
 }
 
@@ -771,6 +779,26 @@ final class FlowFakeVenueSearchService implements VenueSearchService {
   }) async {
     byNameCalls.add(query);
     if (query.trim().isEmpty) return const VenuesFound(<Venue>[]);
+    return result;
+  }
+}
+
+/// A [PlaceSearchService] answering one settable [result] and recording
+/// every query — mirrors `test/fakes`' `FakePlaceSearchService`,
+/// duplicated here for the reason this file's own top doc comment gives.
+final class FlowFakePlaceSearchService implements PlaceSearchService {
+  /// What every search answers; no places until a flow sets it.
+  PlaceSearchResult result = const PlacesFound(<StreetPlace>[]);
+
+  /// Every query [search] was asked for, in call order.
+  final List<String> calls = <String>[];
+
+  @override
+  Future<PlaceSearchResult> search(
+    String query, {
+    required String language,
+  }) async {
+    calls.add(query);
     return result;
   }
 }

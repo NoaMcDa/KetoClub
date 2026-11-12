@@ -26,6 +26,9 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/website/backend_website_fetcher.dart';
 import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
+import 'package:ketoclub/services/place/backend_place_search_service.dart';
+import 'package:ketoclub/services/place/fallback_place_search_service.dart';
+import 'package:ketoclub/services/place/photon/photon_place_search_service.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -119,6 +122,8 @@ void main() {
       expect(dependencies.menuSharer, isA<SharePlusMenuSharer>());
       expect(dependencies.locationService, isA<GeolocatorLocationService>());
       expect(dependencies.venueSearchService, isA<WoltVenueSearchService>());
+      // No backend URL in a test run: Photon alone (issue #449).
+      expect(dependencies.placeSearchService, isA<PhotonPlaceSearchService>());
       // The test VM is not web, so the phone path: a key store for the
       // user's own Gemini key (architecture.md D17).
       expect(dependencies.apiKeyStore, isA<SecureApiKeyStore>());
@@ -519,6 +524,40 @@ void main() {
       final primary = fallback.primary as BackendVenueSearchService;
       expect(primary.baseUrl, _base);
       expect(identical(fallback.fallback, direct), isTrue);
+    });
+  });
+
+  group('placeSearchFor (issue #449, D27)', () {
+    test('with no backend is Photon alone', () {
+      // Act
+      final service = placeSearchFor(
+        backendBase: null,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+      );
+
+      // Assert
+      expect(service, isA<PhotonPlaceSearchService>());
+    });
+
+    test('with a backend asks it first and Photon second, reading no '
+        'install id while it is built', () {
+      // Arrange
+      final store = FakeInstallIdStore();
+
+      // Act
+      final service = placeSearchFor(
+        backendBase: _base,
+        client: http.Client(),
+        installIdStore: store,
+      );
+
+      // Assert
+      final fallback = service as FallbackPlaceSearchService;
+      final primary = fallback.primary as BackendPlaceSearchService;
+      expect(primary.baseUrl, _base);
+      expect(fallback.fallback, isA<PhotonPlaceSearchService>());
+      expect(store.calls, 0);
     });
   });
 

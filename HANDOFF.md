@@ -34,6 +34,23 @@ blocked for about 21 s in a debug build and is now blocked for 2.3 s (release:
 far below the fold is no longer in the element tree, and fast scrolling in a
 debug build is less smooth than it was; see `architecture.md` D27.
 
+**D27 — a street as the custom location, found by a geocoder on an explicit
+tap (#449).** The location picker's field now reads "Search for a city or a
+street". Typing still filters the bundled cities on the device and sends
+nothing; from three characters a "Search streets for “…”" action appears with
+a caption naming where the text goes. One tap is one
+`PlaceSearchService.search` (`services/place/`): `BackendPlaceSearchService`
+(`POST /v1/places/search`, install id header only) first and
+`PhotonPlaceSearchService` (`photon.komoot.io`, HTTP only, with the pure
+`PhotonPlaceMapper`) when the backend could not answer; Photon alone with no
+backend URL. A picked `StreetPlace` goes to `VenueSearchController.chooseStreet`,
+which is `choosePlace` for coordinates; it is saved as
+`AppSettings.discoveryStreet` (label and coordinates) and cleared exactly as a
+city is. The mapper's dedupe step merges one address under several spellings
+of its city and a street in several segments; the backend's port must match
+it. Evidence is fakes, mocked HTTP and two recorded Photon replies; see
+`architecture.md` D27.
+
 **D26 — Discovery looks around a place the user chooses, and filters by
 distance (#443).** "Choose a location", in the Discovery header and on the
 location-denied and location-unavailable cards, opens `LocationPickerSheet`:

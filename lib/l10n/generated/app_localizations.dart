@@ -1151,7 +1151,7 @@ abstract class AppLocalizations {
   /// No description provided for @locationPickerSearchLabel.
   ///
   /// In en, this message translates to:
-  /// **'Search for a city'**
+  /// **'Search for a city or a street'**
   String get locationPickerSearchLabel;
 
   /// No description provided for @locationPickerNoMatch.
@@ -1159,6 +1159,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No city matches that. Try another spelling.'**
   String get locationPickerNoMatch;
+
+  /// No description provided for @locationPickerStreetSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search streets for “{query}”'**
+  String locationPickerStreetSearch(String query);
+
+  /// No description provided for @locationPickerStreetCaptionBackend.
+  ///
+  /// In en, this message translates to:
+  /// **'Sends what you typed to KetoClub\'s server and to Photon, an OpenStreetMap search service.'**
+  String get locationPickerStreetCaptionBackend;
+
+  /// No description provided for @locationPickerStreetCaptionDirect.
+  ///
+  /// In en, this message translates to:
+  /// **'Sends what you typed to Photon, an OpenStreetMap search service.'**
+  String get locationPickerStreetCaptionDirect;
+
+  /// No description provided for @locationPickerStreetSearching.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching streets…'**
+  String get locationPickerStreetSearching;
+
+  /// No description provided for @locationPickerStreetsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Streets'**
+  String get locationPickerStreetsHeading;
+
+  /// No description provided for @locationPickerStreetNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No street found for “{query}”. Check the spelling, or add the city.'**
+  String locationPickerStreetNoMatch(String query);
+
+  /// No description provided for @placeSearchFailedOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection, so the street search could not run.'**
+  String get placeSearchFailedOffline;
+
+  /// No description provided for @placeSearchFailedTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The street search took too long to answer. Try again in a moment.'**
+  String get placeSearchFailedTimeout;
+
+  /// No description provided for @placeSearchFailedRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many street searches in a row. Wait a minute, then try again.'**
+  String get placeSearchFailedRateLimited;
+
+  /// No description provided for @placeSearchFailedBackendUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub\'s server could not be reached, so the street search could not run.'**
+  String get placeSearchFailedBackendUnreachable;
+
+  /// No description provided for @placeSearchFailedProviderChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'The street search service answered in a way KetoClub could not read. Please report this.'**
+  String get placeSearchFailedProviderChanged;
 
   /// No description provided for @discoveryLocating.
   ///

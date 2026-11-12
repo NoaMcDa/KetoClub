@@ -5,6 +5,7 @@ import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -66,6 +67,9 @@ class AppDependencies {
   /// [menuStoreClient] defaults to [NoMenuStoreClient], which sends nothing
   /// and does no I/O; `di.dart` passes the backend's (issue #312, D24).
   ///
+  /// [placeSearchService] defaults to null, which offers no street search
+  /// in the location picker; `di.dart` always passes one (issue #449).
+  ///
   /// [backendConfigured] defaults to false, which is also the no-backend
   /// build's real value; `di.dart` passes whether a backend URL is set
   /// (issue #330).
@@ -100,6 +104,7 @@ class AppDependencies {
     this.visitHistory = const NoVisitHistoryStore(),
     this.menuStoreClient = const NoMenuStoreClient(),
     this.backendConfigured = false,
+    this.placeSearchService,
     MenuRepository? estimateMenuRepository,
   }) : estimateMenuRepository = estimateMenuRepository ?? menuRepository;
 
@@ -228,4 +233,10 @@ class AppDependencies {
   /// with the user's own Gemini key used only if the server cannot be
   /// reached (issue #330); the consent and scan disclosures follow it.
   final bool backendConfigured;
+
+  /// Turns what the user typed in the location picker into streets (issue
+  /// #449, D27), only when they tap "Search streets": KetoClub's backend
+  /// first and Photon directly as the fallback with a backend URL, Photon
+  /// alone without one. Null offers cities only.
+  final PlaceSearchService? placeSearchService;
 }

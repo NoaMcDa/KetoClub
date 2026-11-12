@@ -30,6 +30,10 @@ import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
 import 'package:ketoclub/services/menu/website/website_adapter.dart';
 import 'package:ketoclub/services/menu/website/website_fetcher.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
+import 'package:ketoclub/services/place/backend_place_search_service.dart';
+import 'package:ketoclub/services/place/fallback_place_search_service.dart';
+import 'package:ketoclub/services/place/photon/photon_place_search_service.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -292,6 +296,32 @@ VenueSearchService venueSearchFor({
         ),
         fallback: direct,
       );
+
+/// The street search behind the location picker (issue #449, D27).
+///
+/// With a [backendBase] it is a [FallbackPlaceSearchService] asking a
+/// [BackendPlaceSearchService] there first and a
+/// [PhotonPlaceSearchService] — Photon, straight from the device — when
+/// the backend could not answer. Without one it is Photon alone, on every
+/// platform: Photon allows any origin, so a browser needs no proxy.
+/// Constructing it sends nothing.
+PlaceSearchService placeSearchFor({
+  required Uri? backendBase,
+  required http.Client client,
+  required InstallIdStore installIdStore,
+}) {
+  final direct = PhotonPlaceSearchService(client: client);
+  return backendBase == null
+      ? direct
+      : FallbackPlaceSearchService(
+          primary: BackendPlaceSearchService(
+            client: client,
+            baseUrl: backendBase,
+            installIdStore: installIdStore,
+          ),
+          fallback: direct,
+        );
+}
 
 /// How long a [BackendMenuAdapter] waits for a menu and its analysis.
 ///
@@ -592,5 +622,12 @@ AppDependencies buildDependencies() {
     // Whether menus, scans and searches go to the backend first (D25);
     // the consent and scan disclosures follow it (issue #330).
     backendConfigured: backendBase != null,
+    // Sends only on the picker's explicit "Search streets" tap (D27); the
+    // constructors read no install id and send nothing.
+    placeSearchService: placeSearchFor(
+      backendBase: backendBase,
+      client: client,
+      installIdStore: installIdStore,
+    ),
   );
 }

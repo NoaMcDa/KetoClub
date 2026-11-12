@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 
@@ -54,6 +55,28 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
 
       await store.write((await store.read()).copyWith(discoveryPlaceId: null));
       expect((await store.read()).discoveryPlaceId, isNull);
+    });
+
+    test('write then read round-trips a chosen street, and a city '
+        'replacing it (issue #449)', () async {
+      final store = build();
+      const street = StreetPlace(
+        label: 'Herzl 10, Tel Aviv',
+        latitude: 32.0625697,
+        longitude: 34.7698648,
+      );
+
+      await store.write(const AppSettings(discoveryStreet: street));
+      final read = await store.read();
+      expect(read.discoveryStreet, equals(street));
+      expect(read.discoveryPlaceId, isNull);
+
+      await store.write(
+        read.copyWith(discoveryPlaceId: 'haifa', discoveryStreet: null),
+      );
+      final replaced = await store.read();
+      expect(replaced.discoveryPlaceId, 'haifa');
+      expect(replaced.discoveryStreet, isNull);
     });
 
     test('write then read round-trips every combination of the dietary '

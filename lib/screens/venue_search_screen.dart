@@ -68,7 +68,10 @@ const double _listCacheExtent = 1200;
 /// unavailable cards, opens `LocationPickerSheet`: the device's position,
 /// or a city from a bundled list. A chosen city is looked around exactly
 /// as a position is, names the header, needs no permission, and is
-/// restored on the next launch. Once there is a position of either kind,
+/// restored on the next launch. Since issue #449 the picker also finds a
+/// street, on an explicit tap only (D27), and a chosen street is looked
+/// around, named and restored the same way. Once there is a position of
+/// any kind,
 /// the chip row starts with the distance filter, "Any distance" or
 /// "Within N km".
 ///
@@ -227,12 +230,18 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
 
   /// Opens the location picker (issue #443) and acts on the answer: the
   /// device's own position through [_locate], or the venues around the
-  /// place picked from the list.
+  /// place picked from the list or the street a street search found
+  /// (issue #449).
   Future<void> _chooseLocation() async {
     final controller = context.read<VenueSearchController>();
+    final language = _language;
     final pick = await showLocationPickerSheet(
       context,
       selected: controller.chosenPlace,
+      searchStreets: controller.canSearchStreets
+          ? (query) => controller.searchStreets(query, language: language)
+          : null,
+      streetSearchThroughBackend: widget.backendConfigured,
     );
     if (pick == null || !mounted) return;
     switch (pick) {
@@ -240,6 +249,8 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         await _locate();
       case LocationPickPlace(:final place):
         await controller.choosePlace(place, language: _language);
+      case LocationPickStreet(:final street):
+        await controller.chooseStreet(street, language: _language);
     }
   }
 
@@ -507,11 +518,14 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   }
 
   /// The header's place once a position exists: the chosen place's name
-  /// in the UI language (issue #443), else the nearest result's address,
+  /// in the UI language (issue #443), or the chosen street's label as the
+  /// geocoder wrote it (issue #449), else the nearest result's address,
   /// or "Your location" without one.
   String _place(AppLocalizations l10n, VenueSearchController controller) {
     final chosen = controller.chosenPlace;
     if (chosen != null) return chosen.nameFor(_language);
+    final street = controller.chosenStreet;
+    if (street != null) return street.label;
     for (final venue in controller.results) {
       final address = venue.address;
       if (address != null && address.trim().isNotEmpty) return address;

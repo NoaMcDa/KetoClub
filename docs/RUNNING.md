@@ -96,6 +96,17 @@ upload is refused with 413). The tables are created on startup, so an
 existing `ketoclub.db` gains `stored_menus` the next time the backend starts.
 `backend/README.md` documents every route, error and cache.
 
+The location picker's street search (D27, #449) needs no client
+configuration: a build with `KETOCLUB_BACKEND_URL` asks the backend's
+`POST /v1/places/search` first and Photon directly when the backend cannot
+answer, and a build without it asks Photon (`photon.komoot.io`) directly, on
+every platform. The backend's side is governed by its own settings,
+documented in `backend/README.md` and `.env.example`: `GEOCODER_BASE_URL`
+(the Photon instance it asks), `PLACE_SEARCH_ENABLED` (whether the route is
+served) and `PLACE_SEARCH_RATE_LIMIT_PER_MINUTE` (per install id). A backend
+without the route answers 404, which the app reports as a changed street
+search service rather than falling back to Photon.
+
 ## 3. The app talking to the backend
 
 The backend URL is compiled in with a `--dart-define`; there is no in-app

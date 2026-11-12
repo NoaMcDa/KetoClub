@@ -56,3 +56,85 @@ final class KnownPlace {
   @override
   String toString() => 'KnownPlace($id)';
 }
+
+/// A street, or an address on one, that a street search found (issue
+/// #449): what the user can choose to look around instead of a city.
+///
+/// Unlike a [KnownPlace] it is not bundled data but an answer from a
+/// geocoder, so its [label] is shown as the geocoder wrote it — in the
+/// language the search was made in, most often Hebrew — and only
+/// [label], [latitude] and [longitude] are kept on the device once it is
+/// chosen ([toJson]). [city] is for display while choosing and is not
+/// stored.
+@immutable
+final class StreetPlace {
+  /// Creates a street labelled [label], in [city] when known, at
+  /// [latitude] and [longitude] in degrees.
+  const new({
+    required this.label,
+    required this.latitude,
+    required this.longitude,
+    this.city,
+  });
+
+  /// Reads a street written by [toJson], or a search answer carrying
+  /// `label`, `latitude`, `longitude` and an optional `city`.
+  ///
+  /// Returns null, never throws, when `label` is not a non-blank string,
+  /// or either coordinate is not a finite number within its range. A
+  /// `city` that is not a non-blank string reads as null.
+  static StreetPlace? tryFrom(Map<String, Object?> json) {
+    final label = json['label'];
+    final latitude = json['latitude'];
+    final longitude = json['longitude'];
+    if (label is! String || label.trim().isEmpty) return null;
+    if (latitude is! num || longitude is! num) return null;
+    final lat = latitude.toDouble();
+    final lon = longitude.toDouble();
+    if (!lat.isFinite || !lon.isFinite) return null;
+    if (lat.abs() > 90 || lon.abs() > 180) return null;
+    final city = json['city'];
+    return StreetPlace(
+      label: label.trim(),
+      city: city is String && city.trim().isNotEmpty ? city.trim() : null,
+      latitude: lat,
+      longitude: lon,
+    );
+  }
+
+  /// What is shown for the street: `"<street> <number>, <city>"`, without
+  /// the number or the city when the geocoder had none.
+  final String label;
+
+  /// The city the street is in, when the geocoder named one.
+  final String? city;
+
+  /// The latitude of the street or address, in degrees.
+  final double latitude;
+
+  /// The longitude of the street or address, in degrees.
+  final double longitude;
+
+  /// The stored form: [label], [latitude] and [longitude] only.
+  Map<String, Object?> toJson() => <String, Object?>{
+    'label': label,
+    'latitude': latitude,
+    'longitude': longitude,
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is StreetPlace &&
+      other.label == label &&
+      other.city == city &&
+      other.latitude == latitude &&
+      other.longitude == longitude;
+
+  @override
+  int get hashCode => Object.hash(label, city, latitude, longitude);
+
+  // Never the label: a street the user chose is where they are looking,
+  // and a toString reaches logs and test output.
+  @override
+  String toString() => 'StreetPlace(…)';
+}

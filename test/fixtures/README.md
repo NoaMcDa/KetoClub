@@ -157,3 +157,24 @@ percent-encoded in `windows-1255` (`%FA%F4%F8%E9%E8`), which is not UTF-8;
 `WebsiteMenuLocator.menuText` reads. Replace or supplement them with real,
 redacted pages once a machine can fetch some, and record which sites they came
 from.
+
+## Photon street search (`photon/*.json`)
+
+**Recorded, real**, for issue #449 (`architecture.md` D27): two replies from
+Photon's public instance (`https://photon.komoot.io/api/`), recorded
+2026-11-12 from a laptop with the exact request the app sends (`limit=15`,
+`bbox=34.2,29.4,35.9,33.4`, `layer=house`, `layer=street`), stored as
+returned (pretty-printed, nothing redacted; they are public OpenStreetMap
+data and carry no user data).
+
+- `photon_herzl_tel_aviv_default.json`: `q=` the Hebrew for "Herzl 10 Tel
+  Aviv", `lang=default`. Nine `house` features; it shows Photon returning one
+  address under three spellings of the city, which the mapper's dedupe step
+  merges.
+- `photon_dizengoff_en.json`: `q=dizengoff`, `lang=en`. Eight segments of one
+  `street` plus three other features.
+
+Photon sends `Content-Type: application/json` with no charset, which is why
+both clients decode `bodyBytes` as UTF-8. To re-record, send the same `GET`
+with any HTTP client and save the body; keep to a handful of requests (the
+public instance is fair-use).

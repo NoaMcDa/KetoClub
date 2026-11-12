@@ -283,8 +283,25 @@
   "discoveryChipDistanceTooltip": "Filter by distance",
   "locationPickerTitle": "Where do you want to eat?",
   "locationPickerUseDevice": "Use my current location",
-  "locationPickerSearchLabel": "Search for a city",
+  "locationPickerSearchLabel": "Search for a city or a street",
   "locationPickerNoMatch": "No city matches that. Try another spelling.",
+  "locationPickerStreetSearch": "Search streets for “{query}”",
+  "@locationPickerStreetSearch": {
+    "placeholders": { "query": { "type": "String" } }
+  },
+  "locationPickerStreetCaptionBackend": "Sends what you typed to KetoClub's server and to Photon, an OpenStreetMap search service.",
+  "locationPickerStreetCaptionDirect": "Sends what you typed to Photon, an OpenStreetMap search service.",
+  "locationPickerStreetSearching": "Searching streets…",
+  "locationPickerStreetsHeading": "Streets",
+  "locationPickerStreetNoMatch": "No street found for “{query}”. Check the spelling, or add the city.",
+  "@locationPickerStreetNoMatch": {
+    "placeholders": { "query": { "type": "String" } }
+  },
+  "placeSearchFailedOffline": "No connection, so the street search could not run.",
+  "placeSearchFailedTimeout": "The street search took too long to answer. Try again in a moment.",
+  "placeSearchFailedRateLimited": "Too many street searches in a row. Wait a minute, then try again.",
+  "placeSearchFailedBackendUnreachable": "KetoClub's server could not be reached, so the street search could not run.",
+  "placeSearchFailedProviderChanged": "The street search service answered in a way KetoClub could not read. Please report this.",
   "discoveryLocating": "Finding your location…",
   "discoverySearching": "Looking for restaurants…",
   "discoveryLocationDeniedTitle": "Location is off for KetoClub",

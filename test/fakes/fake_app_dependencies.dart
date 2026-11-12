@@ -12,6 +12,7 @@ import 'fake_menu_sharer.dart';
 import 'fake_menu_store_client.dart';
 import 'fake_notes_store.dart';
 import 'fake_page_picker.dart';
+import 'fake_place_search_service.dart';
 import 'fake_qr_scanner.dart';
 import 'fake_scanned_menu_classifier.dart';
 import 'fake_settings_store.dart';
@@ -111,6 +112,10 @@ final class FakeAppDependencies {
   /// [FakeMenuStoreClient.uploads].
   final FakeMenuStoreClient menuStoreClient = FakeMenuStoreClient();
 
+  /// The faked street search behind the location picker (issue #449);
+  /// script it with [FakePlaceSearchService.queueFound] and friends.
+  final FakePlaceSearchService placeSearchService = FakePlaceSearchService();
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
@@ -131,5 +136,6 @@ final class FakeAppDependencies {
     scannedPages: scannedPages,
     visitHistory: visitHistory,
     menuStoreClient: menuStoreClient,
+    placeSearchService: placeSearchService,
   );
 }

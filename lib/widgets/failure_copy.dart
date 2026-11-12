@@ -1,5 +1,6 @@
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 
 /// The message for a menu-fetch failure (architecture.md §10).
@@ -143,4 +144,26 @@ String venueSearchFailureMessage(
     l10n.venueSearchFailedBlockedByBrowser,
   VenueSearchFailureReason.backendUnreachable =>
     l10n.venueSearchFailedBackendUnreachable,
+};
+
+/// The message for a street-search failure in the location picker (issue
+/// #449, architecture.md D27).
+///
+/// Takes no placeholders: a status code on [PlaceSearchFailed] is for a
+/// log, not for the user.
+///
+/// An exhaustive switch with no `default`: adding a reason without adding
+/// its copy here is a compile error, never a silently collapsed message
+/// (architecture.md §10, "collapsing reasons is a bug").
+String placeSearchFailureMessage(
+  PlaceSearchFailureReason reason,
+  AppLocalizations l10n,
+) => switch (reason) {
+  PlaceSearchFailureReason.offline => l10n.placeSearchFailedOffline,
+  PlaceSearchFailureReason.timeout => l10n.placeSearchFailedTimeout,
+  PlaceSearchFailureReason.rateLimited => l10n.placeSearchFailedRateLimited,
+  PlaceSearchFailureReason.backendUnreachable =>
+    l10n.placeSearchFailedBackendUnreachable,
+  PlaceSearchFailureReason.providerChanged =>
+    l10n.placeSearchFailedProviderChanged,
 };

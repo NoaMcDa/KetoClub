@@ -5,9 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
@@ -21,6 +23,7 @@ import '../fakes/fake_clock.dart';
 import '../fakes/fake_location_service.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_place_search_service.dart';
 import '../fakes/fake_settings_store.dart';
 import '../fakes/fake_venue_search_service.dart';
 import '../fakes/fake_visit_history_store.dart';
@@ -1938,6 +1941,239 @@ void main() {
         // Assert
         expect(controller.failure, isNull);
         expect(controller.results.map((v) => v.name), ['near-haifa']);
+      });
+    });
+
+    group('streets (issue #449)', () {
+      const herzl = StreetPlace(
+        label: 'הרצל 10, תל אביב',
+        city: 'תל אביב',
+        latitude: 32.0625697,
+        longitude: 34.7698648,
+      );
+      final haifa = knownPlaceById('haifa')!;
+      late FakePlaceSearchService places;
+
+      setUp(() {
+        places = FakePlaceSearchService();
+        controller.dispose();
+        controller = VenueSearchController(
+          settings,
+          repository,
+          locationService: location,
+          venueSearchService: search,
+          estimateClassifier: estimator,
+          autoEstimateLimit: 0,
+          visitHistory: history,
+          placeSearchService: places,
+        );
+      });
+
+      test('searchStreets asks the place search once, in the given language, '
+          'and changes nothing here', () async {
+        // Arrange
+        places.queueFound(const <StreetPlace>[herzl]);
+
+        // Act
+        final result = await controller.searchStreets(
+          'הרצל 10',
+          language: 'he',
+        );
+
+        // Assert
+        expect(controller.canSearchStreets, isTrue);
+        expect(result, const PlacesFound(<StreetPlace>[herzl]));
+        expect(places.calls, <PlaceSearchCall>[
+          (query: 'הרצל 10', language: 'he'),
+        ]);
+        expect(controller.chosenStreet, isNull);
+        expect(controller.position, isNull);
+        expect(search.nearbyCalls, isEmpty);
+        expect(await settings.read(), const AppSettings());
+      });
+
+      test('without a place search there is no street search, and asking '
+          'sends nothing', () async {
+        // Arrange
+        final plain = build();
+        addTearDown(plain.dispose);
+
+        // Act
+        final result = await plain.searchStreets('herzl', language: 'en');
+
+        // Assert
+        expect(plain.canSearchStreets, isFalse);
+        expect(
+          result,
+          const PlaceSearchFailed(PlaceSearchFailureReason.backendUnreachable),
+        );
+        expect(places.calls, isEmpty);
+      });
+
+      test('chooseStreet lists the venues around the street, measures from '
+          'it and saves it in place of any city', () async {
+        // Arrange
+        await settings.write(const AppSettings(discoveryPlaceId: 'haifa'));
+        search.queueFound([
+          _venue('a', latitude: 32.0625697, longitude: 34.7698648),
+        ]);
+
+        // Act
+        await controller.chooseStreet(herzl, language: 'he');
+
+        // Assert
+        final call = search.nearbyCalls.single;
+        expect(call.latitude, herzl.latitude);
+        expect(call.longitude, herzl.longitude);
+        expect(call.language, 'he');
+        expect(location.currentCallCount, 0);
+        expect(controller.chosenStreet, herzl);
+        expect(controller.chosenPlace, isNull);
+        expect(controller.position?.latitude, herzl.latitude);
+        expect(
+          controller.distanceKmTo(controller.results.single),
+          closeTo(0, 0.001),
+        );
+        final saved = await settings.read();
+        expect(saved.discoveryStreet, herzl);
+        expect(saved.discoveryPlaceId, isNull);
+      });
+
+      test('the distance filter measures from the chosen street', () async {
+        // Arrange
+        search.queueFound([
+          _venue('near', latitude: 32.063, longitude: 34.770),
+          _venue('far', latitude: 32.794, longitude: 34.990),
+        ]);
+        await controller.chooseStreet(herzl, language: 'en');
+
+        // Act
+        controller.setRadius(1);
+
+        // Assert
+        expect(controller.visibleResults.map((v) => v.name), ['near']);
+      });
+
+      test(
+        'choosing a city replaces the street, with no place search',
+        () async {
+          // Arrange
+          await controller.chooseStreet(herzl, language: 'en');
+
+          // Act
+          await controller.choosePlace(haifa, language: 'en');
+
+          // Assert
+          expect(controller.chosenPlace, haifa);
+          expect(controller.chosenStreet, isNull);
+          expect(places.calls, isEmpty);
+          final saved = await settings.read();
+          expect(saved.discoveryPlaceId, 'haifa');
+          expect(saved.discoveryStreet, isNull);
+        },
+      );
+
+      test('a found device position replaces the street and clears the '
+          'saved one', () async {
+        // Arrange
+        await controller.chooseStreet(herzl, language: 'en');
+
+        // Act
+        await controller.locate(language: 'en');
+
+        // Assert
+        expect(controller.chosenStreet, isNull);
+        expect(controller.position?.latitude, 32.0809);
+        expect((await settings.read()).discoveryStreet, isNull);
+      });
+
+      test('a refused device position keeps the street', () async {
+        // Arrange
+        await controller.chooseStreet(herzl, language: 'en');
+        location.result = const LocationDenied(permanently: false);
+
+        // Act
+        await controller.locate(language: 'en');
+
+        // Assert
+        expect(controller.chosenStreet, herzl);
+        expect((await settings.read()).discoveryStreet, herzl);
+      });
+
+      test('a failed nearby search keeps the street, and retry asks around '
+          'it again', () async {
+        // Arrange
+        search
+          ..queueFailed(VenueSearchFailureReason.offline)
+          ..queueFound([_venue('a')]);
+        await controller.chooseStreet(herzl, language: 'en');
+
+        // Act
+        await controller.retry();
+
+        // Assert
+        expect(controller.chosenStreet, herzl);
+        expect(search.nearbyCalls, hasLength(2));
+        expect(search.nearbyCalls.last.latitude, herzl.latitude);
+        expect(controller.results.map((v) => v.name), ['a']);
+      });
+
+      test('the first load restores a saved street and lists around it, '
+          'with no place search', () async {
+        // Arrange
+        await settings.write(
+          const AppSettings(
+            discoveryStreet: StreetPlace(
+              label: 'הרצל 10, תל אביב',
+              latitude: 32.0625697,
+              longitude: 34.7698648,
+            ),
+          ),
+        );
+        search.queueFound([_venue('near-herzl')]);
+
+        // Act
+        await controller.load(language: 'he');
+
+        // Assert
+        expect(controller.chosenStreet?.label, 'הרצל 10, תל אביב');
+        expect(controller.chosenPlace, isNull);
+        expect(controller.position?.longitude, 34.7698648);
+        expect(search.nearbyCalls.single.latitude, 32.0625697);
+        expect(controller.results.map((v) => v.name), ['near-herzl']);
+        expect(places.calls, isEmpty);
+      });
+
+      test('a later load does not restore the street again', () async {
+        // Arrange
+        await controller.load();
+        await settings.write(const AppSettings(discoveryStreet: herzl));
+
+        // Act
+        await controller.load(language: 'en');
+
+        // Assert
+        expect(controller.chosenStreet, isNull);
+        expect(search.nearbyCalls, isEmpty);
+      });
+
+      test('a saved city wins over a saved street the list no longer '
+          'reaches, and a city id the list lacks falls back to the '
+          'street', () async {
+        // Arrange: a record that somehow holds an unknown id and a street.
+        await settings.write(
+          const AppSettings(
+            discoveryPlaceId: 'atlantis',
+            discoveryStreet: herzl,
+          ),
+        );
+
+        // Act
+        await controller.load();
+
+        // Assert
+        expect(controller.chosenPlace, isNull);
+        expect(controller.chosenStreet, herzl);
       });
     });
 

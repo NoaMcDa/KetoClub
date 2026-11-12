@@ -304,7 +304,8 @@ ketoclub/
 │   │   ├── note_editor_sheet.dart        # personal, local-only notes on a dish (#131)
 │   │   ├── rules_reason_banner.dart      # why a menu fell back to the rule engine (#125)
 │   │   ├── rename_menu_dialog.dart       # a scanned menu's name and city (#315, D23)
-│   │   ├── location_picker_sheet.dart    # Discovery's location picker: the device, or a city (#443, D26)
+│   │   ├── location_picker_sheet.dart    # Discovery's location picker: the device, a city (#443, D26),
+│   │   │                                 # or a street found on an explicit tap (#449, D27)
 │   │   └── mobile_qr_scanner.dart        # MobileQrScanner + its camera page; the ONLY file importing
 │   │                                     # package:mobile_scanner (#182); here, not in services/, since it owns a page
 │   │
@@ -350,6 +351,13 @@ ketoclub/
 │   │   │   └── wolt/
 │   │   │       ├── wolt_venue_search_service.dart # HTTP only; delegates to the mapper
 │   │   │       └── wolt_venue_mapper.dart # pure: Wolt discovery JSON → Venue (fixture-tested, no I/O)
+│   │   ├── place/                        # rank 0 — the location picker's street search (#449, D27)
+│   │   │   ├── place_search_service.dart # interface + sealed PlaceSearchResult, the query rule
+│   │   │   ├── backend_place_search_service.dart # the ONLY file naming `/v1/places/search`
+│   │   │   ├── fallback_place_search_service.dart # backend first, Photon on backendUnreachable/timeout/rateLimited
+│   │   │   └── photon/
+│   │   │       ├── photon_place_search_service.dart # HTTP only; the ONLY file naming `photon.komoot.io`
+│   │   │       └── photon_place_mapper.dart # pure: Photon GeoJSON → StreetPlace (fixture-tested, no I/O)
 │   │   ├── community/                    # rank 0 — KetoClub's shared menu store (D24)
 │   │   │   └── menu_store_client.dart    # interface + BackendMenuStoreClient; the ONLY file naming `/v1/menus` (#309)
 │   │   ├── menu/                         # rank 1 — may import storage/ and platform/
@@ -385,7 +393,8 @@ ketoclub/
 │   │   ├── venue.dart
 │   │   ├── menu.dart                     # Menu, MenuCategory, Dish, DishOption
 │   │   ├── analysis.dart                 # DishVerdict, AnalysedDish, MenuAnalysis (sealed)
-│   │   ├── place.dart                    # KnownPlace: a city the user can look around (#443, D26)
+│   │   ├── place.dart                    # KnownPlace: a city the user can look around (#443, D26);
+│   │   │                                 # StreetPlace: a street a street search found (#449, D27)
 │   │   └── failures.dart                 # MenuFetchFailureReason, MenuAnalysisFailureReason
 │   │
 │   ├── utils/
@@ -495,6 +504,9 @@ literal.
   `services/classifier/backend_menu_classifier.dart`, `/v1/scan` in
   `services/classifier/backend_scanned_menu_classifier.dart`, `/v1/venues/nearby`
   and `/v1/venues/search` in `services/venue/backend_venue_search_service.dart`;
+  `/v1/places/search` only in `services/place/backend_place_search_service.dart`
+  and `photon.komoot.io` only in
+  `services/place/photon/photon_place_search_service.dart` (D27);
   `KETOCLUB_BACKEND_URL` only in `di.dart`; `googleapis.com` and the `x-goog-api-key` header only in
   `services/llm/gemini_chat_client.dart`, the phones' direct client (D17);
   `package:flutter_secure_storage/` only in `services/storage/api_key_store.dart`;
@@ -1114,6 +1126,14 @@ gracefully to "type an address or a venue name" on denial or on web without HTTP
    (1, 2, 5 or 10 km, `discoveryRadiusOptionsKm`) narrows `visibleResults` by
    the haversine distance from the search position, on the device, from
    coordinates the search already returned.
+
+   *(D27, issue #449)* **Or a street.** Once the picker's text is three
+   characters or more it offers one explicit "Search streets" action, which
+   asks a `PlaceSearchService` (KetoClub's backend, then Photon) and lists
+   up to six matches. `VenueSearchController.chooseStreet` then runs the
+   same `nearby` call at the street's coordinates. A chosen street is stored
+   as `AppSettings.discoveryStreet` (label and coordinates) in place of any
+   `discoveryPlaceId`, and is restored and cleared exactly as a city is.
 
 Venues are not persisted beyond "last opened" until Phase 3 adds a community
 directory.
@@ -3097,6 +3117,11 @@ that the keto vocabulary makes (§12).
   city centre: whether Wolt answers a centre with as full a list as it does a
   residential address is unobserved.
 
+*(Amended by D27, issue #449: the picker also finds a street, through a
+geocoder, on an explicit tap only. "A city centre, not a street" and the
+reasoning under "Why a bundled list" still hold for the city list, which
+stays the offline, no-network path.)*
+
 **What it costs.** Two small files of data and model (`models/place.dart`,
 `utils/known_places.dart`), one widget (`location_picker_sheet.dart`), one
 `AppSettings` field decoded by the "added later" rule, three controller
@@ -3166,6 +3191,110 @@ Chrome driven over the DevTools protocol:
 
 **What it costs.** `SliverVenueGrid` beside `VenueGrid`, a screen `build`
 split into slivers, and four flows that bring the list into view first.
+
+### D27 — A street as the custom location, found by a geocoder on an explicit tap
+
+*(Issue #449. Amends D26; extends D25's fallback pattern to a new outside
+host.)*
+
+**What changed.** D26 let the user look around one of 42 bundled cities,
+which puts "Within 1 km" at the middle of town. A user who is planning a
+meal near their office, or whose browser cannot give a position, needs a
+street. The location picker now offers one more thing beneath the city
+list: once the trimmed text is at least three characters, a single action
+reading "Search streets for “…”", with a caption naming where the text
+goes. Tapping it runs one street search; the picker shows progress, then up
+to six matches by label, or "no street found", or a failure with its own
+copy and a retry. Picking a match closes the sheet and
+`VenueSearchController.chooseStreet` looks around it exactly as
+`choosePlace` looks around a city: the same `VenueSearchService.nearby`
+call at the street's coordinates, the same `position` for card distances,
+the distance filter and a search by name, and the header shows the label.
+
+**The provider.** Photon (`photon.komoot.io`), komoot's public geocoder
+over OpenStreetMap data: no key, no account, and it answers every origin
+with `Access-Control-Allow-Origin: *` (checked 2026-11-12), so a browser
+can call it without a proxy. One request per search:
+`GET /api/?q=…&limit=15&lang=…&bbox=34.2,29.4,35.9,33.4&layer=house&layer=street`,
+with `lang=en` under English and `lang=default` otherwise (Photon has no
+Hebrew; `default` gives the local, mostly Hebrew, names). The reply is
+mapped by one rule set, implemented twice and kept identical —
+`services/place/photon/photon_place_mapper.dart` on the device and the
+backend's own port: keep a feature only in `IL`, of type `house` or
+`street`, with two finite coordinates; name it `"<street> <number>,
+<city>"` (`street` for a house, `name` for a street; `city`, else
+`district`); then skip a place when one already kept has the same label,
+or the same street and house number (trimmed, lower-cased; no number
+matches only no number) within 0.003° of latitude and of longitude —
+Photon returns one address under several spellings of its city, and one
+street in several segments — and keep the first six.
+
+**Routing.** As D25 does for every other outside call: with
+`KETOCLUB_BACKEND_URL`, `FallbackPlaceSearchService` asks
+`BackendPlaceSearchService` (`POST /v1/places/search`, `{query,
+language}`, the install id header and nothing else identifying) and falls
+through to `PhotonPlaceSearchService` only on `backendUnreachable`,
+`timeout` or `rateLimited`; without a URL, Photon alone, on every platform.
+Failures are a sealed `PlaceSearchResult` with five reasons (`offline`,
+`timeout`, `rateLimited`, `backendUnreachable`, `providerChanged`), each
+with its own copy in both languages.
+
+**The explicit-action rule.** Typing filters the bundled cities on the
+device and sends nothing anywhere — not debounced, not on submit. The text
+leaves the device only on the tap, and the caption under the action says
+where: "KetoClub's server and Photon, an OpenStreetMap search service" in
+a build with a backend, "Photon" in one without. Choosing a city still
+makes no request at all. This is the difference from the venue search by
+name, which runs as the user types: that text goes to the platform the
+user is already searching, this text is about where the user is.
+
+**What leaves the device, and what is stored.**
+
+- On the tap, the trimmed query (2 to 120 characters) and the UI language
+  go to KetoClub's backend with the install id (its rate-limit key), or to
+  Photon with neither. Nothing else: no position, no key.
+- On a pick, only the street's latitude and longitude leave the device,
+  as the nearby search that already exists (D25 sends that to KetoClub's
+  server on the way to Wolt, as it does a device position or a city
+  centre).
+- The chosen street — label, latitude, longitude, never the city or the
+  query — is `AppSettings.discoveryStreet`, in `shared_preferences` on the
+  device. It and `discoveryPlaceId` are never both set: choosing either
+  clears the other, a found device position clears both, a refused one
+  keeps them, and a record holding both reads back as the city. The first
+  `load` restores it as it restores a city. It is never logged
+  (`StreetPlace.toString` names no place) and never sent beside the
+  install id except as the nearby search's coordinates.
+
+**What it accepts.**
+
+- **A new outside host.** Photon sees what the user types when there is no
+  backend, or when the backend cannot answer. That is why the action is
+  explicit and captioned. Photon's public instance is a fair-use service
+  with no SLA; heavy use would need our own instance, which is what the
+  backend's `GEOCODER_BASE_URL` setting is for.
+- **Coverage is OpenStreetMap's.** A street OSM does not know is "no street
+  found"; Hebrew and English spellings both work only as far as OSM's
+  names do.
+- **An older or switched-off backend.** The contract maps any status it
+  does not name to `providerChanged`, which does not fall through: a
+  backend without the route (a `404`) or one with `PLACE_SEARCH_ENABLED`
+  off answers "the street search service changed" rather than falling back
+  to Photon.
+- **Evidence.** Unit tests (the mapper against two recorded Photon replies,
+  `test/fixtures/photon/`, and hand-built edge cases; both HTTP clients
+  against a mocked `http.Client`; the fallback; settings; the controller),
+  widget tests of the picker in both languages, and a flow test under
+  `flutter-tester`. No street search has run in a real browser or on a
+  device, and the app has never called the backend's route.
+
+**What it costs.** One services sub-package (`services/place/`, rank 0,
+five files), one model (`StreetPlace`), one `AppSettings` field decoded by
+the "added later" rule, three controller members (`chooseStreet`,
+`searchStreets`, `canSearchStreets`), an optional `AppDependencies` field,
+two architecture-test boundaries, and eleven new ARB keys in each language
+(one changed: the picker's field now reads "Search for a city or a
+street").
 
 ---
 

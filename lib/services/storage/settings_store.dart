@@ -11,6 +11,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,7 +54,8 @@ enum AppThemeMode {
 /// last-used filter (issue #55), the three "Your keto rules"
 /// toggles (issue #56), whether the first-launch AI disclosure
 /// banner has been seen (D16, issue #167), and the place chosen to look
-/// around on the Discovery screen (issue #443).
+/// around on the Discovery screen: a city (issue #443) or a street (issue
+/// #449).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -79,6 +81,7 @@ final class AppSettings {
     this.lastFilter,
     this.disclosureSeen = false,
     this.discoveryPlaceId,
+    this.discoveryStreet,
   });
 
   /// Reads settings written by [toJson].
@@ -111,6 +114,12 @@ final class AppSettings {
   /// [discoveryPlaceId] (issue #443) follows the same rule: a missing key,
   /// or a value that is not a non-empty string, decodes to null — "no
   /// place chosen".
+  ///
+  /// [discoveryStreet] (issue #449) follows it too: a missing key, or a
+  /// value [StreetPlace.tryFrom] does not read, decodes to null. The two
+  /// are never both set: a record holding both keeps the city and drops
+  /// the street, since a city is the older and the cheaper choice to
+  /// restore (it is never looked up again).
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -149,6 +158,11 @@ final class AppSettings {
     final discoveryPlaceId = rawPlaceId is String && rawPlaceId.isNotEmpty
         ? rawPlaceId
         : null;
+    final rawStreet = json['discoveryStreet'];
+    final discoveryStreet =
+        discoveryPlaceId == null && rawStreet is Map<String, Object?>
+        ? StreetPlace.tryFrom(rawStreet)
+        : null;
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
@@ -165,6 +179,7 @@ final class AppSettings {
       lastFilter: lastFilter,
       disclosureSeen: json['disclosureSeen'] == true,
       discoveryPlaceId: discoveryPlaceId,
+      discoveryStreet: discoveryStreet,
     );
   }
 
@@ -232,10 +247,23 @@ final class AppSettings {
   /// it was written and simply not restored by `VenueSearchController`.
   final String? discoveryPlaceId;
 
+  /// The street the user chose to look around on the Discovery screen
+  /// (issue #449, architecture.md D27), or null when none is chosen.
+  ///
+  /// Stored as its label and coordinates only ([StreetPlace.toJson]),
+  /// since a street, unlike a city, cannot be looked up again without
+  /// sending the user's words to a geocoder. Never set together with
+  /// [discoveryPlaceId]: `VenueSearchController` clears one whenever it
+  /// writes the other, and [tryFrom] keeps only the city if both are
+  /// found. It stays on the device: the only part of it that ever leaves
+  /// is the latitude and longitude of the nearby search made around it.
+  final StreetPlace? discoveryStreet;
+
   /// Returns a copy with the given fields replaced.
   ///
-  /// Omitting [languageTag], [lastVenue], [lastFilter] or
-  /// [discoveryPlaceId] leaves the current value in place; passing `null`
+  /// Omitting [languageTag], [lastVenue], [lastFilter],
+  /// [discoveryPlaceId] or [discoveryStreet] leaves the current value in
+  /// place; passing `null`
   /// explicitly for any of them clears it. This is done by defaulting each
   /// of them to a private
   /// sentinel distinct from `null`, so "not passed" and "passed null" can
@@ -256,6 +284,7 @@ final class AppSettings {
     Object? lastFilter = _unset,
     bool? disclosureSeen,
     Object? discoveryPlaceId = _unset,
+    Object? discoveryStreet = _unset,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -278,6 +307,9 @@ final class AppSettings {
     discoveryPlaceId: identical(discoveryPlaceId, _unset)
         ? this.discoveryPlaceId
         : discoveryPlaceId as String?,
+    discoveryStreet: identical(discoveryStreet, _unset)
+        ? this.discoveryStreet
+        : discoveryStreet as StreetPlace?,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -294,6 +326,7 @@ final class AppSettings {
     'lastFilter': lastFilter?.name,
     'disclosureSeen': disclosureSeen,
     'discoveryPlaceId': discoveryPlaceId,
+    'discoveryStreet': discoveryStreet?.toJson(),
   };
 
   @override
@@ -310,7 +343,8 @@ final class AppSettings {
       other.carnivoreOnly == carnivoreOnly &&
       other.lastFilter == lastFilter &&
       other.disclosureSeen == disclosureSeen &&
-      other.discoveryPlaceId == discoveryPlaceId;
+      other.discoveryPlaceId == discoveryPlaceId &&
+      other.discoveryStreet == discoveryStreet;
 
   @override
   int get hashCode => Object.hash(
@@ -326,6 +360,7 @@ final class AppSettings {
     lastFilter,
     disclosureSeen,
     discoveryPlaceId,
+    discoveryStreet,
   );
 
   @override
@@ -336,7 +371,8 @@ final class AppSettings {
       'seedOilFree: $seedOilFree, dairyFree: $dairyFree, '
       'carnivoreOnly: $carnivoreOnly, '
       'disclosureSeen: $disclosureSeen, '
-      'discoveryPlace: $discoveryPlaceId)';
+      'discoveryPlace: $discoveryPlaceId, '
+      'discoveryStreet: ${discoveryStreet != null})';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -472,6 +473,97 @@ void main() {
         expect(decoded!.discoveryPlaceId, isNull, reason: '$raw');
         expect(decoded.languageTag, 'he', reason: '$raw');
       }
+    });
+
+    test('AppSettings.tryFrom round-trips discoveryStreet through toJson, '
+        'storing its label and coordinates only (issue #449)', () {
+      // Arrange
+      const settings = AppSettings(
+        discoveryStreet: StreetPlace(
+          label: 'Herzl 10, Tel Aviv',
+          city: 'Tel Aviv',
+          latitude: 32.06,
+          longitude: 34.77,
+        ),
+      );
+
+      // Act
+      final json = settings.toJson();
+      final decoded = AppSettings.tryFrom(json);
+
+      // Assert
+      expect(json['discoveryStreet'], <String, Object?>{
+        'label': 'Herzl 10, Tel Aviv',
+        'latitude': 32.06,
+        'longitude': 34.77,
+      });
+      expect(decoded!.discoveryStreet!.label, 'Herzl 10, Tel Aviv');
+      expect(decoded.discoveryStreet!.latitude, 32.06);
+      expect(decoded.discoveryStreet!.longitude, 34.77);
+      expect(decoded.discoveryStreet!.city, isNull);
+      expect(settings.toString(), isNot(contains('Herzl')));
+    });
+
+    test('AppSettings.tryFrom reads a missing or malformed discoveryStreet '
+        'as null and keeps every other field (issue #449)', () {
+      for (final raw in <Object?>[
+        null,
+        'Herzl 10',
+        7,
+        <String, Object?>{'label': '', 'latitude': 32.0, 'longitude': 34.7},
+        <String, Object?>{'label': 'Herzl', 'latitude': '32', 'longitude': 34},
+        <String, Object?>{'label': 'Herzl', 'latitude': 95.0, 'longitude': 34},
+        <String, Object?>{'label': 'Herzl', 'latitude': 32.0},
+      ]) {
+        // Act
+        final decoded = AppSettings.tryFrom(<String, Object?>{
+          'languageTag': 'he',
+          'filter': 'all',
+          'estimationConsentGiven': true,
+          'lastVenue': null,
+          'discoveryStreet': ?raw,
+        });
+
+        // Assert
+        expect(decoded, isNotNull, reason: '$raw');
+        expect(decoded!.discoveryStreet, isNull, reason: '$raw');
+        expect(decoded.languageTag, 'he', reason: '$raw');
+      }
+    });
+
+    test('AppSettings.tryFrom keeps the city and drops the street when a '
+        'record holds both (issue #449)', () {
+      // Act
+      final decoded = AppSettings.tryFrom(<String, Object?>{
+        'filter': 'all',
+        'discoveryPlaceId': 'haifa',
+        'discoveryStreet': <String, Object?>{
+          'label': 'Herzl 10, Tel Aviv',
+          'latitude': 32.06,
+          'longitude': 34.77,
+        },
+      });
+
+      // Assert
+      expect(decoded!.discoveryPlaceId, 'haifa');
+      expect(decoded.discoveryStreet, isNull);
+    });
+
+    test('AppSettings.copyWith keeps discoveryStreet when it is omitted and '
+        'clears it when null is passed (issue #449)', () {
+      // Arrange
+      const street = StreetPlace(label: 'Herzl', latitude: 32, longitude: 34);
+      const settings = AppSettings(discoveryStreet: street);
+
+      // Act
+      final kept = settings.copyWith(languageTag: 'he');
+      final cleared = settings.copyWith(discoveryStreet: null);
+
+      // Assert
+      expect(kept.discoveryStreet, street);
+      expect(cleared.discoveryStreet, isNull);
+      expect(settings, isNot(equals(cleared)));
+      expect(settings.hashCode, isNot(cleared.hashCode));
     });
 
     test('AppSettings.copyWith keeps discoveryPlaceId when it is omitted '

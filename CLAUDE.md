@@ -107,6 +107,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > `VenueGrid` is left for the loading skeletons. Measured on that list: main
 > thread blocked 21 s → 2.3 s in a debug build and 8.5 s → 0.4 s in release,
 > photos requested on arrival 328 → 15.
+
+> **D27 (#449) adds a street to the picker, found on an explicit tap.** Typing
+> in the picker still filters the cities on the device and sends nothing; at
+> three characters a "Search streets for “…”" action appears, captioned with
+> where the text goes. One tap is one `PlaceSearchService.search`
+> (`services/place/`): KetoClub's backend (`POST /v1/places/search`) first and
+> Photon (`photon.komoot.io`, OpenStreetMap) directly when the backend cannot
+> answer, or Photon alone with no backend URL. A picked street
+> (`StreetPlace`) runs the same nearby search at its coordinates, names the
+> header with its label, and is saved as `AppSettings.discoveryStreet`
+> (label and coordinates, on the device only) in place of any saved city.
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -254,7 +265,8 @@ lib/
 ├── l10n/                      # app_en.arb, app_he.arb + committed generated/ output
 ├── models/                    # venue, menu, analysis, failures, scanned_menu (the pages of
 │                              # one scan, in memory only), place (KnownPlace, a city the
-│                              # user can look around, D26) — plain immutable Dart
+│                              # user can look around, D26; StreetPlace, a street a street
+│                              # search found, D27) — plain immutable Dart
 ├── utils/                     # constants (the keto vocabulary), text_normaliser,
 │                              # classification_rules, price_format, keto_score,
 │                              # wolt_headers (the web-client header set, #168),
@@ -277,6 +289,12 @@ lib/
 │   ├── community/             # menu_store_client (MenuStoreClient + BackendMenuStoreClient,
 │   │                          # the shared menu store's upload; names /v1/menus, D24)
 │   ├── location/              # location_service, geolocator_location_service (issue #37)
+│   ├── place/                 # the location picker's street search (#449, D27):
+│   │                          # place_search_service (interface + sealed result),
+│   │                          # backend_place_search_service (names /v1/places/search),
+│   │                          # fallback_place_search_service (backend first, Photon second),
+│   │                          # photon/ (PhotonPlaceSearchService, HTTP, names
+│   │                          # photon.komoot.io; PhotonPlaceMapper, pure)
 │   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), qr_payload_router
 │   │                          # (a scanned QR payload → venue / unsupported / photograph, pure, #182),
 │   │                          # venue_search_service
@@ -311,7 +329,8 @@ lib/
 │                              # scan_failure_copy, mobile_qr_scanner (the QR camera page and
 │                              # its QrScanner, the one file over mobile_scanner, #182),
 │                              # rename_menu_dialog (a scan's name and city, #315),
-│                              # location_picker_sheet (the device, or a city, #443, D26)
+│                              # location_picker_sheet (the device, a city, #443, D26, or a
+│                              # street found on an explicit tap, #449, D27)
 └── screens/                   # venue_search (the Discovery screen, D13), menu,
                                # waiter_card_sheet, settings (a Gemini key section on
                                # phones only, D17), saved (the Recent tab: the visit
@@ -445,7 +464,13 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   (D25).** It is the same cache over the direct adapters; routing it through
   the backend would classify every Discovery card on the server.
 - **A `KnownPlace.id` is stored on the device (D26); never change or reuse
-  one.** And the distance filter is `radiusKm`, not a `DiscoveryChip`: do not
+  one.** A chosen street (D27) is stored beside it as
+  `AppSettings.discoveryStreet`; the two are never both set, so write them
+  together (`VenueSearchController._saveChoice`).
+- **The picker sends nothing while the user types (D27).** The street search
+  runs only from its explicit action; do not debounce it onto the text
+  field. The Photon dedupe rule lives twice, in `photon_place_mapper.dart`
+  and the backend's port: change both together. And the distance filter is `radiusKm`, not a `DiscoveryChip`: do not
   clear it where `_activeChips` is cleared.
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
@@ -722,6 +747,15 @@ Built, but not confirmed end to end, and not to be reported as done:
   The 42 coordinates are approximate centres, checked only to lie inside
   Israel. The new flow (`discovery_choose_location_flow_test.dart`) passed
   under `flutter-tester`.
+- **No street search (D27, #449) has run in a real browser or on a device.**
+  The Photon mapper is tested against two replies recorded from a laptop
+  (`test/fixtures/photon/`), both HTTP clients against a mocked client, and
+  the picker, controller and flow (`discovery_choose_street_flow_test.dart`,
+  `flutter-tester` only) against fakes. The app has never called the
+  backend's `/v1/places/search`, and Photon's CORS header was checked with a
+  script, not from a browser. A backend without that route answers 404,
+  which the contract reads as `providerChanged` and does **not** fall back to
+  Photon.
 - **`flutter drive` could not complete in this environment** (a
   chromedriver/Chromium mismatch; runs hang after "Debug service listening",
   including flows that predate D25), so the two new flows

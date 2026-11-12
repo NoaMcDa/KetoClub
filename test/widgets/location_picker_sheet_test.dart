@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/place.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/utils/known_places.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
+import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/location_picker_sheet.dart';
 
 /// Pumps a page with one button that opens the picker with [selected]
@@ -13,6 +17,8 @@ Future<void> _pump(
   required List<LocationPick?> picks,
   KnownPlace? selected,
   Locale locale = const Locale('en'),
+  StreetSearch? searchStreets,
+  bool throughBackend = false,
 }) {
   return tester.pumpWidget(
     MaterialApp(
@@ -23,7 +29,12 @@ Future<void> _pump(
         body: Builder(
           builder: (context) => TextButton(
             onPressed: () async => picks.add(
-              await showLocationPickerSheet(context, selected: selected),
+              await showLocationPickerSheet(
+                context,
+                selected: selected,
+                searchStreets: searchStreets,
+                streetSearchThroughBackend: throughBackend,
+              ),
             ),
             child: const SizedBox(width: 40, height: 40),
           ),
@@ -242,6 +253,298 @@ void main() {
       final size = tester.getSize(find.byType(LocationPickerSheet));
       expect(size.width, lessThanOrEqualTo(kSheetMaxWidth));
       expect(size.height, lessThanOrEqualTo(900 * 0.8));
+    });
+  });
+
+  group('LocationPickerSheet street search (issue #449)', () {
+    const herzl = StreetPlace(
+      label: 'הרצל 10, תל אביב',
+      city: 'תל אביב',
+      latitude: 32.0625697,
+      longitude: 34.7698648,
+    );
+    const dizengoff = StreetPlace(
+      label: 'Dizengoff, Tel Aviv',
+      latitude: 32.0765505,
+      longitude: 34.7746435,
+    );
+
+    /// A street search that records each query and answers [answer].
+    StreetSearch recording(
+      List<String> queries, [
+      PlaceSearchResult answer = const PlacesFound(<StreetPlace>[herzl]),
+    ]) => (query) async {
+      queries.add(query);
+      return answer;
+    };
+
+    /// The street action's row for [text].
+    Finder action(AppLocalizations l10n, String text) =>
+        find.widgetWithText(ListTile, l10n.locationPickerStreetSearch(text));
+
+    testWidgets('offers the action only from three characters, and typing '
+        'sends nothing', (tester) async {
+      // Arrange
+      final queries = <String>[];
+      await _pump(tester, picks: [], searchStreets: recording(queries));
+      await _open(tester);
+      final l10n = _l10n(tester);
+
+      // Act & Assert
+      await tester.enterText(find.byType(TextField), 'he');
+      await tester.pump();
+      expect(action(l10n, 'he'), findsNothing);
+
+      await tester.enterText(find.byType(TextField), ' her ');
+      await tester.pump();
+      expect(action(l10n, 'her'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'herzl 10');
+      await tester.pump();
+      expect(action(l10n, 'herzl 10'), findsOneWidget);
+      expect(queries, isEmpty);
+    });
+
+    testWidgets('offers no street action without a street search', (
+      tester,
+    ) async {
+      // Arrange
+      await _pump(tester, picks: []);
+      await _open(tester);
+      final l10n = _l10n(tester);
+
+      // Act
+      await tester.enterText(find.byType(TextField), 'herzl');
+      await tester.pump();
+
+      // Assert
+      expect(action(l10n, 'herzl'), findsNothing);
+      expect(find.text(l10n.locationPickerStreetCaptionDirect), findsNothing);
+    });
+
+    testWidgets('names Photon alone as where the text goes in a build with '
+        'no backend (the Hebrew test covers the backend caption)', (
+      tester,
+    ) async {
+      // Arrange
+      await _pump(tester, picks: [], searchStreets: recording([]));
+      await _open(tester);
+      final l10n = _l10n(tester);
+
+      // Act
+      await tester.enterText(find.byType(TextField), 'herzl');
+      await tester.pump();
+
+      // Assert
+      expect(find.text(l10n.locationPickerStreetCaptionDirect), findsOneWidget);
+      expect(find.text(l10n.locationPickerStreetCaptionBackend), findsNothing);
+    });
+
+    testWidgets('a tap runs one search for the trimmed text, shows progress, '
+        'then the matches', (tester) async {
+      // Arrange
+      final queries = <String>[];
+      final answer = Completer<PlaceSearchResult>();
+      await _pump(
+        tester,
+        picks: [],
+        searchStreets: (query) {
+          queries.add(query);
+          return answer.future;
+        },
+      );
+      await _open(tester);
+      final l10n = _l10n(tester);
+      await tester.enterText(find.byType(TextField), ' dizengoff ');
+      await tester.pump();
+
+      // Act
+      await tester.tap(action(l10n, 'dizengoff'));
+      await tester.pump();
+
+      // Assert: in flight.
+      expect(queries, <String>['dizengoff']);
+      expect(find.text(l10n.locationPickerStreetSearching), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      // Act
+      answer.complete(const PlacesFound(<StreetPlace>[dizengoff, herzl]));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(l10n.locationPickerStreetSearching), findsNothing);
+      expect(find.text(l10n.locationPickerStreetsHeading), findsOneWidget);
+      expect(_row('Dizengoff, Tel Aviv'), findsOneWidget);
+      expect(_row('הרצל 10, תל אביב'), findsOneWidget);
+      expect(queries, hasLength(1));
+    });
+
+    testWidgets('picking a match closes the sheet with that street', (
+      tester,
+    ) async {
+      // Arrange
+      final picks = <LocationPick?>[];
+      await _pump(tester, picks: picks, searchStreets: recording([]));
+      await _open(tester);
+      final l10n = _l10n(tester);
+      await tester.enterText(find.byType(TextField), 'הרצל 10');
+      await tester.pump();
+      await tester.tap(action(l10n, 'הרצל 10'));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(_row('הרצל 10, תל אביב'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(LocationPickerSheet), findsNothing);
+      expect(picks, hasLength(1));
+      expect((picks.single! as LocationPickStreet).street, herzl);
+    });
+
+    testWidgets('says so when no street matches', (tester) async {
+      // Arrange
+      await _pump(
+        tester,
+        picks: [],
+        searchStreets: recording([], const PlacesFound(<StreetPlace>[])),
+      );
+      await _open(tester);
+      final l10n = _l10n(tester);
+      await tester.enterText(find.byType(TextField), 'zzzz');
+      await tester.pump();
+
+      // Act
+      await tester.tap(action(l10n, 'zzzz'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text(l10n.locationPickerStreetNoMatch('zzzz')),
+        findsOneWidget,
+      );
+      expect(find.text(l10n.locationPickerStreetsHeading), findsNothing);
+    });
+
+    for (final reason in PlaceSearchFailureReason.values) {
+      testWidgets('shows the ${reason.name} failure with a retry that '
+          'searches again', (tester) async {
+        // Arrange
+        final queries = <String>[];
+        final answers = <PlaceSearchResult>[
+          PlaceSearchFailed(reason),
+          const PlacesFound(<StreetPlace>[dizengoff]),
+        ];
+        await _pump(
+          tester,
+          picks: [],
+          searchStreets: (query) async {
+            queries.add(query);
+            return answers.removeAt(0);
+          },
+        );
+        await _open(tester);
+        final l10n = _l10n(tester);
+        await tester.enterText(find.byType(TextField), 'dizengoff');
+        await tester.pump();
+        await tester.tap(action(l10n, 'dizengoff'));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(
+          find.text(placeSearchFailureMessage(reason, l10n)),
+          findsOneWidget,
+        );
+
+        // Act
+        await tester.tap(find.text(l10n.actionRetry));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(queries, <String>['dizengoff', 'dizengoff']);
+        expect(_row('Dizengoff, Tel Aviv'), findsOneWidget);
+        expect(
+          find.text(placeSearchFailureMessage(reason, l10n)),
+          findsNothing,
+        );
+      });
+    }
+
+    testWidgets('editing the text drops the answer and offers the action '
+        'again, and a late answer to older text is ignored', (tester) async {
+      // Arrange
+      final answer = Completer<PlaceSearchResult>();
+      await _pump(tester, picks: [], searchStreets: (_) => answer.future);
+      await _open(tester);
+      final l10n = _l10n(tester);
+      await tester.enterText(find.byType(TextField), 'herzl');
+      await tester.pump();
+      await tester.tap(action(l10n, 'herzl'));
+      await tester.pump();
+
+      // Act
+      await tester.enterText(find.byType(TextField), 'herzl 1');
+      await tester.pump();
+      answer.complete(const PlacesFound(<StreetPlace>[herzl]));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(action(l10n, 'herzl 1'), findsOneWidget);
+      expect(_row('הרצל 10, תל אביב'), findsNothing);
+      expect(find.text(l10n.locationPickerStreetSearching), findsNothing);
+    });
+
+    testWidgets('a city still closes the sheet with no street search', (
+      tester,
+    ) async {
+      // Arrange
+      final queries = <String>[];
+      final picks = <LocationPick?>[];
+      await _pump(tester, picks: picks, searchStreets: recording(queries));
+      await _open(tester);
+      await tester.enterText(find.byType(TextField), 'haifa');
+      await tester.pump();
+
+      // Act
+      await tester.tap(_row('Haifa'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect((picks.single! as LocationPickPlace).place.id, 'haifa');
+      expect(queries, isEmpty);
+    });
+
+    testWidgets('reads in Hebrew under Hebrew, with the matches as the '
+        'search wrote them', (tester) async {
+      // Arrange
+      await _pump(
+        tester,
+        picks: [],
+        locale: const Locale('he'),
+        searchStreets: recording([]),
+        throughBackend: true,
+      );
+      await _open(tester);
+      final l10n = _l10n(tester);
+      await tester.enterText(find.byType(TextField), 'הרצל');
+      await tester.pump();
+
+      // Assert
+      expect(find.text(l10n.locationPickerSearchLabel), findsOneWidget);
+      expect(l10n.locationPickerSearchLabel, 'חיפוש עיר או רחוב');
+      expect(action(l10n, 'הרצל'), findsOneWidget);
+      expect(
+        find.text(l10n.locationPickerStreetCaptionBackend),
+        findsOneWidget,
+      );
+
+      // Act
+      await tester.tap(action(l10n, 'הרצל'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('רחובות'), findsOneWidget);
+      expect(_row('הרצל 10, תל אביב'), findsOneWidget);
     });
   });
 }

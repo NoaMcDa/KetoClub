@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu_question.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 
@@ -136,6 +137,41 @@ void main() {
     });
   });
 
+  group('placeSearchFailureMessage (issue #449)', () {
+    for (final locale in _locales) {
+      test('gives every reason its own non-empty copy in '
+          '${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final messages = [
+          for (final reason in PlaceSearchFailureReason.values)
+            placeSearchFailureMessage(reason, l10n),
+        ];
+
+        // Assert: collapsing reasons is a bug (architecture.md §10).
+        expect(messages, everyElement(isNotEmpty));
+        expect(messages.toSet(), hasLength(messages.length));
+      });
+    }
+
+    test('the English and Hebrew copy differ for every reason', () {
+      // Arrange
+      final en = lookupAppLocalizations(const Locale('en'));
+      final he = lookupAppLocalizations(const Locale('he'));
+
+      // Act & Assert
+      for (final reason in PlaceSearchFailureReason.values) {
+        expect(
+          placeSearchFailureMessage(reason, he),
+          isNot(equals(placeSearchFailureMessage(reason, en))),
+          reason: '$reason is not translated',
+        );
+      }
+    });
+  });
+
   group('fetch, analysis and venue-search copy together', () {
     for (final locale in _locales) {
       test('never share copy across the three failure enums in $locale', () {
@@ -162,11 +198,17 @@ void main() {
             venueSearchFailureMessage(reason, l10n),
         ];
 
+        final placeSearchMessages = [
+          for (final reason in PlaceSearchFailureReason.values)
+            placeSearchFailureMessage(reason, l10n),
+        ];
+
         // Assert
         final all = [
           ...fetchMessages,
           ...analysisMessages,
           ...venueSearchMessages,
+          ...placeSearchMessages,
         ];
         expect(all.toSet(), hasLength(all.length));
       });

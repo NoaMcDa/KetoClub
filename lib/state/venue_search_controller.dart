@@ -9,6 +9,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
@@ -90,6 +91,14 @@ typedef VenueCardNumbers = ({
 /// the saved one, and one that does not leaves it alone. No permission is
 /// involved anywhere on this path.
 ///
+/// **A street works the same way (issue #449, D27).** [searchStreets]
+/// runs one street search for the location picker, only when the user
+/// taps for it, and [chooseStreet] then looks around the street it found
+/// exactly as [choosePlace] looks around a city. A chosen street is saved
+/// as `AppSettings.discoveryStreet` — its label and coordinates, on the
+/// device only — and a chosen city and a chosen street replace each other,
+/// in memory and in storage alike.
+///
 /// **The distance filter is not a chip in [activeChips]** (issue #443):
 /// [radiusKm] holds a number of kilometres rather than an on/off, and it
 /// stays through later result lists until [setRadius] changes it, where
@@ -141,7 +150,9 @@ final class VenueSearchController extends ChangeNotifier {
   /// [venueAutoEstimateLimit]; 0 turns the automatic run off.
   ///
   /// `visitHistory` defaults to [NoVisitHistoryStore], which remembers
-  /// nothing (issue #307).
+  /// nothing (issue #307). `placeSearchService` finds streets for the
+  /// location picker (issue #449); without one, [canSearchStreets] is
+  /// false and the picker offers cities only.
   new(
     this._settings,
     this._repository, {
@@ -152,10 +163,12 @@ final class VenueSearchController extends ChangeNotifier {
     this._estimateConcurrency = venueEstimateConcurrency,
     this._autoEstimateLimit = venueAutoEstimateLimit,
     VisitHistoryStore visitHistory = const NoVisitHistoryStore(),
+    PlaceSearchService? placeSearchService,
   }) : _location = locationService,
        _search = venueSearchService,
        _estimator = estimateClassifier,
-       _history = visitHistory;
+       _history = visitHistory,
+       _placeSearch = placeSearchService;
 
   final SettingsStore _settings;
   final MenuRepository _repository;
@@ -170,6 +183,10 @@ final class VenueSearchController extends ChangeNotifier {
   /// name and city are read from it first (issue #312).
   final VisitHistoryStore _history;
 
+  /// Finds streets for the location picker (issue #449), or null when
+  /// this build offers none.
+  final PlaceSearchService? _placeSearch;
+
   String _input = '';
   VenueRef? _resolved;
   VenueRef? _lastVenue;
@@ -180,6 +197,7 @@ final class VenueSearchController extends ChangeNotifier {
   LocationResult? _locationOutcome;
   ({double latitude, double longitude})? _position;
   KnownPlace? _place;
+  StreetPlace? _street;
   int? _radiusKm;
   // Whether [load] has already looked for a saved place: it is restored
   // once per controller, never again on a later return to the tab.
@@ -272,8 +290,17 @@ final class VenueSearchController extends ChangeNotifier {
   ({double latitude, double longitude})? get position => _position;
 
   /// The place the user chose to look around (issue #443), or null when
-  /// [position] is the device's own or there is none.
+  /// [position] is the device's own, a [chosenStreet]'s, or there is none.
   KnownPlace? get chosenPlace => _place;
+
+  /// The street the user chose to look around (issue #449), or null when
+  /// [position] is the device's own, a [chosenPlace]'s, or there is none.
+  /// Never set together with [chosenPlace].
+  StreetPlace? get chosenStreet => _street;
+
+  /// Whether the location picker may offer a street search: true when
+  /// this build has a place search service (issue #449).
+  bool get canSearchStreets => _placeSearch != null;
 
   /// The distance filter (issue #443): only venues within this many
   /// kilometres of [position] are in [visibleResults]. Null, the default,
@@ -458,10 +485,11 @@ final class VenueSearchController extends ChangeNotifier {
     switch (result) {
       case LocationFound(:final latitude, :final longitude):
         _place = null;
+        _street = null;
         _position = (latitude: latitude, longitude: longitude);
         // Also when no place is chosen in memory: one saved by an earlier
         // launch must not come back after the user asked for their own.
-        final saving = _savePlace(null);
+        final saving = _saveChoice();
         await _run(
           () => _search.nearby(
             latitude: latitude,
@@ -494,9 +522,10 @@ final class VenueSearchController extends ChangeNotifier {
     _debounceTimer = null;
     final generation = ++_generation;
     _place = place;
+    _street = null;
     _position = (latitude: place.latitude, longitude: place.longitude);
     _locationOutcome = null;
-    final saving = _savePlace(place.id);
+    final saving = _saveChoice(placeId: place.id);
     await _run(
       () => _search.nearby(
         latitude: place.latitude,
@@ -507,6 +536,56 @@ final class VenueSearchController extends ChangeNotifier {
       isNearby: true,
     );
     await saving;
+  }
+
+  /// Looks around [street] instead of the device's position (issue #449):
+  /// exactly what [choosePlace] does for a city — the same nearby search
+  /// at its coordinates, in [language], the same [position] and the same
+  /// [retry] — and saves it as `AppSettings.discoveryStreet` in place of
+  /// any saved city. Nothing is sent but the nearby search's coordinates.
+  Future<void> chooseStreet(
+    StreetPlace street, {
+    required String language,
+  }) async {
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+    final generation = ++_generation;
+    _place = null;
+    _street = street;
+    _position = (latitude: street.latitude, longitude: street.longitude);
+    _locationOutcome = null;
+    final saving = _saveChoice(street: street);
+    await _run(
+      () => _search.nearby(
+        latitude: street.latitude,
+        longitude: street.longitude,
+        language: language,
+      ),
+      generation: generation,
+      isNearby: true,
+    );
+    await saving;
+  }
+
+  /// One street search for the location picker (issue #449): what the
+  /// user typed, in [language], sent only because they tapped for it.
+  ///
+  /// Changes nothing here — the picker shows the answer, and a pick comes
+  /// back through [chooseStreet]. Without a place search service (see
+  /// [canSearchStreets]) it answers
+  /// [PlaceSearchFailureReason.backendUnreachable] and sends nothing.
+  /// Never throws.
+  Future<PlaceSearchResult> searchStreets(
+    String query, {
+    required String language,
+  }) async {
+    final service = _placeSearch;
+    if (service == null) {
+      return const PlaceSearchFailed(
+        PlaceSearchFailureReason.backendUnreachable,
+      );
+    }
+    return await service.search(query, language: language);
   }
 
   /// Sets the distance filter to [km] kilometres, or to "any distance"
@@ -559,7 +638,9 @@ final class VenueSearchController extends ChangeNotifier {
   ///
   /// The one exception is the first call (issue #443): it also restores
   /// the place saved as `AppSettings.discoveryPlaceId`, when the list
-  /// still holds it and nothing has set a [position] meanwhile. Given a
+  /// still holds it, or else the street saved as
+  /// `AppSettings.discoveryStreet` (issue #449), when nothing has set a
+  /// [position] meanwhile. Given a
   /// [language], and only while the screen is still untouched — nothing
   /// typed, nothing searched, nothing in flight — it then lists the venues
   /// around that place, so a launch opens on the place the user chose.
@@ -575,7 +656,7 @@ final class VenueSearchController extends ChangeNotifier {
         : known?.name ??
               VenueRefResolver.websiteHost(lastVenue) ??
               lastVenue.platformId;
-    final restored = _restorePlace(settings.discoveryPlaceId);
+    final restored = _restoreChoice(settings);
     _notify();
     if (restored == null || language == null) return;
     if (_phase != DiscoveryPhase.idle ||
@@ -595,26 +676,40 @@ final class VenueSearchController extends ChangeNotifier {
     );
   }
 
-  /// On the first call only, makes the place saved under [savedId] the
-  /// [chosenPlace] and its centre the [position], unless something has set
-  /// a position already. Returns the place it restored, else null.
-  KnownPlace? _restorePlace(String? savedId) {
+  /// On the first call only, makes the place saved in [settings] the
+  /// [chosenPlace] — or, with none the list still holds, the street saved
+  /// there the [chosenStreet] — and its coordinates the [position], unless
+  /// something has set a position already. Returns the position it
+  /// restored, else null.
+  ({double latitude, double longitude})? _restoreChoice(AppSettings settings) {
     if (_placeRestored) return null;
     _placeRestored = true;
-    if (savedId == null || _position != null) return null;
-    final place = knownPlaceById(savedId);
-    if (place == null) return null;
-    _place = place;
-    _position = (latitude: place.latitude, longitude: place.longitude);
-    return place;
+    if (_position != null) return null;
+    final savedId = settings.discoveryPlaceId;
+    final place = savedId == null ? null : knownPlaceById(savedId);
+    if (place != null) {
+      _place = place;
+      return _position = (latitude: place.latitude, longitude: place.longitude);
+    }
+    final street = settings.discoveryStreet;
+    if (street == null) return null;
+    _street = street;
+    return _position = (latitude: street.latitude, longitude: street.longitude);
   }
 
-  /// Saves [placeId] as `AppSettings.discoveryPlaceId`, or clears it with
-  /// null, leaving every other setting as it is.
-  Future<void> _savePlace(String? placeId) async {
+  /// Saves the chosen location: [placeId] as `AppSettings.discoveryPlaceId`
+  /// and [street] as `AppSettings.discoveryStreet`, at most one of them
+  /// given, clearing whichever is not and leaving every other setting as
+  /// it is.
+  Future<void> _saveChoice({String? placeId, StreetPlace? street}) async {
     final settings = await _settings.read();
-    if (settings.discoveryPlaceId == placeId) return;
-    await _settings.write(settings.copyWith(discoveryPlaceId: placeId));
+    if (settings.discoveryPlaceId == placeId &&
+        settings.discoveryStreet == street) {
+      return;
+    }
+    await _settings.write(
+      settings.copyWith(discoveryPlaceId: placeId, discoveryStreet: street),
+    );
   }
 
   /// "Quick score the rest" (issue #42, D13, D21): fetches the menu of

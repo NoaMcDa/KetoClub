@@ -1,0 +1,260 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "N",
+        "osm_id": 4989545303,
+        "osm_key": "amenity",
+        "osm_value": "restaurant",
+        "type": "house",
+        "housenumber": "10",
+        "name": "Donkey Fresh Mex",
+        "street": "הרצל",
+        "district": "לב תל-אביב",
+        "city": "תל אביב",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "6688218",
+        "countrycode": "IL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7698648,
+          32.0625697
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "N",
+        "osm_id": 12588084718,
+        "osm_key": "amenity",
+        "osm_value": "restaurant",
+        "type": "house",
+        "housenumber": "10",
+        "name": "PokeShop",
+        "street": "הרצל",
+        "district": "לב תל-אביב",
+        "city": "תל אביב-יפו",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "6688218",
+        "countrycode": "IL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7699465,
+          32.0625439
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "N",
+        "osm_id": 2078969553,
+        "osm_key": "place",
+        "osm_value": "house",
+        "type": "house",
+        "housenumber": "10",
+        "street": "הרצל",
+        "district": "לב תל-אביב",
+        "city": "תל אביב–יפו",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "6688218",
+        "countrycode": "IL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.769931,
+          32.062416
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "N",
+        "osm_id": 2078972302,
+        "osm_key": "place",
+        "osm_value": "house",
+        "type": "house",
+        "housenumber": "10",
+        "street": "רוזנבלום הרצל ד\"ר",
+        "district": "גלילות",
+        "city": "תל אביב–יפו",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "6949409",
+        "countrycode": "IL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.791136,
+          32.138385
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "N",
+        "osm_id": 1697402193,
+        "osm_key": "place",
+        "osm_value": "house",
+        "type": "house",
+        "housenumber": "10",
+        "street": "הרצל",
+        "district": "יהלום",
+        "city": "רמת גן",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "5325707",
+        "countrycode": "IL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.8188628,
+          32.08107
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 1551687619,
+        "osm_key": "building",
+        "osm_value": "yes",
+        "type": "house",
+        "name": "רוטשילד 10",
+        "street": "הרצל",
+        "district": "לב תל-אביב",
+        "city": "תל אביב–יפו",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "6688218",
+        "countrycode": "IL",
+        "extent": [
+          34.7702342,
+          32.0626385,
+          34.7705968,
+          32.062405
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7704155,
+          32.0625218
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 325077478,
+        "osm_key": "building",
+        "osm_value": "yes",
+        "type": "house",
+        "housenumber": "10/37",
+        "street": "הרצל",
+        "district": "בת ים",
+        "city": "בת ים",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "5957109",
+        "countrycode": "IL",
+        "extent": [
+          34.7432644,
+          32.0265344,
+          34.7436279,
+          32.0261988
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7435548,
+          32.0263808
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 383514201,
+        "osm_key": "building",
+        "osm_value": "semidetached_house",
+        "type": "house",
+        "housenumber": "10",
+        "street": "תל חי",
+        "locality": "נווה עובד",
+        "district": "הרצליה הירוקה",
+        "city": "הרצליה",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "4648528",
+        "countrycode": "IL",
+        "extent": [
+          34.8463343,
+          32.1732605,
+          34.8464563,
+          32.1731141
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.8463953,
+          32.1731873
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "N",
+        "osm_id": 2521439262,
+        "osm_key": "amenity",
+        "osm_value": "bureau_de_change",
+        "type": "house",
+        "name": "Change 10",
+        "street": "סוקולוב",
+        "district": "ויצמן",
+        "city": "הרצליה",
+        "county": "נפת תל אביב",
+        "state": "מחוז תל אביב",
+        "country": "ישראל",
+        "postcode": "4648528",
+        "countrycode": "IL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.8398406,
+          32.166865
+        ]
+      }
+    }
+  ]
+}

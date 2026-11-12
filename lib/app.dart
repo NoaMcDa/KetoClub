@@ -81,6 +81,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
       venueSearchService: dependencies.venueSearchService,
       estimateClassifier: dependencies.estimateClassifier,
       visitHistory: dependencies.visitHistory,
+      placeSearchService: dependencies.placeSearchService,
     );
     // Fire-and-forget: the first frame renders in the device locale (and,
     // for appearance, ThemeMode.system) and flips once each resolves

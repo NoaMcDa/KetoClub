@@ -673,10 +673,54 @@ class AppLocalizationsHe extends AppLocalizations {
   String get locationPickerUseDevice => 'השתמש במיקום הנוכחי שלי';
 
   @override
-  String get locationPickerSearchLabel => 'חיפוש עיר';
+  String get locationPickerSearchLabel => 'חיפוש עיר או רחוב';
 
   @override
   String get locationPickerNoMatch => 'לא נמצאה עיר מתאימה. נסו איות אחר.';
+
+  @override
+  String locationPickerStreetSearch(String query) {
+    return 'חיפוש רחובות עבור \"$query\"';
+  }
+
+  @override
+  String get locationPickerStreetCaptionBackend =>
+      'מה שהקלדתם יישלח לשרת של קטוקלאב ול‑Photon, שירות חיפוש של OpenStreetMap.';
+
+  @override
+  String get locationPickerStreetCaptionDirect =>
+      'מה שהקלדתם יישלח ל‑Photon, שירות חיפוש של OpenStreetMap.';
+
+  @override
+  String get locationPickerStreetSearching => 'מחפשים רחובות…';
+
+  @override
+  String get locationPickerStreetsHeading => 'רחובות';
+
+  @override
+  String locationPickerStreetNoMatch(String query) {
+    return 'לא נמצא רחוב עבור \"$query\". בדקו את האיות, או הוסיפו את שם העיר.';
+  }
+
+  @override
+  String get placeSearchFailedOffline =>
+      'אין חיבור, ולכן לא ניתן היה לחפש רחובות.';
+
+  @override
+  String get placeSearchFailedTimeout =>
+      'חיפוש הרחובות לא ענה בזמן. נסו שוב בעוד רגע.';
+
+  @override
+  String get placeSearchFailedRateLimited =>
+      'יותר מדי חיפושי רחובות ברצף. חכו דקה ונסו שוב.';
+
+  @override
+  String get placeSearchFailedBackendUnreachable =>
+      'השרת של קטוקלאב לא היה זמין, ולכן לא ניתן היה לחפש רחובות.';
+
+  @override
+  String get placeSearchFailedProviderChanged =>
+      'שירות חיפוש הרחובות ענה בצורה שקטוקלאב לא הצליח לקרוא. אנא דווחו על זה.';
 
   @override
   String get discoveryLocating => 'מאתר את המיקום שלך…';

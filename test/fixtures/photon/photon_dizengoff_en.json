@@ -1,0 +1,349 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 1113400113,
+        "osm_key": "highway",
+        "osm_value": "tertiary",
+        "type": "street",
+        "name": "Dizengoff",
+        "district": "The Old North - Southern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6433262",
+        "countrycode": "IL",
+        "extent": [
+          34.7745107,
+          32.0769106,
+          34.7747785,
+          32.0761911
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7746435,
+          32.0765505
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 1312197919,
+        "osm_key": "highway",
+        "osm_value": "tertiary",
+        "type": "street",
+        "name": "Dizengoff",
+        "district": "The Old North - Southern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6473702",
+        "countrycode": "IL",
+        "extent": [
+          34.7811498,
+          32.0737417,
+          34.7817537,
+          32.0735985
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7814542,
+          32.0736803
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 289596332,
+        "osm_key": "highway",
+        "osm_value": "tertiary",
+        "type": "street",
+        "name": "Dizengoff",
+        "district": "The Old North - Southern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6437701",
+        "countrycode": "IL",
+        "extent": [
+          34.7748359,
+          32.0760479,
+          34.7758855,
+          32.0748673
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7752664,
+          32.0753711
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 204396768,
+        "osm_key": "highway",
+        "osm_value": "tertiary",
+        "type": "street",
+        "name": "Dizengoff",
+        "district": "The Old North - Southern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6343804",
+        "countrycode": "IL",
+        "extent": [
+          34.7737676,
+          32.084301,
+          34.7742428,
+          32.0797282
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7738402,
+          32.0820303
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 239160737,
+        "osm_key": "highway",
+        "osm_value": "tertiary",
+        "type": "street",
+        "name": "Dizengoff",
+        "district": "The Old North - Northern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6340506",
+        "countrycode": "IL",
+        "extent": [
+          34.7762924,
+          32.0948202,
+          34.7766651,
+          32.0924898
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7765529,
+          32.0936613
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 229938809,
+        "osm_key": "highway",
+        "osm_value": "tertiary",
+        "type": "street",
+        "name": "Dizengoff",
+        "district": "The Old North - Southern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6439505",
+        "countrycode": "IL",
+        "extent": [
+          34.773839,
+          32.0797282,
+          34.7740839,
+          32.0783884
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7739622,
+          32.0790578
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 1348973560,
+        "osm_key": "highway",
+        "osm_value": "tertiary",
+        "type": "street",
+        "name": "Dizengoff",
+        "district": "The Old North - Northern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6340201",
+        "countrycode": "IL",
+        "extent": [
+          34.77489,
+          32.086984,
+          34.7749221,
+          32.0868547
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7749068,
+          32.0869192
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 1382207651,
+        "osm_key": "highway",
+        "osm_value": "tertiary",
+        "type": "street",
+        "name": "Dizengoff",
+        "district": "The Old North - Northern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6340502",
+        "countrycode": "IL",
+        "extent": [
+          34.7749221,
+          32.0892936,
+          34.7754904,
+          32.086984
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7752044,
+          32.0881389
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "R",
+        "osm_id": 15311025,
+        "osm_key": "shop",
+        "osm_value": "mall",
+        "type": "house",
+        "name": "Dizengoff Center",
+        "street": "1240",
+        "district": "The Old North - Southern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6433262",
+        "countrycode": "IL",
+        "extent": [
+          34.773702,
+          32.0759866,
+          34.7762454,
+          32.0744846
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7745919,
+          32.0752455
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "W",
+        "osm_id": 204436041,
+        "osm_key": "building",
+        "osm_value": "yes",
+        "type": "house",
+        "housenumber": "16",
+        "name": "Dizengoff House",
+        "street": "Sderot Rothschild",
+        "district": "Lev Tel Aviv",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6688218",
+        "countrycode": "IL",
+        "extent": [
+          34.7708169,
+          32.0628767,
+          34.7710346,
+          32.0626117
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7709248,
+          32.0627835
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "osm_type": "R",
+        "osm_id": 13645250,
+        "osm_key": "place",
+        "osm_value": "square",
+        "type": "street",
+        "name": "Dizengoff Square (tsina)",
+        "district": "The Old North - Southern part",
+        "city": "Tel Aviv",
+        "county": "Tel Aviv Subdistrict",
+        "state": "Tel-Aviv District",
+        "country": "Israel",
+        "postcode": "6356836",
+        "countrycode": "IL",
+        "extent": [
+          34.7738809,
+          32.0782606,
+          34.7745159,
+          32.077723
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7743493,
+          32.0779938
+        ]
+      }
+    }
+  ]
+}

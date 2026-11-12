@@ -5,11 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
+import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -32,6 +34,7 @@ import 'fake_llm_chat_client.dart';
 import 'fake_menu_cache.dart';
 import 'fake_notes_store.dart';
 import 'fake_page_picker.dart';
+import 'fake_place_search_service.dart';
 import 'fake_qr_scanner.dart';
 import 'fake_scanned_menu_classifier.dart';
 import 'fake_settings_store.dart';
@@ -787,6 +790,77 @@ void main() {
       expect(await scanner.scan(), 'second');
       expect(await scanner.scan(), isNull);
       expect(scanner.scanCallCount, 4);
+    });
+  });
+
+  group('FakePlaceSearchService (issue #449)', () {
+    const street = StreetPlace(label: 'Herzl', latitude: 32, longitude: 34);
+
+    test('finds nothing until scripted, then answers the queue in order and '
+        'sticks on the last', () async {
+      // Arrange
+      final fake = FakePlaceSearchService();
+
+      // Act
+      final before = await fake.search('herzl', language: 'en');
+      fake
+        ..queueFound(const <StreetPlace>[street])
+        ..queueFailed(PlaceSearchFailureReason.timeout, statusCode: 504);
+      final first = await fake.search('herzl', language: 'he');
+      final second = await fake.search('herzl', language: 'he');
+      final third = await fake.search('herzl', language: 'he');
+
+      // Assert
+      expect(before, const PlacesFound(<StreetPlace>[]));
+      expect(first, const PlacesFound(<StreetPlace>[street]));
+      expect(
+        second,
+        const PlaceSearchFailed(
+          PlaceSearchFailureReason.timeout,
+          statusCode: 504,
+        ),
+      );
+      expect(third, second);
+      expect(fake.calls, hasLength(4));
+      expect(fake.calls[1], (query: 'herzl', language: 'he'));
+    });
+
+    test(
+      'a too-short query finds nothing without consuming the queue',
+      () async {
+        // Arrange
+        final fake = FakePlaceSearchService()
+          ..queueFound(const <StreetPlace>[street]);
+
+        // Act
+        final short = await fake.search(' a ', language: 'en');
+        final real = await fake.search('herzl', language: 'en');
+
+        // Assert
+        expect(short, const PlacesFound(<StreetPlace>[]));
+        expect(real, const PlacesFound(<StreetPlace>[street]));
+        expect(fake.calls, hasLength(2));
+      },
+    );
+
+    test('waits for its gate before answering', () async {
+      // Arrange
+      final gate = Completer<void>();
+      final fake = FakePlaceSearchService()..gate = gate.future;
+      var answered = false;
+
+      // Act
+      final pending = fake
+          .search('herzl', language: 'en')
+          .then((_) => answered = true);
+      await Future<void>.delayed(Duration.zero);
+      final before = answered;
+      gate.complete();
+      await pending;
+
+      // Assert
+      expect(before, isFalse);
+      expect(answered, isTrue);
     });
   });
 

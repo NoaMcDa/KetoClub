@@ -667,11 +667,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationPickerUseDevice => 'Use my current location';
 
   @override
-  String get locationPickerSearchLabel => 'Search for a city';
+  String get locationPickerSearchLabel => 'Search for a city or a street';
 
   @override
   String get locationPickerNoMatch =>
       'No city matches that. Try another spelling.';
+
+  @override
+  String locationPickerStreetSearch(String query) {
+    return 'Search streets for “$query”';
+  }
+
+  @override
+  String get locationPickerStreetCaptionBackend =>
+      'Sends what you typed to KetoClub\'s server and to Photon, an OpenStreetMap search service.';
+
+  @override
+  String get locationPickerStreetCaptionDirect =>
+      'Sends what you typed to Photon, an OpenStreetMap search service.';
+
+  @override
+  String get locationPickerStreetSearching => 'Searching streets…';
+
+  @override
+  String get locationPickerStreetsHeading => 'Streets';
+
+  @override
+  String locationPickerStreetNoMatch(String query) {
+    return 'No street found for “$query”. Check the spelling, or add the city.';
+  }
+
+  @override
+  String get placeSearchFailedOffline =>
+      'No connection, so the street search could not run.';
+
+  @override
+  String get placeSearchFailedTimeout =>
+      'The street search took too long to answer. Try again in a moment.';
+
+  @override
+  String get placeSearchFailedRateLimited =>
+      'Too many street searches in a row. Wait a minute, then try again.';
+
+  @override
+  String get placeSearchFailedBackendUnreachable =>
+      'KetoClub\'s server could not be reached, so the street search could not run.';
+
+  @override
+  String get placeSearchFailedProviderChanged =>
+      'The street search service answered in a way KetoClub could not read. Please report this.';
 
   @override
   String get discoveryLocating => 'Finding your location…';
