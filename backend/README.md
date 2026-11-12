@@ -518,7 +518,11 @@ access-log line carries it.
   coordinates are two finite numbers. The street is `street` for a house
   (`name` for a street), the city `city` else `district` else null, and the
   label `"<street> <housenumber>, <city>"` without the parts that are
-  missing. Labels are deduplicated exactly, keeping the first. The Flutter
+  missing. Walking Photon's order, a place is skipped when one already kept
+  has the same label, or the same street and house number (each trimmed and
+  lowercased; a missing number matches only a missing number) within 0.003°
+  in both latitude and longitude: OSM often holds one address under several
+  spellings of its city (`תל אביב`, `תל אביב-יפו`, `תל אביב–יפו`). The Flutter
   app's direct fallback applies the same rules.
 - Errors: 429 `rateLimited` (`PLACE_SEARCH_RATE_LIMIT_PER_MINUTE` per install
   id, default 20, no daily cap); 502 `offline` (Photon unreachable); 502

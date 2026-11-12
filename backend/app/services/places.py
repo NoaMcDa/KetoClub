@@ -15,8 +15,15 @@ implements the same mapping, so the rules here are exact:
   ``properties.housenumber`` when non-blank, for a house only;
 - the city is ``properties.city``, else ``properties.district``, else null;
 - the label is ``"<street> <housenumber>, <city>"`` with the missing parts
-  left out; labels are deduplicated keeping Photon's first, and at most
-  ``MAX_PLACES`` are returned.
+  left out;
+- in Photon's order, a place is skipped when one already kept has the same
+  label, or has the same street and house number (each trimmed and
+  lowercased; a missing number matches only a missing number) and lies
+  within ``DUPLICATE_DEGREES`` of it in both latitude and longitude. OSM
+  often carries one address several times under different spellings of its
+  city ("תל אביב", "תל אביב-יפו", "תל אביב–יפו"), and the label alone
+  cannot tell those apart;
+- at most ``MAX_PLACES`` are returned.
 
 Privacy: the query, the labels and the coordinates are never logged and
 never stored. httpx logs every request's URL, and Photon's URL carries the
@@ -37,6 +44,10 @@ import httpx
 UPSTREAM_LIMIT: Final = 15
 MAX_PLACES: Final = 6
 
+# Two places with the same street and number are one address when neither
+# coordinate differs by more than this (about 330 m of latitude in Israel).
+DUPLICATE_DEGREES: Final = 0.003
+
 # Israel, as minLon,minLat,maxLon,maxLat (Photon's bbox order).
 ISRAEL_BBOX: Final = "34.2,29.4,35.9,33.4"
 
@@ -49,12 +60,15 @@ _KEPT_TYPES: Final = frozenset({"house", "street"})
 
 @dataclass(frozen=True)
 class MappedPlace:
-    """One geocoded street or address, in the route's reply shape."""
+    """One geocoded street or address: the route's reply fields, plus the
+    street and house number the duplicate check compares."""
 
     label: str
     city: str | None
     latitude: float
     longitude: float
+    street: str
+    housenumber: str | None
 
 
 def geocoder_url(base_url: str) -> str:
@@ -95,16 +109,32 @@ def map_photon_places(body: Any) -> list[MappedPlace] | None:
         return None
 
     places: list[MappedPlace] = []
-    seen: set[str] = set()
     for feature in features:
         place = _map_feature(feature)
-        if place is None or place.label in seen:
+        if place is None or any(_is_duplicate(place, kept) for kept in places):
             continue
-        seen.add(place.label)
         places.append(place)
         if len(places) == MAX_PLACES:
             break
     return places
+
+
+def _is_duplicate(place: MappedPlace, kept: MappedPlace) -> bool:
+    """Whether ``place`` repeats ``kept``: the same label, or the same
+    street and number close by."""
+    if place.label == kept.label:
+        return True
+    return (
+        _key(place.street) == _key(kept.street)
+        and _key(place.housenumber) == _key(kept.housenumber)
+        and abs(place.latitude - kept.latitude) <= DUPLICATE_DEGREES
+        and abs(place.longitude - kept.longitude) <= DUPLICATE_DEGREES
+    )
+
+
+def _key(value: str | None) -> str | None:
+    """``value`` trimmed and lowercased for comparison; None stays None."""
+    return None if value is None else value.strip().lower()
 
 
 def _map_feature(feature: Any) -> MappedPlace | None:
@@ -140,7 +170,12 @@ def _map_feature(feature: Any) -> MappedPlace | None:
     if city is not None:
         label = f"{label}, {city}"
     return MappedPlace(
-        label=label.strip(), city=city, latitude=latitude, longitude=longitude
+        label=label.strip(),
+        city=city,
+        latitude=latitude,
+        longitude=longitude,
+        street=street,
+        housenumber=number,
     )
 
 

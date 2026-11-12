@@ -67,6 +67,8 @@ def _street(
     name: str | None,
     city: str | None = "תל אביב-יפו",
     *,
+    lon: float = 34.77,
+    lat: float = 32.07,
     country: str = "IL",
     district: str | None = None,
 ) -> dict[str, Any]:
@@ -79,7 +81,7 @@ def _street(
         properties["district"] = district
     return {
         "type": "Feature",
-        "geometry": {"type": "Point", "coordinates": [34.77, 32.07]},
+        "geometry": {"type": "Point", "coordinates": [lon, lat]},
         "properties": properties,
     }
 
@@ -205,6 +207,68 @@ def test_duplicates_are_dropped_keeping_the_first(
 
     assert [p["label"] for p in places] == ["הרצל 10, תל אביב-יפו", "הרצל, תל אביב-יפו"]
     assert places[0]["longitude"] == 34.1
+
+
+def _labels(*features: dict[str, Any]) -> list[str]:
+    places = map_photon_places(_collection(*features))
+    assert places is not None
+    return [place.label for place in places]
+
+
+def test_one_address_under_three_city_spellings_is_one_place() -> None:
+    # The live reply for "הרצל 10 תל אביב" on 2026-11-12.
+    labels = _labels(
+        _house("הרצל", "10", "תל אביב", lon=34.7698648, lat=32.0625697),
+        _house("הרצל", "10", "תל אביב-יפו", lon=34.7699465, lat=32.0625439),
+        _house("הרצל", "10", "תל אביב–יפו", lon=34.769931, lat=32.062416),
+        _house("הרצל", "10", "רמת גן", lon=34.8188628, lat=32.08107),
+    )
+
+    assert labels == ["הרצל 10, תל אביב", "הרצל 10, רמת גן"]
+
+
+def test_street_and_number_compare_trimmed_and_lowercased() -> None:
+    labels = _labels(
+        _house("Herzl", "10a", "Tel Aviv", lon=34.7700, lat=32.0600),
+        _house(" herzl ", " 10A ", "Tel Aviv-Yafo", lon=34.7720, lat=32.0620),
+    )
+
+    assert labels == ["Herzl 10a, Tel Aviv"]
+
+
+def test_the_same_street_in_two_cities_far_apart_stays_two() -> None:
+    labels = _labels(
+        _street("רוטשילד", "תל אביב-יפו", lon=34.7740, lat=32.0640),
+        _street("רוטשילד", "ראשון לציון", lon=34.8028, lat=31.9640),
+    )
+
+    assert labels == ["רוטשילד, תל אביב-יפו", "רוטשילד, ראשון לציון"]
+
+
+def test_a_numberless_street_does_not_merge_with_a_house_on_it() -> None:
+    labels = _labels(
+        _street("הרצל", "תל אביב", lon=34.7700, lat=32.0620),
+        _house("הרצל", "10", "תל אביב-יפו", lon=34.7701, lat=32.0621),
+        _house("הרצל", None, "תל אביב–יפו", lon=34.7702, lat=32.0622),
+    )
+
+    assert labels == ["הרצל, תל אביב", "הרצל 10, תל אביב-יפו"]
+
+
+def test_close_same_named_street_segments_merge() -> None:
+    labels = _labels(
+        _street("אבן גבירול", "תל אביב", lon=34.7810, lat=32.0800),
+        _street("אבן גבירול", "תל אביב-יפו", lon=34.7835, lat=32.0825),
+        _street("אבן גבירול", "תל אביב–יפו", lon=34.7810, lat=32.0840),
+        _street("אבן גבירול", "רמת השרון", lon=34.7850, lat=32.0800),
+    )
+
+    # Within 0.003 of the first in both axes merges; 0.004 in either does not.
+    assert labels == [
+        "אבן גבירול, תל אביב",
+        "אבן גבירול, תל אביב–יפו",
+        "אבן גבירול, רמת השרון",
+    ]
 
 
 def test_at_most_six_places(client: TestClient, photon: respx.MockRouter) -> None:
