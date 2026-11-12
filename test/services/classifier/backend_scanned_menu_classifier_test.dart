@@ -17,6 +17,7 @@ import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../../fakes/fake_install_id_store.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 import 'scanned_menu_classifier_contract.dart';
 
 /// The backend base every test uses unless it is exercising the URL
@@ -420,10 +421,13 @@ void main() {
       ),
       "FastAPI's 422 detail": ('{"detail": []}', 422),
       'a non-JSON body': ('<html>Bad gateway</html>', 502),
+      'a missing route (404 detail)': ('{"detail": "Not Found"}', 404),
+      'a refused install id (400)': (_errorBody('badResponse', 400), 400),
     };
     for (final MapEntry(key: label, value: (body, status))
         in untrusted.entries) {
-      test('$label is badResponse', () async {
+      test('$label is backendUnreachable, so the device reads the pages '
+          '(issue #471)', () async {
         // Arrange
         final classifier = _answering(body, status);
 
@@ -435,7 +439,7 @@ void main() {
           result,
           equals(
             const ScannedMenuFailed(
-              reason: MenuAnalysisFailureReason.badResponse,
+              reason: MenuAnalysisFailureReason.backendUnreachable,
             ),
           ),
         );
@@ -444,6 +448,31 @@ void main() {
   });
 
   group('BackendScannedMenuClassifier transport failures', () {
+    for (final error in <Exception>[
+      const FakeHandshakeException(),
+      const FakeSocketException(),
+      const FormatException('half a body'),
+    ]) {
+      test('a $error from the transport is backendUnreachable, never a '
+          'throw (issue #278)', () async {
+        // Arrange
+        final classifier = _build(MockClient((request) async => throw error));
+
+        // Act
+        final result = await _classify(classifier);
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const ScannedMenuFailed(
+              reason: MenuAnalysisFailureReason.backendUnreachable,
+            ),
+          ),
+        );
+      });
+    }
+
     test('a ClientException is backendUnreachable, never offline', () async {
       // Arrange
       final classifier = _build(

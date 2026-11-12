@@ -67,24 +67,40 @@ Object? decodeBackendBody(http.Response response) {
   }
 }
 
-/// The reason an error body from KetoClub's backend names, mapped by name
-/// onto [MenuAnalysisFailureReason] (`backend_plan.md` §3.3).
+/// The statuses that mean the backend did not take the request at all,
+/// whatever their body says (issue #471): 404, a backend without the
+/// route (one checked out before D25, or a route not mounted); 400, a
+/// refused request such as a missing install id; 413, a request over the
+/// server's size cap, which the device's own engine does not have.
+const Set<int> _notServedStatuses = <int>{400, 404, 413};
+
+/// The reason an error response from KetoClub's backend names, mapped by
+/// name onto [MenuAnalysisFailureReason] (`backend_plan.md` §3.3).
 ///
-/// [decoded] is the body as [decodeBackendBody] read it. Anything that
-/// does not name a reason this client trusts — a non-JSON body, FastAPI's
-/// `{"detail": …}` 422, `payloadTooLarge`, an unknown name or a
-/// client-only one — is [MenuAnalysisFailureReason.badResponse]. Nothing
-/// else from the body reaches the caller.
-MenuAnalysisFailureReason backendFailureReasonFrom(Object? decoded) {
+/// [decoded] is the body as [decodeBackendBody] read it and [statusCode]
+/// the response's status. A 400, 404 or 413 ([_notServedStatuses]), and
+/// any error body that names no reason this client trusts — a non-JSON
+/// body, FastAPI's `{"detail": …}`, `payloadTooLarge`, an unknown name or
+/// a client-only one — is [MenuAnalysisFailureReason.backendUnreachable]:
+/// the backend did not answer this request, so a fallback chain tries the
+/// device's own engine, as menus and venue search do against the same
+/// server (issue #471). Nothing else from the body reaches the caller.
+MenuAnalysisFailureReason backendFailureReasonFrom(
+  Object? decoded, {
+  required int statusCode,
+}) {
+  if (_notServedStatuses.contains(statusCode)) {
+    return MenuAnalysisFailureReason.backendUnreachable;
+  }
   if (decoded is! Map<String, Object?>) {
-    return MenuAnalysisFailureReason.badResponse;
+    return MenuAnalysisFailureReason.backendUnreachable;
   }
   final name = decoded['reason'];
-  if (name is! String) return MenuAnalysisFailureReason.badResponse;
+  if (name is! String) return MenuAnalysisFailureReason.backendUnreachable;
   for (final reason in _wireReasons) {
     if (reason.name == name) return reason;
   }
-  return MenuAnalysisFailureReason.badResponse;
+  return MenuAnalysisFailureReason.backendUnreachable;
 }
 
 /// The `options` object of a D25 analysis request: `{netCarbLimitGrams,
@@ -99,16 +115,21 @@ Map<String, Object?> backendOptionsJson(ClassificationOptions options) =>
 ///
 /// **One request, no retries.** Each [classify] call is exactly one
 /// request; nothing pre-checks whether the server is up, so the call is
-/// the probe (D10, D11). A socket or DNS failure is
-/// [MenuAnalysisFailureReason.backendUnreachable] and exceeding [timeout]
-/// is [MenuAnalysisFailureReason.timeout].
+/// the probe (D10, D11). Any exception sending the request or reading its
+/// reply — a socket or DNS failure, but also a TLS handshake failure or a
+/// socket closed mid-body, which `IOClient` throws unwrapped (issue #278)
+/// — is [MenuAnalysisFailureReason.backendUnreachable], and exceeding
+/// [timeout] is [MenuAnalysisFailureReason.timeout].
 ///
 /// **The server's own fallback stands.** A Gemini failure on the server
 /// is not an error: the server answers 200 with its ported rule engine's
 /// analysis stamped `{"kind": "rules", "reason": …}`, and that analysis is
 /// returned as it came. Only an empty analysis bucket (429 `rateLimited`),
 /// a menu with no dish (422 `noDishesFound`) and refusals of the request
-/// itself arrive as errors; each is mapped by its `reason` name.
+/// itself arrive as errors; each is mapped by its `reason` name, and a
+/// request the backend did not serve (404, 400, 413, or no reason named)
+/// is [MenuAnalysisFailureReason.backendUnreachable]
+/// ([backendFailureReasonFrom], issue #471).
 ///
 /// **No credentials, and no consent check.** The request carries the
 /// anonymous install id as [backendInstallIdHeader] and never an
@@ -182,7 +203,10 @@ final class BackendMenuClassifier implements MenuClassifier {
       return const MenuAnalysisFailed(
         reason: MenuAnalysisFailureReason.timeout,
       );
-    } on http.ClientException {
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278).
       return const MenuAnalysisFailed(
         reason: MenuAnalysisFailureReason.backendUnreachable,
       );
@@ -195,7 +219,9 @@ final class BackendMenuClassifier implements MenuClassifier {
     final statusCode = response.statusCode;
     final decoded = decodeBackendBody(response);
     if (statusCode < 200 || statusCode >= 300) {
-      return MenuAnalysisFailed(reason: backendFailureReasonFrom(decoded));
+      return MenuAnalysisFailed(
+        reason: backendFailureReasonFrom(decoded, statusCode: statusCode),
+      );
     }
     final analysis = _analysisFrom(decoded);
     if (analysis == null || !_namesOnlyDishesOf(analysis, menu)) {

@@ -10,6 +10,7 @@ import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 
 import '../../fakes/fake_api_key_store.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 import 'llm_chat_client_contract.dart';
 
 /// The key every test saves unless it is exercising the key itself.
@@ -629,6 +630,7 @@ void main() {
         ChatFailureReason.apiKeyRejected,
       ),
       ('429', 429, '{}', ChatFailureReason.rateLimited),
+      ('504', 504, '{}', ChatFailureReason.timeout),
       ('500', 500, '{}', ChatFailureReason.badResponse),
       ('503', 503, 'not json', ChatFailureReason.badResponse),
       ('404', 404, '{}', ChatFailureReason.badResponse),
@@ -744,6 +746,71 @@ void main() {
       expect(_configOf(sent[0]).containsKey('responseSchema'), isTrue);
       expect(_configOf(sent[1]).containsKey('responseSchema'), isFalse);
       expect(_configOf(sent[1])['responseMimeType'], 'application/json');
+    });
+
+    test('the retry drops thinkingConfig too, since the 400 may be about '
+        'it (issue #278)', () async {
+      // Arrange
+      final sent = <http.Request>[];
+      final client = _build(
+        MockClient((request) async {
+          sent.add(request);
+          return sent.length == 1
+              ? http.Response(_badRequestBody, 400)
+              : http.Response(_successBody(), 200);
+        }),
+      );
+
+      // Act
+      await client.complete(
+        systemPrompt: 's',
+        userPrompt: 'u',
+        responseSchema: _schema,
+      );
+
+      // Assert
+      expect(_configOf(sent[0]).containsKey('thinkingConfig'), isTrue);
+      expect(_configOf(sent[1]).containsKey('thinkingConfig'), isFalse);
+    });
+
+    test('both attempts share one deadline (issue #278)', () {
+      fakeAsync((async) {
+        // Arrange: the 400 arrives after 20 s; the retry never answers.
+        var requests = 0;
+        final client = _build(
+          MockClient((_) async {
+            requests++;
+            if (requests == 1) {
+              await Future<void>.delayed(const Duration(seconds: 20));
+              return http.Response(_badRequestBody, 400);
+            }
+            return Completer<http.Response>().future;
+          }),
+          timeout: const Duration(seconds: 30),
+        );
+        ChatResult? result;
+
+        // Act
+        unawaited(
+          client
+              .complete(
+                systemPrompt: 's',
+                userPrompt: 'u',
+                responseSchema: _schema,
+              )
+              .then((value) => result = value),
+        );
+        async.elapse(const Duration(seconds: 29));
+
+        // Assert: the retry got the 10 s left, not a fresh 30 s.
+        expect(requests, 2);
+        expect(result, isNull);
+        async.elapse(const Duration(seconds: 1));
+        expect(
+          result,
+          equals(const ChatFailed(reason: ChatFailureReason.timeout)),
+        );
+      });
     });
 
     test('the retry re-sends the images unchanged', () async {
@@ -884,6 +951,29 @@ void main() {
   });
 
   group('GeminiChatClient transport failures', () {
+    for (final error in <Exception>[
+      const FakeHandshakeException(),
+      const FakeSocketException(),
+      const FormatException('half a body'),
+    ]) {
+      test('a $error is offline, never a throw (issue #278)', () async {
+        // Arrange
+        final client = _build(MockClient((_) async => throw error));
+
+        // Act
+        final result = await client.complete(
+          systemPrompt: 's',
+          userPrompt: 'u',
+        );
+
+        // Assert
+        expect(
+          result,
+          equals(const ChatFailed(reason: ChatFailureReason.offline)),
+        );
+      });
+    }
+
     test('a ClientException is offline: there is no server between', () async {
       // Arrange
       final client = _build(
