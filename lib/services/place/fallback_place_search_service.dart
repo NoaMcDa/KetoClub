@@ -2,7 +2,7 @@ import 'package:ketoclub/services/place/place_search_service.dart';
 
 /// Asks [primary] (KetoClub's backend) first and [fallback] (Photon,
 /// directly) when the backend could not answer (issue #449,
-/// architecture.md D27), as the D25 fallback chains do.
+/// architecture.md D28), as the D25 fallback chains do.
 ///
 /// Falls through on [PlaceSearchFailureReason.backendUnreachable],
 /// [PlaceSearchFailureReason.timeout] and

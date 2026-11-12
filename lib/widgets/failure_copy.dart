@@ -147,7 +147,7 @@ String venueSearchFailureMessage(
 };
 
 /// The message for a street-search failure in the location picker (issue
-/// #449, architecture.md D27).
+/// #449, architecture.md D28).
 ///
 /// Takes no placeholders: a status code on [PlaceSearchFailed] is for a
 /// log, not for the user.

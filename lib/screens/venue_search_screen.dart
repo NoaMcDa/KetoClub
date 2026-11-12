@@ -69,7 +69,7 @@ const double _listCacheExtent = 1200;
 /// or a city from a bundled list. A chosen city is looked around exactly
 /// as a position is, names the header, needs no permission, and is
 /// restored on the next launch. Since issue #449 the picker also finds a
-/// street, on an explicit tap only (D27), and a chosen street is looked
+/// street, on an explicit tap only (D28), and a chosen street is looked
 /// around, named and restored the same way. Once there is a position of
 /// any kind,
 /// the chip row starts with the distance filter, "Any distance" or

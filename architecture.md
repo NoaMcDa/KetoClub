@@ -305,7 +305,7 @@ ketoclub/
 │   │   ├── rules_reason_banner.dart      # why a menu fell back to the rule engine (#125)
 │   │   ├── rename_menu_dialog.dart       # a scanned menu's name and city (#315, D23)
 │   │   ├── location_picker_sheet.dart    # Discovery's location picker: the device, a city (#443, D26),
-│   │   │                                 # or a street found on an explicit tap (#449, D27)
+│   │   │                                 # or a street found on an explicit tap (#449, D28)
 │   │   └── mobile_qr_scanner.dart        # MobileQrScanner + its camera page; the ONLY file importing
 │   │                                     # package:mobile_scanner (#182); here, not in services/, since it owns a page
 │   │
@@ -351,7 +351,7 @@ ketoclub/
 │   │   │   └── wolt/
 │   │   │       ├── wolt_venue_search_service.dart # HTTP only; delegates to the mapper
 │   │   │       └── wolt_venue_mapper.dart # pure: Wolt discovery JSON → Venue (fixture-tested, no I/O)
-│   │   ├── place/                        # rank 0 — the location picker's street search (#449, D27)
+│   │   ├── place/                        # rank 0 — the location picker's street search (#449, D28)
 │   │   │   ├── place_search_service.dart # interface + sealed PlaceSearchResult, the query rule
 │   │   │   ├── backend_place_search_service.dart # the ONLY file naming `/v1/places/search`
 │   │   │   ├── fallback_place_search_service.dart # backend first, Photon on backendUnreachable/timeout/rateLimited
@@ -394,7 +394,7 @@ ketoclub/
 │   │   ├── menu.dart                     # Menu, MenuCategory, Dish, DishOption
 │   │   ├── analysis.dart                 # DishVerdict, AnalysedDish, MenuAnalysis (sealed)
 │   │   ├── place.dart                    # KnownPlace: a city the user can look around (#443, D26);
-│   │   │                                 # StreetPlace: a street a street search found (#449, D27)
+│   │   │                                 # StreetPlace: a street a street search found (#449, D28)
 │   │   └── failures.dart                 # MenuFetchFailureReason, MenuAnalysisFailureReason
 │   │
 │   ├── utils/
@@ -506,7 +506,7 @@ literal.
   and `/v1/venues/search` in `services/venue/backend_venue_search_service.dart`;
   `/v1/places/search` only in `services/place/backend_place_search_service.dart`
   and `photon.komoot.io` only in
-  `services/place/photon/photon_place_search_service.dart` (D27);
+  `services/place/photon/photon_place_search_service.dart` (D28);
   `KETOCLUB_BACKEND_URL` only in `di.dart`; `googleapis.com` and the `x-goog-api-key` header only in
   `services/llm/gemini_chat_client.dart`, the phones' direct client (D17);
   `package:flutter_secure_storage/` only in `services/storage/api_key_store.dart`;
@@ -1127,7 +1127,7 @@ gracefully to "type an address or a venue name" on denial or on web without HTTP
    the haversine distance from the search position, on the device, from
    coordinates the search already returned.
 
-   *(D27, issue #449)* **Or a street.** Once the picker's text is three
+   *(D28, issue #449)* **Or a street.** Once the picker's text is three
    characters or more it offers one explicit "Search streets" action, which
    asks a `PlaceSearchService` (KetoClub's backend, then Photon) and lists
    up to six matches. `VenueSearchController.chooseStreet` then runs the
@@ -3117,7 +3117,7 @@ that the keto vocabulary makes (§12).
   city centre: whether Wolt answers a centre with as full a list as it does a
   residential address is unobserved.
 
-*(Amended by D27, issue #449: the picker also finds a street, through a
+*(Amended by D28, issue #449: the picker also finds a street, through a
 geocoder, on an explicit tap only. "A city centre, not a street" and the
 reasoning under "Why a bundled list" still hold for the city list, which
 stays the offline, no-network path.)*
@@ -3192,7 +3192,7 @@ Chrome driven over the DevTools protocol:
 **What it costs.** `SliverVenueGrid` beside `VenueGrid`, a screen `build`
 split into slivers, and four flows that bring the list into view first.
 
-### D27 — A street as the custom location, found by a geocoder on an explicit tap
+### D28 — A street as the custom location, found by a geocoder on an explicit tap
 
 *(Issue #449. Amends D26; extends D25's fallback pattern to a new outside
 host.)*

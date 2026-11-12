@@ -9,7 +9,7 @@ import 'package:ketoclub/services/place/place_search_service.dart';
 
 /// Searches for streets in Israel with Photon, komoot's public
 /// OpenStreetMap geocoder, straight from the device (issue #449,
-/// architecture.md D27).
+/// architecture.md D28).
 ///
 /// This class does HTTP and the failure mapping only; reading Photon's
 /// reply is [PhotonPlaceMapper]'s job. It works in a browser too: Photon

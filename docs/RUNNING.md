@@ -96,7 +96,7 @@ upload is refused with 413). The tables are created on startup, so an
 existing `ketoclub.db` gains `stored_menus` the next time the backend starts.
 `backend/README.md` documents every route, error and cache.
 
-The location picker's street search (D27, #449) needs no client
+The location picker's street search (D28, #449) needs no client
 configuration: a build with `KETOCLUB_BACKEND_URL` asks the backend's
 `POST /v1/places/search` first and Photon directly when the backend cannot
 answer, and a build without it asks Photon (`photon.komoot.io`) directly, on

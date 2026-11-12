@@ -101,7 +101,7 @@ final class PlaceSearchFailed extends PlaceSearchResult {
 }
 
 /// Turns what the user typed into streets in Israel (issue #449,
-/// architecture.md D27).
+/// architecture.md D28).
 ///
 /// One call per explicit "Search streets" tap, never per keystroke: the
 /// text goes to an outside geocoder, so it leaves the device only when

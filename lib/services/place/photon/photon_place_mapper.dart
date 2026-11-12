@@ -1,7 +1,7 @@
 import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/services/place/place_search_service.dart';
 
-/// Turns a Photon reply into streets (issue #449, architecture.md D27).
+/// Turns a Photon reply into streets (issue #449, architecture.md D28).
 ///
 /// Pure and total: no HTTP, never throws. `PhotonPlaceSearchService` does
 /// the request; this file is the only place Photon's GeoJSON shape is

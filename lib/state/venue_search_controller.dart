@@ -91,7 +91,7 @@ typedef VenueCardNumbers = ({
 /// the saved one, and one that does not leaves it alone. No permission is
 /// involved anywhere on this path.
 ///
-/// **A street works the same way (issue #449, D27).** [searchStreets]
+/// **A street works the same way (issue #449, D28).** [searchStreets]
 /// runs one street search for the location picker, only when the user
 /// taps for it, and [chooseStreet] then looks around the street it found
 /// exactly as [choosePlace] looks around a city. A chosen street is saved

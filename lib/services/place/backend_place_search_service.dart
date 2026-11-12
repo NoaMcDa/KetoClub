@@ -8,7 +8,7 @@ import 'package:ketoclub/services/place/place_search_service.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
 
 /// Searches for streets through KetoClub's own backend (issue #449,
-/// architecture.md D27): `POST /v1/places/search`, which asks Photon on
+/// architecture.md D28): `POST /v1/places/search`, which asks Photon on
 /// the server and maps its reply by the same rules as
 /// `PhotonPlaceMapper`.
 ///

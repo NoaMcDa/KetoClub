@@ -43,7 +43,7 @@ const serviceRank = <String, int>{
   'location': 0,
   'venue': 0,
   'community': 0,
-  // The location picker's street search (issue #449, D27).
+  // The location picker's street search (issue #449, D28).
   'place': 0,
   'menu': 1,
   'classifier': 1,
@@ -260,7 +260,7 @@ const _boundaries = <_Boundary>[
   _Boundary('/v1/venues/search', {
     'services/venue/backend_venue_search_service.dart',
   }),
-  // The location picker's street search (issue #449, D27): the backend's
+  // The location picker's street search (issue #449, D28): the backend's
   // route in its one client, and Photon, the geocoder called directly
   // without a backend or when it cannot answer, in its one client.
   _Boundary('/v1/places/search', {
@@ -274,7 +274,7 @@ const _boundaries = <_Boundary>[
   }),
   _Boundary('github.com/NoaMcDa', {
     'services/menu/website/direct_website_fetcher.dart',
-    // The User-Agent a phone sends to Photon (issue #449, D27).
+    // The User-Agent a phone sends to Photon (issue #449, D28).
     'services/place/photon/photon_place_search_service.dart',
     // The issue tracker "Report a problem" opens (issue #258).
     'screens/settings_screen.dart',

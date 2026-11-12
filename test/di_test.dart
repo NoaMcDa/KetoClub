@@ -527,7 +527,7 @@ void main() {
     });
   });
 
-  group('placeSearchFor (issue #449, D27)', () {
+  group('placeSearchFor (issue #449, D28)', () {
     test('with no backend is Photon alone', () {
       // Act
       final service = placeSearchFor(

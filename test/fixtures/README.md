@@ -160,7 +160,7 @@ from.
 
 ## Photon street search (`photon/*.json`)
 
-**Recorded, real**, for issue #449 (`architecture.md` D27): two replies from
+**Recorded, real**, for issue #449 (`architecture.md` D28): two replies from
 Photon's public instance (`https://photon.komoot.io/api/`), recorded
 2026-11-12 from a laptop with the exact request the app sends (`limit=15`,
 `bbox=34.2,29.4,35.9,33.4`, `layer=house`, `layer=street`), stored as

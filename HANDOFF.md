@@ -34,7 +34,7 @@ blocked for about 21 s in a debug build and is now blocked for 2.3 s (release:
 far below the fold is no longer in the element tree, and fast scrolling in a
 debug build is less smooth than it was; see `architecture.md` D27.
 
-**D27 — a street as the custom location, found by a geocoder on an explicit
+**D28 — a street as the custom location, found by a geocoder on an explicit
 tap (#449).** The location picker's field now reads "Search for a city or a
 street". Typing still filters the bundled cities on the device and sends
 nothing; from three characters a "Search streets for “…”" action appears with
@@ -49,7 +49,7 @@ which is `choosePlace` for coordinates; it is saved as
 city is. The mapper's dedupe step merges one address under several spellings
 of its city and a street in several segments; the backend's port must match
 it. Evidence is fakes, mocked HTTP and two recorded Photon replies; see
-`architecture.md` D27.
+`architecture.md` D28.
 
 **D26 — Discovery looks around a place the user chooses, and filters by
 distance (#443).** "Choose a location", in the Discovery header and on the
@@ -747,7 +747,7 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D27, each
+- `architecture.md` §14 — the decisions log, now D1 to D28, each
   recording what was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately

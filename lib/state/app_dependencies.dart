@@ -235,7 +235,7 @@ class AppDependencies {
   final bool backendConfigured;
 
   /// Turns what the user typed in the location picker into streets (issue
-  /// #449, D27), only when they tap "Search streets": KetoClub's backend
+  /// #449, D28), only when they tap "Search streets": KetoClub's backend
   /// first and Photon directly as the fallback with a backend URL, Photon
   /// alone without one. Null offers cities only.
   final PlaceSearchService? placeSearchService;

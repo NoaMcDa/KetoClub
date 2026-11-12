@@ -108,7 +108,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > thread blocked 21 s → 2.3 s in a debug build and 8.5 s → 0.4 s in release,
 > photos requested on arrival 328 → 15.
 
-> **D27 (#449) adds a street to the picker, found on an explicit tap.** Typing
+> **D28 (#449) adds a street to the picker, found on an explicit tap.** Typing
 > in the picker still filters the cities on the device and sends nothing; at
 > three characters a "Search streets for “…”" action appears, captioned with
 > where the text goes. One tap is one `PlaceSearchService.search`
@@ -266,7 +266,7 @@ lib/
 ├── models/                    # venue, menu, analysis, failures, scanned_menu (the pages of
 │                              # one scan, in memory only), place (KnownPlace, a city the
 │                              # user can look around, D26; StreetPlace, a street a street
-│                              # search found, D27) — plain immutable Dart
+│                              # search found, D28) — plain immutable Dart
 ├── utils/                     # constants (the keto vocabulary), text_normaliser,
 │                              # classification_rules, price_format, keto_score,
 │                              # wolt_headers (the web-client header set, #168),
@@ -289,7 +289,7 @@ lib/
 │   ├── community/             # menu_store_client (MenuStoreClient + BackendMenuStoreClient,
 │   │                          # the shared menu store's upload; names /v1/menus, D24)
 │   ├── location/              # location_service, geolocator_location_service (issue #37)
-│   ├── place/                 # the location picker's street search (#449, D27):
+│   ├── place/                 # the location picker's street search (#449, D28):
 │   │                          # place_search_service (interface + sealed result),
 │   │                          # backend_place_search_service (names /v1/places/search),
 │   │                          # fallback_place_search_service (backend first, Photon second),
@@ -330,7 +330,7 @@ lib/
 │                              # its QrScanner, the one file over mobile_scanner, #182),
 │                              # rename_menu_dialog (a scan's name and city, #315),
 │                              # location_picker_sheet (the device, a city, #443, D26, or a
-│                              # street found on an explicit tap, #449, D27)
+│                              # street found on an explicit tap, #449, D28)
 └── screens/                   # venue_search (the Discovery screen, D13), menu,
                                # waiter_card_sheet, settings (a Gemini key section on
                                # phones only, D17), saved (the Recent tab: the visit
@@ -464,10 +464,10 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   (D25).** It is the same cache over the direct adapters; routing it through
   the backend would classify every Discovery card on the server.
 - **A `KnownPlace.id` is stored on the device (D26); never change or reuse
-  one.** A chosen street (D27) is stored beside it as
+  one.** A chosen street (D28) is stored beside it as
   `AppSettings.discoveryStreet`; the two are never both set, so write them
   together (`VenueSearchController._saveChoice`).
-- **The picker sends nothing while the user types (D27).** The street search
+- **The picker sends nothing while the user types (D28).** The street search
   runs only from its explicit action; do not debounce it onto the text
   field. The Photon dedupe rule lives twice, in `photon_place_mapper.dart`
   and the backend's port: change both together. And the distance filter is `radiusKm`, not a `DiscoveryChip`: do not
@@ -747,20 +747,20 @@ Built, but not confirmed end to end, and not to be reported as done:
   The 42 coordinates are approximate centres, checked only to lie inside
   Israel. The new flow (`discovery_choose_location_flow_test.dart`) passed
   under `flutter-tester`.
-- **No street search (D27, #449) has run in a real browser or on a device.**
+- **No street search (D28, #449) has run in a real browser or on a device.**
   The Photon mapper is tested against two replies recorded from a laptop
   (`test/fixtures/photon/`), both HTTP clients against a mocked client, and
   the picker, controller and flow (`discovery_choose_street_flow_test.dart`,
   `flutter-tester` only) against fakes. Both clients have run against live
   services only from a throwaway `flutter test` on a laptop (the backend
   client through a local backend to Photon, the direct one to Photon; see
-  D27), and Photon's CORS header was checked with a script, not from a
+  D28), and Photon's CORS header was checked with a script, not from a
   browser. A backend without that route (404, or
   `PLACE_SEARCH_ENABLED` off) or one refusing a missing install id (400)
   reads as `backendUnreachable` and falls back to Photon; that path is
   proven against a mocked client only. Photon answers `403` to Dart's
   default `User-Agent`, so the direct client sends a KetoClub one on phones;
-  a live `flutter test` run of the direct client then answered (see D27),
+  a live `flutter test` run of the direct client then answered (see D28),
   but no browser has sent the web path's request, which carries no
   `User-Agent` of ours and relies on the browser's own being accepted.
 - **`flutter drive` could not complete in this environment** (a
@@ -788,7 +788,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
    scan issue (#88; §16's Phase 4 steps). §14 has the decisions
-   log D1–D27, §17 the open questions with the default the code follows.
+   log D1–D28, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

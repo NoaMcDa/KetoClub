@@ -248,7 +248,7 @@ final class AppSettings {
   final String? discoveryPlaceId;
 
   /// The street the user chose to look around on the Discovery screen
-  /// (issue #449, architecture.md D27), or null when none is chosen.
+  /// (issue #449, architecture.md D28), or null when none is chosen.
   ///
   /// Stored as its label and coordinates only ([StreetPlace.toJson]),
   /// since a street, unlike a city, cannot be looked up again without

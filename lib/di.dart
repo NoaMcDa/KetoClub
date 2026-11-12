@@ -297,7 +297,7 @@ VenueSearchService venueSearchFor({
         fallback: direct,
       );
 
-/// The street search behind the location picker (issue #449, D27).
+/// The street search behind the location picker (issue #449, D28).
 ///
 /// With a [backendBase] it is a [FallbackPlaceSearchService] asking a
 /// [BackendPlaceSearchService] there first and a
@@ -622,7 +622,7 @@ AppDependencies buildDependencies() {
     // Whether menus, scans and searches go to the backend first (D25);
     // the consent and scan disclosures follow it (issue #330).
     backendConfigured: backendBase != null,
-    // Sends only on the picker's explicit "Search streets" tap (D27); the
+    // Sends only on the picker's explicit "Search streets" tap (D28); the
     // constructors read no install id and send nothing.
     placeSearchService: placeSearchFor(
       backendBase: backendBase,

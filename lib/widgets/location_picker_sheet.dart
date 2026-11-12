@@ -80,7 +80,7 @@ Future<LocationPick?> showLocationPickerSheet(
 /// location" above a searchable list of the places in
 /// `utils/known_places.dart`, each named in the UI language, and — once
 /// the text is at least [streetSearchMinLength] characters — one explicit
-/// "Search streets" action (issue #449, architecture.md D27).
+/// "Search streets" action (issue #449, architecture.md D28).
 ///
 /// **Typing sends nothing.** The city list is filtered on the device as
 /// the user types; the text leaves the device only when the user taps the
