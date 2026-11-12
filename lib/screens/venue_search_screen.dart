@@ -217,6 +217,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   Future<void> _locate() async {
     final controller = context.read<VenueSearchController>();
     final result = await controller.locate(language: _language);
+    if (mounted && controller.input.isEmpty) _field.clear();
     if (!mounted || !controller.hasSearched) return;
     final l10n = AppLocalizations.of(context)!;
     final message = switch (result) {

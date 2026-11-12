@@ -677,10 +677,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         // At phone width the four segments were forced into equal quarters
         // and their labels broke mid-word ("Ever/ythin/g") — found by the
         // visual audit. The artboard's chip-sized label and tighter
-        // padding let all four fit a 390px screen; the sideways scroll is
-        // only the fallback for a narrower one or a longer translation.
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        // padding let all four fit a 390px screen. There is no sideways
+        // scroll behind it (it hid the last segment, #482): a label too long
+        // for its share of the row scales down instead of wrapping.
+        SizedBox(
+          width: double.infinity,
           child: SegmentedButton<MenuFilter>(
             showSelectedIcon: false,
             style: SegmentedButton.styleFrom(
@@ -694,17 +695,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             segments: [
               ButtonSegment(
                 value: MenuFilter.greenOnly,
-                label: Text(l10n.tileGreenLabel),
+                label: _segmentLabel(l10n.tileGreenLabel),
               ),
               ButtonSegment(
                 value: MenuFilter.yellowOnly,
-                label: Text(l10n.tileYellowLabel),
+                label: _segmentLabel(l10n.tileYellowLabel),
               ),
               ButtonSegment(
                 value: MenuFilter.redOnly,
-                label: Text(l10n.tileRedLabel),
+                label: _segmentLabel(l10n.tileRedLabel),
               ),
-              ButtonSegment(value: MenuFilter.all, label: Text(l10n.filterAll)),
+              ButtonSegment(
+                value: MenuFilter.all,
+                label: _segmentLabel(l10n.filterAll),
+              ),
             ],
             selected: <MenuFilter>{controller.filter},
             onSelectionChanged: busy
@@ -753,16 +757,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // The artboard's "Clear" is a quiet `--red-ink` text
                   // action at the row's end, not a filled button: it is
                   // destructive, and the dialog behind it asks first.
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      foregroundColor: VerdictColors.of(context).red.ink,
+                  Flexible(
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: VerdictColors.of(context).red.ink,
+                      ),
+                      onPressed: busy
+                          ? null
+                          : () => unawaited(
+                              _confirmAndClearCache(context, controller),
+                            ),
+                      child: Text(l10n.settingsClearCache),
                     ),
-                    onPressed: busy
-                        ? null
-                        : () => unawaited(
-                            _confirmAndClearCache(context, controller),
-                          ),
-                    child: Text(l10n.settingsClearCache),
                   ),
                 ],
               ),
@@ -856,8 +862,8 @@ class _ThreeWayControl<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    return SizedBox(
+      width: double.infinity,
       child: SegmentedButton<T>(
         showSelectedIcon: false,
         style: SegmentedButton.styleFrom(
@@ -870,7 +876,10 @@ class _ThreeWayControl<T> extends StatelessWidget {
         ),
         segments: [
           for (final option in options)
-            ButtonSegment<T>(value: option.value, label: Text(option.label)),
+            ButtonSegment<T>(
+              value: option.value,
+              label: _segmentLabel(option.label),
+            ),
         ],
         selected: <T>{selected},
         onSelectionChanged: enabled
@@ -880,6 +889,13 @@ class _ThreeWayControl<T> extends StatelessWidget {
     );
   }
 }
+
+/// A segment's label: one line that scales down to the width its segment
+/// gets rather than wrapping inside a one-line button (#482).
+Widget _segmentLabel(String text) => FittedBox(
+  fit: BoxFit.scaleDown,
+  child: Text(text, maxLines: 1, softWrap: false),
+);
 
 /// A section heading in the artboard's style (`.design/Settings.dc.html`):
 /// small, extra-bold, letter-spaced and muted, sitting just above its

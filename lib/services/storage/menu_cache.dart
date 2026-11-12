@@ -6,6 +6,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/utils/dish_kind.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
 /// The reason whose `name` equals [wire], or null when none does.
@@ -152,7 +153,7 @@ final class CachedMenuEntry {
         ref: menu.venueRef,
         venueName: menu.venueName,
         fetchedAt: menu.fetchedAt,
-        dishCount: menu.allDishes.length,
+        dishCount: listedDishCount(menu),
         engine: null,
         pinned: pinned,
       );
@@ -164,7 +165,7 @@ final class CachedMenuEntry {
       ref: menu.venueRef,
       venueName: menu.venueName,
       fetchedAt: menu.fetchedAt,
-      dishCount: menu.allDishes.length,
+      dishCount: listedDishCount(menu),
       engine: analysis.engine,
       score: score,
       greenCount: score == null ? 0 : counts.green,

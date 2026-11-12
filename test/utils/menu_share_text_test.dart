@@ -52,6 +52,52 @@ MenuAnalysed _analysisOf(List<AnalysedDish> dishes) => MenuAnalysed(
 );
 
 void main() {
+  group('MenuShareText.hasContent', () {
+    test('is false when the only green line is a notice (issue #460)', () {
+      // Arrange
+      final notice = _dish('Allergen information', id: 'n1');
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: <MenuCategory>[
+          MenuCategory(id: 'c0', name: 'Please note', dishes: [notice]),
+        ],
+      );
+
+      // Act & Assert
+      expect(
+        MenuShareText.hasContent(
+          menu,
+          _analysisOf([_verdictFor(notice, DishVerdict.orderAsIs)]),
+        ),
+        isFalse,
+      );
+    });
+
+    test('is true for a green dish and false when all are red', () {
+      // Arrange
+      final steak = _dish('Grilled Steak');
+      final menu = _menuOf([steak]);
+
+      // Act & Assert
+      expect(
+        MenuShareText.hasContent(
+          menu,
+          _analysisOf([_verdictFor(steak, DishVerdict.orderAsIs)]),
+        ),
+        isTrue,
+      );
+      expect(
+        MenuShareText.hasContent(
+          menu,
+          _analysisOf([_verdictFor(steak, DishVerdict.nonKeto)]),
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('MenuShareText.build', () {
     test('leaves a notice line out even when it was judged green '
         '(issue #445)', () {
