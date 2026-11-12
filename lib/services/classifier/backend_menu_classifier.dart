@@ -43,6 +43,7 @@ const Set<MenuAnalysisFailureReason> _wireReasons = <MenuAnalysisFailureReason>{
   MenuAnalysisFailureReason.timeout,
   MenuAnalysisFailureReason.rateLimited,
   MenuAnalysisFailureReason.badResponse,
+  MenuAnalysisFailureReason.unavailable,
   MenuAnalysisFailureReason.noDishesFound,
 };
 

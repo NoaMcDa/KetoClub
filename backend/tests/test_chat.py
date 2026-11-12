@@ -305,8 +305,12 @@ def test_no_key_is_not_configured_without_an_upstream_call(
             429,
             "rateLimited",
         ),
-        (500, {"error": {"code": 500}}, 502, "badResponse"),
-        (503, {"error": {"code": 503, "status": "UNAVAILABLE"}}, 502, "badResponse"),
+        # #485: a busy or failing Google is "unavailable", not an unusable
+        # answer; its own 504 is "timeout".
+        (500, {"error": {"code": 500}}, 503, "unavailable"),
+        (502, {"error": {"code": 502}}, 503, "unavailable"),
+        (503, {"error": {"code": 503, "status": "UNAVAILABLE"}}, 503, "unavailable"),
+        (504, {"error": {"code": 504}}, 504, "timeout"),
         (404, {"error": {"code": 404, "status": "NOT_FOUND"}}, 502, "badResponse"),
     ],
 )
@@ -578,7 +582,7 @@ def test_logs_never_carry_the_key_prompts_upstream_body_or_full_install_id(
         # A distinct prompt on the second call: the same body would be a
         # #103 cache hit and never reach the third mocked (500) response.
         assert _post(chat_client).status_code == 200
-        assert _post(chat_client, body=_prompt_variant("second")).status_code == 502
+        assert _post(chat_client, body=_prompt_variant("second")).status_code == 503
         # A page (#170): only its count may reach a log line.
         assert (
             _post(chat_client, body=_image_body(("image/webp", image_b64))).status_code
@@ -867,7 +871,7 @@ def test_a_non_404_error_without_a_status_logs_only_the_status_code(
     gemini.post(_URL).mock(return_value=mocked)
 
     with caplog.at_level(logging.INFO):
-        assert _post(chat_client).status_code == 502
+        assert _post(chat_client).status_code == 503
 
     chat_lines = [r.getMessage() for r in caplog.records if r.name == "ketoclub.chat"]
     assert "gemini upstream_status=500" in chat_lines
@@ -1074,7 +1078,7 @@ def test_upstream_error_message_is_not_logged_by_default(
     gemini.post(_URL).mock(return_value=httpx.Response(503, json=_UNAVAILABLE_BODY))
 
     with caplog.at_level(logging.INFO):
-        assert _post(chat_client).status_code == 502
+        assert _post(chat_client).status_code == 503
 
     lines = _chat_lines(caplog)
     assert "gemini upstream error_status=UNAVAILABLE error_code=503" in lines
@@ -1092,7 +1096,7 @@ def test_upstream_error_message_is_logged_with_the_key_redacted_when_enabled(
 
     with _client(_settings(log_upstream_errors=True)) as client:
         with caplog.at_level(logging.INFO):
-            assert _post(client).status_code == 502
+            assert _post(client).status_code == 503
 
     lines = _chat_lines(caplog)
     assert "gemini upstream error_status=UNAVAILABLE error_code=503" in lines
@@ -1121,8 +1125,8 @@ def test_an_enabled_error_message_is_capped_and_absent_without_an_error_object(
 
     with _client(_settings(log_upstream_errors=True)) as client:
         with caplog.at_level(logging.INFO):
-            assert _post(client).status_code == 502
-            assert _post(client, body=_prompt_variant("second")).status_code == 502
+            assert _post(client).status_code == 503
+            assert _post(client, body=_prompt_variant("second")).status_code == 503
 
     messages = [line for line in _chat_lines(caplog) if "error_message=" in line]
     assert len(messages) == 1

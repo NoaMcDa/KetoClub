@@ -397,6 +397,7 @@ void main() {
       ('badResponse', 502, MenuAnalysisFailureReason.badResponse),
       // A 400 is a refused request whatever it names (issue #471).
       ('badResponse', 400, MenuAnalysisFailureReason.backendUnreachable),
+      ('unavailable', 503, MenuAnalysisFailureReason.unavailable),
       ('noDishesFound', 422, MenuAnalysisFailureReason.noDishesFound),
     ];
     for (final (name, status, reason) in named) {
@@ -609,6 +610,7 @@ void main() {
           MenuAnalysisFailureReason.timeout,
           MenuAnalysisFailureReason.rateLimited,
           MenuAnalysisFailureReason.badResponse,
+          MenuAnalysisFailureReason.unavailable,
           MenuAnalysisFailureReason.noDishesFound,
         };
         expect(

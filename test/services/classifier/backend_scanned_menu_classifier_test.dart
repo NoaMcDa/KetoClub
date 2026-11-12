@@ -398,6 +398,7 @@ void main() {
       ('timeout', 504, MenuAnalysisFailureReason.timeout),
       ('rateLimited', 429, MenuAnalysisFailureReason.rateLimited),
       ('badResponse', 502, MenuAnalysisFailureReason.badResponse),
+      ('unavailable', 503, MenuAnalysisFailureReason.unavailable),
       ('noDishesFound', 422, MenuAnalysisFailureReason.noDishesFound),
     ];
     for (final (name, status, reason) in named) {

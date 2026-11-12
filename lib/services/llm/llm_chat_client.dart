@@ -42,6 +42,13 @@ enum ChatFailureReason {
   /// naming an invalid key (architecture.md D17). The user can fix it in
   /// Settings.
   apiKeyRejected,
+
+  /// The model provider answered but could not serve the request right
+  /// now: Google's 500, 502 or 503 ("the model is overloaded"), or
+  /// KetoClub's backend relaying one (issue #485). Distinct from
+  /// [badResponse], which is an answer the client could not use; trying
+  /// again in a minute usually works.
+  unavailable,
 }
 
 /// The outcome of one [LlmChatClient.complete] call (architecture.md §9,

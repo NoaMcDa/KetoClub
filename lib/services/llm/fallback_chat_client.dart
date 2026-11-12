@@ -43,6 +43,9 @@ final class FallbackChatClient implements LlmChatClient {
         return true;
       case ChatFailureReason.offline:
       case ChatFailureReason.badResponse:
+      // The backend answered: the model provider is busy (#485), and the
+      // device would ask the same provider.
+      case ChatFailureReason.unavailable:
       case ChatFailureReason.apiKeyMissing:
       case ChatFailureReason.apiKeyRejected:
         return false;

@@ -398,6 +398,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The AI model gave an unusable answer. Showing rule-based results.';
 
   @override
+  String get analysisUnavailable =>
+      'The AI service is busy right now. Showing rule-based results. Try again in a minute.';
+
+  @override
   String get analysisNoDishesFound =>
       'The AI could not identify any dishes on this menu.';
 
@@ -1293,6 +1297,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The AI model gave an unusable answer. Your pages are kept; try again.';
 
   @override
+  String get scanScreenFailureUnavailable =>
+      'The AI service is busy right now. Your pages are kept; try again in a minute.';
+
+  @override
   String get scanScreenFailureNoDishesFound =>
       'No dishes could be read from these pages. Check that the photos are sharp and well lit, or paste the text instead.';
 
@@ -1459,6 +1467,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get menuQuestionFailedBadResponse =>
       'The AI gave an unusable answer. Try asking in a different way.';
+
+  @override
+  String get menuQuestionFailedUnavailable =>
+      'The AI service is busy right now. Try asking again in a minute.';
 
   @override
   String get menuQuestionFailedBackendUnreachable =>

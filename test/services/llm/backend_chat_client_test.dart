@@ -523,6 +523,7 @@ void main() {
       ('timeout', 504, ChatFailureReason.timeout),
       ('rateLimited', 429, ChatFailureReason.rateLimited),
       ('badResponse', 502, ChatFailureReason.badResponse),
+      ('unavailable', 503, ChatFailureReason.unavailable),
     ];
 
     for (final (name, status, expected) in wireCases) {

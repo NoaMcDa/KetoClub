@@ -64,7 +64,7 @@ from app.services.rate_limit import RateLimiter
 logger = logging.getLogger("ketoclub.classify")
 
 RulesReason = Literal[
-    "notConfigured", "offline", "timeout", "rateLimited", "badResponse"
+    "notConfigured", "offline", "timeout", "rateLimited", "badResponse", "unavailable"
 ]
 """The reasons a server-side rules fallback is stamped with: the Gemini
 client's failure names (``app.services.gemini.CHAT_FAILURE_REASONS``)."""
@@ -75,6 +75,7 @@ _RULES_REASONS: Final[dict[str, RulesReason]] = {
     "timeout": "timeout",
     "rateLimited": "rateLimited",
     "badResponse": "badResponse",
+    "unavailable": "unavailable",
 }
 """``gemini.CHAT_FAILURE_REASONS``, typed: a test pins the two equal."""
 

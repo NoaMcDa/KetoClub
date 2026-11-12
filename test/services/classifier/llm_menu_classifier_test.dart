@@ -283,6 +283,8 @@ void main() {
               MenuAnalysisFailureReason.rateLimited,
             ChatFailureReason.badResponse =>
               MenuAnalysisFailureReason.badResponse,
+            ChatFailureReason.unavailable =>
+              MenuAnalysisFailureReason.unavailable,
             ChatFailureReason.backendUnreachable =>
               MenuAnalysisFailureReason.backendUnreachable,
             ChatFailureReason.apiKeyMissing =>

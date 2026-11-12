@@ -183,7 +183,8 @@ def test_a_hit_for_the_same_text_under_other_ids_is_a_miss(
 @pytest.mark.parametrize(
     ("upstream", "reason"),
     [
-        (httpx.Response(503, json={"error": {"status": "UNAVAILABLE"}}), "badResponse"),
+        (httpx.Response(503, json={"error": {"status": "UNAVAILABLE"}}), "unavailable"),
+        (httpx.Response(504), "timeout"),
         (httpx.Response(429), "rateLimited"),
         (httpx.Response(403), "notConfigured"),
         (httpx.ConnectError("no route"), "offline"),

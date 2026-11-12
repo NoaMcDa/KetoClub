@@ -19,6 +19,7 @@ const Set<ChatFailureReason> _wireReasons = <ChatFailureReason>{
   ChatFailureReason.timeout,
   ChatFailureReason.rateLimited,
   ChatFailureReason.badResponse,
+  ChatFailureReason.unavailable,
 };
 
 /// [LlmChatClient] backed by KetoClub's own backend (`backend_plan.md`

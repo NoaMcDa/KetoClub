@@ -82,6 +82,7 @@ const List<MenuAnalysisFailureReason> _fallbackReasons =
       MenuAnalysisFailureReason.timeout,
       MenuAnalysisFailureReason.rateLimited,
       MenuAnalysisFailureReason.badResponse,
+      MenuAnalysisFailureReason.unavailable,
       MenuAnalysisFailureReason.backendUnreachable,
       MenuAnalysisFailureReason.notConfigured,
       // The direct Gemini client's own reasons (architecture.md D17): the

@@ -631,8 +631,10 @@ void main() {
       ),
       ('429', 429, '{}', ChatFailureReason.rateLimited),
       ('504', 504, '{}', ChatFailureReason.timeout),
-      ('500', 500, '{}', ChatFailureReason.badResponse),
-      ('503', 503, 'not json', ChatFailureReason.badResponse),
+      // Issue #485: a busy or failing Google is unavailable.
+      ('500', 500, '{}', ChatFailureReason.unavailable),
+      ('502', 502, '{}', ChatFailureReason.unavailable),
+      ('503', 503, 'not json', ChatFailureReason.unavailable),
       ('404', 404, '{}', ChatFailureReason.badResponse),
       (
         'a 400 that is not about the key',

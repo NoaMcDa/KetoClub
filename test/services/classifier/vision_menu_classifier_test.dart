@@ -287,6 +287,7 @@ void main() {
       ChatFailureReason.timeout: MenuAnalysisFailureReason.timeout,
       ChatFailureReason.rateLimited: MenuAnalysisFailureReason.rateLimited,
       ChatFailureReason.badResponse: MenuAnalysisFailureReason.badResponse,
+      ChatFailureReason.unavailable: MenuAnalysisFailureReason.unavailable,
       ChatFailureReason.backendUnreachable:
           MenuAnalysisFailureReason.backendUnreachable,
       ChatFailureReason.apiKeyMissing: MenuAnalysisFailureReason.apiKeyMissing,

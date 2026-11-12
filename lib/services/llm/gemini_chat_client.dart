@@ -107,7 +107,9 @@ Object? _copy(Object? value) => switch (value) {
 /// [ChatFailureReason.apiKeyRejected] too; 429 is
 /// [ChatFailureReason.rateLimited] (the user's own key's quota); 504 is
 /// [ChatFailureReason.timeout] (Google gave up waiting on the model,
-/// architecture.md §10); any other status, or a reply with no usable text,
+/// architecture.md §10); 500, 502 and 503 are
+/// [ChatFailureReason.unavailable] (the provider is busy, issue #485); any
+/// other status, or a reply with no usable text,
 /// is [ChatFailureReason.badResponse]. Exceeding [timeout] is
 /// [ChatFailureReason.timeout]. **Any other exception while sending the
 /// request or reading its reply** — a socket or DNS error
@@ -319,6 +321,14 @@ final class GeminiChatClient implements LlmChatClient {
     }
     if (status == 504) {
       return ChatFailed(reason: ChatFailureReason.timeout, statusCode: status);
+    }
+    if (status == 500 || status == 502 || status == 503) {
+      // Google is busy or down ("the model is overloaded"): not a reply
+      // this client could not use (issue #485).
+      return ChatFailed(
+        reason: ChatFailureReason.unavailable,
+        statusCode: status,
+      );
     }
     final decoded = status == 200 ? _decode(response) : null;
     final content = decoded is Map<String, Object?>

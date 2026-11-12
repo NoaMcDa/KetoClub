@@ -758,6 +758,12 @@ abstract class AppLocalizations {
   /// **'The AI model gave an unusable answer. Showing rule-based results.'**
   String get analysisBadResponseNoDetail;
 
+  /// No description provided for @analysisUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service is busy right now. Showing rule-based results. Try again in a minute.'**
+  String get analysisUnavailable;
+
   /// No description provided for @analysisNoDishesFound.
   ///
   /// In en, this message translates to:
@@ -2066,6 +2072,12 @@ abstract class AppLocalizations {
   /// **'The AI model gave an unusable answer. Your pages are kept; try again.'**
   String get scanScreenFailureBadResponse;
 
+  /// No description provided for @scanScreenFailureUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service is busy right now. Your pages are kept; try again in a minute.'**
+  String get scanScreenFailureUnavailable;
+
   /// No description provided for @scanScreenFailureNoDishesFound.
   ///
   /// In en, this message translates to:
@@ -2329,6 +2341,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The AI gave an unusable answer. Try asking in a different way.'**
   String get menuQuestionFailedBadResponse;
+
+  /// No description provided for @menuQuestionFailedUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service is busy right now. Try asking again in a minute.'**
+  String get menuQuestionFailedUnavailable;
 
   /// No description provided for @menuQuestionFailedBackendUnreachable.
   ///

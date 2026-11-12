@@ -36,6 +36,7 @@ String scanFailureMessage(
   MenuAnalysisFailureReason.timeout => l10n.scanScreenFailureTimeout,
   MenuAnalysisFailureReason.rateLimited => l10n.scanScreenFailureRateLimited,
   MenuAnalysisFailureReason.badResponse => l10n.scanScreenFailureBadResponse,
+  MenuAnalysisFailureReason.unavailable => l10n.scanScreenFailureUnavailable,
   MenuAnalysisFailureReason.noDishesFound =>
     l10n.scanScreenFailureNoDishesFound,
   MenuAnalysisFailureReason.backendUnreachable =>

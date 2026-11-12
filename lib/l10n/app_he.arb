@@ -159,6 +159,7 @@
     "placeholders": { "detail": { "type": "String" } }
   },
   "analysisBadResponseNoDetail": "מודל הבינה המלאכותית החזיר תשובה לא שמישה. מוצגות תוצאות על בסיס כללים.",
+  "analysisUnavailable": "שירות הבינה המלאכותית עמוס כרגע. מוצגות תוצאות על בסיס כללים. נסו שוב בעוד דקה.",
   "analysisNoDishesFound": "הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.",
   "analysisBackendUnreachable": "לא ניתן היה להתחבר לשרת של קטוקלאב. מוצגות תוצאות על בסיס כללים.",
   "analysisConsentWithheld": "אשרו ניתוח בינה מלאכותית בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.",
@@ -548,6 +549,7 @@
   "scanScreenFailureTimeout": "מודל ה-AI היה איטי מדי. הדפים נשמרו; נסו שוב.",
   "scanScreenFailureRateLimited": "מכסת ה-AI היומית נוצלה. הדפים נשמרו; נסו שוב מאוחר יותר.",
   "scanScreenFailureBadResponse": "מודל ה-AI החזיר תשובה שאי אפשר להשתמש בה. הדפים נשמרו; נסו שוב.",
+  "scanScreenFailureUnavailable": "שירות ה-AI עמוס כרגע. הדפים נשמרו; נסו שוב בעוד דקה.",
   "scanScreenFailureNoDishesFound": "לא ניתן היה לקרוא מנות מהדפים האלה. ודאו שהתמונות חדות ומוארות היטב, או הדביקו את הטקסט במקום.",
   "scanScreenFailureBackendUnreachable": "לא ניתן להגיע לשרת של קטוקלאב. הדפים נשמרו; נסו שוב.",
   "scanScreenFailureConsentWithheld": "סריקה שולחת את הדפים ל-Gemini API של גוגל לקריאה. אפשרו ניתוח AI בהגדרות כדי לסרוק תפריט.",
@@ -625,6 +627,7 @@
   "menuQuestionFailedTimeout": "מודל הבינה המלאכותית היה איטי מדי. נסו לשאול שוב.",
   "menuQuestionFailedRateLimited": "המגבלה היומית של הבינה המלאכותית נוצלה. נסו שוב מאוחר יותר.",
   "menuQuestionFailedBadResponse": "הבינה המלאכותית החזירה תשובה לא שמישה. נסו לנסח את השאלה אחרת.",
+  "menuQuestionFailedUnavailable": "שירות הבינה המלאכותית עמוס כרגע. נסו לשאול שוב בעוד דקה.",
   "menuQuestionFailedBackendUnreachable": "לא ניתן היה להתחבר לשרת של קטוקלאב. נסו לשאול שוב.",
   "menuQuestionFailedConsentWithheld": "אשרו ניתוח בינה מלאכותית בהגדרות כדי לשאול שאלות על תפריט.",
   "menuQuestionFailedApiKeyMissing": "הוסיפו את מפתח ה‑Gemini API שלכם בהגדרות כדי לשאול שאלות על תפריט.",

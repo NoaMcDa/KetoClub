@@ -400,6 +400,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'מודל הבינה המלאכותית החזיר תשובה לא שמישה. מוצגות תוצאות על בסיס כללים.';
 
   @override
+  String get analysisUnavailable =>
+      'שירות הבינה המלאכותית עמוס כרגע. מוצגות תוצאות על בסיס כללים. נסו שוב בעוד דקה.';
+
+  @override
   String get analysisNoDishesFound =>
       'הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.';
 
@@ -1300,6 +1304,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'מודל ה-AI החזיר תשובה שאי אפשר להשתמש בה. הדפים נשמרו; נסו שוב.';
 
   @override
+  String get scanScreenFailureUnavailable =>
+      'שירות ה-AI עמוס כרגע. הדפים נשמרו; נסו שוב בעוד דקה.';
+
+  @override
   String get scanScreenFailureNoDishesFound =>
       'לא ניתן היה לקרוא מנות מהדפים האלה. ודאו שהתמונות חדות ומוארות היטב, או הדביקו את הטקסט במקום.';
 
@@ -1465,6 +1473,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get menuQuestionFailedBadResponse =>
       'הבינה המלאכותית החזירה תשובה לא שמישה. נסו לנסח את השאלה אחרת.';
+
+  @override
+  String get menuQuestionFailedUnavailable =>
+      'שירות הבינה המלאכותית עמוס כרגע. נסו לשאול שוב בעוד דקה.';
 
   @override
   String get menuQuestionFailedBackendUnreachable =>
