@@ -1914,11 +1914,14 @@ should not reach a log or a widget, even with no bearer token left to leak.
     fallback for working **without** a backend, not the recommended path; never
     ship with that flag either way.
 - Geolocation requires HTTPS.
-- Secure storage on web is `localStorage`-backed; say so in Settings.
+- The web build has no key store (D17): the Gemini key lives in the backend's
+  environment, and Settings shows no key section on web.
 
 ### iOS
 
-- `NSLocationWhenInUseUsageDescription` in `Info.plist`.
+- `NSLocationWhenInUseUsageDescription`, `NSCameraUsageDescription` and
+  `NSPhotoLibraryUsageDescription` in `Info.plist` (location, the Scan tab's
+  camera and QR reader, and the photo picker).
 - App Transport Security: all endpoints are HTTPS; no exceptions needed.
 
 ### Android
@@ -2080,7 +2083,7 @@ removed.** *(Supersedes D3; closes §17 open question 1 as originally posed —
 Android by D17**, which puts a user-supplied key back on phones; D12 still
 describes the web build exactly.)* The backend holds a
 Gemini key server-side (`GEMINI_API_KEY`, model `GEMINI_MODEL`, default
-`gemini-2.5-flash`) and the app never holds a model key at all:
+`gemini-2.5-flash` at the time; now `gemini-3.5-flash`, see §17.1) and the app never holds a model key at all:
 `flutter_secure_storage` and `KeyStore` are gone, and so is the Settings key
 section. `BackendChatClient` posts `{system_prompt, user_prompt,
 response_schema, schema_name}` to `/v1/chat` with an `X-KetoClub-Install-Id`
@@ -3898,11 +3901,11 @@ protection: nothing merges red, and nothing merges without a review.
 | Job | Steps | Purpose |
 |---|---|---|
 | `quality` | `flutter pub get` · `dart format --output=none --set-exit-if-changed` · `tool/flow_shard.sh --verify 4` · `flutter analyze --fatal-infos --fatal-warnings` | style and static correctness; every flow file in exactly one shard |
-| `test` | generate the all-imports helper · `flutter test --coverage` (unit + flow + architecture) · `tool/coverage_gate.sh` · upload `lcov.info` | behaviour and the 80% gate |
+| `test` | generate the all-imports helper · `flutter test --coverage` (unit, widget and architecture tests; the flows in `integration_test/` run in `integration-shard`) · `tool/coverage_gate.sh` · upload `lcov.info` | behaviour and the 80% gate |
 | `integration-shard` (×4) | headless Chrome + chromedriver · `tool/flow_shard.sh <n> 4` writes one entry importing a quarter of `integration_test/flows/*_flow_test.dart` · one `flutter drive` of that entry | the real build on a real browser, one compile per machine (#453) |
 | `integration` | waits for the four shards; green only if all four are | one stable check name for the shards |
-| `build` | `flutter build web --release` · `flutter build apk --debug` | the app still compiles for the shipping targets |
-| `ios` | `flutter build ios --no-codesign` on macOS, on pushes to `main` only | catches iOS-only breakage without spending macOS minutes on every push |
+| `build` | `flutter build web --release` · `flutter build apk --debug` · `flutter build apk --release` (R8 shrinking, debug-signed) | the app still compiles for the shipping targets |
+| `ios` | `flutter build ios --no-codesign` on macOS, on every pull request and push | catches iOS-only breakage before it merges |
 
 Conventions:
 
@@ -3915,7 +3918,11 @@ Conventions:
 - A red `main` is the top priority for whoever broke it; no new work merges on top
   of a red `main`.
 - Flaky tests are fixed or deleted the day they flake; there is no retry button.
-- Dependencies are updated by a scheduled bot pull request, which goes through the
+- Runs on `main` are never cancelled by a later push (`cancel-in-progress` is off
+  for `main`).
+- `pubspec.lock` and `backend/uv.lock` are committed; `backend/check.sh` uses
+  `uv sync --locked`.
+- Dependencies are updated by a scheduled bot pull request (`.github/dependabot.yml`, weekly), which goes through the
   same checks as any other.
 
 ### 18.6 Definition of Done for a pull request
