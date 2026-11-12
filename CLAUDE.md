@@ -753,9 +753,10 @@ Built, but not confirmed end to end, and not to be reported as done:
   the picker, controller and flow (`discovery_choose_street_flow_test.dart`,
   `flutter-tester` only) against fakes. The app has never called the
   backend's `/v1/places/search`, and Photon's CORS header was checked with a
-  script, not from a browser. A backend without that route answers 404,
-  which the contract reads as `providerChanged` and does **not** fall back to
-  Photon.
+  script, not from a browser. A backend without that route (404, or
+  `PLACE_SEARCH_ENABLED` off) or one refusing a missing install id (400)
+  reads as `backendUnreachable` and falls back to Photon; that path is
+  proven against a mocked client only.
 - **`flutter drive` could not complete in this environment** (a
   chromedriver/Chromium mismatch; runs hang after "Debug service listening",
   including flows that predate D25), so the two new flows

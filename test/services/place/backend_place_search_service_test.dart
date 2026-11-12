@@ -7,9 +7,11 @@ import 'package:http/testing.dart';
 import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/place/backend_place_search_service.dart';
+import 'package:ketoclub/services/place/fallback_place_search_service.dart';
 import 'package:ketoclub/services/place/place_search_service.dart';
 
 import '../../fakes/fake_install_id_store.dart';
+import '../../fakes/fake_place_search_service.dart';
 
 final Uri _base = Uri.parse('http://localhost:8000');
 
@@ -264,7 +266,7 @@ void main() {
           (
             400,
             _error('badResponse', 400),
-            PlaceSearchFailureReason.providerChanged,
+            PlaceSearchFailureReason.backendUnreachable,
           ),
         ];
         for (final (status, body, reason) in cases) {
@@ -286,7 +288,6 @@ void main() {
     test('an unexpected status, or a 502 without a known reason, is a '
         'changed provider', () async {
       for (final (status, body) in <(int, String)>[
-        (404, '{"detail":"Not Found"}'),
         (500, 'Internal Server Error'),
         (502, 'Bad Gateway'),
         (503, '{}'),
@@ -309,6 +310,53 @@ void main() {
         );
       }
     });
+
+    test('a backend without the route (404) is backend unreachable, so '
+        'the fallback can ask Photon', () async {
+      // Arrange
+      final service = _service(
+        _answering(404, '{"detail":"Not Found"}'),
+        baseUrl: _base,
+      );
+
+      // Act
+      final result = await service.search('herzl', language: 'en');
+
+      // Assert
+      expect(
+        result,
+        const PlaceSearchFailed(
+          PlaceSearchFailureReason.backendUnreachable,
+          statusCode: 404,
+        ),
+      );
+    });
+
+    for (final (status, body) in <(int, String)>[
+      (404, '{"detail":"Not Found"}'),
+      (400, '{"reason":"badResponse","status_code":400}'),
+    ]) {
+      test('behind the fallback chain, a $status reaches Photon', () async {
+        // Arrange
+        final photon = FakePlaceSearchService()
+          ..queueFound(const <StreetPlace>[
+            StreetPlace(label: 'Herzl 10', latitude: 32.06, longitude: 34.77),
+          ]);
+        final chain = FallbackPlaceSearchService(
+          primary: _service(_answering(status, body), baseUrl: _base),
+          fallback: photon,
+        );
+
+        // Act
+        final result = await chain.search('herzl', language: 'he');
+
+        // Assert
+        expect(photon.calls, <PlaceSearchCall>[
+          (query: 'herzl', language: 'he'),
+        ]);
+        expect((result as PlacesFound).places.single.label, 'Herzl 10');
+      });
+    }
 
     test('a 2xx body that is not the contract is a changed provider', () async {
       for (final body in <String>[

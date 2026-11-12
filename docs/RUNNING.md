@@ -104,8 +104,9 @@ every platform. The backend's side is governed by its own settings,
 documented in `backend/README.md` and `.env.example`: `GEOCODER_BASE_URL`
 (the Photon instance it asks), `PLACE_SEARCH_ENABLED` (whether the route is
 served) and `PLACE_SEARCH_RATE_LIMIT_PER_MINUTE` (per install id). A backend
-without the route answers 404, which the app reports as a changed street
-search service rather than falling back to Photon.
+without the route answers 404, and the app then asks Photon directly, so
+an older backend or one with the route switched off still gets street
+search.
 
 ## 3. The app talking to the backend
 

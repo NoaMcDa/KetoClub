@@ -3234,7 +3234,10 @@ street in several segments — and keep the first six.
 `BackendPlaceSearchService` (`POST /v1/places/search`, `{query,
 language}`, the install id header and nothing else identifying) and falls
 through to `PhotonPlaceSearchService` only on `backendUnreachable`,
-`timeout` or `rateLimited`; without a URL, Photon alone, on every platform.
+`timeout` or `rateLimited`. A `404` (a backend without the route: older, or
+with `PLACE_SEARCH_ENABLED` off) and a `400` (the route's `badResponse` for a
+missing install id) read as `backendUnreachable`, as
+`BackendVenueSearchService` reads them, so they reach Photon too; without a URL, Photon alone, on every platform.
 Failures are a sealed `PlaceSearchResult` with five reasons (`offline`,
 `timeout`, `rateLimited`, `backendUnreachable`, `providerChanged`), each
 with its own copy in both languages.
@@ -3276,11 +3279,11 @@ user is already searching, this text is about where the user is.
 - **Coverage is OpenStreetMap's.** A street OSM does not know is "no street
   found"; Hebrew and English spellings both work only as far as OSM's
   names do.
-- **An older or switched-off backend.** The contract maps any status it
-  does not name to `providerChanged`, which does not fall through: a
-  backend without the route (a `404`) or one with `PLACE_SEARCH_ENABLED`
-  off answers "the street search service changed" rather than falling back
-  to Photon.
+- **An older or switched-off backend costs a round trip.** A backend
+  without the route answers `404` and the app then asks Photon, so street
+  search works with any backend, at the price of one wasted request per
+  search. Only `providerChanged` (an unexpected status or body) and
+  `offline` stop at the backend.
 - **Evidence.** Unit tests (the mapper against two recorded Photon replies,
   `test/fixtures/photon/`, and hand-built edge cases; both HTTP clients
   against a mocked `http.Client`; the fallback; settings; the controller),

@@ -19,14 +19,17 @@ import 'package:ketoclub/services/storage/install_id_store.dart';
 ///
 /// Failure mapping (the backend's own errors are `{reason, status_code}`):
 ///
-/// - [baseUrl] null, or a `ClientException`:
+/// - [baseUrl] null, a `ClientException`, `404` (a backend without the
+///   route: older, or with `PLACE_SEARCH_ENABLED` off) or `400` (the
+///   route's `badResponse` for a missing install id):
 ///   [PlaceSearchFailureReason.backendUnreachable], with no I/O for the
-///   former. It is what `FallbackPlaceSearchService` falls through on.
+///   first. Each says the backend, not the geocoder, could not answer, so
+///   it is what `FallbackPlaceSearchService` falls through to Photon on —
+///   the same reading `BackendVenueSearchService` gives such statuses.
 /// - `429`: [PlaceSearchFailureReason.rateLimited]; `504` and a
 ///   client-side timeout: [PlaceSearchFailureReason.timeout].
 /// - `502` with reason `offline`: [PlaceSearchFailureReason.offline].
-/// - Anything else — `502 providerChanged`, any other status (the `400`
-///   the route answers without an install id among them), a 2xx body
+/// - Anything else — `502 providerChanged`, any other status, a 2xx body
 ///   without a `places` list, or an element that is not an object:
 ///   [PlaceSearchFailureReason.providerChanged]. An element that is an
 ///   object without a usable label and coordinates is skipped.
@@ -97,6 +100,12 @@ final class BackendPlaceSearchService implements PlaceSearchService {
     }
 
     final status = response.statusCode;
+    if (status == 404 || status == 400) {
+      return PlaceSearchFailed(
+        PlaceSearchFailureReason.backendUnreachable,
+        statusCode: status,
+      );
+    }
     if (status == 429) {
       return const PlaceSearchFailed(
         PlaceSearchFailureReason.rateLimited,
