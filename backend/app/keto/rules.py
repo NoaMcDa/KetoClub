@@ -54,6 +54,7 @@ from app.keto.normaliser import (
     dish_core_text,
     dish_option_rules_text,
     dish_rules_text,
+    is_add_on_option_group,
     is_removal_option_value,
     normalise,
 )
@@ -555,6 +556,9 @@ def _dough_choices(dish: Dish) -> list[tuple[str, bool]]:
     ``dish`` in option order, as ``(label, offers_rescued)``."""
     choices: list[tuple[str, bool]] = []
     for option in dish.options:
+        # An upsell is never what the dish is made of (issue #475).
+        if is_add_on_option_group(option.name):
+            continue
         name = normalise(option.name)
         label = _unguarded_dough_label(name)
         if label is None:
@@ -586,6 +590,8 @@ def _filling_text(dish: Dish) -> str:
     #273): Dart's ``replaceAll`` with each topping pattern, in order."""
     parts = [normalise(dish.description)]
     for option in dish.options:
+        if is_add_on_option_group(option.name):
+            continue
         for value in option.values:
             if is_removal_option_value(value):
                 continue

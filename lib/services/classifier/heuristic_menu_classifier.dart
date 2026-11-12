@@ -16,6 +16,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/dish_kind.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// The offline, rule-based [MenuClassifier] (architecture.md §6.2).
@@ -58,7 +59,9 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     // the call starts (issue #65).
     options.onEngineStarted?.call(ClassifyingEngine.rules);
     final dishes = <AnalysedDish>[
-      for (final dish in menu.allDishes) _analyse(dish, options),
+      for (final category in menu.categories)
+        for (final dish in category.dishes)
+          _analyse(dish, options, category: category.name),
     ];
     return MenuAnalysed(
       dishes: dishes,
@@ -81,7 +84,11 @@ final class HeuristicMenuClassifier implements MenuClassifier {
   /// one gains the extra ask. A dish yellow only because of a dietary rule
   /// gets [dietaryRuleWhyEn]/[dietaryRuleWhyHe], since the carb-component
   /// `why` would not be true of it.
-  AnalysedDish _analyse(Dish dish, ClassificationOptions options) {
+  AnalysedDish _analyse(
+    Dish dish,
+    ClassificationOptions options, {
+    required String category,
+  }) {
     // The rules read the dish minus its removal options (issue #192), and
     // judge it as a whole dish rather than one flat string (issue #191):
     // see ClassificationRules.matchDish for the order of its steps.
@@ -90,7 +97,19 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     // text, not the UI locale (architecture.md §12): a Hebrew menu
     // read by an English-UI user still gets a Hebrew script.
     final isHebrew = TextNormaliser.containsHebrew(text);
-    final match = ClassificationRules.matchDish(dish);
+    var match = ClassificationRules.matchDish(dish);
+    // A brand or a fruit under a beer or juice heading is that drink
+    // (issue #474): the heading names the base the dish text does not.
+    if (!match.isNonKeto) {
+      final drinkBase = headingDrinkBase(category: category, dish: dish);
+      if (drinkBase != null) {
+        match = RuleMatch(
+          isNonKeto: true,
+          baseLabel: drinkBase,
+          instructions: const <String>[],
+        );
+      }
+    }
 
     if (match.isNonKeto) {
       final template = isHebrew ? redWhyHe : redWhyEn;

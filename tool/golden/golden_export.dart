@@ -341,6 +341,8 @@ Map<String, Object?> _vocabulary() {
     'dairyGuardsHe': _guards(dairyGuardsHe),
     'optionRemovalWordsEn': optionRemovalWordsEn,
     'optionRemovalWordsHe': optionRemovalWordsHe,
+    'optionAddOnGroupWordsEn': optionAddOnGroupWordsEn,
+    'optionAddOnGroupWordsHe': optionAddOnGroupWordsHe,
     'noPrefixHebrewTriggers': _noPrefixHebrewTriggers(),
     'hebrewTriggerPatternExample': <String, Object?>{
       'trigger': _exampleHe,
@@ -381,6 +383,12 @@ Map<String, Object?> _vocabulary() {
       'drinkNameTriggersHe': drinkNameTriggersHe,
       'drinkNameGuardWordsEn': drinkNameGuardWordsEn,
       'drinkNameGuardWordsHe': drinkNameGuardWordsHe,
+      'extraNameWordsEn': extraNameWordsEn,
+      'extraNameWordsHe': extraNameWordsHe,
+      'drinkHeadingBasesEn': drinkHeadingBasesEn,
+      'drinkHeadingBasesHe': drinkHeadingBasesHe,
+      'drinkHeadingGuardWordsEn': drinkHeadingGuardWordsEn,
+      'drinkHeadingGuardWordsHe': drinkHeadingGuardWordsHe,
       // Read from `utils/dish_kind.dart`, where they are private: which
       // vocabularies match Hebrew with the permissive prefix.
       'hebrewPrefixAllowed': <String, Object?>{
@@ -390,6 +398,10 @@ Map<String, Object?> _vocabulary() {
         'notice': false,
         'drinkNames': true,
         'drinkNameGuards': true,
+        'extraNames': false,
+        'plainDrinkNames': true,
+        'drinkHeadings': false,
+        'drinkHeadingGuards': true,
       },
     },
     'templates': <String, Object?>{

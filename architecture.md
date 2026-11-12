@@ -3377,6 +3377,43 @@ inline SVG.
 
 ---
 
+### D30 — The rule engine reads a drink's heading and skips upsell groups
+
+*(Issues #273, #274, #276, #469, #470, #472–#475. Amends §6.1, §6.2 and D21.)*
+
+**What changed.** A QA pass replayed 18 real Wolt menus through the rule
+engine and found it judging dishes by text that does not say what they are.
+Besides vocabulary (desserts, sushi, beer brands, plural and construct forms),
+three rules now read more than the dish's own words:
+
+- **A drink takes its heading's base** (`headingDrinkBase`,
+  `utils/dish_kind.dart`; #474). A drink (D21's kind) under a beer, juice or
+  shake heading (`drinkHeadingBases*`) is red with that base unless its name is
+  a plain drink (wine, water, spirits) or carries a zero, diet or no-sugar word.
+  "היינקן" under "בירות" and "תפוז" under "מיצים טבעיים" were green. The
+  heuristic classifier now walks categories, so it knows each dish's heading.
+- **An upsell group is not read** (`TextNormaliser.isAddOnOptionGroup`; #475).
+  A group whose name holds an `optionAddOnGroupWords*` phrase ("תוספות
+  בתשלום", "תרצו להוסיף…?", "Add a drink", "A small discount") is left out of
+  the rules text, the filling check and the choice-of-dough check. A required
+  choice ("בחרו תוספת") still counts. `dishSearchText`, and so
+  `menuFingerprint`, is unchanged.
+- **A choice of pasta is the base** (#473): an option group naming pasta or
+  noodles beside a choice word is read like #447's choice of dough.
+- **A starch named alone is the dish** (#276): rice, purée or fries named alone
+  is red unless the description names a protein; a bread keeps #191's filling
+  rule. The name-wide keto substitutes (`ketoSubstituteNameWords*`, #273) and
+  the regular English plural on every base (#274) also land here.
+- **A non-edible line is named as such** (`extraNameWords*`, #472): cutlery,
+  candles and greeting cards are extras under any heading.
+
+**What it accepts.** A heading is evidence only for drinks; food is never
+reddened by its heading. An alcohol-free beer under "Beers" stays red (it is
+still malt). An upsell word in a required group's name ("Extra side") hides
+that group. The Python port and the goldens move with every rule (D25).
+
+---
+
 ## 15. Testing strategy
 
 The pyramid, the coverage gate, and the CI wiring are defined in §18.4 and §18.5.

@@ -1,6 +1,30 @@
 {
   "headings": [
     {
+      "heading": "הודעות חשובות 💚",
+      "kind": "notice"
+    },
+    {
+      "heading": "💗 לתשומת לבכם 💗",
+      "kind": "notice"
+    },
+    {
+      "heading": "מספר סועדים",
+      "kind": "extra"
+    },
+    {
+      "heading": "נרות יום הולדת",
+      "kind": "extra"
+    },
+    {
+      "heading": "ברכה להזמנה 💌",
+      "kind": "extra"
+    },
+    {
+      "heading": "Notices",
+      "kind": "notice"
+    },
+    {
       "heading": "‫לקוחות יקרים",
       "kind": "notice"
     },
@@ -3183,7 +3207,7 @@
         "x10": "food",
         "x11": "notice",
         "x12": "food",
-        "x13": "food",
+        "x13": "drink",
         "x14": "drink",
         "x15": "food",
         "x2": "food",
@@ -3378,6 +3402,306 @@
     },
     {
       "kinds": {
+        "d1": "drink",
+        "d10": "drink",
+        "d11": "drink",
+        "d12": "drink",
+        "d13": "drink",
+        "d14": "drink",
+        "d15": "drink",
+        "d16": "drink",
+        "d17": "food",
+        "d18": "extra",
+        "d19": "extra",
+        "d2": "drink",
+        "d20": "extra",
+        "d21": "extra",
+        "d22": "food",
+        "d23": "food",
+        "d24": "notice",
+        "d3": "drink",
+        "d4": "drink",
+        "d5": "drink",
+        "d6": "drink",
+        "d7": "drink",
+        "d8": "drink",
+        "d9": "drink"
+      },
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "היינקן בקבוק 330 מ\"ל",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "פאולנר",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "הרצל- שש אחוז כפרה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "יין אדום יבש",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "בירה זירו",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-beer",
+            "name": "בירות ויין"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d6",
+                "imageUrl": null,
+                "name": "תפוז",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d7",
+                "imageUrl": null,
+                "name": "לימון נענע",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d8",
+                "imageUrl": null,
+                "name": "מים מינרלים",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-juice",
+            "name": "מיצים טבעיים"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d9",
+                "imageUrl": null,
+                "name": "פיוז טי אפרסק",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d10",
+                "imageUrl": null,
+                "name": "טרופית",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d11",
+                "imageUrl": null,
+                "name": "לימונדת הבית",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d12",
+                "imageUrl": null,
+                "name": "מים בטעם ענבים",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d13",
+                "imageUrl": null,
+                "name": "Diet coke",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-soft",
+            "name": "שתייה קלה"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d14",
+                "imageUrl": null,
+                "name": "Blue Moon",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d15",
+                "imageUrl": null,
+                "name": "Hazy IPA",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d16",
+                "imageUrl": null,
+                "name": "Whisky",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-en",
+            "name": "Beers"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d17",
+                "imageUrl": null,
+                "name": "סטייק אנטריקוט",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d18",
+                "imageUrl": null,
+                "name": "סכו\"ם חד\"פ",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "",
+                "id": "d19",
+                "imageUrl": null,
+                "name": "נר מספר 5",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d20",
+                "imageUrl": null,
+                "name": "כרטיס ברכה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d21",
+                "imageUrl": null,
+                "name": "Cutlery",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d22",
+                "imageUrl": null,
+                "name": "קציצות בטעם של ברכה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d23",
+                "imageUrl": null,
+                "name": "שמנת קשיו",
+                "options": [
+                  {
+                    "name": "תוספות בתשלום",
+                    "values": [
+                      "קוקוט רוטב סובה",
+                      "מנת לחם (4 פרוסות)"
+                    ]
+                  }
+                ],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-mains",
+            "name": "עיקריות"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d24",
+                "imageUrl": null,
+                "name": "הערה חשובה! נשים בהיריון",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              }
+            ],
+            "id": "d-notice",
+            "name": "💗 לתשומת לבכם 💗"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "drinks",
+          "source": "wolt"
+        }
+      },
+      "name": "drinks"
+    },
+    {
+      "kinds": {
         "mains-1": "drink",
         "mains-10": "drink",
         "mains-11": "drink",
@@ -3396,9 +3720,21 @@
         "mains-23": "food",
         "mains-24": "drink",
         "mains-25": "drink",
-        "mains-26": "food",
+        "mains-26": "drink",
         "mains-27": "food",
+        "mains-28": "extra",
+        "mains-29": "extra",
         "mains-3": "drink",
+        "mains-30": "extra",
+        "mains-31": "extra",
+        "mains-32": "extra",
+        "mains-33": "extra",
+        "mains-34": "extra",
+        "mains-35": "extra",
+        "mains-36": "extra",
+        "mains-37": "food",
+        "mains-38": "food",
+        "mains-39": "drink",
         "mains-4": "drink",
         "mains-5": "drink",
         "mains-6": "drink",
@@ -3652,6 +3988,114 @@
                 "options": [],
                 "page": null,
                 "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-28",
+                "imageUrl": null,
+                "name": "סכו\"ם חד\"פ 🍴",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-29",
+                "imageUrl": null,
+                "name": "סכו״ם | צ׳ופסטיקס",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-30",
+                "imageUrl": null,
+                "name": "מזלג חד\"פ",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-31",
+                "imageUrl": null,
+                "name": "סט צ'ופסטיקס ומפית",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-32",
+                "imageUrl": null,
+                "name": "נר מספר 5",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-33",
+                "imageUrl": null,
+                "name": "נר HAPPY BIRTHDAY",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-34",
+                "imageUrl": null,
+                "name": "כרטיס ברכה Nola",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-35",
+                "imageUrl": null,
+                "name": "Cutlery",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-36",
+                "imageUrl": null,
+                "name": "Birthday candles",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-37",
+                "imageUrl": null,
+                "name": "Candlelight dinner for two",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-38",
+                "imageUrl": null,
+                "name": "קציצות בטעם של ברכה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mains-39",
+                "imageUrl": null,
+                "name": "פיוז טי אפרסק",
+                "options": [],
+                "page": null,
+                "price": 40.0
               }
             ],
             "id": "mains",
@@ -3690,7 +4134,19 @@
         "drinks-25": "drink",
         "drinks-26": "drink",
         "drinks-27": "drink",
+        "drinks-28": "drink",
+        "drinks-29": "drink",
         "drinks-3": "drink",
+        "drinks-30": "drink",
+        "drinks-31": "drink",
+        "drinks-32": "drink",
+        "drinks-33": "drink",
+        "drinks-34": "drink",
+        "drinks-35": "drink",
+        "drinks-36": "drink",
+        "drinks-37": "drink",
+        "drinks-38": "drink",
+        "drinks-39": "drink",
         "drinks-4": "drink",
         "drinks-5": "drink",
         "drinks-6": "drink",
@@ -3944,6 +4400,114 @@
                 "options": [],
                 "page": null,
                 "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-28",
+                "imageUrl": null,
+                "name": "סכו\"ם חד\"פ 🍴",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-29",
+                "imageUrl": null,
+                "name": "סכו״ם | צ׳ופסטיקס",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-30",
+                "imageUrl": null,
+                "name": "מזלג חד\"פ",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-31",
+                "imageUrl": null,
+                "name": "סט צ'ופסטיקס ומפית",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-32",
+                "imageUrl": null,
+                "name": "נר מספר 5",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-33",
+                "imageUrl": null,
+                "name": "נר HAPPY BIRTHDAY",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-34",
+                "imageUrl": null,
+                "name": "כרטיס ברכה Nola",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-35",
+                "imageUrl": null,
+                "name": "Cutlery",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-36",
+                "imageUrl": null,
+                "name": "Birthday candles",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-37",
+                "imageUrl": null,
+                "name": "Candlelight dinner for two",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-38",
+                "imageUrl": null,
+                "name": "קציצות בטעם של ברכה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "drinks-39",
+                "imageUrl": null,
+                "name": "פיוז טי אפרסק",
+                "options": [],
+                "page": null,
+                "price": 40.0
               }
             ],
             "id": "drinks",
@@ -3980,9 +4544,21 @@
         "mixed-23": "food",
         "mixed-24": "drink",
         "mixed-25": "drink",
-        "mixed-26": "food",
+        "mixed-26": "drink",
         "mixed-27": "food",
+        "mixed-28": "extra",
+        "mixed-29": "extra",
         "mixed-3": "drink",
+        "mixed-30": "extra",
+        "mixed-31": "extra",
+        "mixed-32": "extra",
+        "mixed-33": "extra",
+        "mixed-34": "extra",
+        "mixed-35": "extra",
+        "mixed-36": "extra",
+        "mixed-37": "food",
+        "mixed-38": "food",
+        "mixed-39": "drink",
         "mixed-4": "drink",
         "mixed-5": "drink",
         "mixed-6": "drink",
@@ -4236,6 +4812,114 @@
                 "options": [],
                 "page": null,
                 "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-28",
+                "imageUrl": null,
+                "name": "סכו\"ם חד\"פ 🍴",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-29",
+                "imageUrl": null,
+                "name": "סכו״ם | צ׳ופסטיקס",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-30",
+                "imageUrl": null,
+                "name": "מזלג חד\"פ",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-31",
+                "imageUrl": null,
+                "name": "סט צ'ופסטיקס ומפית",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-32",
+                "imageUrl": null,
+                "name": "נר מספר 5",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-33",
+                "imageUrl": null,
+                "name": "נר HAPPY BIRTHDAY",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-34",
+                "imageUrl": null,
+                "name": "כרטיס ברכה Nola",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-35",
+                "imageUrl": null,
+                "name": "Cutlery",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-36",
+                "imageUrl": null,
+                "name": "Birthday candles",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-37",
+                "imageUrl": null,
+                "name": "Candlelight dinner for two",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-38",
+                "imageUrl": null,
+                "name": "קציצות בטעם של ברכה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "mixed-39",
+                "imageUrl": null,
+                "name": "פיוז טי אפרסק",
+                "options": [],
+                "page": null,
+                "price": 40.0
               }
             ],
             "id": "mixed",
@@ -4259,7 +4943,10 @@
         "free-3": "notice",
         "free-4": "notice",
         "free-5": "notice",
-        "free-6": "notice"
+        "free-6": "notice",
+        "free-7": "notice",
+        "free-8": "notice",
+        "free-9": "notice"
       },
       "menu": {
         "categories": [
@@ -4318,6 +5005,33 @@
                 "options": [],
                 "page": null,
                 "price": 0.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "free-7",
+                "imageUrl": null,
+                "name": "הערה חשובה! נשים בהיריון",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "free-8",
+                "imageUrl": null,
+                "name": "Notices",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "free-9",
+                "imageUrl": null,
+                "name": "אלרגנים",
+                "options": [],
+                "page": null,
+                "price": 0.0
               }
             ],
             "id": "free",
@@ -4341,7 +5055,10 @@
         "priced-3": "food",
         "priced-4": "food",
         "priced-5": "food",
-        "priced-6": "food"
+        "priced-6": "food",
+        "priced-7": "food",
+        "priced-8": "food",
+        "priced-9": "food"
       },
       "menu": {
         "categories": [
@@ -4397,6 +5114,33 @@
                 "id": "priced-6",
                 "imageUrl": null,
                 "name": "מידע לאלרגנים! 💙",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "priced-7",
+                "imageUrl": null,
+                "name": "הערה חשובה! נשים בהיריון",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "priced-8",
+                "imageUrl": null,
+                "name": "Notices",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "served with a glass of wine and a cola",
+                "id": "priced-9",
+                "imageUrl": null,
+                "name": "אלרגנים",
                 "options": [],
                 "page": null,
                 "price": 40.0

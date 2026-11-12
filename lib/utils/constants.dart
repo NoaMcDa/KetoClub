@@ -708,6 +708,24 @@ const List<String> nonKetoDrinkBasesEn = <String>[
   'sweet wine',
   'moscato',
   'port wine',
+  // Issue #474: sweetened drinks and beers named by brand, found green on
+  // real menus whatever their heading.
+  'fuze tea',
+  'fuzetea',
+  'flavoured water',
+  'flavored water',
+  'goldstar',
+  'heineken',
+  'carlsberg',
+  'tuborg',
+  'corona',
+  'stella artois',
+  'guinness',
+  'paulaner',
+  'weihenstephan',
+  'peroni',
+  'becks',
+  'blue moon',
 ];
 
 /// Dough, English: a dish built on dough — a pizza, a calzone, dough
@@ -897,6 +915,13 @@ const List<String> nonKetoDrinkBasesHe = <String>[
   'ליקר', // liqueur
   'סמוטי', // smoothie
   'יין מתוק', // sweet wine
+  // Issue #474: the construct form, sweetened drinks and beers by brand.
+  'לימונדת', // lemonade of ("לימונדת הבית")
+  'פיוז טי', 'פיוזטי', // Fuze tea, a sweetened iced tea
+  'טרופית', // Tropit, a juice drink
+  'מים בטעם', // flavoured water
+  'גולדסטאר', 'היינקן', 'קרלסברג', 'טובורג', 'קורונה', 'סטלה ארטואה',
+  'גינס', 'פאולנר', 'ויינשטפן', 'פרוני', 'בקס', 'בלו מון',
 ];
 
 // ---------------------------------------------------------------------------
@@ -1111,6 +1136,10 @@ const List<String> extraCategoryWordsEn = <String>[
   'gift card',
   'gift cards',
   'packaging',
+  // Issue #472: birthday candles and greeting cards sold beside a cake.
+  'candles',
+  'greeting card',
+  'greeting cards',
 ];
 
 /// [extraCategoryWordsEn] in Hebrew. **Not `תוספות`**: on an Israeli menu
@@ -1134,6 +1163,103 @@ const List<String> extraCategoryWordsHe = <String>[
   'שוברים',
   'גיפט קארד',
   'אריזה',
+  // Issue #472: candles, greeting cards and the diner count a menu asks
+  // for so the kitchen packs cutlery.
+  'נרות',
+  'נרות יום הולדת',
+  'כרטיס ברכה',
+  'כרטיסי ברכה',
+  'ברכה להזמנה',
+  'מספר סועדים',
+];
+
+/// Dish **names** that are a non-edible line whatever their heading,
+/// English (issue #472): cutlery, chopsticks, a candle, a greeting card.
+/// A cutlery line filed under "Mains" is still not food. Matched as whole
+/// words, so "candlelight dinner" stays food; nothing ambiguous on a
+/// menu (a fork, a spoon) is listed.
+const List<String> extraNameWordsEn = <String>[
+  'cutlery',
+  'utensils',
+  'chopsticks',
+  'napkin',
+  'napkins',
+  'candle',
+  'candles',
+  'sparklers',
+  'balloon',
+  'balloons',
+  'greeting card',
+  'number of diners',
+];
+
+/// [extraNameWordsEn] in Hebrew, matched without the permissive prefix:
+/// "סכו"ם חד"פ", "מזלג חד"פ", "סט צ'ופסטיקס ומפית", "נר מספר 5", "כרטיס
+/// ברכה". A bare `ברכה` is not here: "קציצות בטעם של ברכה" is food.
+const List<String> extraNameWordsHe = <String>[
+  'סכו"ם',
+  "צ'ופסטיקס",
+  'מזלג',
+  'מפית',
+  'מפיות',
+  'חד"פ',
+  'נר',
+  'נרות',
+  'זיקוק',
+  'זיקוקים',
+  'בלון',
+  'בלונים',
+  'כרטיס ברכה',
+  'מספר סועדים',
+];
+
+/// The category headings whose drinks take the heading's own red base
+/// (issue #474), heading word to label, English: a brand or a fruit
+/// under "Beers" or "Juices" is that drink even when its name says
+/// nothing the vocabulary knows. A drink under such a heading stays as
+/// it is only when its name is a plain drink ([plainDrinkWordsEn]: wine,
+/// water, spirits) or carries a [drinkHeadingGuardWordsEn] word.
+const Map<String, String> drinkHeadingBasesEn = <String, String>{
+  'beer': 'beer',
+  'beers': 'beer',
+  'juice': 'juice',
+  'juices': 'juice',
+  'smoothie': 'smoothie',
+  'smoothies': 'smoothie',
+  'lemonades': 'lemonade',
+};
+
+/// [drinkHeadingBasesEn] in Hebrew: "בירות", "מיצים טבעיים", "שייקים".
+const Map<String, String> drinkHeadingBasesHe = <String, String>{
+  'בירות': 'בירה',
+  'בירה': 'בירה',
+  'מיצים': 'מיץ',
+  'מיץ': 'מיץ',
+  'סמוטי': 'סמוטי',
+  'שייקים': 'שייק',
+  'לימונדות': 'לימונדה',
+};
+
+/// Words in a drink's name that keep it from taking its heading's red
+/// base (issue #474), English: a zero, diet or unsweetened drink. An
+/// alcohol-free beer is not here: it is still brewed from malt.
+const List<String> drinkHeadingGuardWordsEn = <String>[
+  'zero',
+  'diet',
+  'sugar free',
+  'no sugar',
+  'unsweetened',
+  'no added sugar',
+];
+
+/// [drinkHeadingGuardWordsEn] in Hebrew.
+const List<String> drinkHeadingGuardWordsHe = <String>[
+  'זירו',
+  'דיאט',
+  'ללא סוכר',
+  'ללא סוכרים',
+  'ללא תוספת סוכר',
+  'בלי סוכר',
 ];
 
 /// Headings that name food, English. When one of these sits beside a
@@ -1189,6 +1315,9 @@ const List<String> noticeCategoryWordsEn = <String>[
   'allergen information',
   'allergy information',
   'allergen info',
+  // Issue #472: the plural and the bare allergen line.
+  'notices',
+  'allergens',
 ];
 
 /// [noticeCategoryWordsEn] in Hebrew.
@@ -1201,6 +1330,16 @@ const List<String> noticeCategoryWordsHe = <String>[
   'מידע לאלרגנים',
   'מידע על אלרגנים',
   'מידע אלרגני',
+  // Issue #472: the plural and feminine forms the strict right boundary
+  // keeps the words above from finding, and the headings real menus use.
+  'הודעות',
+  'חשובה',
+  'חשובות',
+  'הערה',
+  'הערות',
+  'לתשומת לבכם',
+  'לתשומת ליבכם',
+  'אלרגנים',
 ];
 
 /// The drink keys of [carbModifiersEn] — yellow drinks with a swap script
@@ -1677,6 +1816,44 @@ const List<String> optionRemovalWordsEn = <String>['no', 'without', 'skip'];
 /// "בלי אלף האיים".
 const List<String> optionRemovalWordsHe = <String>['ללא', 'בלי'];
 
+/// Words that mark an option **group** as an upsell or paid extras rather
+/// than a choice the dish is made with, English (issue #475): "Add a
+/// drink?", "Paid extras", "A small discount", "Upgrade". Nothing in such
+/// a group is something the diner ordered, so the rule engine reads
+/// neither its name nor its values. A required choice ("Choice of side",
+/// "Choose your dough") names none of these and still counts
+/// (architecture.md §6.1). Each is a whole phrase, compared after
+/// normalisation against the group's name padded with spaces.
+const List<String> optionAddOnGroupWordsEn = <String>[
+  'add a drink',
+  'add drink',
+  'add on',
+  'add ons',
+  'addons',
+  'extra',
+  'extras',
+  'paid',
+  'upgrade',
+  'discount',
+  'would you like',
+];
+
+/// [optionAddOnGroupWordsEn] in Hebrew: "תוספות בתשלום", "תרצו להוסיף
+/// שתייה?", "תרצו משהו נוסף?", "שדרגו". Not `תוספות`, which is how a
+/// required choice of side is named.
+const List<String> optionAddOnGroupWordsHe = <String>[
+  'בתשלום',
+  'תרצו',
+  'רוצים',
+  'להוסיף',
+  'הוסיפו',
+  'שדרוג',
+  'שדרגו',
+  'הנחה',
+  'בהנחה',
+  'אקסטרה',
+];
+
 // ---------------------------------------------------------------------------
 // nonKetoBaseLabels — for rendering {base} in redWhy
 // ---------------------------------------------------------------------------
@@ -1741,6 +1918,7 @@ const Map<String, String> nonKetoBaseLabelsHe = <String, String>{
   'בחלבה': 'חלבה',
   'בבלילה': 'בלילה',
   'בבלילת': 'בלילה',
+  'לימונדת': 'לימונדה',
   // Issue #470: a roll is red for its rice, so the rice is what `why`
   // names.
   'מאקי': 'אורז סושי',
@@ -1858,6 +2036,7 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'orange juice': (before: [], after: _dressingWords),
   'apple juice': (before: [], after: _dressingWords),
   'lemonade': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'fuze tea': (before: _sugarFreeWords, after: _sugarFreeWords),
   // Issue #273: a port wine reduction is a sauce; the yellow
   // `port wine reduction` family in [carbModifiersEn] takes over.
   'port wine': (before: _cookedInWords, after: _cookedInWords),
@@ -2155,6 +2334,9 @@ final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
   'בירה שחורה': _heBeerGuard,
   'טוניק': _heDrinkGuard,
   'לימונדה': _heDrinkGuard,
+  'לימונדת': _heDrinkGuard,
+  'פיוז טי': _heDrinkGuard,
+  'פיוזטי': _heDrinkGuard,
 
   // Issue #274: sushi-grade fish (`טונה באיכות סושי`) is raw fish.
   'סושי': _heGuard(const ['איכות', 'באיכות']),

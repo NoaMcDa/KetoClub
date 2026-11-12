@@ -1354,6 +1354,40 @@
       "מיצים",
       "בר"
     ],
+    "drinkHeadingBasesEn": {
+      "beer": "beer",
+      "beers": "beer",
+      "juice": "juice",
+      "juices": "juice",
+      "lemonades": "lemonade",
+      "smoothie": "smoothie",
+      "smoothies": "smoothie"
+    },
+    "drinkHeadingBasesHe": {
+      "בירה": "בירה",
+      "בירות": "בירה",
+      "לימונדות": "לימונדה",
+      "מיץ": "מיץ",
+      "מיצים": "מיץ",
+      "סמוטי": "סמוטי",
+      "שייקים": "שייק"
+    },
+    "drinkHeadingGuardWordsEn": [
+      "zero",
+      "diet",
+      "sugar free",
+      "no sugar",
+      "unsweetened",
+      "no added sugar"
+    ],
+    "drinkHeadingGuardWordsHe": [
+      "זירו",
+      "דיאט",
+      "ללא סוכר",
+      "ללא סוכרים",
+      "ללא תוספת סוכר",
+      "בלי סוכר"
+    ],
     "drinkNameGuardWordsEn": [
       "batter",
       "battered",
@@ -1399,6 +1433,22 @@
       "sweet wine",
       "moscato",
       "port wine",
+      "fuze tea",
+      "fuzetea",
+      "flavoured water",
+      "flavored water",
+      "goldstar",
+      "heineken",
+      "carlsberg",
+      "tuborg",
+      "corona",
+      "stella artois",
+      "guinness",
+      "paulaner",
+      "weihenstephan",
+      "peroni",
+      "becks",
+      "blue moon",
       "latte",
       "iced latte",
       "cappuccino",
@@ -1449,6 +1499,23 @@
       "ליקר",
       "סמוטי",
       "יין מתוק",
+      "לימונדת",
+      "פיוז טי",
+      "פיוזטי",
+      "טרופית",
+      "מים בטעם",
+      "גולדסטאר",
+      "היינקן",
+      "קרלסברג",
+      "טובורג",
+      "קורונה",
+      "סטלה ארטואה",
+      "גינס",
+      "פאולנר",
+      "ויינשטפן",
+      "פרוני",
+      "בקס",
+      "בלו מון",
       "הפוך",
       "הפוך קר",
       "לאטה",
@@ -1493,7 +1560,10 @@
       "delivery",
       "gift card",
       "gift cards",
-      "packaging"
+      "packaging",
+      "candles",
+      "greeting card",
+      "greeting cards"
     ],
     "extraCategoryWordsHe": [
       "רטבים",
@@ -1508,7 +1578,43 @@
       "שובר",
       "שוברים",
       "גיפט קארד",
-      "אריזה"
+      "אריזה",
+      "נרות",
+      "נרות יום הולדת",
+      "כרטיס ברכה",
+      "כרטיסי ברכה",
+      "ברכה להזמנה",
+      "מספר סועדים"
+    ],
+    "extraNameWordsEn": [
+      "cutlery",
+      "utensils",
+      "chopsticks",
+      "napkin",
+      "napkins",
+      "candle",
+      "candles",
+      "sparklers",
+      "balloon",
+      "balloons",
+      "greeting card",
+      "number of diners"
+    ],
+    "extraNameWordsHe": [
+      "סכו\"ם",
+      "צ'ופסטיקס",
+      "מזלג",
+      "מפית",
+      "מפיות",
+      "חד\"פ",
+      "נר",
+      "נרות",
+      "זיקוק",
+      "זיקוקים",
+      "בלון",
+      "בלונים",
+      "כרטיס ברכה",
+      "מספר סועדים"
     ],
     "foodCategoryWordsEn": [
       "sides",
@@ -1545,11 +1651,15 @@
     ],
     "hebrewPrefixAllowed": {
       "drinkCategories": false,
+      "drinkHeadingGuards": true,
+      "drinkHeadings": false,
       "drinkNameGuards": true,
       "drinkNames": true,
       "extraCategories": false,
+      "extraNames": false,
       "foodCategories": true,
-      "notice": false
+      "notice": false,
+      "plainDrinkNames": true
     },
     "noticeCategoryWordsEn": [
       "dear customers",
@@ -1560,7 +1670,9 @@
       "important",
       "allergen information",
       "allergy information",
-      "allergen info"
+      "allergen info",
+      "notices",
+      "allergens"
     ],
     "noticeCategoryWordsHe": [
       "לקוחות יקרים",
@@ -1570,7 +1682,15 @@
       "חשוב",
       "מידע לאלרגנים",
       "מידע על אלרגנים",
-      "מידע אלרגני"
+      "מידע אלרגני",
+      "הודעות",
+      "חשובה",
+      "חשובות",
+      "הערה",
+      "הערות",
+      "לתשומת לבכם",
+      "לתשומת ליבכם",
+      "אלרגנים"
     ],
     "plainDrinkWordsEn": [
       "water",
@@ -1993,6 +2113,28 @@
         "pan",
         "stir",
         "air"
+      ]
+    },
+    "fuze tea": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
       ]
     },
     "hamburger": {
@@ -2631,6 +2773,20 @@
         "ללא סוכרים"
       ]
     },
+    "לימונדת": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
     "מוס": {
       "after": [
         "כבד",
@@ -2776,6 +2932,34 @@
       ]
     },
     "פאנטה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "פיוז טי": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "פיוזטי": {
       "after": [
         "זירו",
         "דיאט",
@@ -3323,6 +3507,7 @@
     "חלות": "חלה",
     "חלת": "חלה",
     "טמאקי": "אורז סושי",
+    "לימונדת": "לימונדה",
     "מאקי": "אורז סושי",
     "ניגירי": "אורז סושי",
     "סושי": "אורז סושי",
@@ -3497,7 +3682,23 @@
     "smoothie",
     "sweet wine",
     "moscato",
-    "port wine"
+    "port wine",
+    "fuze tea",
+    "fuzetea",
+    "flavoured water",
+    "flavored water",
+    "goldstar",
+    "heineken",
+    "carlsberg",
+    "tuborg",
+    "corona",
+    "stella artois",
+    "guinness",
+    "paulaner",
+    "weihenstephan",
+    "peroni",
+    "becks",
+    "blue moon"
   ],
   "nonKetoBasesHe": [
     "פסטה",
@@ -3721,7 +3922,24 @@
     "שיכר",
     "ליקר",
     "סמוטי",
-    "יין מתוק"
+    "יין מתוק",
+    "לימונדת",
+    "פיוז טי",
+    "פיוזטי",
+    "טרופית",
+    "מים בטעם",
+    "גולדסטאר",
+    "היינקן",
+    "קרלסברג",
+    "טובורג",
+    "קורונה",
+    "סטלה ארטואה",
+    "גינס",
+    "פאולנר",
+    "ויינשטפן",
+    "פרוני",
+    "בקס",
+    "בלו מון"
   ],
   "nonKetoDrinkBasesEn": [
     "cola",
@@ -3741,7 +3959,23 @@
     "smoothie",
     "sweet wine",
     "moscato",
-    "port wine"
+    "port wine",
+    "fuze tea",
+    "fuzetea",
+    "flavoured water",
+    "flavored water",
+    "goldstar",
+    "heineken",
+    "carlsberg",
+    "tuborg",
+    "corona",
+    "stella artois",
+    "guinness",
+    "paulaner",
+    "weihenstephan",
+    "peroni",
+    "becks",
+    "blue moon"
   ],
   "nonKetoDrinkBasesHe": [
     "קולה",
@@ -3758,7 +3992,49 @@
     "שיכר",
     "ליקר",
     "סמוטי",
-    "יין מתוק"
+    "יין מתוק",
+    "לימונדת",
+    "פיוז טי",
+    "פיוזטי",
+    "טרופית",
+    "מים בטעם",
+    "גולדסטאר",
+    "היינקן",
+    "קרלסברג",
+    "טובורג",
+    "קורונה",
+    "סטלה ארטואה",
+    "גינס",
+    "פאולנר",
+    "ויינשטפן",
+    "פרוני",
+    "בקס",
+    "בלו מון"
+  ],
+  "optionAddOnGroupWordsEn": [
+    "add a drink",
+    "add drink",
+    "add on",
+    "add ons",
+    "addons",
+    "extra",
+    "extras",
+    "paid",
+    "upgrade",
+    "discount",
+    "would you like"
+  ],
+  "optionAddOnGroupWordsHe": [
+    "בתשלום",
+    "תרצו",
+    "רוצים",
+    "להוסיף",
+    "הוסיפו",
+    "שדרוג",
+    "שדרגו",
+    "הנחה",
+    "בהנחה",
+    "אקסטרה"
   ],
   "optionRemovalWordsEn": [
     "no",

@@ -2216,8 +2216,8 @@
             "modification": null,
             "name": "סאן מיגל",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e3fc",
@@ -2225,8 +2225,8 @@
             "modification": null,
             "name": "פרסקה סאן מיגל",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
             "dishId": "61ecfdac853cef6ba4d5e3f3",
@@ -5735,8 +5735,8 @@
             "modification": null,
             "name": "Goldstar",
             "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+            "verdict": "nonKeto",
+            "why": "Built on goldstar, which cannot be made keto."
           },
           {
             "dishId": "x14",
@@ -5769,10 +5769,10 @@
         "unclassified": []
       },
       "counts": {
-        "green": 4,
+        "green": 3,
         "hiddenCarbYellow": 0,
         "red": 5,
-        "score": 4.5,
+        "score": 4.0,
         "yellow": 2
       },
       "menu": {
@@ -5955,6 +5955,518 @@
         }
       },
       "name": "mixed/rules"
+    },
+    {
+      "analysis": {
+        "analysedAt": "2026-01-01T00:00:00.000Z",
+        "dishes": [
+          {
+            "dishId": "d1",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "היינקן בקבוק 330 מ\"ל",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על היינקן, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d2",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "פאולנר",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על פאולנר, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d3",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "הרצל- שש אחוז כפרה",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על בירה, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d4",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "יין אדום יבש",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d5",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "בירה זירו",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d6",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "תפוז",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על מיץ, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d7",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "לימון נענע",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על מיץ, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d8",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "מים מינרלים",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d9",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "פיוז טי אפרסק",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על פיוז טי, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d10",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "טרופית",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על טרופית, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d11",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "לימונדת הבית",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על לימונדה, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d12",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "מים בטעם ענבים",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "המנה מבוססת על מים בטעם, ואי אפשר להפוך אותה לקטוגנית."
+          },
+          {
+            "dishId": "d13",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Diet coke",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+          },
+          {
+            "dishId": "d14",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Blue Moon",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "Built on blue moon, which cannot be made keto."
+          },
+          {
+            "dishId": "d15",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Hazy IPA",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "Built on beer, which cannot be made keto."
+          },
+          {
+            "dishId": "d16",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Whisky",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+          },
+          {
+            "dishId": "d17",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "סטייק אנטריקוט",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d18",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "סכו\"ם חד\"פ",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d19",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "נר מספר 5",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d20",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "כרטיס ברכה",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d21",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Cutlery",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+          },
+          {
+            "dishId": "d22",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "קציצות בטעם של ברכה",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d23",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "שמנת קשיו",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          },
+          {
+            "dishId": "d24",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "הערה חשובה! נשים בהיריון",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+          }
+        ],
+        "engine": {
+          "kind": "rules",
+          "reason": "notConfigured"
+        },
+        "options": {
+          "dietaryConstraints": [],
+          "netCarbLimitGrams": 6
+        },
+        "schemaVersion": 0,
+        "unclassified": []
+      },
+      "counts": {
+        "green": 3,
+        "hiddenCarbYellow": 0,
+        "red": 0,
+        "score": 10.0,
+        "yellow": 0
+      },
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "היינקן בקבוק 330 מ\"ל",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "פאולנר",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "הרצל- שש אחוז כפרה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "יין אדום יבש",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "בירה זירו",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-beer",
+            "name": "בירות ויין"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d6",
+                "imageUrl": null,
+                "name": "תפוז",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d7",
+                "imageUrl": null,
+                "name": "לימון נענע",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d8",
+                "imageUrl": null,
+                "name": "מים מינרלים",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-juice",
+            "name": "מיצים טבעיים"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d9",
+                "imageUrl": null,
+                "name": "פיוז טי אפרסק",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d10",
+                "imageUrl": null,
+                "name": "טרופית",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d11",
+                "imageUrl": null,
+                "name": "לימונדת הבית",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d12",
+                "imageUrl": null,
+                "name": "מים בטעם ענבים",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d13",
+                "imageUrl": null,
+                "name": "Diet coke",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-soft",
+            "name": "שתייה קלה"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d14",
+                "imageUrl": null,
+                "name": "Blue Moon",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d15",
+                "imageUrl": null,
+                "name": "Hazy IPA",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d16",
+                "imageUrl": null,
+                "name": "Whisky",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-en",
+            "name": "Beers"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d17",
+                "imageUrl": null,
+                "name": "סטייק אנטריקוט",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d18",
+                "imageUrl": null,
+                "name": "סכו\"ם חד\"פ",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "",
+                "id": "d19",
+                "imageUrl": null,
+                "name": "נר מספר 5",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d20",
+                "imageUrl": null,
+                "name": "כרטיס ברכה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d21",
+                "imageUrl": null,
+                "name": "Cutlery",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d22",
+                "imageUrl": null,
+                "name": "קציצות בטעם של ברכה",
+                "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "d23",
+                "imageUrl": null,
+                "name": "שמנת קשיו",
+                "options": [
+                  {
+                    "name": "תוספות בתשלום",
+                    "values": [
+                      "קוקוט רוטב סובה",
+                      "מנת לחם (4 פרוסות)"
+                    ]
+                  }
+                ],
+                "page": null,
+                "price": 40.0
+              }
+            ],
+            "id": "d-mains",
+            "name": "עיקריות"
+          },
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d24",
+                "imageUrl": null,
+                "name": "הערה חשובה! נשים בהיריון",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              }
+            ],
+            "id": "d-notice",
+            "name": "💗 לתשומת לבכם 💗"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "drinks",
+          "source": "wolt"
+        }
+      },
+      "name": "drinks/rules"
     },
     {
       "analysis": {

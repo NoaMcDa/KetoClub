@@ -9319,6 +9319,208 @@
     ]
   },
   {
+    "containsHebrew": false,
+    "in": "fuze tea",
+    "isRemovalOptionValue": false,
+    "normalised": "fuze tea",
+    "words": [
+      "fuze",
+      "tea"
+    ],
+    "wordsMin3": [
+      "fuze",
+      "tea"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "fuzetea",
+    "isRemovalOptionValue": false,
+    "normalised": "fuzetea",
+    "words": [
+      "fuzetea"
+    ],
+    "wordsMin3": [
+      "fuzetea"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "flavoured water",
+    "isRemovalOptionValue": false,
+    "normalised": "flavoured water",
+    "words": [
+      "flavoured",
+      "water"
+    ],
+    "wordsMin3": [
+      "flavoured",
+      "water"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "flavored water",
+    "isRemovalOptionValue": false,
+    "normalised": "flavored water",
+    "words": [
+      "flavored",
+      "water"
+    ],
+    "wordsMin3": [
+      "flavored",
+      "water"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "goldstar",
+    "isRemovalOptionValue": false,
+    "normalised": "goldstar",
+    "words": [
+      "goldstar"
+    ],
+    "wordsMin3": [
+      "goldstar"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "heineken",
+    "isRemovalOptionValue": false,
+    "normalised": "heineken",
+    "words": [
+      "heineken"
+    ],
+    "wordsMin3": [
+      "heineken"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "carlsberg",
+    "isRemovalOptionValue": false,
+    "normalised": "carlsberg",
+    "words": [
+      "carlsberg"
+    ],
+    "wordsMin3": [
+      "carlsberg"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "tuborg",
+    "isRemovalOptionValue": false,
+    "normalised": "tuborg",
+    "words": [
+      "tuborg"
+    ],
+    "wordsMin3": [
+      "tuborg"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "corona",
+    "isRemovalOptionValue": false,
+    "normalised": "corona",
+    "words": [
+      "corona"
+    ],
+    "wordsMin3": [
+      "corona"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "stella artois",
+    "isRemovalOptionValue": false,
+    "normalised": "stella artois",
+    "words": [
+      "stella",
+      "artois"
+    ],
+    "wordsMin3": [
+      "stella",
+      "artois"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "guinness",
+    "isRemovalOptionValue": false,
+    "normalised": "guinness",
+    "words": [
+      "guinness"
+    ],
+    "wordsMin3": [
+      "guinness"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "paulaner",
+    "isRemovalOptionValue": false,
+    "normalised": "paulaner",
+    "words": [
+      "paulaner"
+    ],
+    "wordsMin3": [
+      "paulaner"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "weihenstephan",
+    "isRemovalOptionValue": false,
+    "normalised": "weihenstephan",
+    "words": [
+      "weihenstephan"
+    ],
+    "wordsMin3": [
+      "weihenstephan"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "peroni",
+    "isRemovalOptionValue": false,
+    "normalised": "peroni",
+    "words": [
+      "peroni"
+    ],
+    "wordsMin3": [
+      "peroni"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "becks",
+    "isRemovalOptionValue": false,
+    "normalised": "becks",
+    "words": [
+      "becks"
+    ],
+    "wordsMin3": [
+      "becks"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "blue moon",
+    "isRemovalOptionValue": false,
+    "normalised": "blue moon",
+    "words": [
+      "blue",
+      "moon"
+    ],
+    "wordsMin3": [
+      "blue",
+      "moon"
+    ]
+  },
+  {
     "containsHebrew": true,
     "in": "פסטה",
     "isRemovalOptionValue": false,
@@ -12057,6 +12259,217 @@
     "wordsMin3": [
       "יינ",
       "מתוק"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "לימונדת",
+    "isRemovalOptionValue": false,
+    "normalised": "לימונדת",
+    "words": [
+      "לימונדת"
+    ],
+    "wordsMin3": [
+      "לימונדת"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "פיוז טי",
+    "isRemovalOptionValue": false,
+    "normalised": "פיוז טי",
+    "words": [
+      "פיוז",
+      "טי"
+    ],
+    "wordsMin3": [
+      "פיוז"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "פיוזטי",
+    "isRemovalOptionValue": false,
+    "normalised": "פיוזטי",
+    "words": [
+      "פיוזטי"
+    ],
+    "wordsMin3": [
+      "פיוזטי"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "טרופית",
+    "isRemovalOptionValue": false,
+    "normalised": "טרופית",
+    "words": [
+      "טרופית"
+    ],
+    "wordsMin3": [
+      "טרופית"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "מים בטעם",
+    "isRemovalOptionValue": false,
+    "normalised": "מימ בטעמ",
+    "words": [
+      "מימ",
+      "בטעמ"
+    ],
+    "wordsMin3": [
+      "מימ",
+      "בטעמ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "גולדסטאר",
+    "isRemovalOptionValue": false,
+    "normalised": "גולדסטאר",
+    "words": [
+      "גולדסטאר"
+    ],
+    "wordsMin3": [
+      "גולדסטאר"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "היינקן",
+    "isRemovalOptionValue": false,
+    "normalised": "היינקנ",
+    "words": [
+      "היינקנ"
+    ],
+    "wordsMin3": [
+      "היינקנ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "קרלסברג",
+    "isRemovalOptionValue": false,
+    "normalised": "קרלסברג",
+    "words": [
+      "קרלסברג"
+    ],
+    "wordsMin3": [
+      "קרלסברג"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "טובורג",
+    "isRemovalOptionValue": false,
+    "normalised": "טובורג",
+    "words": [
+      "טובורג"
+    ],
+    "wordsMin3": [
+      "טובורג"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "קורונה",
+    "isRemovalOptionValue": false,
+    "normalised": "קורונה",
+    "words": [
+      "קורונה"
+    ],
+    "wordsMin3": [
+      "קורונה"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "סטלה ארטואה",
+    "isRemovalOptionValue": false,
+    "normalised": "סטלה ארטואה",
+    "words": [
+      "סטלה",
+      "ארטואה"
+    ],
+    "wordsMin3": [
+      "סטלה",
+      "ארטואה"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "גינס",
+    "isRemovalOptionValue": false,
+    "normalised": "גינס",
+    "words": [
+      "גינס"
+    ],
+    "wordsMin3": [
+      "גינס"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "פאולנר",
+    "isRemovalOptionValue": false,
+    "normalised": "פאולנר",
+    "words": [
+      "פאולנר"
+    ],
+    "wordsMin3": [
+      "פאולנר"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "ויינשטפן",
+    "isRemovalOptionValue": false,
+    "normalised": "ויינשטפנ",
+    "words": [
+      "ויינשטפנ"
+    ],
+    "wordsMin3": [
+      "ויינשטפנ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "פרוני",
+    "isRemovalOptionValue": false,
+    "normalised": "פרוני",
+    "words": [
+      "פרוני"
+    ],
+    "wordsMin3": [
+      "פרוני"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "בקס",
+    "isRemovalOptionValue": false,
+    "normalised": "בקס",
+    "words": [
+      "בקס"
+    ],
+    "wordsMin3": [
+      "בקס"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "בלו מון",
+    "isRemovalOptionValue": false,
+    "normalised": "בלו מונ",
+    "words": [
+      "בלו",
+      "מונ"
+    ],
+    "wordsMin3": [
+      "בלו",
+      "מונ"
     ]
   },
   {
@@ -17975,6 +18388,46 @@
     ]
   },
   {
+    "containsHebrew": false,
+    "in": "candles",
+    "isRemovalOptionValue": false,
+    "normalised": "candles",
+    "words": [
+      "candles"
+    ],
+    "wordsMin3": [
+      "candles"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "greeting card",
+    "isRemovalOptionValue": false,
+    "normalised": "greeting card",
+    "words": [
+      "greeting",
+      "card"
+    ],
+    "wordsMin3": [
+      "greeting",
+      "card"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "greeting cards",
+    "isRemovalOptionValue": false,
+    "normalised": "greeting cards",
+    "words": [
+      "greeting",
+      "cards"
+    ],
+    "wordsMin3": [
+      "greeting",
+      "cards"
+    ]
+  },
+  {
     "containsHebrew": true,
     "in": "רטבים",
     "isRemovalOptionValue": false,
@@ -18120,6 +18573,90 @@
     ],
     "wordsMin3": [
       "אריזה"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "נרות",
+    "isRemovalOptionValue": false,
+    "normalised": "נרות",
+    "words": [
+      "נרות"
+    ],
+    "wordsMin3": [
+      "נרות"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "נרות יום הולדת",
+    "isRemovalOptionValue": false,
+    "normalised": "נרות יומ הולדת",
+    "words": [
+      "נרות",
+      "יומ",
+      "הולדת"
+    ],
+    "wordsMin3": [
+      "נרות",
+      "יומ",
+      "הולדת"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "כרטיס ברכה",
+    "isRemovalOptionValue": false,
+    "normalised": "כרטיס ברכה",
+    "words": [
+      "כרטיס",
+      "ברכה"
+    ],
+    "wordsMin3": [
+      "כרטיס",
+      "ברכה"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "כרטיסי ברכה",
+    "isRemovalOptionValue": false,
+    "normalised": "כרטיסי ברכה",
+    "words": [
+      "כרטיסי",
+      "ברכה"
+    ],
+    "wordsMin3": [
+      "כרטיסי",
+      "ברכה"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "ברכה להזמנה",
+    "isRemovalOptionValue": false,
+    "normalised": "ברכה להזמנה",
+    "words": [
+      "ברכה",
+      "להזמנה"
+    ],
+    "wordsMin3": [
+      "ברכה",
+      "להזמנה"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "מספר סועדים",
+    "isRemovalOptionValue": false,
+    "normalised": "מספר סועדימ",
+    "words": [
+      "מספר",
+      "סועדימ"
+    ],
+    "wordsMin3": [
+      "מספר",
+      "סועדימ"
     ]
   },
   {
@@ -18487,6 +19024,30 @@
     ]
   },
   {
+    "containsHebrew": false,
+    "in": "notices",
+    "isRemovalOptionValue": false,
+    "normalised": "notices",
+    "words": [
+      "notices"
+    ],
+    "wordsMin3": [
+      "notices"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "allergens",
+    "isRemovalOptionValue": false,
+    "normalised": "allergens",
+    "words": [
+      "allergens"
+    ],
+    "wordsMin3": [
+      "allergens"
+    ]
+  },
+  {
     "containsHebrew": true,
     "in": "לקוחות יקרים",
     "isRemovalOptionValue": false,
@@ -18590,6 +19151,106 @@
     "wordsMin3": [
       "מידע",
       "אלרגני"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "הודעות",
+    "isRemovalOptionValue": false,
+    "normalised": "הודעות",
+    "words": [
+      "הודעות"
+    ],
+    "wordsMin3": [
+      "הודעות"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "חשובה",
+    "isRemovalOptionValue": false,
+    "normalised": "חשובה",
+    "words": [
+      "חשובה"
+    ],
+    "wordsMin3": [
+      "חשובה"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "חשובות",
+    "isRemovalOptionValue": false,
+    "normalised": "חשובות",
+    "words": [
+      "חשובות"
+    ],
+    "wordsMin3": [
+      "חשובות"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "הערה",
+    "isRemovalOptionValue": false,
+    "normalised": "הערה",
+    "words": [
+      "הערה"
+    ],
+    "wordsMin3": [
+      "הערה"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "הערות",
+    "isRemovalOptionValue": false,
+    "normalised": "הערות",
+    "words": [
+      "הערות"
+    ],
+    "wordsMin3": [
+      "הערות"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "לתשומת לבכם",
+    "isRemovalOptionValue": false,
+    "normalised": "לתשומת לבכמ",
+    "words": [
+      "לתשומת",
+      "לבכמ"
+    ],
+    "wordsMin3": [
+      "לתשומת",
+      "לבכמ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "לתשומת ליבכם",
+    "isRemovalOptionValue": false,
+    "normalised": "לתשומת ליבכמ",
+    "words": [
+      "לתשומת",
+      "ליבכמ"
+    ],
+    "wordsMin3": [
+      "לתשומת",
+      "ליבכמ"
+    ]
+  },
+  {
+    "containsHebrew": true,
+    "in": "אלרגנים",
+    "isRemovalOptionValue": false,
+    "normalised": "אלרגנימ",
+    "words": [
+      "אלרגנימ"
+    ],
+    "wordsMin3": [
+      "אלרגנימ"
     ]
   },
   {

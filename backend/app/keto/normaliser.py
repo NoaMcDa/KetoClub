@@ -199,6 +199,8 @@ def dish_option_rules_text(dish: Dish) -> str:
     option value that is not a removal (:func:`is_removal_option_value`)."""
     parts: list[str] = []
     for option in dish.options:
+        if is_add_on_option_group(option.name):
+            continue
         parts.append(normalise(option.name))
         parts.extend(
             normalise(value)
@@ -212,6 +214,24 @@ def dish_rules_text(dish: Dish) -> str:
     """``TextNormaliser.dishRulesText``: what the rule engine reads,
     :func:`dish_core_text` plus :func:`dish_option_rules_text`."""
     return _join([dish_core_text(dish), dish_option_rules_text(dish)])
+
+
+def is_add_on_option_group(raw_name: str) -> bool:
+    """``TextNormaliser.isAddOnOptionGroup``: whether an option group's
+    normalised name holds an upsell or paid-extras word as whole words
+    (issue #475); such a group is left out of the rules text whole."""
+    normalised = normalise(raw_name)
+    if not normalised:
+        return False
+    padded = f" {normalised} "
+    vocab = vocabulary()
+    return any(
+        f" {normalise(word)} " in padded
+        for word in (
+            *vocab.option_add_on_group_words_en,
+            *vocab.option_add_on_group_words_he,
+        )
+    )
 
 
 def is_removal_option_value(raw: str) -> bool:

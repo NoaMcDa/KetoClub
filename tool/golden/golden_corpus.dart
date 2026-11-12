@@ -903,6 +903,38 @@ final List<Dish> ruleDishes = <Dish>[
   ruleDish('Steak with rice'),
   ruleDish('לאפה', description: 'שווארמה, חומוס וסלט'),
   ruleDish('פיתה', description: 'שמן זית וזעתר'),
+  // Issue #475: an upsell or paid-extras group is not what the dish
+  // comes with; a required choice of side still is.
+  ruleDish(
+    'שמנת קשיו',
+    options: const <DishOption>[
+      DishOption(
+        name: 'תוספות בתשלום',
+        values: <String>['קוקוט ויניגרט פסיפלורה', 'קוקוט רוטב סובה'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'משפחתית עבה',
+    options: const <DishOption>[
+      DishOption(name: 'תרצו להוסיף שתייה?', values: <String>['קוקה קולה']),
+    ],
+  ),
+  ruleDish(
+    'Tuna melt',
+    options: const <DishOption>[
+      DishOption(
+        name: 'A small discount',
+        values: <String>['Arnold Palmer | half iced tea half lemonade'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'סטייק',
+    options: const <DishOption>[
+      DishOption(name: 'בחרו תוספת', values: <String>["צ'יפס", 'סלט']),
+    ],
+  ),
 ];
 
 // ---------------------------------------------------------------------------
@@ -1123,11 +1155,90 @@ final Menu goldenMixedMenu = Menu(
   ],
 );
 
+/// A menu of drinks under beer, juice and soft-drink headings (issue
+/// #474), cutlery, candles and cards under food headings (issue #472),
+/// and a dish with an upsell group (issue #475).
+final Menu goldenDrinksMenu = Menu(
+  venueRef: const VenueRef(source: MenuSource.wolt, platformId: 'drinks'),
+  currency: 'ILS',
+  fetchedAt: goldenNow,
+  categories: <MenuCategory>[
+    MenuCategory(
+      id: 'd-beer',
+      name: 'בירות ויין',
+      dishes: <Dish>[
+        menuDish('d1', 'היינקן בקבוק 330 מ"ל'),
+        menuDish('d2', 'פאולנר'),
+        menuDish('d3', 'הרצל- שש אחוז כפרה'),
+        menuDish('d4', 'יין אדום יבש'),
+        menuDish('d5', 'בירה זירו'),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-juice',
+      name: 'מיצים טבעיים',
+      dishes: <Dish>[
+        menuDish('d6', 'תפוז'),
+        menuDish('d7', 'לימון נענע'),
+        menuDish('d8', 'מים מינרלים'),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-soft',
+      name: 'שתייה קלה',
+      dishes: <Dish>[
+        menuDish('d9', 'פיוז טי אפרסק'),
+        menuDish('d10', 'טרופית'),
+        menuDish('d11', 'לימונדת הבית'),
+        menuDish('d12', 'מים בטעם ענבים'),
+        menuDish('d13', 'Diet coke'),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-en',
+      name: 'Beers',
+      dishes: <Dish>[
+        menuDish('d14', 'Blue Moon'),
+        menuDish('d15', 'Hazy IPA'),
+        menuDish('d16', 'Whisky'),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-mains',
+      name: 'עיקריות',
+      dishes: <Dish>[
+        menuDish('d17', 'סטייק אנטריקוט'),
+        menuDish('d18', 'סכו"ם חד"פ', price: 0),
+        menuDish('d19', 'נר מספר 5'),
+        menuDish('d20', 'כרטיס ברכה'),
+        menuDish('d21', 'Cutlery'),
+        menuDish('d22', 'קציצות בטעם של ברכה'),
+        menuDish(
+          'd23',
+          'שמנת קשיו',
+          options: const <DishOption>[
+            DishOption(
+              name: 'תוספות בתשלום',
+              values: <String>['קוקוט רוטב סובה', 'מנת לחם (4 פרוסות)'],
+            ),
+          ],
+        ),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-notice',
+      name: '\u{1F497} לתשומת לבכם \u{1F497}',
+      dishes: <Dish>[menuDish('d24', 'הערה חשובה! נשים בהיריון', price: 0)],
+    ),
+  ],
+);
+
 /// The hand-built menus, by name.
 final Map<String, Menu> goldenHandBuiltMenus = <String, Menu>{
   'english': goldenEnglishMenu,
   'hebrew': goldenHebrewMenu,
   'mixed': goldenMixedMenu,
+  'drinks': goldenDrinksMenu,
 };
 
 // ---------------------------------------------------------------------------
@@ -1137,6 +1248,12 @@ final Map<String, Menu> goldenHandBuiltMenus = <String, Menu>{
 /// Category headings for `categoryKindOf`, lifted from
 /// `dish_kind_test.dart` and extended.
 const List<String> dishKindHeadings = <String>[
+  'הודעות חשובות \u{1F49A}',
+  '\u{1F497} לתשומת לבכם \u{1F497}',
+  'מספר סועדים',
+  'נרות יום הולדת',
+  'ברכה להזמנה \u{1F48C}',
+  'Notices',
   '\u202Bלקוחות יקרים',
   'ספיישל סמאשבורגר \u{1F31F}',
   '\u202Bהדילים של המוסד  \u{1F354} +  \u{1F35F} + \u{1F964}',
@@ -1220,6 +1337,20 @@ const List<String> dishKindNames = <String>[
   'בקפה',
   'Goldstar',
   'Tiramisu',
+  // Issue #472: non-edible lines named as such, and food that only
+  // sounds like one.
+  'סכו"ם חד"פ \u{1F374}',
+  'סכו״ם | צ׳ופסטיקס',
+  'מזלג חד"פ',
+  "סט צ'ופסטיקס ומפית",
+  'נר מספר 5',
+  'נר HAPPY BIRTHDAY',
+  'כרטיס ברכה Nola',
+  'Cutlery',
+  'Birthday candles',
+  'Candlelight dinner for two',
+  'קציצות בטעם של ברכה',
+  'פיוז טי אפרסק',
 ];
 
 /// Notice-like dish names read at a price of zero and of forty.
@@ -1230,6 +1361,9 @@ const List<String> dishKindNoticeNames = <String>[
   'חשוב',
   'Allergen information: ask your waiter',
   'מידע לאלרגנים! \u{1F499}',
+  'הערה חשובה! נשים בהיריון',
+  'Notices',
+  'אלרגנים',
 ];
 
 // ---------------------------------------------------------------------------

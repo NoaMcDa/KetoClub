@@ -470,6 +470,8 @@ bool _namesRescuedDough(String haystack) {
 /// too ("בחרו סוג בצק" with a bare "כרובית" among its values).
 Iterable<({String label, bool offersRescued})> _doughChoices(Dish dish) sync* {
   for (final option in dish.options) {
+    // An upsell is never what the dish is made of (issue #475).
+    if (TextNormaliser.isAddOnOptionGroup(option.name)) continue;
     final name = TextNormaliser.normalise(option.name);
     final label = _unguardedDoughLabel(name) ?? _unguardedChoiceBaseLabel(name);
     if (label == null) continue;
@@ -799,13 +801,15 @@ abstract final class ClassificationRules {
     ]);
   }
 
-  /// [dish]'s description and non-removal option values, normalised and
-  /// joined, with every topping replaced by a space: a topping named
+  /// [dish]'s description and non-removal option values outside upsell
+  /// groups (issue #475), normalised and joined, with every topping
+  /// replaced by a space: a topping named
   /// again ("tossed in truffle oil and parmesan") is not a filling (issue
   /// #273). What [describesFilling] and [_describesProtein] read.
   static String _fillingText(Dish dish) {
     final parts = <String>[TextNormaliser.normalise(dish.description)];
     for (final option in dish.options) {
+      if (TextNormaliser.isAddOnOptionGroup(option.name)) continue;
       for (final value in option.values) {
         if (TextNormaliser.isRemovalOptionValue(value)) continue;
         parts.add(TextNormaliser.normalise(value));
