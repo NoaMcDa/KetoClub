@@ -751,12 +751,18 @@ Built, but not confirmed end to end, and not to be reported as done:
   The Photon mapper is tested against two replies recorded from a laptop
   (`test/fixtures/photon/`), both HTTP clients against a mocked client, and
   the picker, controller and flow (`discovery_choose_street_flow_test.dart`,
-  `flutter-tester` only) against fakes. The app has never called the
-  backend's `/v1/places/search`, and Photon's CORS header was checked with a
-  script, not from a browser. A backend without that route (404, or
+  `flutter-tester` only) against fakes. Both clients have run against live
+  services only from a throwaway `flutter test` on a laptop (the backend
+  client through a local backend to Photon, the direct one to Photon; see
+  D27), and Photon's CORS header was checked with a script, not from a
+  browser. A backend without that route (404, or
   `PLACE_SEARCH_ENABLED` off) or one refusing a missing install id (400)
   reads as `backendUnreachable` and falls back to Photon; that path is
-  proven against a mocked client only.
+  proven against a mocked client only. Photon answers `403` to Dart's
+  default `User-Agent`, so the direct client sends a KetoClub one on phones;
+  a live `flutter test` run of the direct client then answered (see D27),
+  but no browser has sent the web path's request, which carries no
+  `User-Agent` of ours and relies on the browser's own being accepted.
 - **`flutter drive` could not complete in this environment** (a
   chromedriver/Chromium mismatch; runs hang after "Debug service listening",
   including flows that predate D25), so the two new flows

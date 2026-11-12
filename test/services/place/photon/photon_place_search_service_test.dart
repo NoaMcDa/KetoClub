@@ -32,7 +32,12 @@ MockClient _answering(
 PhotonPlaceSearchService _service(
   http.Client client, {
   Duration timeout = const Duration(seconds: 10),
-}) => PhotonPlaceSearchService(client: client, timeout: timeout);
+  bool runsInBrowser = false,
+}) => PhotonPlaceSearchService(
+  client: client,
+  timeout: timeout,
+  runsInBrowser: runsInBrowser,
+);
 
 void main() {
   group('PhotonPlaceSearchService (issue #449)', () {
@@ -66,6 +71,65 @@ void main() {
       expect(
         request.headers.keys.map((k) => k.toLowerCase()),
         isNot(contains('x-ketoclub-install-id')),
+      );
+    });
+
+    test('on a phone names KetoClub in the User-Agent: Photon refuses '
+        "Dart's own with a 403", () async {
+      // Arrange
+      final requests = <http.Request>[];
+      final service = _service(_answering(200, _herzlReply(), requests));
+
+      // Act
+      await service.search('herzl', language: 'en');
+
+      // Assert
+      expect(
+        requests.single.headers['User-Agent'],
+        'KetoClub/1.0 (+https://github.com/NoaMcDa/KetoClub; place search)',
+      );
+      expect(
+        requests.single.headers['User-Agent'],
+        PhotonPlaceSearchService.photonUserAgent,
+      );
+    });
+
+    test('in a browser sends no User-Agent, which the browser owns', () async {
+      // Arrange
+      final requests = <http.Request>[];
+      final service = _service(
+        _answering(200, _herzlReply(), requests),
+        runsInBrowser: true,
+      );
+
+      // Act
+      await service.search('herzl', language: 'en');
+
+      // Assert
+      expect(
+        requests.single.headers.keys.map((k) => k.toLowerCase()),
+        isNot(contains('user-agent')),
+      );
+      expect(requests.single.headers['Accept'], 'application/json');
+    });
+
+    test('a 403, as Photon answers an unnamed client, is a changed '
+        'provider', () async {
+      // Arrange
+      final service = _service(
+        _answering(403, utf8.encode('<html>403 Forbidden</html>')),
+      );
+
+      // Act
+      final result = await service.search('herzl', language: 'en');
+
+      // Assert
+      expect(
+        result,
+        const PlaceSearchFailed(
+          PlaceSearchFailureReason.providerChanged,
+          statusCode: 403,
+        ),
       );
     });
 

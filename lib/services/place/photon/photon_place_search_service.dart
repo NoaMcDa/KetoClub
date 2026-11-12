@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:ketoclub/models/place.dart';
 import 'package:ketoclub/services/place/photon/photon_place_mapper.dart';
@@ -21,6 +22,14 @@ import 'package:ketoclub/services/place/place_search_service.dart';
 /// `layer=street`. Nothing else is sent: no install id, no key and no
 /// position — the query is the only thing that leaves the device.
 ///
+/// **User-Agent.** Photon's public instance answers `403` to Dart's
+/// default `User-Agent` (`Dart/… (dart:io)`), so on a phone the request
+/// names KetoClub with [photonUserAgent], the string the backend's
+/// `GEOCODER_USER_AGENT` defaults to. In a browser ([runsInBrowser]) the
+/// header is left out, as the Wolt adapter and the website fetcher leave
+/// theirs out: a page cannot set it (it is a forbidden header name), and
+/// the browser sends its own.
+///
 /// Failure mapping: a `ClientException` is
 /// [PlaceSearchFailureReason.offline], the time budget running out is
 /// [PlaceSearchFailureReason.timeout], `429` is
@@ -29,7 +38,14 @@ import 'package:ketoclub/services/place/place_search_service.dart';
 /// [PlaceSearchFailureReason.providerChanged].
 final class PhotonPlaceSearchService implements PlaceSearchService {
   /// Creates a service that sends its requests through [client].
-  new({required http.Client client, this.timeout = const Duration(seconds: 10)})
+  ///
+  /// [runsInBrowser] defaults to [kIsWeb] and exists so a test can check
+  /// the browser's headers on any platform.
+  new({
+    required http.Client client,
+    this.timeout = const Duration(seconds: 10),
+    this.runsInBrowser = kIsWeb,
+  })
     // The field is private and the parameter is not, so an initializing
     // formal is not available.
     // ignore: prefer_initializing_formals
@@ -39,7 +55,17 @@ final class PhotonPlaceSearchService implements PlaceSearchService {
   /// [PlaceSearchFailureReason.timeout].
   final Duration timeout;
 
+  /// Whether requests go out through a browser, which sends its own
+  /// `User-Agent` and refuses to let a page set one.
+  final bool runsInBrowser;
+
   final http.Client _client;
+
+  /// The `User-Agent` a phone sends to Photon: it names the app and where
+  /// to find it, as Photon's fair-use policy asks, and is the backend's
+  /// `GEOCODER_USER_AGENT` default.
+  static const String photonUserAgent =
+      'KetoClub/1.0 (+https://github.com/NoaMcDa/KetoClub; place search)';
 
   /// Photon's host.
   static const String host = 'photon.komoot.io';
@@ -72,7 +98,10 @@ final class PhotonPlaceSearchService implements PlaceSearchService {
       response = await _client
           .get(
             uri,
-            headers: const <String, String>{'Accept': 'application/json'},
+            headers: <String, String>{
+              'Accept': 'application/json',
+              if (!runsInBrowser) 'User-Agent': photonUserAgent,
+            },
           )
           .timeout(timeout);
     } on http.ClientException {

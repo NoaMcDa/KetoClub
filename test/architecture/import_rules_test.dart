@@ -274,6 +274,8 @@ const _boundaries = <_Boundary>[
   }),
   _Boundary('github.com/NoaMcDa', {
     'services/menu/website/direct_website_fetcher.dart',
+    // The User-Agent a phone sends to Photon (issue #449, D27).
+    'services/place/photon/photon_place_search_service.dart',
     // The issue tracker "Report a problem" opens (issue #258).
     'screens/settings_screen.dart',
   }),

@@ -175,6 +175,9 @@ data and carry no user data).
   `street` plus three other features.
 
 Photon sends `Content-Type: application/json` with no charset, which is why
-both clients decode `bodyBytes` as UTF-8. To re-record, send the same `GET`
+both clients decode `bodyBytes` as UTF-8. These were recorded with Python's
+own `User-Agent`; Photon answers `403` to Dart's default one, which is why
+`PhotonPlaceSearchService` sends a KetoClub `User-Agent` on phones (a
+fixture cannot show that: a mocked client never sees Photon's check). To re-record, send the same `GET`
 with any HTTP client and save the body; keep to a handful of requests (the
 public instance is fair-use).

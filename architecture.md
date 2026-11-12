@@ -3217,7 +3217,14 @@ with `Access-Control-Allow-Origin: *` (checked 2026-11-12), so a browser
 can call it without a proxy. One request per search:
 `GET /api/?q=…&limit=15&lang=…&bbox=34.2,29.4,35.9,33.4&layer=house&layer=street`,
 with `lang=en` under English and `lang=default` otherwise (Photon has no
-Hebrew; `default` gives the local, mostly Hebrew, names). The reply is
+Hebrew; `default` gives the local, mostly Hebrew, names). On a phone the
+request carries `User-Agent: KetoClub/1.0 (+https://github.com/NoaMcDa/KetoClub;
+place search)`, the backend's `GEOCODER_USER_AGENT` default: Photon's
+public instance answers `403` to Dart's default `User-Agent` (found in a
+live check; the recorded fixtures came from a script with its own). In a
+browser the header is left out, as the Wolt adapter and the website
+fetcher leave theirs out — a page cannot set it — and the browser's own is
+sent. The reply is
 mapped by one rule set, implemented twice and kept identical —
 `services/place/photon/photon_place_mapper.dart` on the device and the
 backend's own port: keep a feature only in `IL`, of type `house` or
@@ -3288,8 +3295,13 @@ user is already searching, this text is about where the user is.
   `test/fixtures/photon/`, and hand-built edge cases; both HTTP clients
   against a mocked `http.Client`; the fallback; settings; the controller),
   widget tests of the picker in both languages, and a flow test under
-  `flutter-tester`. No street search has run in a real browser or on a
-  device, and the app has never called the backend's route.
+  `flutter-tester`. On 2026-11-12 a throwaway `flutter test` (plain `test()`,
+  real HTTP, not committed) ran `PhotonPlaceSearchService` with the phone's
+  `User-Agent` against the live instance: "Dizengoff 50 Tel Aviv" in English
+  gave one place ("Dizengoff 50, Tel Aviv"), and the Hebrew "Herzl 10 Tel
+  Aviv" the same six labels the recorded fixture maps to. A separate check
+  ran `BackendPlaceSearchService` through a local backend to Photon. No street
+  search has run in a real browser or on a device.
 
 **What it costs.** One services sub-package (`services/place/`, rank 0,
 five files), one model (`StreetPlace`), one `AppSettings` field decoded by
