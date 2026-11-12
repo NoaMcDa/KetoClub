@@ -28,6 +28,7 @@ from app.errors import (
     handle_backend_error,
     handle_validation_error,
 )
+from app.logs import configure_logging
 from app.models import Base
 from app.routers import (
     chat,
@@ -73,6 +74,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     caller all reading the same instance.
     """
     resolved_settings = settings or get_settings()
+    configure_logging()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:

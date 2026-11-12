@@ -709,7 +709,15 @@ cross-origin check at all. The request still says `Host: evil.example`.
   forwards in `Host`. `*` alone turns the check off; do not use it on a
   machine a browser can reach.
 
-### Unexpected errors
+### The log and unexpected errors
+
+Every `ketoclub.*` logger prints through one stream handler on the
+`ketoclub` parent, at INFO, installed by `create_app` (`app/logs.py`, #467):
+uvicorn configures only its own loggers, so a module logger with no handler
+of its own was silently dropped. Lines read `<time> <logger> <message>`, for
+example `ketoclub.request request request_id=… method=GET route=/v1/health
+status=200 latency_ms=1.2` or `ketoclub.classify classify engine=rules
+reason=timeout`.
 
 An exception no route handles is `500 {"reason":"internalError"}`, answered
 inside CORS so a browser sees the status rather than a CORS failure (#270),

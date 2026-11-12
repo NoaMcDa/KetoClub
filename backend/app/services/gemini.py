@@ -62,14 +62,8 @@ _USAGE_FIELDS: Final[tuple[tuple[str, str], ...]] = (
     ("totalTokenCount", "total_tokens"),
 )
 
+# Printed through the ``ketoclub`` parent's handler (``app.logs``, #467).
 logger = logging.getLogger("ketoclub.chat")
-logger.setLevel(logging.INFO)
-if not logger.handlers:
-    # Attached directly, as in ``request_logging``: uvicorn configures only
-    # its own loggers, so without this the chat lines would vanish.
-    _handler = logging.StreamHandler()
-    _handler.setFormatter(logging.Formatter("%(asctime)s %(name)s %(message)s"))
-    logger.addHandler(_handler)
 
 
 def to_gemini_schema(schema: dict[str, object]) -> dict[str, object]:
