@@ -124,7 +124,9 @@ void main() {
         expect(find.text('Rothschild 22'), findsOneWidget);
 
         // Assert: a card per venue, in the order the search service gave
-        // them, and the cached venue's card shows its score.
+        // them, and the cached venue's card shows its score. On a short
+        // window the list starts under the fold, so scroll to it first.
+        await showVenueList(tester);
         expect(find.byType(VenueCard), findsNWidgets(3));
         // Reading order: top to bottom on a phone, and row by row, left
         // to right, once a wide window lays the cards out in a grid

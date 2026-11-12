@@ -69,6 +69,8 @@ import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
+import 'package:ketoclub/widgets/venue_card.dart';
+import 'package:ketoclub/widgets/venue_grid.dart';
 
 /// Pumps the whole app over [fakes] and settles it.
 ///
@@ -102,6 +104,24 @@ Finder navDestination(String label) => find.descendant(
 /// Taps the widget [finder] resolves to and settles.
 Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
   await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+/// Scrolls the Discovery screen until its venue list is on screen, when it
+/// is not already, and settles. A no-op when a card is showing or there
+/// is no list.
+///
+/// The list is a sliver (`SliverVenueGrid`, issue #446). On a short window
+/// the header, field and chips can fill the screen and leave the list
+/// wholly under the fold, and a finder skips everything in a sliver that
+/// is not on screen — even cards the scroll view has already built. A
+/// flow calls this before it looks for a card, as a user scrolls down to
+/// the results.
+Future<void> showVenueList(WidgetTester tester) async {
+  if (find.byType(VenueCard).evaluate().isNotEmpty) return;
+  final list = find.byType(SliverVenueGrid, skipOffstage: false);
+  if (list.evaluate().isEmpty) return;
+  await tester.ensureVisible(list);
   await tester.pumpAndSettle();
 }
 

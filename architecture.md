@@ -1179,7 +1179,10 @@ gutters) and three from 1000px, and the loading skeletons follow the same
 grid. In a single column the photo keeps the artboard's fixed 118px banner,
 so a phone looks as before; in two or three columns it is 3:2, so a card is a
 photo tile rather than a strip, and the cards in a row are stretched to one
-height. Every venue card is drawn on a `Card`, taking the theme's
+height. *(D27, issue #446)* The list itself is `SliverVenueGrid`, the same
+layout built row by row inside the page's `CustomScrollView`, so only the
+cards on or near the screen exist; the eager `VenueGrid` is left for the three
+loading skeletons. Every venue card is drawn on a `Card`, taking the theme's
 `CardThemeData` shape and `--line` edge, with its ink well laid over the
 whole card so a hover or keyboard focus on the web lights up the photo too.
 
@@ -3099,6 +3102,70 @@ that the keto vocabulary makes (§12).
 `AppSettings` field decoded by the "added later" rule, three controller
 members (`choosePlace`, `setRadius`, the restoring `load`), eight ARB keys in
 each language, and `locate` now completing with the device's answer.
+
+### D27 — The Discovery list is built lazily
+
+*(Issue #446. Reverses the "plain `Column`" choice of the Discovery screen
+and of `VenueGrid`, D20; changes no behaviour a user can name except speed.)*
+
+**What changed.** The Discovery page was one `SingleChildScrollView` over a
+`Column` holding every venue card, each row of the grid wrapped in
+`IntrinsicHeight`. The screen's own comment gave the reason: "a search
+answers a few dozen venues at most, and every card is then in the element
+tree for tests and for screen readers alike." A real nearby search around
+Herzliya answers **334**. All 334 cards were built, laid out and painted when
+the list arrived, and again on every `notifyListeners` of
+`VenueSearchController` — once per quick-score result (D21), per chip tap,
+per keystroke — because the whole screen watches the controller. All 328
+venue photos (44 MB) were requested in one burst. D26 made it visible on
+launch, by restoring a saved city's list with no tap.
+
+Now the page is a `CustomScrollView`. Everything above the list is one box
+sliver; the cards are a `SliverVenueGrid`, which lays rows out exactly as
+`VenueGrid` does (one, two or three columns, the row gap, a row's cards
+stretched to its tallest, a short last row keeping its cards' width) but
+builds only the rows on or near the screen, through a `SliverList`. The scroll
+view's cache extent is 1,200px, about three rows, so a card just under the
+fold already has its photo. The eager `VenueGrid` stays for the three loading
+skeletons, and both grids build a row through one shared function so they
+cannot drift apart.
+
+**Measured**, on the same 334-venue list, web build, a visible tab in headless
+Chrome driven over the DevTools protocol:
+
+| | Debug before | Debug after | Release before | Release after |
+|---|---|---|---|---|
+| Main thread blocked after the list arrives | about 21 s | 2.3 s | 8.5 s | 0.4 s |
+| Longest single block | 4.3 s | 0.3 s | 1.35 s | 0.12 s |
+| Tapping a chip | 1.2–3.5 s | 0.2 s | 0.6–0.9 s | 0.07–0.12 s |
+| Typing one letter | about 1.8 s | 0.1–0.5 s | about 10 ms | 7–21 ms |
+| Photos requested on arrival | 328 (44.4 MB) | 15 (1.8 MB) | 328 (44.4 MB) | 15 (1.8 MB) |
+
+**What it accepts.**
+
+- **A card far below the fold is not in the element tree**, as on the menu
+  screen. A test scrolls to it. And a sliver wholly under the fold is
+  "offstage" to a test finder even when its cards are built in the cache:
+  flows call `showVenueList` (`flow_support.dart`) before looking for a card,
+  and a scroll moves a sliver's children only once a frame has laid the page
+  out, so `ensureVisible` needs a pump before a tap.
+- **Fast scrolling in a debug build is less smooth than it was.** Rows are
+  built as they come into view: a debug build scrolled at about 120 fps once
+  everything existed and now scrolls a 3,000px-per-second fling at 40–50 fps,
+  with hitches up to 190 ms. A release build holds about 115–128 fps.
+- **The scroll extent of rows not yet built is an estimate**, so the scroll
+  bar's thumb can shift a little as rows of different heights are built.
+- **The screen still watches the whole controller.** A notification now
+  rebuilds a screenful of cards, not hundreds, which was enough; a per-card
+  listener was not needed and was not added.
+- **Each photo is still tried as a fetch first** (it fails on CORS, then
+  loads as an image), and still at full size. There are now 15 of them, not
+  328.
+- **Evidence.** Unit, widget and flow tests, and the measurements above on
+  one list from one machine. No phone has run it.
+
+**What it costs.** `SliverVenueGrid` beside `VenueGrid`, a screen `build`
+split into slivers, and four flows that bring the list into view first.
 
 ---
 

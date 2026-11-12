@@ -58,6 +58,7 @@ Future<void> _openCard(WidgetTester tester, {bool locate = false}) async {
   if (locate) {
     await tapAndSettle(tester, find.byTooltip(_en.discoveryUseLocation));
   }
+  await showVenueList(tester);
   final card = find.widgetWithText(VenueCard, _venue.name);
   await tester.ensureVisible(card);
   await tester.pumpAndSettle();

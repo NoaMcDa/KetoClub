@@ -24,6 +24,16 @@ request.
 
 ## What shipped
 
+**D27 — the Discovery list is built lazily (#446).** A nearby search answers
+hundreds of venues (334 around Herzliya); the page built every card at once and
+again on every controller notification, and froze for seconds. It is now a
+`CustomScrollView` whose cards are a `SliverVenueGrid`: `VenueGrid`'s layout,
+built row by row, with a 1,200px cache extent. On that list the main thread was
+blocked for about 21 s in a debug build and is now blocked for 2.3 s (release:
+8.5 s to 0.4 s), and 15 photos are requested on arrival where 328 were. A card
+far below the fold is no longer in the element tree, and fast scrolling in a
+debug build is less smooth than it was; see `architecture.md` D27.
+
 **D26 — Discovery looks around a place the user chooses, and filters by
 distance (#443).** "Choose a location", in the Discovery header and on the
 location-denied and location-unavailable cards, opens `LocationPickerSheet`:
@@ -668,6 +678,12 @@ this is the short list.
   should stay lazy — so a test asserting on content below its fold must scroll first.
   `SettingsScreen` uses a `Column` in a `SingleChildScrollView` for the opposite
   reason: it is short, and a screen reader should not have to scroll to find a control.
+  The Discovery list was an eager `Column` for that reason too, until a 334-venue
+  nearby list froze the page for seconds (D27, #446); it is a `SliverVenueGrid` now.
+  A sliver wholly below the fold is also "offstage" to a finder even when its
+  children are built in the cache extent, so `find.text` on a card there finds
+  nothing: pass `skipOffstage: false`, or scroll the list into view first
+  (`showVenueList` in `flow_support.dart`).
 - **Two reply schemas: the text path's has exactly seven dish properties; the
   vision path's `visionResponseSchema` adds `page`.** A field that lives on
   `Menu`/`Dish` never needs a `schemaVersion` bump — bumping it re-analyses
@@ -714,7 +730,7 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D26, each
+- `architecture.md` §14 — the decisions log, now D1 to D27, each
   recording what was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately
