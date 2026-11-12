@@ -367,7 +367,7 @@ def test_a_menu_link_is_followed_once_and_its_page_read(
     entry = golden_entry("website.json", "menu_page_inline_prices.html")
     assert body["menu"]["categories"] == entry["textMenu"]["categories"]
     assert body["menu"]["venueRef"] == {"source": "website", "platformId": _SITE}
-    assert body["analysis"]["engine"] == {"kind": "rules", "reason": "badResponse"}
+    assert body["analysis"]["engine"] == {"kind": "rules", "reason": "unavailable"}
 
 
 def test_a_linked_page_is_never_followed_further(
@@ -537,7 +537,7 @@ def test_a_pdf_scan_spends_the_analysis_bucket(web: respx.MockRouter) -> None:
 @pytest.mark.parametrize(
     ("gemini_answer_or_error", "status", "reason"),
     [
-        (httpx.Response(500), 502, "badResponse"),
+        (httpx.Response(500), 502, "unavailable"),
         (httpx.Response(429), 502, "rateLimited"),
         (httpx.Response(403), 502, "notConfigured"),
         (httpx.ConnectError("down"), 502, "offline"),
