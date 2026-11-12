@@ -41,14 +41,29 @@ final RegExp _bidiControls = RegExp('[$_bidiControlChars]');
 
 /// Hebrew points and teamim (niqqud, cantillation marks), stripped
 /// wholesale because pasted menus carry them inconsistently (step 2).
-final RegExp _hebrewPointsAndTeamim = RegExp('[֑-ׇ]');
+///
+/// The marks only: U+0591-U+05BD, U+05BF, U+05C1-U+05C2, U+05C4-U+05C5
+/// and U+05C7. The block's four punctuation characters in between, the
+/// maqaf U+05BE, paseq U+05C0, sof pasuq U+05C3 and nun hafukha U+05C6,
+/// are left for step 6 to turn into a space, as a hyphen is: deleting
+/// the maqaf glued `תפוחי־אדמה` into one word and hid the potato trigger
+/// (issue #275).
+final RegExp _hebrewPointsAndTeamim = RegExp(
+  '[\u0591-\u05BD\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7]',
+);
 
 /// Quote marks deleted (not replaced with a space) so that a geresh or
 /// gershayim inside a word does not split it: `צ'יפס` → `ציפס`,
 /// `תפו"א` → `תפוא` (step 3). Includes the Hebrew geresh/gershayim
 /// (U+05F3, U+05F4), the ASCII quote and backtick, and the common
-/// "smart quote" and modifier-apostrophe forms platforms substitute.
-final RegExp _quoteMarks = RegExp("[׳״'\"`’”ʼ]");
+/// "smart quote" and modifier-apostrophe forms platforms substitute:
+/// both single and both double curly quotes, the acute accent U+00B4
+/// and the primes U+2032, U+2033 that keyboards put in place of a
+/// geresh (issue #275: `צ‘יפס` read as two words and hid the chips
+/// trigger).
+final RegExp _quoteMarks = RegExp(
+  "[\u05F3\u05F4'\"`\u2018\u2019\u201C\u201D\u02BC\u00B4\u2032\u2033]",
+);
 
 /// Any run of characters that is neither a letter nor a number,
 /// collapsed to one space (step 6). Deliberately the negated-letter
