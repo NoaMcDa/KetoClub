@@ -157,6 +157,27 @@ def _dough_he() -> tuple[_Compiled, ...]:
     return _hebrew(vocabulary().dough_bases_he, honour_no_prefix=False)
 
 
+@cache
+def _choice_base_en() -> tuple[_Compiled, ...]:
+    # The other bases of a choice-of-base group (issue #473), with the
+    # regular plural like every English base.
+    return _latin(vocabulary().choice_bases_en, allow_plural=True)
+
+
+@cache
+def _choice_base_he() -> tuple[_Compiled, ...]:
+    return _hebrew(vocabulary().choice_bases_he, honour_no_prefix=False)
+
+
+@cache
+def _choice_words() -> tuple[_Compiled, ...]:
+    vocab = vocabulary()
+    return (
+        *_latin(vocab.choice_group_words_en),
+        *_hebrew(vocab.choice_group_words_he, honour_no_prefix=False),
+    )
+
+
 def _modifiers(
     pairs: Sequence[tuple[str, str]], compiled: tuple[_Compiled, ...]
 ) -> tuple[_Compiled, ...]:
@@ -344,13 +365,45 @@ def _unguarded_dough_label(haystack: str) -> str | None:
     return None
 
 
+def _unguarded_choice_base_label(name: str) -> str | None:
+    """The label of the first choice base (pasta, noodles; issue #473) that
+    survives its guards in an option group's normalised ``name``, English
+    table first, when the name also holds a choice word; ``None``
+    otherwise."""
+    if not any(word.pattern.search(name) for word in _choice_words()):
+        return None
+    vocab = vocabulary()
+    for table, guards, labels in (
+        (
+            _choice_base_en(),
+            vocab.keto_qualifier_guards_en,
+            vocab.non_keto_base_labels_en,
+        ),
+        (
+            _choice_base_he(),
+            vocab.keto_qualifier_guards_he,
+            vocab.non_keto_base_labels_he,
+        ),
+    ):
+        for entry in table:
+            for found in entry.pattern.finditer(name):
+                if not _is_guarded(
+                    name, found.start(), found.end(), guards.get(entry.key)
+                ):
+                    return labels.get(entry.key, entry.key)
+    return None
+
+
 def _names_rescued_dough(haystack: str) -> bool:
     """Whether a dough word in ``haystack`` is rescued by one of its
-    guards: a cauliflower, almond or keto dough is named there."""
+    guards: a cauliflower, almond or keto dough is named there; a pasta or
+    noodle word rescued the same way counts too (issue #473)."""
     vocab = vocabulary()
     for table, guards in (
         (_dough_en(), vocab.keto_qualifier_guards_en),
         (_dough_he(), vocab.keto_qualifier_guards_he),
+        (_choice_base_en(), vocab.keto_qualifier_guards_en),
+        (_choice_base_he(), vocab.keto_qualifier_guards_he),
     ):
         for entry in table:
             for found in entry.pattern.finditer(haystack):
@@ -432,7 +485,8 @@ def match_dish(dish: Dish) -> RuleMatch:
 
     1. A name that is only a starch or a bread (:func:`carb_only_base`) is
        red, unless the description or an option names a filling
-       (:func:`describes_filling`).
+       (:func:`describes_filling`); a starch that is not a bread is rescued
+       only by a protein (issue #276).
     2. A non-keto base in the name or description is red.
     3. A choice of dough among the options (:func:`dough_choice_base`) is
        red: the group asks which dough the dish is made of.
@@ -441,7 +495,11 @@ def match_dish(dish: Dish) -> RuleMatch:
        the dish yellow with ``optionBaseModification`` first.
     """
     carb_only = carb_only_base(dish.name)
-    if carb_only is not None and not describes_filling(dish):
+    if carb_only is not None and not (
+        describes_filling(dish)
+        if carb_only in vocabulary().carb_only_bread_triggers
+        else _describes_protein(dish)
+    ):
         return RuleMatch(is_non_keto=True, base_label=carb_only)
 
     name = normalise(dish.name)
@@ -500,6 +558,8 @@ def _dough_choices(dish: Dish) -> list[tuple[str, bool]]:
         name = normalise(option.name)
         label = _unguarded_dough_label(name)
         if label is None:
+            label = _unguarded_choice_base_label(name)
+        if label is None:
             continue
         choices.append(
             (
@@ -520,10 +580,10 @@ def _first_dough_choice(dish: Dish) -> str | None:
     return choices[0][0] if choices else None
 
 
-def describes_filling(dish: Dish) -> bool:
-    """``ClassificationRules.describesFilling``: whether the description or a
-    non-removal option value names a protein, a plant or dairy. The name is
-    never consulted."""
+def _filling_text(dish: Dish) -> str:
+    """Dart ``_fillingText``: the description and non-removal option values,
+    normalised and joined, with every topping replaced by a space (issue
+    #273): Dart's ``replaceAll`` with each topping pattern, in order."""
     parts = [normalise(dish.description)]
     for option in dish.options:
         for value in option.values:
@@ -532,11 +592,31 @@ def describes_filling(dish: Dish) -> bool:
             parts.append(normalise(value))
     text = " ".join(part for part in parts if part)
     if not text:
-        return False
-    # A topping named again is not a filling (issue #273): Dart's
-    # ``replaceAll`` with each topping pattern, in order.
+        return text
     for topping in _toppings():
         text = topping.pattern.sub(" ", text)
+    return text
+
+
+def _describes_protein(dish: Dish) -> bool:
+    """Dart ``_describesProtein``: whether the filling text names a protein,
+    the one filling that rescues a starch named alone (issue #276)."""
+    text = _filling_text(dish)
+    if not text:
+        return False
+    protein_en, protein_he = _filling_protein()
+    return _any_unguarded_match(
+        text, [(protein_en, _NO_GUARDS), (protein_he, _NO_GUARDS)]
+    )
+
+
+def describes_filling(dish: Dish) -> bool:
+    """``ClassificationRules.describesFilling``: whether the description or a
+    non-removal option value names a protein, a plant or dairy. The name is
+    never consulted."""
+    text = _filling_text(dish)
+    if not text:
+        return False
     protein_en, protein_he = _filling_protein()
     return (
         mentions_plant(text)

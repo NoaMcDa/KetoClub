@@ -308,6 +308,8 @@ const String _sOnionRings =
 const String _sFlatbread = 'Please serve it on a plate, without the flatbread.';
 const String _sPortSauce =
     'Please leave out the port wine sauce; it reduces to sugar.';
+const String _sChocolateSauce =
+    'Please leave out the chocolate sauce; it is sweetened.';
 
 /// Carb-modifier triggers (waiter-script templates) in English, from
 /// README's 13 verbatim, plus the false-green-gap additions, the D-V3
@@ -451,6 +453,11 @@ const Map<String, String> carbModifiersEn = <String, String>{
   'port wine sauce': _sPortSauce,
   'port sauce': _sPortSauce,
   'port wine glaze': _sPortSauce,
+  // Issue #469: chocolate is red as the dish itself (see the guard on
+  // `chocolate`), but a chocolate sauce on a plate is something to leave
+  // off, like the port wine sauce above.
+  'chocolate sauce': _sChocolateSauce,
+  'chocolate drizzle': _sChocolateSauce,
 
   // Drink triggers — yellow with a swap script (#216). Latte/cappuccino:
   // the dairy rule (dairyTriggersEn `milk`/`cream`) fires separately when
@@ -633,6 +640,8 @@ const Map<String, String> carbModifiersHe = <String, String>{
   'רוטב פורט': _sPortSauceHe,
   'רדוקציית פורט': _sPortSauceHe,
   'רדוקציית יין פורט': _sPortSauceHe,
+  // Issue #469, mirroring `chocolate sauce`.
+  'רוטב שוקולד': 'אפשר בבקשה בלי רוטב השוקולד? יש בו סוכר.',
 
   // #12 audit additions (agent 1D): `maple` and `balsamic glaze` had no
   // Hebrew counterpart at all, the exact silent-vocabulary-gap failure
@@ -718,6 +727,44 @@ const List<String> doughBasesEn = <String>['dough'];
 /// בצק" (a crustless quiche).
 const List<String> doughBasesHe = <String>['בצק'];
 
+/// The other bases a dish can be *made of* when the menu lists the dish
+/// by its sauce and asks for the base in an option group, English (issue
+/// #473): a pasta bar's "Bolognese" with a required "Choose your pasta".
+/// Unlike a dough word, one of these in a group's name makes the group a
+/// choice of base only beside a choice word ([choiceGroupWordsEn]): "Add
+/// pasta" is an add-on, "Choose your pasta" is what the dish is. Matched
+/// with the regular plural, like every English base.
+const List<String> choiceBasesEn = <String>['pasta', 'noodle', 'spaghetti'];
+
+/// [choiceBasesEn] in Hebrew: "בחרו סוג פסטה".
+const List<String> choiceBasesHe = <String>[
+  'פסטה',
+  'פסטת',
+  'נודלס',
+  'אטריות',
+  'אטריה',
+];
+
+/// The words that make an option group named after a [choiceBasesEn]
+/// word a choice of what the dish is made of (issue #473).
+const List<String> choiceGroupWordsEn = <String>[
+  'choose',
+  'choice',
+  'select',
+  'pick',
+  'type',
+];
+
+/// [choiceGroupWordsEn] in Hebrew: "בחר", "בחרו", "סוג".
+const List<String> choiceGroupWordsHe = <String>[
+  'בחר',
+  'בחרו',
+  'בחרי',
+  'בחירת',
+  'בחירה',
+  'סוג',
+];
+
 // ---------------------------------------------------------------------------
 // nonKetoBases — English
 // ---------------------------------------------------------------------------
@@ -787,6 +834,26 @@ const List<String> nonKetoBasesEn = <String>[
   'fried chicken', 'popcorn chicken', 'crispy chicken',
   // The Hebrew `חלבה` had no English twin (issue #273's `מחלבה` test).
   'halva',
+
+  // Issue #469: desserts and sweets with no trigger at all, found green
+  // on real menus. `chocolate` is red as the dish ("chocolate bar",
+  // "hot chocolate") and guarded where it is sugar-free, dark or a sauce
+  // (see [ketoQualifierGuardsEn]); `mousse` is guarded against the
+  // savoury mousses. A truffle on its own is a mushroom, so only the
+  // chocolate one is here.
+  'chocolate', 'fudge', 'panna cotta', 'profiterole', 'candy', 'candies',
+  'chocolate truffle', 'praline', 'mousse', 'biscuit', 'eclair',
+  'cannoli', 'gelato', 'sorbet', 'marshmallow', 'toffee', 'nutella',
+
+  // Issue #470: a sushi roll is rice, and asking for it without the rice
+  // is not a roll any more. Bare `roll` is not here: a bread roll and a
+  // lobster roll are carriers. A cucumber-wrapped (naruto) or riceless
+  // roll is rescued by [ketoSubstituteNameWordsEn]; sashimi has no
+  // trigger at all.
+  'temaki', 'futomaki', 'hosomaki', 'hand roll', 'sushi roll',
+  'california roll', 'inside out roll',
+  // Rolls that are not sushi, and are red for their own wrapper.
+  'spring roll', 'egg roll', 'cinnamon roll',
 
   // Issue #190: the pastry counter. A cinnamon danish classified green
   // on a real Aroma menu because none of these was a trigger. `danish`
@@ -940,6 +1007,24 @@ const List<String> nonKetoBasesHe = <String>[
   // itself, which on an Israeli menu is always the breaded one.
   "קריספי צ'יקן", "צ'יקן קריספי", 'עוף קריספי',
   "פיש נ' צ'יפס", // fish 'n' chips
+  // Issue #469: desserts and sweets found green on real menus. `שוקולד`
+  // is red as the dish and guarded where it is sugar-free, dark or a
+  // sauce; `מוס` is guarded against the savoury mousses (see
+  // [ketoQualifierGuardsHe]). `חלת`/`חלות` are `חלה`'s construct and
+  // plural, prefix-free like it.
+  'שוקולד', "פאדג'", 'סוכריות', 'סוכריה', 'סוכרייה', 'טראפלס',
+  'פרלינים', 'פרלין', 'פחזניות', 'פחזנית', 'בוואריה', 'קדאיף', 'פנקוטה',
+  'פנה קוטה', 'מוס', 'גביע', 'גביעים', 'גביעי', 'ביסקיט', 'ביסקוויט',
+  'ביסקוויטים', 'זיווה', 'זיוות', 'מלוואח', 'חלת', 'חלות', "פוקאצ'ה",
+  "בן אנד ג'ריס", 'נוטלה', 'מרשמלו', 'טופי', 'אקלר', 'קנולי', "ג'לטו",
+  'סורבה',
+  // Issue #470: a sushi roll is rice (see the English list). The longer
+  // non-sushi rolls come before bare `רול`, so where both start at the
+  // same letter the dish is labelled by its own name, not sushi rice.
+  'מאקי', 'טמאקי', 'אורמאקי', 'פוטומאקי', 'הוסומאקי', 'אינסייד אאוט',
+  'אינסייד אווט', 'קליפורניה רול',
+  'ספרינג רול', 'רול קינמון', 'קינמון רול', 'אגרול',
+  'רול', 'רולים', 'רולס',
   // Dough itself: see [doughBasesHe]. After `בצק עלים` in this list, so
   // that longer trigger keeps its own label where both start together.
   ...doughBasesHe,
@@ -1346,6 +1431,41 @@ const Set<String> carbOnlyEligibleTriggers = <String>{
   'פיתות', 'טורטיות', 'האש בראון', 'טבעות בצל', 'נאן',
 };
 
+/// The breads of [carbOnlyEligibleTriggers] (issue #276): a bread named
+/// alone is a carrier when its description names a filling ("Laffa" with
+/// shawarma, D-V3's yellow), but a starch named alone ("Rice", "פירה") is
+/// the dish whatever the description says, unless it names a protein
+/// ("Rice bowl" with chicken). Holds every bread trigger and every bread
+/// label ([carbOnlyBaseLabels]), since `ClassificationRules.matchDish`
+/// tests the label.
+const Set<String> carbOnlyBreadTriggers = <String>{
+  'bread',
+  'pita',
+  'laffa',
+  'bun',
+  'buns',
+  'burger bun',
+  'baguette',
+  'tortilla',
+  'naan',
+  'flatbread',
+  'flatbreads',
+  'לחם',
+  'פיתה',
+  'פיתות',
+  'לאפה',
+  'לחמנייה',
+  'לחמניה',
+  'לחמניות',
+  'לחמניית',
+  'לחמנית',
+  'באגט',
+  'טורטייה',
+  'טורטיה',
+  'טורטיות',
+  'נאן',
+};
+
 /// Display labels for a carb-only red's `{base}` (issue #191), for the
 /// triggers whose dictionary key is not a form that reads well on its own
 /// — a construct form ("לחמניית" needs a following word) or a shorthand.
@@ -1520,6 +1640,12 @@ const List<String> carbOnlyToppingsEn = <String>[
   'paprika',
   'cajun',
   'salt',
+  // Issue #276: a spread or an oil leaves a bread the bread ("Garlic
+  // bread", "Pita with olive oil and za'atar").
+  'butter',
+  'oil',
+  'olive',
+  'zaatar',
 ];
 
 /// Hebrew mirror of [carbOnlyToppingsEn]: "צ'יפס פרמז'ן כמהין". Matched
@@ -1533,6 +1659,11 @@ const List<String> carbOnlyToppingsHe = <String>[
   'רוזמרין',
   'פפריקה',
   'מלח',
+  // Issue #276, mirroring the English spreads and oils.
+  'חמאה',
+  'שמן',
+  'זית',
+  'זעתר',
 ];
 
 /// First words that mark an option value as a *removal* rather than an
@@ -1561,6 +1692,18 @@ const Map<String, String> nonKetoBaseLabelsEn = <String, String>{
   'fish chips': 'battered fish',
   'fish n chips': 'battered fish',
   'noodle': 'noodles',
+  // Issue #470: a roll is red for its rice.
+  'sushi': 'sushi rice',
+  'nigiri': 'sushi rice',
+  'maki': 'sushi rice',
+  'uramaki': 'sushi rice',
+  'temaki': 'sushi rice',
+  'futomaki': 'sushi rice',
+  'hosomaki': 'sushi rice',
+  'hand roll': 'sushi rice',
+  'sushi roll': 'sushi rice',
+  'california roll': 'sushi rice',
+  'inside out roll': 'sushi rice',
 };
 
 /// Display labels for [nonKetoBasesHe] triggers, for rendering `{base}`
@@ -1598,6 +1741,26 @@ const Map<String, String> nonKetoBaseLabelsHe = <String, String>{
   'בחלבה': 'חלבה',
   'בבלילה': 'בלילה',
   'בבלילת': 'בלילה',
+  // Issue #470: a roll is red for its rice, so the rice is what `why`
+  // names.
+  'מאקי': 'אורז סושי',
+  'טמאקי': 'אורז סושי',
+  'אורמאקי': 'אורז סושי',
+  'פוטומאקי': 'אורז סושי',
+  'הוסומאקי': 'אורז סושי',
+  'אינסייד אאוט': 'אורז סושי',
+  'אינסייד אווט': 'אורז סושי',
+  'קליפורניה רול': 'אורז סושי',
+  'רול': 'אורז סושי',
+  'רולים': 'אורז סושי',
+  'רולס': 'אורז סושי',
+  'סושי': 'אורז סושי',
+  'ניגירי': 'אורז סושי',
+  // Issue #469: construct and plural forms read as the dish.
+  'חלת': 'חלה',
+  'חלות': 'חלה',
+  'גביעים': 'גביע',
+  'גביעי': 'גביע',
 };
 
 // ---------------------------------------------------------------------------
@@ -1705,6 +1868,18 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'fried chicken': (before: ['pan', 'stir', 'air'], after: []),
   // Crispy chicken skin is skin, not a coating.
   'crispy chicken': (before: [], after: ['skin']),
+
+  // Issue #469: sugar-free, keto or dark chocolate is not candy, and a
+  // chocolate sauce is the yellow `chocolate sauce` modifier instead.
+  'chocolate': (
+    before: [..._sugarFreeWords, 'keto', 'dark'],
+    after: [..._sugarFreeWords, 'sauce', 'drizzle', 'rub', 'mole'],
+  ),
+  // A savoury mousse is a pâté.
+  'mousse': (
+    before: ['salmon', 'liver', 'chicken', 'duck', 'fish', 'tuna', 'avocado'],
+    after: [],
+  ),
 };
 
 /// The keto-substitute words before `noodle` and `pasta` (issue #273):
@@ -1983,6 +2158,30 @@ final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
 
   // Issue #274: sushi-grade fish (`טונה באיכות סושי`) is raw fish.
   'סושי': _heGuard(const ['איכות', 'באיכות']),
+
+  // Issue #469: sugar-free, keto or dark chocolate is not candy, and a
+  // chocolate sauce is the yellow `רוטב שוקולד` modifier instead.
+  'שוקולד': _heGuard(const [
+    'ללא סוכר',
+    'ללא סוכרים',
+    'קטו',
+    'מריר',
+    'דל פחמימות',
+    'רוטב',
+    'ברוטב',
+    'הרוטב',
+  ]),
+  // A savoury mousse is a pâté.
+  'מוס': _heGuard(const [
+    'כבד',
+    'כבדי',
+    'סלמון',
+    'דגים',
+    'עוף',
+    'טונה',
+    'אבוקדו',
+    'חצילים',
+  ]),
 };
 
 // ---------------------------------------------------------------------------
@@ -2013,9 +2212,33 @@ const Map<String, List<String>> ketoSubstituteNameWordsEn =
       'pasta': _konjacNameWordsEn,
       'noodle': _konjacNameWordsEn,
       'spaghetti': _konjacNameWordsEn,
-      'rice': _ketoNameWordsEn,
+      // Issue #470: a dish named "... no rice" asks for none.
+      'rice': [..._ketoNameWordsEn, 'no rice', 'without rice'],
       'risotto': _ketoNameWordsEn,
+      // Issue #470: a roll wrapped in cucumber (naruto) or rice paper, or
+      // made with no rice, is not built on rice.
+      'sushi': _ricelessRollWordsEn,
+      'maki': _ricelessRollWordsEn,
+      'uramaki': _ricelessRollWordsEn,
+      'temaki': _ricelessRollWordsEn,
+      'futomaki': _ricelessRollWordsEn,
+      'hosomaki': _ricelessRollWordsEn,
+      'hand roll': _ricelessRollWordsEn,
+      'sushi roll': _ricelessRollWordsEn,
+      'california roll': _ricelessRollWordsEn,
+      'inside out roll': _ricelessRollWordsEn,
     };
+
+/// The words that mark a sushi roll as riceless (issue #470).
+const List<String> _ricelessRollWordsEn = <String>[
+  'naruto',
+  'no rice',
+  'without rice',
+  'riceless',
+  'rice paper',
+  'cucumber wrap',
+  'cucumber wrapped',
+];
 
 /// The words that mark a whole dish name as adapted (issue #273).
 const List<String> _ketoNameWordsEn = <String>['keto', 'low carb', 'lowcarb'];
@@ -2039,9 +2262,34 @@ const Map<String, List<String>> ketoSubstituteNameWordsHe =
       'פסטת': _heKonjacNameWords,
       'נודלס': _heKonjacNameWords,
       'אטריות': _heKonjacNameWords,
-      'אורז': _heKetoNameWords,
+      // Issue #470: a dish named "... ללא אורז" asks for none.
+      'אורז': [..._heKetoNameWords, 'ללא אורז', 'בלי אורז'],
       'ריזוטו': _heKetoNameWords,
+      // Issue #470: see [ketoSubstituteNameWordsEn].
+      'סושי': _heRicelessRollWords,
+      'מאקי': _heRicelessRollWords,
+      'טמאקי': _heRicelessRollWords,
+      'אורמאקי': _heRicelessRollWords,
+      'פוטומאקי': _heRicelessRollWords,
+      'הוסומאקי': _heRicelessRollWords,
+      'אינסייד אאוט': _heRicelessRollWords,
+      'אינסייד אווט': _heRicelessRollWords,
+      'רול': _heRicelessRollWords,
+      'רולים': _heRicelessRollWords,
+      'רולס': _heRicelessRollWords,
     };
+
+/// The words that mark a sushi roll as riceless (issue #470): `נארוטו`
+/// is the cucumber-wrapped roll. `מלפפון` alone is not: a cucumber maki
+/// has the cucumber inside the rice.
+const List<String> _heRicelessRollWords = <String>[
+  'נארוטו',
+  'ללא אורז',
+  'בלי אורז',
+  'נייר אורז',
+  'עטוף במלפפון',
+  'בעטיפת מלפפון',
+];
 
 /// The words that mark a whole Hebrew dish name as adapted (issue #273).
 const List<String> _heKetoNameWords = <String>['קטו', 'דלת פחמימות'];

@@ -408,6 +408,54 @@ const List<String> ruleTexts = <String>[
   "פרנץ' טוסט",
   "Fish 'n' Chips",
   "פיש נ' צ'יפס",
+  // Issue #469: desserts and sweets, and chocolate's guards.
+  'טבלת שוקולד חלב וקרמל מלוח',
+  'בר שוקולד דובאי',
+  'וולקנו שוקולד חם',
+  'שוקולד מריר 85%',
+  'שוקולד ללא סוכר',
+  'סטייק ברוטב שוקולד',
+  'Steak with chocolate sauce',
+  'Dark chocolate bar',
+  'Hot chocolate',
+  "פאדג' שוקולד",
+  'מארז סוכריות גומי',
+  'מארז טראפלס',
+  'ספיישל פחזניות טופי מיסו',
+  'בוואריה שנות ה80',
+  'קדאיף חלבי',
+  'פנקוטה וניל, מוס מנגו',
+  'מוס כבד עוף',
+  'Chicken liver mousse',
+  'Chocolate mousse',
+  'מארז גביעים',
+  'ביסקיט תרד',
+  'זיווה גבינות',
+  'מלוואח במילוי שוקולד',
+  'חלת בצל',
+  "בן אנד ג'ריס פיינט וניל",
+  'Panna cotta',
+  'Profiteroles',
+  'Gummy candy',
+  'Chocolate truffles',
+  'Truffle fries',
+  'Pralines',
+  // Issue #470: sushi rolls are rice; sashimi and naruto rolls are not.
+  'מאקי סלמון',
+  'טמאקי סלמון אבוקדו',
+  'קליפורניה רול',
+  'אינסייד אאוט טונה',
+  'גרין רול ללא גלוטן',
+  'רול קינמון',
+  'ספרינג רול ירקות',
+  'נארוטו רול סלמון',
+  'רול סלמון ללא אורז',
+  'סשימי סלמון',
+  'Salmon temaki',
+  'Spicy tuna sushi roll',
+  'Naruto sushi roll',
+  'Vegetable spring rolls',
+  'Lobster roll',
 ];
 
 /// Hand-written `ClassificationRules.carbOnlyBase` inputs, lifted from
@@ -791,6 +839,70 @@ final List<Dish> ruleDishes = <Dish>[
   ruleDish('פיתות'),
   ruleDish('טורטיות'),
   ruleDish('עוגת שוקולד'),
+  // Issue #473: a pasta listed by its sauce, with the pasta only in a
+  // required choice; a rescued choice is a yellow; a side choice is not
+  // a choice of base.
+  ruleDish(
+    'רוזה',
+    description: 'עגבניות ושמנת',
+    options: const <DishOption>[
+      DishOption(name: 'בחרו סוג פסטה', values: <String>['פנה']),
+    ],
+  ),
+  ruleDish(
+    'בולונז',
+    description: 'בקר טחון שבושל ביין אדום וירקות שורש, רוטב עגבניות',
+    options: const <DishOption>[
+      DishOption(
+        name: 'בחר סוג פסטה',
+        values: <String>['רדיאטורי', 'בומבטי', 'בומבטי סלק'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'Bolognese',
+    options: const <DishOption>[
+      DishOption(name: 'Choose your pasta', values: <String>['Penne']),
+    ],
+  ),
+  ruleDish(
+    'Bolognese',
+    options: const <DishOption>[
+      DishOption(
+        name: 'Choose your noodles',
+        values: <String>['Egg noodles', 'Zucchini noodles'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'רוזה',
+    options: const <DishOption>[
+      DishOption(name: 'בחרו סוג פסטה', values: <String>['פנה', 'קישואים']),
+    ],
+  ),
+  ruleDish(
+    'שניצל',
+    options: const <DishOption>[
+      DishOption(name: 'תוספת לבחירה', values: <String>['פסטה', 'סלט']),
+    ],
+  ),
+  ruleDish(
+    'Steak',
+    options: const <DishOption>[
+      DishOption(name: 'Add pasta', values: <String>['Penne']),
+    ],
+  ),
+  // Issue #276: a starch named alone is the dish, whatever the
+  // description says; a bread with a filling and a starch with a
+  // protein stay yellow.
+  ruleDish('Rice', description: 'Basmati rice with herbs'),
+  ruleDish('פירה', description: 'פירה עם חמאה ושמנת'),
+  ruleDish('Garlic bread'),
+  ruleDish('Garlic bread', description: 'Baguette with butter and garlic'),
+  ruleDish('Rice bowl', description: 'Grilled chicken, vegetables'),
+  ruleDish('Steak with rice'),
+  ruleDish('לאפה', description: 'שווארמה, חומוס וסלט'),
+  ruleDish('פיתה', description: 'שמן זית וזעתר'),
 ];
 
 // ---------------------------------------------------------------------------

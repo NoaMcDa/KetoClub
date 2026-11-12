@@ -291,12 +291,17 @@ class Vocabulary:
     non_keto_drink_bases_he: tuple[str, ...]
     dough_bases_en: tuple[str, ...]
     dough_bases_he: tuple[str, ...]
+    choice_bases_en: tuple[str, ...]
+    choice_bases_he: tuple[str, ...]
+    choice_group_words_en: tuple[str, ...]
+    choice_group_words_he: tuple[str, ...]
     non_keto_bases_en: tuple[str, ...]
     non_keto_bases_he: tuple[str, ...]
     non_keto_base_labels_en: Mapping[str, str]
     non_keto_base_labels_he: Mapping[str, str]
     carb_only_base_labels: Mapping[str, str]
     carb_only_eligible_triggers: tuple[str, ...]
+    carb_only_bread_triggers: tuple[str, ...]
     carb_only_qualifiers_en: tuple[str, ...]
     carb_only_qualifiers_he: tuple[str, ...]
     carb_only_toppings_en: tuple[str, ...]
@@ -373,12 +378,17 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         non_keto_drink_bases_he=strs("nonKetoDrinkBasesHe"),
         dough_bases_en=strs("doughBasesEn"),
         dough_bases_he=strs("doughBasesHe"),
+        choice_bases_en=strs("choiceBasesEn"),
+        choice_bases_he=strs("choiceBasesHe"),
+        choice_group_words_en=strs("choiceGroupWordsEn"),
+        choice_group_words_he=strs("choiceGroupWordsHe"),
         non_keto_bases_en=strs("nonKetoBasesEn"),
         non_keto_bases_he=strs("nonKetoBasesHe"),
         non_keto_base_labels_en=_str_map(root["nonKetoBaseLabelsEn"], "labelsEn"),
         non_keto_base_labels_he=_str_map(root["nonKetoBaseLabelsHe"], "labelsHe"),
         carb_only_base_labels=_str_map(root["carbOnlyBaseLabels"], "carbOnlyLabels"),
         carb_only_eligible_triggers=strs("carbOnlyEligibleTriggers"),
+        carb_only_bread_triggers=strs("carbOnlyBreadTriggers"),
         carb_only_qualifiers_en=strs("carbOnlyQualifiersEn"),
         carb_only_qualifiers_he=strs("carbOnlyQualifiersHe"),
         carb_only_toppings_en=strs("carbOnlyToppingsEn"),
