@@ -238,7 +238,7 @@ final class GeminiChatClient implements LlmChatClient {
         when schema != null &&
             response.statusCode == 400 &&
             !_isInvalidKey(response)) {
-      return _post(
+      return await _post(
         key,
         _body(systemPrompt, userParts, schema: null, thinking: false),
       );

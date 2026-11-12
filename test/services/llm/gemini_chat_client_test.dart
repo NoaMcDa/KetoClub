@@ -784,7 +784,7 @@ void main() {
               await Future<void>.delayed(const Duration(seconds: 20));
               return http.Response(_badRequestBody, 400);
             }
-            return Completer<http.Response>().future;
+            return await Completer<http.Response>().future;
           }),
           timeout: const Duration(seconds: 30),
         );
