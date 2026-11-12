@@ -54,7 +54,7 @@ final class SettingsController extends ChangeNotifier {
 
   bool _isBusy = false;
   AppSettings _appSettings = const AppSettings();
-  int _cachedMenuCount = 0;
+  int _recentMenuCount = 0;
   bool _hasApiKey = false;
 
   /// Whether an operation is currently reading from or writing to a
@@ -105,10 +105,11 @@ final class SettingsController extends ChangeNotifier {
   /// already holds a controller.
   bool get disclosureSeen => _appSettings.disclosureSeen;
 
-  /// How many menus are currently cached (issue #61's Settings section). A
-  /// count of entries, never a byte figure —
-  /// [MenuRepository.cachedMenuCount]'s own doc comment explains why.
-  int get cachedMenuCount => _cachedMenuCount;
+  /// How many menus the Recent tab lists (issue #61's Settings section,
+  /// #488): the visit history, never the raw cache, which also holds a
+  /// quick score for every venue Discovery showed and so counts menus
+  /// nobody opened (D21, D23). A count of entries, never a byte figure.
+  int get recentMenuCount => _recentMenuCount;
 
   /// Reads the [SettingsStore] and the cached-menu count, populating every
   /// other getter.
@@ -117,7 +118,7 @@ final class SettingsController extends ChangeNotifier {
     notifyListeners();
 
     _appSettings = await _settings.read();
-    _cachedMenuCount = await _repository.cachedMenuCount();
+    _recentMenuCount = (await _history.entries()).length;
     _hasApiKey = await _apiKeyStore?.hasKey() ?? false;
 
     _isBusy = false;
@@ -300,7 +301,7 @@ final class SettingsController extends ChangeNotifier {
 
   /// Forgets every cached menu and analysis, through the repository, and
   /// empties the Recent list (the visit history, D23, issue #314), then
-  /// re-reads [cachedMenuCount] so the Settings screen's count reflects
+  /// re-reads [recentMenuCount] so the Settings screen's count reflects
   /// the clear immediately, without a second [load] call. Also clears the
   /// last-opened venue and last-used filter (issue #55) — a stale
   /// [AppSettings.lastVenue] would otherwise offer to resume a venue whose
@@ -311,7 +312,7 @@ final class SettingsController extends ChangeNotifier {
 
     await _repository.clearCache();
     await _history.clear();
-    _cachedMenuCount = await _repository.cachedMenuCount();
+    _recentMenuCount = (await _history.entries()).length;
     await _change(
       (latest) => latest.copyWith(lastVenue: null, lastFilter: null),
     );

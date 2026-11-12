@@ -86,13 +86,14 @@ final class AppSettings {
 
   /// Reads settings written by [toJson].
   ///
-  /// Returns null for any shape mismatch, including a malformed
-  /// [lastVenue] or an unknown [filter] name, and never throws. [themeMode]
-  /// is the one exception (issue #58): it was added after installs already
-  /// existed without it, so a missing or unrecognised value decodes to
-  /// [AppThemeMode.system] rather than invalidating the whole record —
-  /// unlike [filter], whose own unknown value already fails this way for
-  /// data written before that field existed too.
+  /// Read field by field (issue #281): never throws and never gives up on
+  /// the record. A missing or unreadable value falls back to its own
+  /// default and every other field keeps its stored value, so an unknown
+  /// [filter] name reads as [MenuFilter.all] and a [lastVenue] that
+  /// [VenueRef.tryFrom] cannot read as null. **Consent fails closed:** a
+  /// present [estimationConsentGiven] that is not a bool reads as false.
+  /// [themeMode] (issue #58) decodes to [AppThemeMode.system] when missing
+  /// or unrecognised.
   ///
   /// [netCarbLimitGrams] (issue #57) follows [themeMode]'s rule for the
   /// same reason: a missing or non-integer value decodes to
@@ -121,39 +122,13 @@ final class AppSettings {
   /// the street, since a city is the older and the cheaper choice to
   /// restore (it is never looked up again).
   static AppSettings? tryFrom(Map<String, Object?> json) {
-    final rawLanguageTag = json['languageTag'];
-    if (rawLanguageTag != null && rawLanguageTag is! String) return null;
+    // Field by field (issue #281): one unreadable value falls back to its
+    // own default and never resets the others.
     final rawFilter = json['filter'];
-    if (rawFilter is! String) return null;
-    final filter = MenuFilter.tryParse(rawFilter);
-    if (filter == null) return null;
-    // D16 (issue #167) flipped the default to true. A stored value —
-    // written by any install that reached [toJson] before or since —
-    // wins over the default, so an install that already refused keeps
-    // its refusal; a missing key on an install that predates
-    // estimationConsentGiven at all reads as the new default rather than
-    // invalidating the record.
-    final rawConsent = json['estimationConsentGiven'];
-    if (rawConsent != null && rawConsent is! bool) return null;
     final rawLastVenue = json['lastVenue'];
-    VenueRef? lastVenue;
-    if (rawLastVenue != null) {
-      if (rawLastVenue is! Map<String, Object?>) return null;
-      lastVenue = VenueRef.tryFrom(rawLastVenue);
-      if (lastVenue == null) return null;
-    }
     final rawThemeMode = json['themeMode'];
-    final themeMode = rawThemeMode is String
-        ? AppThemeMode.tryParse(rawThemeMode) ?? AppThemeMode.system
-        : AppThemeMode.system;
     final rawLimit = json['netCarbLimitGrams'];
-    final netCarbLimitGrams = rawLimit is int
-        ? clampNetCarbLimitGrams(rawLimit)
-        : defaultNetCarbLimitGrams;
     final rawLastFilter = json['lastFilter'];
-    final lastFilter = rawLastFilter is String
-        ? MenuFilter.tryParse(rawLastFilter)
-        : null;
     final rawPlaceId = json['discoveryPlaceId'];
     final discoveryPlaceId = rawPlaceId is String && rawPlaceId.isNotEmpty
         ? rawPlaceId
@@ -164,24 +139,44 @@ final class AppSettings {
         ? StreetPlace.tryFrom(rawStreet)
         : null;
     return AppSettings(
-      languageTag: rawLanguageTag is String ? rawLanguageTag : null,
-      filter: filter,
-      // Missing key → D16 default of true (issue #167); a stored bool
-      // wins. The earlier guard rejects any non-null non-bool, so by
-      // here rawConsent is null, true, or false.
-      estimationConsentGiven: rawConsent != false,
-      lastVenue: lastVenue,
-      themeMode: themeMode,
-      netCarbLimitGrams: netCarbLimitGrams,
+      languageTag: switch (json['languageTag']) {
+        final String tag => tag,
+        _ => null,
+      },
+      filter: rawFilter is String
+          ? MenuFilter.tryParse(rawFilter) ?? MenuFilter.all
+          : MenuFilter.all,
+      estimationConsentGiven: _readConsent(json['estimationConsentGiven']),
+      lastVenue: rawLastVenue is Map<String, Object?>
+          ? VenueRef.tryFrom(rawLastVenue)
+          : null,
+      themeMode: rawThemeMode is String
+          ? AppThemeMode.tryParse(rawThemeMode) ?? AppThemeMode.system
+          : AppThemeMode.system,
+      netCarbLimitGrams: rawLimit is int
+          ? clampNetCarbLimitGrams(rawLimit)
+          : defaultNetCarbLimitGrams,
       seedOilFree: json['seedOilFree'] == true,
       dairyFree: json['dairyFree'] == true,
       carnivoreOnly: json['carnivoreOnly'] == true,
-      lastFilter: lastFilter,
+      lastFilter: rawLastFilter is String
+          ? MenuFilter.tryParse(rawLastFilter)
+          : null,
       disclosureSeen: json['disclosureSeen'] == true,
       discoveryPlaceId: discoveryPlaceId,
       discoveryStreet: discoveryStreet,
     );
   }
+
+  /// [raw] as the stored consent, failing closed (issue #281): a missing
+  /// key is the D16 default of true (issue #167), a bool is itself, and a
+  /// value that is present but cannot be read is false. A parse failure
+  /// may withdraw consent, never grant it.
+  static bool _readConsent(Object? raw) => switch (raw) {
+    null => true,
+    final bool given => given,
+    _ => false,
+  };
 
   /// The UI language, as a BCP-47 tag such as `"he"`. Null means "follow
   /// the device locale".
@@ -446,6 +441,13 @@ final class PrefsSettingsStore implements SettingsStore {
     return result;
   }
 
+  /// What a stored record that cannot be decoded at all reads as: the
+  /// defaults with consent withheld (issue #281). The stored consent may
+  /// have been a refusal, and a parse failure never grants it.
+  static const AppSettings _unreadable = AppSettings(
+    estimationConsentGiven: false,
+  );
+
   @override
   Future<AppSettings> read() => _serialised(_read);
 
@@ -476,10 +478,10 @@ final class PrefsSettingsStore implements SettingsStore {
     try {
       decoded = jsonDecode(raw);
     } on FormatException {
-      return const AppSettings();
+      return _unreadable;
     }
-    if (decoded is! Map<String, Object?>) return const AppSettings();
-    return AppSettings.tryFrom(decoded) ?? const AppSettings();
+    if (decoded is! Map<String, Object?>) return _unreadable;
+    return AppSettings.tryFrom(decoded) ?? _unreadable;
   }
 
   /// Saves [settings]; see [write].

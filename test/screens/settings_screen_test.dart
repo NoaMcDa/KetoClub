@@ -18,9 +18,11 @@ import 'package:provider/provider.dart';
 
 import '../fakes/fake_api_key_store.dart';
 import '../fakes/fake_app_info.dart';
+import '../fakes/fake_clock.dart';
 import '../fakes/fake_external_link_opener.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_visit_history_store.dart';
 
 /// The English strings a test can read expected copy from, computed the
 /// same way the widget under test does.
@@ -77,10 +79,12 @@ SettingsController _controllerFor({
   FakeSettingsStore? settingsStore,
   FakeMenuRepository? repository,
   FakeApiKeyStore? apiKeyStore,
+  FakeVisitHistoryStore? history,
 }) => SettingsController(
   settingsStore ?? FakeSettingsStore(),
   repository ?? FakeMenuRepository(),
   apiKeyStore,
+  history ?? FakeVisitHistoryStore(FakeClock(DateTime.utc(2026, 11, 12))),
 );
 
 /// Pumps the real [SettingsScreen] over a real [SettingsController] and a
@@ -612,6 +616,17 @@ void main() {
         repository.seedCache(CachedMenu(menu: fetched.menu));
       }
 
+      /// A history holding the one menu [seedOneMenu] opened (#488).
+      Future<FakeVisitHistoryStore> openedHistory() async {
+        final history = FakeVisitHistoryStore(
+          FakeClock(DateTime.utc(2026, 11, 12)),
+        );
+        await history.recordVisit(
+          const VenueRef(source: MenuSource.wolt, platformId: 'x'),
+        );
+        return history;
+      }
+
       testWidgets(
         'tapping Clear opens a confirmation dialog that clears nothing '
         'by itself',
@@ -619,7 +634,10 @@ void main() {
           // Arrange
           final repository = FakeMenuRepository();
           await seedOneMenu(repository);
-          final controller = _controllerFor(repository: repository);
+          final controller = _controllerFor(
+            repository: repository,
+            history: await openedHistory(),
+          );
           await _pump(tester, controller);
           await tester.pumpAndSettle();
 
@@ -642,7 +660,10 @@ void main() {
         // Arrange
         final repository = FakeMenuRepository();
         await seedOneMenu(repository);
-        final controller = _controllerFor(repository: repository);
+        final controller = _controllerFor(
+          repository: repository,
+          history: await openedHistory(),
+        );
         await _pump(tester, controller);
         await tester.pumpAndSettle();
 
@@ -665,7 +686,10 @@ void main() {
         // Arrange
         final repository = FakeMenuRepository();
         await seedOneMenu(repository);
-        final controller = _controllerFor(repository: repository);
+        final controller = _controllerFor(
+          repository: repository,
+          history: await openedHistory(),
+        );
         await _pump(tester, controller);
         await tester.pumpAndSettle();
         expect(find.text(_en.settingsCacheCleared), findsNothing);
