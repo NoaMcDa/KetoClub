@@ -1170,7 +1170,10 @@ final class MenuController extends ChangeNotifier {
   ///
   /// Guards: no-ops when [_answerer] is null, when [analysis] is not a
   /// [MenuAnalysed] with an [LlmEngine], when [question] is blank after
-  /// trimming, or when a question is already in flight. The question is
+  /// trimming, or when a question is already in flight. With the
+  /// AI-analysis consent withdrawn since the menu was analysed, nothing is
+  /// sent and the ask fails as [MenuAnalysisFailureReason.consentWithheld]
+  /// (issue #279). The question is
   /// never persisted, never logged, and never stored in the Hive cache or
   /// [SettingsStore] (architecture.md D8; issue #214).
   ///
@@ -1192,6 +1195,16 @@ final class MenuController extends ChangeNotifier {
     _questionAnswer = null;
     _questionFailure = null;
     notifyListeners();
+
+    // Consent is read at every ask, not taken from when the menu was
+    // analysed: withdrawn in Settings since, nothing is sent (issue #279).
+    final settings = await _settings.read();
+    if (!settings.estimationConsentGiven) {
+      _questionState = QuestionState.failed;
+      _questionFailure = MenuAnalysisFailureReason.consentWithheld;
+      notifyListeners();
+      return;
+    }
 
     // The question is in the user prompt only, never logged or persisted.
     final result = await answerer.ask(menu, analysis, trimmed);

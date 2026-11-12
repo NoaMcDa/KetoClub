@@ -2609,6 +2609,27 @@ void main() {
       },
     );
 
+    test('askQuestion with the consent withdrawn since the analysis sends '
+        'nothing and fails as consentWithheld (issue #279)', () async {
+      // Arrange
+      await openWithLlmAnalysis();
+      answerer.enqueueAnswer('Never sent.');
+      await settings.write(
+        (await settings.read()).copyWith(estimationConsentGiven: false),
+      );
+
+      // Act
+      await controller.askQuestion('Which dish should I order?');
+
+      // Assert
+      expect(answerer.calls, isEmpty);
+      expect(controller.questionState, QuestionState.failed);
+      expect(
+        controller.questionFailure,
+        MenuAnalysisFailureReason.consentWithheld,
+      );
+    });
+
     test('askQuestion sets questionAnswer on success', () async {
       await openWithLlmAnalysis();
       answerer.enqueueAnswer('Steak is great.', dishIds: ['steak']);
