@@ -78,8 +78,15 @@ abstract final class VenueRefResolver {
   /// numeric id after it), anything that would otherwise resolve to an
   /// empty [VenueRef.platformId], or a bare token that carries no hyphen
   /// (issue #169: not slug-shaped).
+  ///
+  /// Text pasted around a link is read the way a person pastes it (issue
+  /// #477): the first `http(s)` URL inside a share message is the link,
+  /// quotes, angle brackets and trailing punctuation around it are not part
+  /// of it, and Unicode format characters (`\p{Cf}`: the RLM, LRM and
+  /// zero-width marks a Hebrew chat copies along) are dropped. Never
+  /// throws: a percent escape that is not valid UTF-8 is null.
   static VenueRef? resolve(String input) {
-    final trimmed = input.trim();
+    final trimmed = _clean(input);
     if (trimmed.isEmpty) return null;
 
     final uri = _asUri(trimmed);
@@ -103,7 +110,7 @@ abstract final class VenueRefResolver {
   /// restaurant's name, so it is searched by name and offers no "open
   /// link" action (issue #229, audit D8).
   static bool isExplicitLink(String input) {
-    final trimmed = input.trim();
+    final trimmed = _clean(input);
     if (!trimmed.contains('/') && !_digitsOnly.hasMatch(trimmed)) {
       return false;
     }
@@ -117,8 +124,67 @@ abstract final class VenueRefResolver {
   /// from "not a URL at all" (the QR router, issue #182) uses the one
   /// parser rather than its own.
   static Uri? parseUrl(String input) {
-    final trimmed = input.trim();
+    final trimmed = _clean(input);
     return trimmed.isEmpty ? null : _asUri(trimmed);
+  }
+
+  /// Unicode format characters (`\p{Cf}`): bidi marks, zero-width spaces
+  /// and joiners, a BOM. Never part of a link or an id (issue #477).
+  static final RegExp _formatCharacters = RegExp(r'\p{Cf}', unicode: true);
+
+  /// The first `http`/`https` URL inside a longer text, up to the first
+  /// whitespace (issue #477: a share message such as
+  /// `Check out HaMosad on Wolt! https://wolt.com/...`).
+  static final RegExp _embeddedUrl = RegExp(
+    r'https?://\S+',
+    caseSensitive: false,
+  );
+
+  static final RegExp _anyWhitespace = RegExp(r'\s');
+
+  /// What may wrap a pasted link or token on the left: quotes and
+  /// opening brackets.
+  static const String _openers = '"\'<([{\u201C\u2018\u00AB';
+
+  /// What may follow a pasted link or token on the right: sentence
+  /// punctuation, closing quotes and closing brackets. None of these ends
+  /// a real Wolt slug or 10bis id, and a website URL that truly ends in
+  /// one is rarer than a sentence that does.
+  static const String _closers = '.,;:!?"\'>)]}\u201D\u2019\u00BB';
+
+  /// [input] reduced to the link or token it carries (issue #477): format
+  /// characters dropped, the first embedded `http(s)` URL taken when
+  /// there is one, and wrapping quotes, brackets and trailing punctuation
+  /// cut from a single token. Text with spaces and no URL in it is a name
+  /// and is returned as it is, trimmed.
+  static String _clean(String input) {
+    var text = input.replaceAll(_formatCharacters, '').trim();
+    final url = _embeddedUrl.firstMatch(text);
+    if (url != null) {
+      text = url.group(0)!;
+    } else if (_anyWhitespace.hasMatch(text)) {
+      return text;
+    }
+    var start = 0;
+    var end = text.length;
+    while (start < end && _openers.contains(text[start])) {
+      start++;
+    }
+    while (end > start && _closers.contains(text[end - 1])) {
+      end--;
+    }
+    return text.substring(start, end);
+  }
+
+  /// [uri]'s decoded path segments, or null when a percent escape in its
+  /// path is not valid UTF-8 ([Uri.pathSegments] throws a
+  /// [FormatException] on one; issues #461, #477).
+  static List<String>? _segments(Uri uri) {
+    try {
+      return uri.pathSegments;
+    } on FormatException {
+      return null;
+    }
   }
 
   /// Parses [trimmed] as an absolute URI.
@@ -202,14 +268,18 @@ abstract final class VenueRefResolver {
   }
 
   /// Resolves a `wolt.com` [uri]: null unless its path holds a
-  /// `restaurant` segment followed by a non-empty slug.
+  /// `restaurant` segment followed by a non-empty slug, which is
+  /// lower-cased.
   static VenueRef? _fromWoltUri(Uri uri) {
-    final segments = uri.pathSegments;
+    final segments = _segments(uri);
+    if (segments == null) return null;
     final restaurantIndex = segments.indexOf('restaurant');
     if (restaurantIndex == -1 || restaurantIndex + 1 >= segments.length) {
       return null;
     }
-    final slug = segments[restaurantIndex + 1];
+    // Wolt's slugs are lower-case and its API is case-sensitive: `Hamosad`
+    // is a 404 where `hamosad` is a menu (issue #477).
+    final slug = segments[restaurantIndex + 1].toLowerCase();
     if (slug.isEmpty) return null;
     return VenueRef(source: MenuSource.wolt, platformId: slug);
   }
@@ -222,7 +292,8 @@ abstract final class VenueRefResolver {
   /// absent, the same tolerance [_fromWoltUri] gives the locale and
   /// city segments in a Wolt URL.
   static VenueRef? _fromTenBisUri(Uri uri) {
-    final segments = uri.pathSegments;
+    final segments = _segments(uri);
+    if (segments == null) return null;
     final restaurantsIndex = segments.indexWhere(
       (segment) => segment.toLowerCase() == 'restaurants',
     );
