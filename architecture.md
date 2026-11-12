@@ -3858,11 +3858,11 @@ protection: nothing merges red, and nothing merges without a review.
 | Job | Steps | Purpose |
 |---|---|---|
 | `quality` | `flutter pub get` · `dart format --output=none --set-exit-if-changed` · `tool/flow_shard.sh --verify 4` · `flutter analyze --fatal-infos --fatal-warnings` | style and static correctness; every flow file in exactly one shard |
-| `test` | generate the all-imports helper · `flutter test --coverage` (unit + flow + architecture) · `tool/coverage_gate.sh` · upload `lcov.info` | behaviour and the 80% gate |
+| `test` | generate the all-imports helper · `flutter test --coverage` (unit, widget and architecture tests; the flows in `integration_test/` run in `integration-shard`) · `tool/coverage_gate.sh` · upload `lcov.info` | behaviour and the 80% gate |
 | `integration-shard` (×4) | headless Chrome + chromedriver · `tool/flow_shard.sh <n> 4` writes one entry importing a quarter of `integration_test/flows/*_flow_test.dart` · one `flutter drive` of that entry | the real build on a real browser, one compile per machine (#453) |
 | `integration` | waits for the four shards; green only if all four are | one stable check name for the shards |
-| `build` | `flutter build web --release` · `flutter build apk --debug` | the app still compiles for the shipping targets |
-| `ios` | `flutter build ios --no-codesign` on macOS, on pushes to `main` only | catches iOS-only breakage without spending macOS minutes on every push |
+| `build` | `flutter build web --release` · `flutter build apk --debug` · `flutter build apk --release` (R8 shrinking, debug-signed) | the app still compiles for the shipping targets |
+| `ios` | `flutter build ios --no-codesign` on macOS, on every pull request and push | catches iOS-only breakage before it merges |
 
 Conventions:
 
@@ -3875,7 +3875,11 @@ Conventions:
 - A red `main` is the top priority for whoever broke it; no new work merges on top
   of a red `main`.
 - Flaky tests are fixed or deleted the day they flake; there is no retry button.
-- Dependencies are updated by a scheduled bot pull request, which goes through the
+- Runs on `main` are never cancelled by a later push (`cancel-in-progress` is off
+  for `main`).
+- `pubspec.lock` and `backend/uv.lock` are committed; `backend/check.sh` uses
+  `uv sync --locked`.
+- Dependencies are updated by a scheduled bot pull request (`.github/dependabot.yml`, weekly), which goes through the
   same checks as any other.
 
 ### 18.6 Definition of Done for a pull request

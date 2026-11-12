@@ -146,7 +146,6 @@ vite.config.ts.timestamp-*
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-pubspec.lock
 .packages
 .pub-cache/
 build/

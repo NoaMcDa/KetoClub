@@ -785,9 +785,7 @@ Built, but not confirmed end to end, and not to be reported as done:
   chromedriver/Chromium mismatch; runs hang after "Debug service listening",
   including flows that predate D25), so the two new flows
   (`backend_classify_flow_test.dart`, `backend_fallback_flow_test.dart`) are
-  proven only under `flutter-tester`. The `app_launch` and `discovery_denied`
-  flows already fail under `flutter-tester` at the pre-D25 commit (`680845e`);
-  that is not a D25 regression.
+  proven only under `flutter-tester`.
 - **No human has reviewed this code.**
 - The three colour pairs that failed WCAG AA contrast (green-on-green at
   4.08:1, light `ink3`-on-bg at 2.78:1, dark `ink3`-on-bg at 4.02:1) were

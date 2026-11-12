@@ -459,9 +459,7 @@ on GitHub — tooling exists for several of them, it did not close any of them.
    chromedriver/Chromium mismatch: runs hang after "Debug service listening",
    including flows that predate D25), so the two new flows are proven only under
    `flutter test -d flutter-tester`. Run all flows once on a machine with a
-   matching browser before release. Also: the `app_launch` and `discovery_denied`
-   flows already fail under `flutter-tester` at the pre-D25 commit (`680845e`);
-   that is not a D25 regression, and it was not investigated here.
+   matching browser before release.
 10. **No human has reviewed the code.** §18.6 wants a review by someone who did
    not write it; none of #90, #91, the second wave, or Phase 2's run, was
    merged with one.
