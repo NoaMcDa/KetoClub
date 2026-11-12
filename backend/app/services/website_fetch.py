@@ -164,7 +164,15 @@ def checked_host(url: str) -> str:
     """The lower-cased host of ``url``, or 400 ``invalidUrl``.
 
     Only ``http``/``https`` with a host, no credentials and the default port.
+    A URL holding whitespace or an ASCII control character is refused here
+    (#270): ``urlsplit`` silently drops CR, LF and tab, so such a URL would
+    pass this check, spend the host's budget on robots.txt and only then
+    fail inside httpx. A host name that cannot be IDNA-encoded (a label over
+    63 characters, an empty label) is refused too, rather than failing in
+    ``getaddrinfo``.
     """
+    if any(char <= " " or char == "\x7f" for char in url):
+        raise BackendError(400, "invalidUrl")
     try:
         parts = urlsplit(url)
         port = parts.port
@@ -175,7 +183,21 @@ def checked_host(url: str) -> str:
         raise BackendError(400, "invalidUrl")
     if parts.username or parts.password or port not in (None, 80, 443):
         raise BackendError(400, "invalidUrl")
+    if ":" not in host:
+        try:
+            host.encode("idna")
+        except UnicodeError:
+            raise BackendError(400, "invalidUrl") from None
     return host
+
+
+def host_in_url(host: str) -> str:
+    """``host`` as it is written in a URL: an IPv6 literal in brackets.
+
+    ``urlsplit(...).hostname`` drops the brackets, so a URL rebuilt from it
+    must put them back (#270).
+    """
+    return f"[{host}]" if ":" in host else host
 
 
 async def _require_public(request: Request, host: str) -> None:
@@ -186,6 +208,9 @@ async def _require_public(request: Request, host: str) -> None:
         addresses = await resolve(host)
     except OSError:
         raise BackendError(502, "offline") from None
+    except ValueError:
+        # UnicodeError is a ValueError: a name getaddrinfo cannot encode.
+        raise BackendError(400, "invalidUrl") from None
     if not addresses:
         raise BackendError(502, "offline")
     if not all(is_public_address(address) for address in addresses):
@@ -209,7 +234,7 @@ async def _robots_for(request: Request, scheme: str, host: str) -> RobotsRules:
     settings = request.app.state.settings
     cache: dict[str, tuple[float, RobotsRules]] = request.app.state.robots_cache
     clock: Callable[[], float] = request.app.state.website_clock
-    key = f"{scheme}://{host}"
+    key = f"{scheme}://{host_in_url(host)}"
     cached = cache.get(key)
     if cached is not None and clock() - cached[0] < settings.WEBSITE_ROBOTS_TTL_SECONDS:
         return cached[1]
@@ -252,9 +277,16 @@ async def _open(request: Request, url: str, *, accept: str) -> httpx.Response | 
     timeout, 400 ``invalidUrl`` when the connection found a private address,
     502 ``offline`` on any other transport failure."""
     http_client: httpx.AsyncClient = request.app.state.website_http_client
-    outgoing = http_client.build_request(
-        "GET", url, headers=_headers(request, accept=accept), timeout=WEBSITE_TIMEOUT
-    )
+    try:
+        outgoing = http_client.build_request(
+            "GET",
+            url,
+            headers=_headers(request, accept=accept),
+            timeout=WEBSITE_TIMEOUT,
+        )
+    except httpx.InvalidURL:
+        # Not an httpx.HTTPError, so nothing below would catch it (#270).
+        raise BackendError(400, "invalidUrl") from None
     try:
         return await http_client.send(outgoing, stream=True, follow_redirects=False)
     except BlockedAddressError:

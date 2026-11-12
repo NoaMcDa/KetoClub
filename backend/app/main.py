@@ -22,7 +22,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
 from app.config import Settings, get_settings
 from app.db import build_engine
-from app.errors import BackendError, handle_backend_error, handle_validation_error
+from app.errors import (
+    BackendError,
+    UnhandledErrorMiddleware,
+    handle_backend_error,
+    handle_validation_error,
+)
 from app.models import Base
 from app.routers import (
     chat,
@@ -151,6 +156,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_exception_handler(BackendError, handle_backend_error)
     app.add_exception_handler(RequestValidationError, handle_validation_error)
 
+    # Added first, so it runs innermost (#270): an exception a route did not
+    # handle becomes a 500 body that the request log and CORS both see.
+    app.add_middleware(UnhandledErrorMiddleware)
     app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(
         CORSMiddleware,

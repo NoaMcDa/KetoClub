@@ -709,6 +709,13 @@ cross-origin check at all. The request still says `Host: evil.example`.
   forwards in `Host`. `*` alone turns the check off; do not use it on a
   machine a browser can reach.
 
+### Unexpected errors
+
+An exception no route handles is `500 {"reason":"internalError"}`, answered
+inside CORS so a browser sees the status rather than a CORS failure (#270),
+and logged as `ketoclub.errors unhandled error type=<ExceptionType>`: the
+type only, since a message can quote request content.
+
 ## Configuration
 
 Copy `.env.example` to `.env` and fill in values; every variable has a safe

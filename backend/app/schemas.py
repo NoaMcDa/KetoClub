@@ -103,6 +103,29 @@ class ImagePart(BaseModel):
         return self._decoded_size
 
 
+MAX_SCHEMA_DEPTH: Final = 32
+"""How deeply ``ChatRequest.response_schema`` may nest dicts and lists."""
+
+
+def _nesting_depth(value: object) -> int:
+    """How many dicts and lists deep ``value`` goes, walked without recursion."""
+    deepest = 0
+    stack: list[tuple[object, int]] = [(value, 1)]
+    while stack:
+        item, depth = stack.pop()
+        if isinstance(item, dict):
+            children: list[object] = list(item.values())
+        elif isinstance(item, list):
+            children = list(item)
+        else:
+            continue
+        deepest = max(deepest, depth)
+        if deepest > MAX_SCHEMA_DEPTH:
+            return deepest
+        stack.extend((child, depth + 1) for child in children)
+    return deepest
+
+
 class ChatRequest(BaseModel):
     """Request body for ``POST /v1/chat``.
 
@@ -130,6 +153,21 @@ class ChatRequest(BaseModel):
     response_schema: dict[str, object] | None = None
     schema_name: str | None = Field(default=None, max_length=64)
     images: list[ImagePart] = Field(default_factory=list)
+
+    @field_validator("response_schema")
+    @classmethod
+    def _schema_is_shallow(
+        cls, value: dict[str, object] | None
+    ) -> dict[str, object] | None:
+        """Refuse a schema nested deeper than ``MAX_SCHEMA_DEPTH`` (#270).
+
+        ``to_gemini_schema`` and the cache key walk it recursively, so a
+        hostile one a thousand levels deep was a ``RecursionError`` and a
+        bare 500. Measured without recursion; the real schema is 6 deep.
+        """
+        if value is not None and _nesting_depth(value) > MAX_SCHEMA_DEPTH:
+            raise ValueError(f"response_schema is nested over {MAX_SCHEMA_DEPTH} deep")
+        return value
 
     def image_bound_violation(self, max_images: int, max_bytes: int) -> str | None:
         """Why ``images`` breaks the configured bounds, or None when it does not.

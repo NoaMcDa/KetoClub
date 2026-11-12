@@ -86,8 +86,10 @@ def _parse(raw: bytes, settings: Settings) -> ChatRequest:
     part is decoded and again, exactly, after. Runs in a worker thread."""
     try:
         parsed: object = json.loads(raw)
-    except ValueError:
-        parsed = None  # Not JSON: the model's own validation says why.
+    except (ValueError, RecursionError):
+        # Not JSON, or nested too deep for the stdlib reader (#270): the
+        # model's own validation says why.
+        parsed = None
     violation = ChatRequest.raw_image_bound_violation(
         parsed, settings.VISION_MAX_IMAGES, settings.VISION_MAX_IMAGE_BYTES
     )
