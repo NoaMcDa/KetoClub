@@ -3575,5 +3575,306 @@
       "diet coke",
       "cheeseburger"
     ]
+  },
+  {
+    "hex": "39330738",
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "d1",
+              "imageUrl": null,
+              "name": "היינקן בקבוק 330 מ\"ל",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d2",
+              "imageUrl": null,
+              "name": "פאולנר",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d3",
+              "imageUrl": null,
+              "name": "הרצל- שש אחוז כפרה",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d4",
+              "imageUrl": null,
+              "name": "יין אדום יבש",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d5",
+              "imageUrl": null,
+              "name": "בירה זירו",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "d-beer",
+          "name": "בירות ויין"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "d6",
+              "imageUrl": null,
+              "name": "תפוז",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d7",
+              "imageUrl": null,
+              "name": "לימון נענע",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d8",
+              "imageUrl": null,
+              "name": "מים מינרלים",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "d-juice",
+          "name": "מיצים טבעיים"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "d9",
+              "imageUrl": null,
+              "name": "פיוז טי אפרסק",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d10",
+              "imageUrl": null,
+              "name": "טרופית",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d11",
+              "imageUrl": null,
+              "name": "לימונדת הבית",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d12",
+              "imageUrl": null,
+              "name": "מים בטעם ענבים",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d13",
+              "imageUrl": null,
+              "name": "Diet coke",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "d-soft",
+          "name": "שתייה קלה"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "d14",
+              "imageUrl": null,
+              "name": "Blue Moon",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d15",
+              "imageUrl": null,
+              "name": "Hazy IPA",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d16",
+              "imageUrl": null,
+              "name": "Whisky",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "d-en",
+          "name": "Beers"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "d17",
+              "imageUrl": null,
+              "name": "סטייק אנטריקוט",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d18",
+              "imageUrl": null,
+              "name": "סכו\"ם חד\"פ",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "d19",
+              "imageUrl": null,
+              "name": "נר מספר 5",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d20",
+              "imageUrl": null,
+              "name": "כרטיס ברכה",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d21",
+              "imageUrl": null,
+              "name": "Cutlery",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d22",
+              "imageUrl": null,
+              "name": "קציצות בטעם של ברכה",
+              "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "d23",
+              "imageUrl": null,
+              "name": "שמנת קשיו",
+              "options": [
+                {
+                  "name": "תוספות בתשלום",
+                  "values": [
+                    "קוקוט רוטב סובה",
+                    "מנת לחם (4 פרוסות)"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 40.0
+            }
+          ],
+          "id": "d-mains",
+          "name": "עיקריות"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "d24",
+              "imageUrl": null,
+              "name": "הערה חשובה! נשים בהיריון",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "d-notice",
+          "name": "💗 לתשומת לבכם 💗"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "drinks",
+        "source": "wolt"
+      }
+    },
+    "name": "drinks",
+    "searchTexts": [
+      "היינקנ בקבוק 330 מל",
+      "פאולנר",
+      "הרצל שש אחוז כפרה",
+      "יינ אדומ יבש",
+      "בירה זירו",
+      "תפוז",
+      "לימונ נענע",
+      "מימ מינרלימ",
+      "פיוז טי אפרסק",
+      "טרופית",
+      "לימונדת הבית",
+      "מימ בטעמ ענבימ",
+      "diet coke",
+      "blue moon",
+      "hazy ipa",
+      "whisky",
+      "סטייק אנטריקוט",
+      "סכומ חדפ",
+      "נר מספר 5",
+      "כרטיס ברכה",
+      "cutlery",
+      "קציצות בטעמ של ברכה",
+      "שמנת קשיו תוספות בתשלומ קוקוט רוטב סובה מנת לחמ 4 פרוסות",
+      "הערה חשובה נשימ בהיריונ"
+    ]
   }
 ]

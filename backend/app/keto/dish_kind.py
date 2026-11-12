@@ -66,6 +66,10 @@ class _Lists:
     notices: _WordList
     drink_names: _WordList
     drink_name_guards: _WordList
+    extra_names: _WordList
+    plain_drink_names: _WordList
+    drink_heading_guards: _WordList
+    drink_heading_bases: tuple[tuple[re.Pattern[str], str], ...]
 
 
 @cache
@@ -102,6 +106,36 @@ def _lists() -> _Lists:
             words.drink_name_guard_words_en,
             words.drink_name_guard_words_he,
             allow_hebrew_prefix=prefix.drink_name_guards,
+        ),
+        extra_names=_WordList.of(
+            words.extra_name_words_en,
+            words.extra_name_words_he,
+            allow_hebrew_prefix=prefix.extra_names,
+        ),
+        plain_drink_names=_WordList.of(
+            words.plain_drink_words_en,
+            words.plain_drink_words_he,
+            allow_hebrew_prefix=prefix.plain_drink_names,
+        ),
+        drink_heading_guards=_WordList.of(
+            words.drink_heading_guard_words_en,
+            words.drink_heading_guard_words_he,
+            allow_hebrew_prefix=prefix.drink_heading_guards,
+        ),
+        drink_heading_bases=(
+            *(
+                (latin_trigger_pattern(normalise(word)), label)
+                for word, label in words.drink_heading_bases_en.items()
+            ),
+            *(
+                (
+                    hebrew_trigger_pattern(
+                        normalise(word), allow_prefix=prefix.drink_headings
+                    ),
+                    label,
+                )
+                for word, label in words.drink_heading_bases_he.items()
+            ),
         ),
     )
 
@@ -141,9 +175,30 @@ def dish_kind_of(*, category: str, dish: Dish) -> DishKind:
     lists = _lists()
     if dish.price == 0 and lists.notices.matches(name):
         return DishKind.NOTICE
+    if lists.extra_names.matches(name):
+        return DishKind.EXTRA
     if lists.drink_names.matches(name) and not lists.drink_name_guards.matches(name):
         return DishKind.DRINK
     return DishKind.FOOD
+
+
+def heading_drink_base(*, category: str, dish: Dish) -> str | None:
+    """Dart ``headingDrinkBase``: the red base a drink takes from a beer,
+    juice or shake heading (issue #474), or ``None`` for anything that is
+    not a drink, a plain drink, a guarded name or another heading."""
+    if dish_kind_of(category=category, dish=dish) is not DishKind.DRINK:
+        return None
+    heading = normalise(category)
+    name = normalise(dish.name)
+    lists = _lists()
+    if lists.plain_drink_names.matches(name) or lists.drink_heading_guards.matches(
+        name
+    ):
+        return None
+    for pattern, label in lists.drink_heading_bases:
+        if pattern.search(heading):
+            return label
+    return None
 
 
 def dish_kinds_of(menu: Menu) -> dict[str, DishKind]:

@@ -35,7 +35,7 @@ def test_every_golden_menu_fingerprints_as_dart_does(entry: dict[str, Any]) -> N
 
 def test_the_corpus_covers_every_menu_family() -> None:
     names = [entry["name"] for entry in _ENTRIES]
-    assert len(names) == 12
+    assert len(names) == 13
     for prefix in ("wolt_", "tenbis_", "pasted_", "scanned_", "english"):
         assert any(name.startswith(prefix) for name in names)
 

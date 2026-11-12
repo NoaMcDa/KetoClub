@@ -99,6 +99,41 @@ final _Vocabulary _drinkNameGuards = _Vocabulary(
   he: drinkNameGuardWordsHe,
   allowHebrewPrefix: true,
 );
+// A non-edible line named as such (issue #472): no permissive prefix, so
+// `נר` ("candle") never fires inside a longer word's particle.
+final _Vocabulary _extraNames = _Vocabulary(
+  en: extraNameWordsEn,
+  he: extraNameWordsHe,
+  allowHebrewPrefix: false,
+);
+final _Vocabulary _plainDrinkNames = _Vocabulary(
+  en: plainDrinkWordsEn,
+  he: plainDrinkWordsHe,
+  allowHebrewPrefix: true,
+);
+final _Vocabulary _drinkHeadingGuards = _Vocabulary(
+  en: drinkHeadingGuardWordsEn,
+  he: drinkHeadingGuardWordsHe,
+  allowHebrewPrefix: true,
+);
+
+/// [drinkHeadingBasesEn] and [drinkHeadingBasesHe] compiled, English
+/// first, each with its label; headings match without the prefix.
+final List<({RegExp pattern, String label})> _drinkHeadingBases = [
+  for (final MapEntry(key: word, value: label) in drinkHeadingBasesEn.entries)
+    (
+      pattern: latinTriggerPattern(TextNormaliser.normalise(word)),
+      label: label,
+    ),
+  for (final MapEntry(key: word, value: label) in drinkHeadingBasesHe.entries)
+    (
+      pattern: hebrewTriggerPattern(
+        TextNormaliser.normalise(word),
+        allowPrefix: false,
+      ),
+      label: label,
+    ),
+];
 
 /// The kind a category heading alone implies, or [DishKind.food] when it
 /// implies nothing — a "Mains" heading says nothing about a drink filed
@@ -124,19 +159,47 @@ DishKind categoryKindOf(String categoryName) {
 /// The heading decides when it can ([categoryKindOf]); otherwise the dish
 /// *name* is read — never the description, so "served with a glass of
 /// wine" cannot turn a steak into a drink. A name that is a notice word at
-/// a price of zero is a notice; a name holding a drink word with none of
-/// the ingredient guards ("beer-battered", "wine-braised", "ברוטב יין") is
-/// a drink; anything else is food.
+/// a price of zero is a notice; a name that is cutlery, a candle or a
+/// greeting card ([extraNameWordsEn], issue #472) is an extra under any
+/// heading; a name holding a drink word with none of the ingredient
+/// guards ("beer-battered", "wine-braised", "ברוטב יין") is a drink;
+/// anything else is food.
 DishKind dishKindOf({required String category, required Dish dish}) {
   final fromHeading = categoryKindOf(category);
   if (fromHeading != DishKind.food) return fromHeading;
   final name = TextNormaliser.normalise(dish.name);
   if (name.isEmpty) return DishKind.food;
   if (dish.price == 0 && _noticeWords.matches(name)) return DishKind.notice;
+  if (_extraNames.matches(name)) return DishKind.extra;
   if (_drinkNames.matches(name) && !_drinkNameGuards.matches(name)) {
     return DishKind.drink;
   }
   return DishKind.food;
+}
+
+/// The red base a drink takes from its heading (issue #474), or null.
+///
+/// A sugary drink named by a brand or a fruit alone ("היינקן", "תפוז")
+/// says nothing the vocabulary knows, but the heading that sorted it
+/// says what it is: a drink ([dishKindOf]) under a beer, juice or shake
+/// heading ([drinkHeadingBasesEn], [drinkHeadingBasesHe]) is that drink.
+/// A plain drink ([plainDrinkWordsEn]: wine, water, spirits) and a name
+/// with a [drinkHeadingGuardWordsEn] word ("זירו", "unsweetened") are
+/// left alone. The label is the heading's first base word, in the
+/// heading's language.
+String? headingDrinkBase({required String category, required Dish dish}) {
+  if (dishKindOf(category: category, dish: dish) != DishKind.drink) {
+    return null;
+  }
+  final heading = TextNormaliser.normalise(category);
+  final name = TextNormaliser.normalise(dish.name);
+  if (_plainDrinkNames.matches(name) || _drinkHeadingGuards.matches(name)) {
+    return null;
+  }
+  for (final base in _drinkHeadingBases) {
+    if (base.pattern.hasMatch(heading)) return base.label;
+  }
+  return null;
 }
 
 /// The kind of every dish on [menu], by dish id, computed once per menu.

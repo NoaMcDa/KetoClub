@@ -130,6 +130,10 @@ class HebrewPrefixAllowed:
     notice: bool
     drink_names: bool
     drink_name_guards: bool
+    extra_names: bool
+    plain_drink_names: bool
+    drink_headings: bool
+    drink_heading_guards: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,6 +156,12 @@ class DishKindWords:
     drink_name_triggers_he: tuple[str, ...]
     drink_name_guard_words_en: tuple[str, ...]
     drink_name_guard_words_he: tuple[str, ...]
+    extra_name_words_en: tuple[str, ...]
+    extra_name_words_he: tuple[str, ...]
+    drink_heading_bases_en: Mapping[str, str]
+    drink_heading_bases_he: Mapping[str, str]
+    drink_heading_guard_words_en: tuple[str, ...]
+    drink_heading_guard_words_he: tuple[str, ...]
     hebrew_prefix_allowed: HebrewPrefixAllowed
 
 
@@ -291,12 +301,17 @@ class Vocabulary:
     non_keto_drink_bases_he: tuple[str, ...]
     dough_bases_en: tuple[str, ...]
     dough_bases_he: tuple[str, ...]
+    choice_bases_en: tuple[str, ...]
+    choice_bases_he: tuple[str, ...]
+    choice_group_words_en: tuple[str, ...]
+    choice_group_words_he: tuple[str, ...]
     non_keto_bases_en: tuple[str, ...]
     non_keto_bases_he: tuple[str, ...]
     non_keto_base_labels_en: Mapping[str, str]
     non_keto_base_labels_he: Mapping[str, str]
     carb_only_base_labels: Mapping[str, str]
     carb_only_eligible_triggers: tuple[str, ...]
+    carb_only_bread_triggers: tuple[str, ...]
     carb_only_qualifiers_en: tuple[str, ...]
     carb_only_qualifiers_he: tuple[str, ...]
     carb_only_toppings_en: tuple[str, ...]
@@ -318,6 +333,8 @@ class Vocabulary:
     dairy_guards_he: Mapping[str, GuardWords]
     option_removal_words_en: tuple[str, ...]
     option_removal_words_he: tuple[str, ...]
+    option_add_on_group_words_en: tuple[str, ...]
+    option_add_on_group_words_he: tuple[str, ...]
     no_prefix_hebrew_triggers: tuple[str, ...]
     hebrew_trigger_pattern_example: HebrewPatternExample
     latin_trigger_pattern_example: LatinPatternExample
@@ -373,12 +390,17 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         non_keto_drink_bases_he=strs("nonKetoDrinkBasesHe"),
         dough_bases_en=strs("doughBasesEn"),
         dough_bases_he=strs("doughBasesHe"),
+        choice_bases_en=strs("choiceBasesEn"),
+        choice_bases_he=strs("choiceBasesHe"),
+        choice_group_words_en=strs("choiceGroupWordsEn"),
+        choice_group_words_he=strs("choiceGroupWordsHe"),
         non_keto_bases_en=strs("nonKetoBasesEn"),
         non_keto_bases_he=strs("nonKetoBasesHe"),
         non_keto_base_labels_en=_str_map(root["nonKetoBaseLabelsEn"], "labelsEn"),
         non_keto_base_labels_he=_str_map(root["nonKetoBaseLabelsHe"], "labelsHe"),
         carb_only_base_labels=_str_map(root["carbOnlyBaseLabels"], "carbOnlyLabels"),
         carb_only_eligible_triggers=strs("carbOnlyEligibleTriggers"),
+        carb_only_bread_triggers=strs("carbOnlyBreadTriggers"),
         carb_only_qualifiers_en=strs("carbOnlyQualifiersEn"),
         carb_only_qualifiers_he=strs("carbOnlyQualifiersHe"),
         carb_only_toppings_en=strs("carbOnlyToppingsEn"),
@@ -404,6 +426,8 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         dairy_guards_he=_guards(root["dairyGuardsHe"], "dairyGuardsHe"),
         option_removal_words_en=strs("optionRemovalWordsEn"),
         option_removal_words_he=strs("optionRemovalWordsHe"),
+        option_add_on_group_words_en=strs("optionAddOnGroupWordsEn"),
+        option_add_on_group_words_he=strs("optionAddOnGroupWordsHe"),
         no_prefix_hebrew_triggers=strs("noPrefixHebrewTriggers"),
         hebrew_trigger_pattern_example=HebrewPatternExample(
             trigger=_str(he_example["trigger"], "trigger"),
@@ -435,6 +459,16 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
             drink_name_triggers_he=kind_strs("drinkNameTriggersHe"),
             drink_name_guard_words_en=kind_strs("drinkNameGuardWordsEn"),
             drink_name_guard_words_he=kind_strs("drinkNameGuardWordsHe"),
+            extra_name_words_en=kind_strs("extraNameWordsEn"),
+            extra_name_words_he=kind_strs("extraNameWordsHe"),
+            drink_heading_bases_en=_str_map(
+                kinds["drinkHeadingBasesEn"], "drinkHeadingBasesEn"
+            ),
+            drink_heading_bases_he=_str_map(
+                kinds["drinkHeadingBasesHe"], "drinkHeadingBasesHe"
+            ),
+            drink_heading_guard_words_en=kind_strs("drinkHeadingGuardWordsEn"),
+            drink_heading_guard_words_he=kind_strs("drinkHeadingGuardWordsHe"),
             hebrew_prefix_allowed=HebrewPrefixAllowed(
                 drink_categories=_bool(prefix["drinkCategories"], "drinkCategories"),
                 extra_categories=_bool(prefix["extraCategories"], "extraCategories"),
@@ -442,6 +476,12 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
                 notice=_bool(prefix["notice"], "notice"),
                 drink_names=_bool(prefix["drinkNames"], "drinkNames"),
                 drink_name_guards=_bool(prefix["drinkNameGuards"], "drinkNameGuards"),
+                extra_names=_bool(prefix["extraNames"], "extraNames"),
+                plain_drink_names=_bool(prefix["plainDrinkNames"], "plainDrinkNames"),
+                drink_headings=_bool(prefix["drinkHeadings"], "drinkHeadings"),
+                drink_heading_guards=_bool(
+                    prefix["drinkHeadingGuards"], "drinkHeadingGuards"
+                ),
             ),
         ),
         templates=Templates(

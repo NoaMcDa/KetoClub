@@ -1447,12 +1447,10 @@
       },
       "doughChoiceBase": null,
       "match": {
-        "baseLabel": null,
-        "instructions": [
-          "Replace French fries with a fresh green salad or a fried egg"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
+        "baseLabel": "fries",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
       },
       "optionRulesText": "toppings cheese sauce",
       "rulesText": "fries toppings cheese sauce",
@@ -1518,14 +1516,12 @@
       "doughChoiceBase": null,
       "match": {
         "baseLabel": null,
-        "instructions": [
-          "Among the options, skip the pasta and choose a salad or vegetables instead."
-        ],
+        "instructions": [],
         "isNonKeto": false,
-        "kind": "yellow"
+        "kind": "green"
       },
-      "optionRulesText": "pasta upgrade yes",
-      "rulesText": "steak pasta upgrade yes",
+      "optionRulesText": "",
+      "rulesText": "steak",
       "searchText": "steak pasta upgrade yes no pasta"
     },
     {
@@ -1802,12 +1798,10 @@
       },
       "doughChoiceBase": null,
       "match": {
-        "baseLabel": null,
-        "instructions": [
-          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
+        "baseLabel": "צ'יפס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
       },
       "optionRulesText": "",
       "rulesText": "מגש ציפס עמ גבינה צהובה",
@@ -1842,7 +1836,7 @@
     {
       "carbOnlyBase": "פיתה",
       "coreText": "פיתה חמאה",
-      "describesFilling": true,
+      "describesFilling": false,
       "dish": {
         "description": "חמאה",
         "id": "d",
@@ -1854,12 +1848,10 @@
       },
       "doughChoiceBase": null,
       "match": {
-        "baseLabel": null,
-        "instructions": [
-          "אפשר בבקשה לקבל את זה בצלחת, בלי הפיתה?"
-        ],
-        "isNonKeto": false,
-        "kind": "yellow"
+        "baseLabel": "פיתה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
       },
       "optionRulesText": "",
       "rulesText": "פיתה חמאה",
@@ -2304,15 +2296,12 @@
       "doughChoiceBase": null,
       "match": {
         "baseLabel": null,
-        "instructions": [
-          "מבין האפשרויות, בלי בצק — בחרו סלט או ירקות במקום.",
-          "אפשר בבקשה בלי הלחם, ועם סלט או ירקות במקום?"
-        ],
+        "instructions": [],
         "isNonKeto": false,
-        "kind": "yellow"
+        "kind": "green"
       },
-      "optionRulesText": "תרצו משהו נוספ מקלות בצק לחמ שומ",
-      "rulesText": "סלט יווני תרצו משהו נוספ מקלות בצק לחמ שומ",
+      "optionRulesText": "",
+      "rulesText": "סלט יווני",
       "searchText": "סלט יווני תרצו משהו נוספ מקלות בצק לחמ שומ"
     },
     {
@@ -2467,7 +2456,7 @@
       },
       "doughChoiceBase": null,
       "match": {
-        "baseLabel": "עוגה",
+        "baseLabel": "שוקולד",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -2927,6 +2916,561 @@
       "optionRulesText": "",
       "rulesText": "עוגת שוקולד",
       "searchText": "עוגת שוקולד"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "רוזה עגבניות ושמנת",
+      "describesFilling": true,
+      "dish": {
+        "description": "עגבניות ושמנת",
+        "id": "d",
+        "imageUrl": null,
+        "name": "רוזה",
+        "options": [
+          {
+            "name": "בחרו סוג פסטה",
+            "values": [
+              "פנה"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": "פסטה",
+      "match": {
+        "baseLabel": "פסטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "בחרו סוג פסטה פנה",
+      "rulesText": "רוזה עגבניות ושמנת בחרו סוג פסטה פנה",
+      "searchText": "רוזה עגבניות ושמנת בחרו סוג פסטה פנה"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "בולונז בקר טחונ שבושל ביינ אדומ וירקות שורש רוטב עגבניות",
+      "describesFilling": true,
+      "dish": {
+        "description": "בקר טחון שבושל ביין אדום וירקות שורש, רוטב עגבניות",
+        "id": "d",
+        "imageUrl": null,
+        "name": "בולונז",
+        "options": [
+          {
+            "name": "בחר סוג פסטה",
+            "values": [
+              "רדיאטורי",
+              "בומבטי",
+              "בומבטי סלק"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": "פסטה",
+      "match": {
+        "baseLabel": "פסטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "בחר סוג פסטה רדיאטורי בומבטי בומבטי סלק",
+      "rulesText": "בולונז בקר טחונ שבושל ביינ אדומ וירקות שורש רוטב עגבניות בחר סוג פסטה רדיאטורי בומבטי בומבטי סלק",
+      "searchText": "בולונז בקר טחונ שבושל ביינ אדומ וירקות שורש רוטב עגבניות בחר סוג פסטה רדיאטורי בומבטי בומבטי סלק"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "bolognese",
+      "describesFilling": false,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Bolognese",
+        "options": [
+          {
+            "name": "Choose your pasta",
+            "values": [
+              "Penne"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": "pasta",
+      "match": {
+        "baseLabel": "pasta",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "choose your pasta penne",
+      "rulesText": "bolognese choose your pasta penne",
+      "searchText": "bolognese choose your pasta penne"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "bolognese",
+      "describesFilling": true,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Bolognese",
+        "options": [
+          {
+            "name": "Choose your noodles",
+            "values": [
+              "Egg noodles",
+              "Zucchini noodles"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Among the options, skip the noodles and choose a salad or vegetables instead."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "choose your noodles egg noodles zucchini noodles",
+      "rulesText": "bolognese choose your noodles egg noodles zucchini noodles",
+      "searchText": "bolognese choose your noodles egg noodles zucchini noodles"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "רוזה",
+      "describesFilling": true,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "רוזה",
+        "options": [
+          {
+            "name": "בחרו סוג פסטה",
+            "values": [
+              "פנה",
+              "קישואים"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "מבין האפשרויות, בלי פסטה — בחרו סלט או ירקות במקום."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "בחרו סוג פסטה פנה קישואימ",
+      "rulesText": "רוזה בחרו סוג פסטה פנה קישואימ",
+      "searchText": "רוזה בחרו סוג פסטה פנה קישואימ"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "שניצל",
+      "describesFilling": true,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "שניצל",
+        "options": [
+          {
+            "name": "תוספת לבחירה",
+            "values": [
+              "פסטה",
+              "סלט"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": "שניצל",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "תוספת לבחירה פסטה סלט",
+      "rulesText": "שניצל תוספת לבחירה פסטה סלט",
+      "searchText": "שניצל תוספת לבחירה פסטה סלט"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "steak",
+      "describesFilling": false,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Steak",
+        "options": [
+          {
+            "name": "Add pasta",
+            "values": [
+              "Penne"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Among the options, skip the pasta and choose a salad or vegetables instead."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "add pasta penne",
+      "rulesText": "steak add pasta penne",
+      "searchText": "steak add pasta penne"
+    },
+    {
+      "carbOnlyBase": "rice",
+      "coreText": "rice basmati rice with herbs",
+      "describesFilling": false,
+      "dish": {
+        "description": "Basmati rice with herbs",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Rice",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": "rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "",
+      "rulesText": "rice basmati rice with herbs",
+      "searchText": "rice basmati rice with herbs"
+    },
+    {
+      "carbOnlyBase": "פירה",
+      "coreText": "פירה פירה עמ חמאה ושמנת",
+      "describesFilling": true,
+      "dish": {
+        "description": "פירה עם חמאה ושמנת",
+        "id": "d",
+        "imageUrl": null,
+        "name": "פירה",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": "פירה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "",
+      "rulesText": "פירה פירה עמ חמאה ושמנת",
+      "searchText": "פירה פירה עמ חמאה ושמנת"
+    },
+    {
+      "carbOnlyBase": "bread",
+      "coreText": "garlic bread",
+      "describesFilling": false,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Garlic bread",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": "bread",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "",
+      "rulesText": "garlic bread",
+      "searchText": "garlic bread"
+    },
+    {
+      "carbOnlyBase": "bread",
+      "coreText": "garlic bread baguette with butter and garlic",
+      "describesFilling": false,
+      "dish": {
+        "description": "Baguette with butter and garlic",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Garlic bread",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": "bread",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "",
+      "rulesText": "garlic bread baguette with butter and garlic",
+      "searchText": "garlic bread baguette with butter and garlic"
+    },
+    {
+      "carbOnlyBase": "rice",
+      "coreText": "rice bowl grilled chicken vegetables",
+      "describesFilling": true,
+      "dish": {
+        "description": "Grilled chicken, vegetables",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Rice bowl",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Omit rice and request double vegetables or salad"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "",
+      "rulesText": "rice bowl grilled chicken vegetables",
+      "searchText": "rice bowl grilled chicken vegetables"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "steak with rice",
+      "describesFilling": false,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Steak with rice",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Omit rice and request double vegetables or salad"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "",
+      "rulesText": "steak with rice",
+      "searchText": "steak with rice"
+    },
+    {
+      "carbOnlyBase": "לאפה",
+      "coreText": "לאפה שווארמה חומוס וסלט",
+      "describesFilling": true,
+      "dish": {
+        "description": "שווארמה, חומוס וסלט",
+        "id": "d",
+        "imageUrl": null,
+        "name": "לאפה",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה לקבל את זה בצלחת, בלי הלאפה?",
+          "אפשר בבקשה בלי החומוס, ועם טחינה או סלט ירוק במקום?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "",
+      "rulesText": "לאפה שווארמה חומוס וסלט",
+      "searchText": "לאפה שווארמה חומוס וסלט"
+    },
+    {
+      "carbOnlyBase": "פיתה",
+      "coreText": "פיתה שמנ זית וזעתר",
+      "describesFilling": false,
+      "dish": {
+        "description": "שמן זית וזעתר",
+        "id": "d",
+        "imageUrl": null,
+        "name": "פיתה",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": "פיתה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "",
+      "rulesText": "פיתה שמנ זית וזעתר",
+      "searchText": "פיתה שמנ זית וזעתר"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "שמנת קשיו",
+      "describesFilling": false,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "שמנת קשיו",
+        "options": [
+          {
+            "name": "תוספות בתשלום",
+            "values": [
+              "קוקוט ויניגרט פסיפלורה",
+              "קוקוט רוטב סובה"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "optionRulesText": "",
+      "rulesText": "שמנת קשיו",
+      "searchText": "שמנת קשיו תוספות בתשלומ קוקוט ויניגרט פסיפלורה קוקוט רוטב סובה"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "משפחתית עבה",
+      "describesFilling": false,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "משפחתית עבה",
+        "options": [
+          {
+            "name": "תרצו להוסיף שתייה?",
+            "values": [
+              "קוקה קולה"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "optionRulesText": "",
+      "rulesText": "משפחתית עבה",
+      "searchText": "משפחתית עבה תרצו להוסיפ שתייה קוקה קולה"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "tuna melt",
+      "describesFilling": false,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Tuna melt",
+        "options": [
+          {
+            "name": "A small discount",
+            "values": [
+              "Arnold Palmer | half iced tea half lemonade"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "optionRulesText": "",
+      "rulesText": "tuna melt",
+      "searchText": "tuna melt a small discount arnold palmer half iced tea half lemonade"
+    },
+    {
+      "carbOnlyBase": null,
+      "coreText": "סטייק",
+      "describesFilling": true,
+      "dish": {
+        "description": "",
+        "id": "d",
+        "imageUrl": null,
+        "name": "סטייק",
+        "options": [
+          {
+            "name": "בחרו תוספת",
+            "values": [
+              "צ'יפס",
+              "סלט"
+            ]
+          }
+        ],
+        "page": null,
+        "price": 10.0
+      },
+      "doughChoiceBase": null,
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "בחרו תוספת ציפס סלט",
+      "rulesText": "סטייק בחרו תוספת ציפס סלט",
+      "searchText": "סטייק בחרו תוספת ציפס סלט"
     },
     {
       "carbOnlyBase": "פיתה",
@@ -9677,7 +10221,7 @@
     },
     {
       "match": {
-        "baseLabel": "sushi",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -9773,6 +10317,426 @@
         "kind": "red"
       },
       "text": "פיש נ' צ'יפס"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "טבלת שוקולד חלב וקרמל מלוח"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "בר שוקולד דובאי"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "וולקנו שוקולד חם"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "שוקולד מריר 85%"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "שוקולד ללא סוכר"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה בלי רוטב השוקולד? יש בו סוכר."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "סטייק ברוטב שוקולד"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the chocolate sauce; it is sweetened."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Steak with chocolate sauce"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Dark chocolate bar"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Hot chocolate"
+    },
+    {
+      "match": {
+        "baseLabel": "פאדג'",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פאדג' שוקולד"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מארז סוכריות גומי"
+    },
+    {
+      "match": {
+        "baseLabel": "טראפלס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מארז טראפלס"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזניות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ספיישל פחזניות טופי מיסו"
+    },
+    {
+      "match": {
+        "baseLabel": "בוואריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "בוואריה שנות ה80"
+    },
+    {
+      "match": {
+        "baseLabel": "קדאיף",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "קדאיף חלבי"
+    },
+    {
+      "match": {
+        "baseLabel": "פנקוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פנקוטה וניל, מוס מנגו"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "מוס כבד עוף"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Chicken liver mousse"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Chocolate mousse"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מארז גביעים"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקיט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ביסקיט תרד"
+    },
+    {
+      "match": {
+        "baseLabel": "זיווה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "זיווה גבינות"
+    },
+    {
+      "match": {
+        "baseLabel": "מלוואח",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מלוואח במילוי שוקולד"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "חלת בצל"
+    },
+    {
+      "match": {
+        "baseLabel": "בן אנד ג'ריס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "בן אנד ג'ריס פיינט וניל"
+    },
+    {
+      "match": {
+        "baseLabel": "panna cotta",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Panna cotta"
+    },
+    {
+      "match": {
+        "baseLabel": "profiterole",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Profiteroles"
+    },
+    {
+      "match": {
+        "baseLabel": "candy",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Gummy candy"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Chocolate truffles"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Replace French fries with a fresh green salad or a fried egg"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Truffle fries"
+    },
+    {
+      "match": {
+        "baseLabel": "praline",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Pralines"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מאקי סלמון"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "טמאקי סלמון אבוקדו"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "קליפורניה רול"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "אינסייד אאוט טונה"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "גרין רול ללא גלוטן"
+    },
+    {
+      "match": {
+        "baseLabel": "רול קינמון",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "רול קינמון"
+    },
+    {
+      "match": {
+        "baseLabel": "ספרינג רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ספרינג רול ירקות"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "נארוטו רול סלמון"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "רול סלמון ללא אורז"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סשימי סלמון"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Salmon temaki"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Spicy tuna sushi roll"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Naruto sushi roll"
+    },
+    {
+      "match": {
+        "baseLabel": "spring roll",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Vegetable spring rolls"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Lobster roll"
     },
     {
       "match": {
@@ -12253,6 +13217,72 @@
       "match": {
         "baseLabel": null,
         "instructions": [
+          "Please leave out the chocolate sauce; it is sweetened."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "chocolate sauce"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the chocolate sauce; it is sweetened."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Grilled salmon with chocolate sauce for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the chocolate sauce; it is sweetened."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Grilled salmon with CHOCOLATE SAUCE for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the chocolate sauce; it is sweetened."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "chocolate drizzle"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the chocolate sauce; it is sweetened."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Grilled salmon with chocolate drizzle for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the chocolate sauce; it is sweetened."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Grilled salmon with CHOCOLATE DRIZZLE for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
           "Please make it with black coffee or unsweetened almond milk, no added sugar."
         ],
         "isNonKeto": false,
@@ -14240,7 +15270,7 @@
     },
     {
       "match": {
-        "baseLabel": "sushi",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -14249,7 +15279,7 @@
     },
     {
       "match": {
-        "baseLabel": "sushi",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -14258,7 +15288,7 @@
     },
     {
       "match": {
-        "baseLabel": "nigiri",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -14267,7 +15297,7 @@
     },
     {
       "match": {
-        "baseLabel": "nigiri",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -14276,7 +15306,7 @@
     },
     {
       "match": {
-        "baseLabel": "maki",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -14285,7 +15315,7 @@
     },
     {
       "match": {
-        "baseLabel": "maki",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -14294,7 +15324,7 @@
     },
     {
       "match": {
-        "baseLabel": "uramaki",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -14303,7 +15333,7 @@
     },
     {
       "match": {
-        "baseLabel": "uramaki",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -14399,6 +15429,492 @@
         "kind": "red"
       },
       "text": "Grilled salmon with halva for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "chocolate"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fudge",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "fudge"
+    },
+    {
+      "match": {
+        "baseLabel": "fudge",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fudge for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "panna cotta",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "panna cotta"
+    },
+    {
+      "match": {
+        "baseLabel": "panna cotta",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with panna cotta for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "profiterole",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "profiterole"
+    },
+    {
+      "match": {
+        "baseLabel": "profiterole",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with profiterole for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "candy",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "candy"
+    },
+    {
+      "match": {
+        "baseLabel": "candy",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with candy for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "candies",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "candies"
+    },
+    {
+      "match": {
+        "baseLabel": "candies",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with candies for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "chocolate truffle"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate truffle for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "praline",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "praline"
+    },
+    {
+      "match": {
+        "baseLabel": "praline",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with praline for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "mousse",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "mousse"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "biscuit",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "biscuit"
+    },
+    {
+      "match": {
+        "baseLabel": "biscuit",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with biscuit for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "eclair",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "eclair"
+    },
+    {
+      "match": {
+        "baseLabel": "eclair",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with eclair for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "cannoli",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "cannoli"
+    },
+    {
+      "match": {
+        "baseLabel": "cannoli",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with cannoli for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "gelato",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "gelato"
+    },
+    {
+      "match": {
+        "baseLabel": "gelato",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with gelato for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "sorbet",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "sorbet"
+    },
+    {
+      "match": {
+        "baseLabel": "sorbet",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sorbet for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "marshmallow",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "marshmallow"
+    },
+    {
+      "match": {
+        "baseLabel": "marshmallow",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with marshmallow for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "toffee",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "toffee"
+    },
+    {
+      "match": {
+        "baseLabel": "toffee",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with toffee for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "nutella",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "nutella"
+    },
+    {
+      "match": {
+        "baseLabel": "nutella",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with nutella for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "temaki"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with temaki for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "futomaki"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with futomaki for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "hosomaki"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with hosomaki for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "hand roll"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with hand roll for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "sushi roll"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sushi roll for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "california roll"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with california roll for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "inside out roll"
+    },
+    {
+      "match": {
+        "baseLabel": "sushi rice",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with inside out roll for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "spring roll",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "spring roll"
+    },
+    {
+      "match": {
+        "baseLabel": "spring roll",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with spring roll for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "egg roll",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "egg roll"
+    },
+    {
+      "match": {
+        "baseLabel": "egg roll",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with egg roll for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "cinnamon roll",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "cinnamon roll"
+    },
+    {
+      "match": {
+        "baseLabel": "cinnamon roll",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with cinnamon roll for dinner"
     },
     {
       "match": {
@@ -14849,6 +16365,294 @@
         "kind": "red"
       },
       "text": "Grilled salmon with port wine for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "fuze tea"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuzetea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "fuzetea"
+    },
+    {
+      "match": {
+        "baseLabel": "fuzetea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuzetea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "flavoured water",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "flavoured water"
+    },
+    {
+      "match": {
+        "baseLabel": "flavoured water",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with flavoured water for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "flavored water",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "flavored water"
+    },
+    {
+      "match": {
+        "baseLabel": "flavored water",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with flavored water for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "goldstar",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "goldstar"
+    },
+    {
+      "match": {
+        "baseLabel": "goldstar",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with goldstar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "heineken",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "heineken"
+    },
+    {
+      "match": {
+        "baseLabel": "heineken",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with heineken for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "carlsberg",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "carlsberg"
+    },
+    {
+      "match": {
+        "baseLabel": "carlsberg",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with carlsberg for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "tuborg",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "tuborg"
+    },
+    {
+      "match": {
+        "baseLabel": "tuborg",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with tuborg for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "corona",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "corona"
+    },
+    {
+      "match": {
+        "baseLabel": "corona",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with corona for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "stella artois",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "stella artois"
+    },
+    {
+      "match": {
+        "baseLabel": "stella artois",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with stella artois for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "guinness",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "guinness"
+    },
+    {
+      "match": {
+        "baseLabel": "guinness",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with guinness for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "paulaner",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "paulaner"
+    },
+    {
+      "match": {
+        "baseLabel": "paulaner",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with paulaner for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "weihenstephan",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "weihenstephan"
+    },
+    {
+      "match": {
+        "baseLabel": "weihenstephan",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with weihenstephan for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "peroni",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "peroni"
+    },
+    {
+      "match": {
+        "baseLabel": "peroni",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with peroni for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "becks",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "becks"
+    },
+    {
+      "match": {
+        "baseLabel": "becks",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with becks for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "blue moon",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "blue moon"
+    },
+    {
+      "match": {
+        "baseLabel": "blue moon",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with blue moon for dinner"
     },
     {
       "match": {
@@ -20258,6 +22062,66 @@
         "kind": "green"
       },
       "text": "סלמון על הגריל עם רדוקציית יין פורטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה בלי רוטב השוקולד? יש בו סוכר."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "רוטב שוקולד"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה בלי רוטב השוקולד? יש בו סוכר."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "סלמון על הגריל עם רוטב שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה בלי רוטב השוקולד? יש בו סוכר."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "סלמון על הגריל עם הרוטב שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם וברוטב שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ושהרוטב שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם רוטב שוקולדי להיום"
     },
     {
       "match": {
@@ -28653,7 +30517,7 @@
     },
     {
       "match": {
-        "baseLabel": "סושי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -28662,7 +30526,7 @@
     },
     {
       "match": {
-        "baseLabel": "סושי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -28671,7 +30535,7 @@
     },
     {
       "match": {
-        "baseLabel": "סושי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -28680,7 +30544,7 @@
     },
     {
       "match": {
-        "baseLabel": "סושי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -28707,7 +30571,7 @@
     },
     {
       "match": {
-        "baseLabel": "ניגירי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -28716,7 +30580,7 @@
     },
     {
       "match": {
-        "baseLabel": "ניגירי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -28725,7 +30589,7 @@
     },
     {
       "match": {
-        "baseLabel": "ניגירי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -28734,7 +30598,7 @@
     },
     {
       "match": {
-        "baseLabel": "ניגירי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -29232,6 +31096,2679 @@
         "kind": "green"
       },
       "text": "סלמון על הגריל עם פיש נ' צ'יפסי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "שוקולד"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם השוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובשוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהשוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולדי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פאדג'",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פאדג'"
+    },
+    {
+      "match": {
+        "baseLabel": "פאדג'",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פאדג' להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פאדג'",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפאדג' להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פאדג'",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפאדג' להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפאדג' להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פאדג'י להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סוכריות"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם סוכריות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הסוכריות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובסוכריות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהסוכריות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם סוכריותי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סוכריה"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם סוכריה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הסוכריה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובסוכריה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהסוכריה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם סוכריהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכרייה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סוכרייה"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכרייה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם סוכרייה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכרייה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הסוכרייה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סוכרייה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובסוכרייה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהסוכרייה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם סוכרייהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טראפלס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "טראפלס"
+    },
+    {
+      "match": {
+        "baseLabel": "טראפלס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם טראפלס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טראפלס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הטראפלס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טראפלס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובטראפלס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהטראפלס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם טראפלסי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרלינים",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פרלינים"
+    },
+    {
+      "match": {
+        "baseLabel": "פרלינים",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פרלינים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרלינים",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפרלינים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרלינים",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפרלינים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפרלינים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פרליניםי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרלין",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פרלין"
+    },
+    {
+      "match": {
+        "baseLabel": "פרלין",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פרלין להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרלין",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפרלין להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרלין",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפרלין להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפרלין להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פרליןי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזניות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פחזניות"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזניות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פחזניות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזניות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפחזניות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזניות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפחזניות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפחזניות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פחזניותי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזנית",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פחזנית"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזנית",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פחזנית להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזנית",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפחזנית להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פחזנית",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפחזנית להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפחזנית להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פחזניתי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בוואריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "בוואריה"
+    },
+    {
+      "match": {
+        "baseLabel": "בוואריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם בוואריה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בוואריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הבוואריה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בוואריה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובבוואריה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהבוואריה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם בוואריהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קדאיף",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "קדאיף"
+    },
+    {
+      "match": {
+        "baseLabel": "קדאיף",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם קדאיף להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קדאיף",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הקדאיף להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קדאיף",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובקדאיף להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהקדאיף להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם קדאיףי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פנקוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פנקוטה"
+    },
+    {
+      "match": {
+        "baseLabel": "פנקוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פנקוטה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פנקוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפנקוטה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פנקוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפנקוטה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפנקוטה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פנקוטהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פנה קוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פנה קוטה"
+    },
+    {
+      "match": {
+        "baseLabel": "פנה קוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פנה קוטה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פנה קוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפנה קוטה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פנה קוטה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפנה קוטה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפנה קוטה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פנה קוטהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מוס"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם המוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובמוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהמוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוסי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "גביע"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם גביע להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הגביע להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובגביע להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהגביע להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם גביעי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "גביעים"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם גביעים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הגביעים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובגביעים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהגביעים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם גביעיםי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "גביעי"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הגביעי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גביע",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובגביעי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהגביעי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם גביעיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקיט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ביסקיט"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקיט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ביסקיט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקיט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הביסקיט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקיט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובביסקיט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהביסקיט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ביסקיטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקוויט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ביסקוויט"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקוויט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ביסקוויט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקוויט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הביסקוויט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקוויט",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובביסקוויט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהביסקוויט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ביסקוויטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקוויטים",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ביסקוויטים"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקוויטים",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ביסקוויטים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקוויטים",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הביסקוויטים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ביסקוויטים",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובביסקוויטים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהביסקוויטים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ביסקוויטיםי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "זיווה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "זיווה"
+    },
+    {
+      "match": {
+        "baseLabel": "זיווה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם זיווה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "זיווה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הזיווה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "זיווה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובזיווה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהזיווה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם זיווהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "זיוות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "זיוות"
+    },
+    {
+      "match": {
+        "baseLabel": "זיוות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם זיוות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "זיוות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הזיוות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "זיוות",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובזיוות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהזיוות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם זיוותי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מלוואח",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מלוואח"
+    },
+    {
+      "match": {
+        "baseLabel": "מלוואח",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם מלוואח להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מלוואח",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם המלוואח להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מלוואח",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובמלוואח להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהמלוואח להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מלוואחי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "חלת"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם חלת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם החלת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובחלת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהחלת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם חלתי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "חלות"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם חלות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם החלות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "חלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובחלות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהחלות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם חלותי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פוקאצ'ה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פוקאצ'ה"
+    },
+    {
+      "match": {
+        "baseLabel": "פוקאצ'ה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פוקאצ'ה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פוקאצ'ה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפוקאצ'ה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פוקאצ'ה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפוקאצ'ה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפוקאצ'ה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פוקאצ'הי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בן אנד ג'ריס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "בן אנד ג'ריס"
+    },
+    {
+      "match": {
+        "baseLabel": "בן אנד ג'ריס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם בן אנד ג'ריס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בן אנד ג'ריס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הבן אנד ג'ריס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בן אנד ג'ריס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובבן אנד ג'ריס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהבן אנד ג'ריס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם בן אנד ג'ריסי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "נוטלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "נוטלה"
+    },
+    {
+      "match": {
+        "baseLabel": "נוטלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם נוטלה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "נוטלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הנוטלה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "נוטלה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובנוטלה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהנוטלה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם נוטלהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מרשמלו",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מרשמלו"
+    },
+    {
+      "match": {
+        "baseLabel": "מרשמלו",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם מרשמלו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מרשמלו",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם המרשמלו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מרשמלו",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובמרשמלו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהמרשמלו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מרשמלוי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טופי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "טופי"
+    },
+    {
+      "match": {
+        "baseLabel": "טופי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם טופי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טופי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הטופי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טופי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובטופי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהטופי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם טופיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אקלר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "אקלר"
+    },
+    {
+      "match": {
+        "baseLabel": "אקלר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם אקלר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אקלר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם האקלר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אקלר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובאקלר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהאקלר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם אקלרי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קנולי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "קנולי"
+    },
+    {
+      "match": {
+        "baseLabel": "קנולי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם קנולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קנולי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הקנולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קנולי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובקנולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהקנולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם קנוליי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ג'לטו",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ג'לטו"
+    },
+    {
+      "match": {
+        "baseLabel": "ג'לטו",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ג'לטו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ג'לטו",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הג'לטו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ג'לטו",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובג'לטו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהג'לטו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ג'לטוי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סורבה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סורבה"
+    },
+    {
+      "match": {
+        "baseLabel": "סורבה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם סורבה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סורבה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הסורבה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סורבה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובסורבה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהסורבה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם סורבהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מאקי"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם מאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם המאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מאקיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "טמאקי"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם טמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הטמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובטמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהטמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם טמאקיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "אורמאקי"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם אורמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם האורמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובאורמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהאורמאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם אורמאקיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פוטומאקי"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פוטומאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפוטומאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפוטומאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפוטומאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פוטומאקיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "הוסומאקי"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הוסומאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ההוסומאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובהוסומאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושההוסומאקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם הוסומאקיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "אינסייד אאוט"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם אינסייד אאוט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם האינסייד אאוט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובאינסייד אאוט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהאינסייד אאוט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם אינסייד אאוטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "אינסייד אווט"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם אינסייד אווט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם האינסייד אווט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובאינסייד אווט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהאינסייד אווט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם אינסייד אווטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם קליפורניה רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הקליפורניה רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובקליפורניה רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ושהקליפורניה רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם קליפורניה רולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ספרינג רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ספרינג רול"
+    },
+    {
+      "match": {
+        "baseLabel": "ספרינג רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ספרינג רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ספרינג רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הספרינג רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ספרינג רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובספרינג רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ושהספרינג רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ספרינג רולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "רול קינמון",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם רול קינמון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "רול קינמון",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הרול קינמון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "רול קינמון",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם וברול קינמון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהרול קינמון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם רול קינמוןי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קינמון רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "קינמון רול"
+    },
+    {
+      "match": {
+        "baseLabel": "קינמון רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם קינמון רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קינמון רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הקינמון רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קינמון רול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובקינמון רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ושהקינמון רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם קינמון רולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אגרול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "אגרול"
+    },
+    {
+      "match": {
+        "baseLabel": "אגרול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם אגרול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אגרול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם האגרול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אגרול",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובאגרול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהאגרול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם אגרולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "רול"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם רול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הרול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם וברול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהרול להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם רולי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "רולים"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם רולים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הרולים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם וברולים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהרולים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם רוליםי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "רולס"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם רולס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הרולס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "אורז סושי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם וברולס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהרולס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם רולסי להיום"
     },
     {
       "match": {
@@ -30078,6 +34615,924 @@
         "kind": "green"
       },
       "text": "סלמון על הגריל עם יין מתוקי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "לימונדת"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הלימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובלימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהלימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם לימונדתי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פיוז טי"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוז טיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פיוזטי"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוזטיי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טרופית",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "טרופית"
+    },
+    {
+      "match": {
+        "baseLabel": "טרופית",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם טרופית להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טרופית",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הטרופית להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טרופית",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובטרופית להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהטרופית להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם טרופיתי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מים בטעם",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "מים בטעם"
+    },
+    {
+      "match": {
+        "baseLabel": "מים בטעם",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם מים בטעם להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מים בטעם",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם המים בטעם להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מים בטעם",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובמים בטעם להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהמים בטעם להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מים בטעםי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גולדסטאר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "גולדסטאר"
+    },
+    {
+      "match": {
+        "baseLabel": "גולדסטאר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם גולדסטאר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גולדסטאר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הגולדסטאר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גולדסטאר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובגולדסטאר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהגולדסטאר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם גולדסטארי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "היינקן",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "היינקן"
+    },
+    {
+      "match": {
+        "baseLabel": "היינקן",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם היינקן להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "היינקן",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ההיינקן להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "היינקן",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובהיינקן להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושההיינקן להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם היינקןי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קרלסברג",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "קרלסברג"
+    },
+    {
+      "match": {
+        "baseLabel": "קרלסברג",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם קרלסברג להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קרלסברג",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הקרלסברג להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קרלסברג",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובקרלסברג להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהקרלסברג להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם קרלסברגי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טובורג",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "טובורג"
+    },
+    {
+      "match": {
+        "baseLabel": "טובורג",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם טובורג להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טובורג",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הטובורג להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "טובורג",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובטובורג להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהטובורג להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם טובורגי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קורונה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "קורונה"
+    },
+    {
+      "match": {
+        "baseLabel": "קורונה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם קורונה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קורונה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הקורונה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "קורונה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובקורונה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהקורונה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם קורונהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סטלה ארטואה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סטלה ארטואה"
+    },
+    {
+      "match": {
+        "baseLabel": "סטלה ארטואה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם סטלה ארטואה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סטלה ארטואה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הסטלה ארטואה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "סטלה ארטואה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובסטלה ארטואה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהסטלה ארטואה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם סטלה ארטואהי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גינס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "גינס"
+    },
+    {
+      "match": {
+        "baseLabel": "גינס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם גינס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גינס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הגינס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "גינס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובגינס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהגינס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם גינסי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פאולנר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פאולנר"
+    },
+    {
+      "match": {
+        "baseLabel": "פאולנר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פאולנר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פאולנר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפאולנר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פאולנר",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפאולנר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפאולנר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פאולנרי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ויינשטפן",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "ויינשטפן"
+    },
+    {
+      "match": {
+        "baseLabel": "ויינשטפן",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ויינשטפן להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ויינשטפן",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הויינשטפן להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "ויינשטפן",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובויינשטפן להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהויינשטפן להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ויינשטפןי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרוני",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "פרוני"
+    },
+    {
+      "match": {
+        "baseLabel": "פרוני",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פרוני להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרוני",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הפרוני להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פרוני",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובפרוני להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהפרוני להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פרוניי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בקס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "בקס"
+    },
+    {
+      "match": {
+        "baseLabel": "בקס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם בקס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בקס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הבקס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בקס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובבקס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהבקס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם בקסי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בלו מון",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "בלו מון"
+    },
+    {
+      "match": {
+        "baseLabel": "בלו מון",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם בלו מון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בלו מון",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הבלו מון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "בלו מון",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ובבלו מון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ושהבלו מון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם בלו מוןי להיום"
     },
     {
       "match": {
@@ -40594,6 +46049,438 @@
         "isNonKeto": false,
         "kind": "green"
       },
+      "text": "Grilled salmon with zero fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with zero extra fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with zero big fat juicy fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with diet fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with diet extra fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with diet big fat juicy fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with sugar-free fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sugar-free extra fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sugar-free big fat juicy fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with sugar free fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sugar free extra fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sugar free big fat juicy fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with no sugar fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with no sugar extra fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with no sugar big fat juicy fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with zero sugar fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with zero sugar extra fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with zero sugar big fat juicy fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with unsweetened fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with unsweetened extra fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with unsweetened big fat juicy fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with light fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with light extra fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with light big fat juicy fuze tea for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea zero for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea extra zero for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea big fat juicy zero for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea diet for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea extra diet for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea big fat juicy diet for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea sugar-free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea extra sugar-free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea big fat juicy sugar-free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea sugar free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea extra sugar free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea big fat juicy sugar free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea no sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea extra no sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea big fat juicy no sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea zero sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea extra zero sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea big fat juicy zero sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea unsweetened for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea extra unsweetened for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea big fat juicy unsweetened for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea light for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fuze tea extra light for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "fuze tea",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fuze tea big fat juicy light for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
       "text": "Grilled salmon with braised port wine for dinner"
     },
     {
@@ -41174,7 +47061,7 @@
     },
     {
       "match": {
-        "baseLabel": "sushi",
+        "baseLabel": "sushi rice",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -41288,6 +47175,771 @@
         "kind": "red"
       },
       "text": "Grilled salmon with crispy chicken big fat juicy skin for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with zero chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with zero extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with zero big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with diet chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with diet extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with diet big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with sugar-free chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sugar-free extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sugar-free big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with sugar free chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sugar free extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with sugar free big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with no sugar chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with no sugar extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with no sugar big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with zero sugar chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with zero sugar extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with zero sugar big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with unsweetened chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with unsweetened extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with unsweetened big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with light chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with light extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with light big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with keto chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with keto extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with keto big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with dark chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with dark extra chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with dark big fat juicy chocolate for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate zero for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra zero for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy zero for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate diet for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra diet for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy diet for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate sugar-free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate extra sugar-free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy sugar-free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate sugar free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate extra sugar free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy sugar free for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate no sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate extra no sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy no sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate zero sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra zero sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy zero sugar for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate unsweetened for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra unsweetened for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy unsweetened for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate light for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra light for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy light for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra sauce for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy sauce for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra drizzle for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy drizzle for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate rub for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra rub for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy rub for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate mole for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chocolate extra mole for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "chocolate",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chocolate big fat juicy mole for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with salmon mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with salmon extra mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "mousse",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with salmon big fat juicy mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with liver mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with liver extra mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "mousse",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with liver big fat juicy mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chicken mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with chicken extra mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "mousse",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with chicken big fat juicy mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with duck mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with duck extra mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "mousse",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with duck big fat juicy mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fish mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with fish extra mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "mousse",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with fish big fat juicy mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with tuna mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with tuna extra mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "mousse",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with tuna big fat juicy mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with avocado mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "Grilled salmon with avocado extra mousse for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": "mousse",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "Grilled salmon with avocado big fat juicy mousse for dinner"
     },
     {
       "match": {
@@ -48098,6 +54750,438 @@
         "isNonKeto": false,
         "kind": "green"
       },
+      "text": "סלמון על הגריל עם זירו לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם לימונדת זירו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם לימונדת עם זירו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם זירו גדול שמן עסיסי לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם דיאט לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם לימונדת דיאט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם לימונדת עם דיאט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם דיאט גדול שמן עסיסי לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא סוכר לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם לימונדת ללא סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם לימונדת עם ללא סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ללא סוכר גדול שמן עסיסי לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא סוכרים לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם לימונדת ללא סוכרים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם לימונדת עם ללא סוכרים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "לימונדה",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ללא סוכרים גדול שמן עסיסי לימונדת להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם זירו פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוז טי זירו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוז טי עם זירו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם זירו גדול שמן עסיסי פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם דיאט פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוז טי דיאט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוז טי עם דיאט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם דיאט גדול שמן עסיסי פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא סוכר פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוז טי ללא סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פיוז טי עם ללא סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ללא סוכר גדול שמן עסיסי פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא סוכרים פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוז טי ללא סוכרים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פיוז טי עם ללא סוכרים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוז טי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ללא סוכרים גדול שמן עסיסי פיוז טי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם זירו פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוזטי זירו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוזטי עם זירו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם זירו גדול שמן עסיסי פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם דיאט פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוזטי דיאט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוזטי עם דיאט להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם דיאט גדול שמן עסיסי פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא סוכר פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוזטי ללא סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פיוזטי עם ללא סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ללא סוכר גדול שמן עסיסי פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא סוכרים פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם פיוזטי ללא סוכרים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם פיוזטי עם ללא סוכרים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "פיוזטי",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ללא סוכרים גדול שמן עסיסי פיוזטי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
       "text": "סלמון על הגריל עם איכות סושי להיום"
     },
     {
@@ -48120,7 +55204,7 @@
     },
     {
       "match": {
-        "baseLabel": "סושי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
@@ -48156,12 +55240,572 @@
     },
     {
       "match": {
-        "baseLabel": "סושי",
+        "baseLabel": "אורז סושי",
         "instructions": [],
         "isNonKeto": true,
         "kind": "red"
       },
       "text": "סלמון על הגריל עם באיכות גדול שמן עסיסי סושי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא סוכר שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד ללא סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם שוקולד עם ללא סוכר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ללא סוכר גדול שמן עסיסי שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם ללא סוכרים שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד ללא סוכרים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם שוקולד עם ללא סוכרים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ללא סוכרים גדול שמן עסיסי שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם קטו שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד קטו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד עם קטו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם קטו גדול שמן עסיסי שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מריר שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד מריר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד עם מריר להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם מריר גדול שמן עסיסי שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם דל פחמימות שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד דל פחמימות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם שוקולד עם דל פחמימות להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם דל פחמימות גדול שמן עסיסי שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד רוטב להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד עם רוטב להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם רוטב גדול שמן עסיסי שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה בלי רוטב השוקולד? יש בו סוכר."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "סלמון על הגריל עם ברוטב שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד ברוטב להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד עם ברוטב להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם ברוטב גדול שמן עסיסי שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד הרוטב להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם שוקולד עם הרוטב להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "שוקולד",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם הרוטב גדול שמן עסיסי שוקולד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם כבד מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס כבד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עם כבד להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם כבד גדול שמן עסיסי מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם כבדי מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס כבדי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עם כבדי להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם כבדי גדול שמן עסיסי מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם סלמון מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס סלמון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עם סלמון להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם סלמון גדול שמן עסיסי מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם דגים מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס דגים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עם דגים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם דגים גדול שמן עסיסי מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם עוף מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עוף להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עם עוף להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם עוף גדול שמן עסיסי מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם טונה מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס טונה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עם טונה להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם טונה גדול שמן עסיסי מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם אבוקדו מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס אבוקדו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עם אבוקדו להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם אבוקדו גדול שמן עסיסי מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם חצילים מוס להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס חצילים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלמון על הגריל עם מוס עם חצילים להיום"
+    },
+    {
+      "match": {
+        "baseLabel": "מוס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "text": "סלמון על הגריל עם חצילים גדול שמן עסיסי מוס להיום"
     },
     {
       "match": {

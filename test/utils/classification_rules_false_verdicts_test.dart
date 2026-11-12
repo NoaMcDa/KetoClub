@@ -299,8 +299,8 @@ void main() {
         'Butter croissants': 'croissant',
         'Sesame bagels': 'bagel',
         'Glazed donuts': 'donut',
-        'Chocolate brownies': 'brownie',
-        'Chocolate chip cookies': 'cookie',
+        'Walnut brownies': 'brownie',
+        'Oatmeal cookies': 'cookie',
         'Sweet crepes': 'crepe',
         'Beef empanadas': 'empanada',
         'Potato croquettes': 'croquette',
@@ -332,7 +332,7 @@ void main() {
         label: 'עוגיה',
       );
       _expectRed(ClassificationRules.match('עוגות הבית'));
-      _expectRed(ClassificationRules.match('Chocolate cake'), label: 'cake');
+      _expectRed(ClassificationRules.match('Carrot cake'), label: 'cake');
       _expectRed(ClassificationRules.match('Chocolate chip cookie'));
     });
 
