@@ -234,6 +234,72 @@ abstract final class AppTokens {
   /// and hue.
   static const Color darkRedInk = Color(0xFFFF968A);
 
+  // The loaders' three foods (issues #450, #451; `LoaderColors`), from the
+  // loading-states design canvas. The meat is the verdict red warmed
+  // toward brown, the yolk the verdict amber, the leaf the accent, so the
+  // foods sit inside the palette rather than beside it.
+
+  /// Light: the steak.
+  static const Color lightMeat = Color(0xFFB5523B);
+
+  /// Light: the steak's marbling.
+  static const Color lightMeatFat = Color(0xFFF4E6D7);
+
+  /// Light: the steak's bone.
+  static const Color lightBone = Color(0xFFF4EFE4);
+
+  /// Light: the egg white.
+  static const Color lightEggWhite = Color(0xFFFFFFFF);
+
+  /// Light: the hairline round the egg white, which would vanish on the
+  /// cream ground without one.
+  static const Color lightEggEdge = Color(0x291F1C17);
+
+  /// Light: the yolk.
+  static const Color lightYolk = Color(0xFFE29F36);
+
+  /// Light: the lettuce leaf.
+  static const Color lightLeaf = Color(0xFF3C7847);
+
+  /// Light: the leaf's veins.
+  static const Color lightVein = Color(0xFFE9F8EC);
+
+  /// Light: the dashed ring the foods circle.
+  static const Color lightRing = Color(0x291F1C17);
+
+  /// Light: the highlight that sweeps across a loading placeholder.
+  static const Color lightSweep = Color(0xBFFFFFFF);
+
+  /// Dark: the steak.
+  static const Color darkMeat = Color(0xFFD7704F);
+
+  /// Dark: the steak's marbling.
+  static const Color darkMeatFat = Color(0xFF3A2A20);
+
+  /// Dark: the steak's bone.
+  static const Color darkBone = Color(0xFFE9E1CF);
+
+  /// Dark: the egg white.
+  static const Color darkEggWhite = Color(0xFFF5F0E4);
+
+  /// Dark: no hairline round the egg white; it stands out on its own.
+  static const Color darkEggEdge = Color(0x00F5F0E4);
+
+  /// Dark: the yolk.
+  static const Color darkYolk = Color(0xFFEDB04A);
+
+  /// Dark: the lettuce leaf.
+  static const Color darkLeaf = Color(0xFF6DC17B);
+
+  /// Dark: the leaf's veins.
+  static const Color darkVein = Color(0xFF1E3A24);
+
+  /// Dark: the dashed ring the foods circle.
+  static const Color darkRing = Color(0x2EF5F0E4);
+
+  /// Dark: the highlight that sweeps across a loading placeholder.
+  static const Color darkSweep = Color(0x14F5F0E4);
+
   // `--line` / `--line2` are alpha-over-ink in the snippet, not their own
   // hex; expose the alphas so `AppTheme` can compute `ink.withValues(...)`
   // rather than hard-coding a second colour that could drift from `ink`.

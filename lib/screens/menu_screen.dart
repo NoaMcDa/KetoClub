@@ -34,6 +34,7 @@ import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/fetch_failure_action.dart';
+import 'package:ketoclub/widgets/keto_loader.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/menu_filters_row.dart';
 import 'package:ketoclub/widgets/menu_question_sheet.dart';
@@ -454,27 +455,34 @@ class _MenuScreenState extends State<MenuScreen> {
     return _loadedView(context, l10n, controller, menu, twoPane: twoPane);
   }
 
-  /// Three [DishCardSkeleton]s in place of the old "Reading the menu…"
-  /// text, for [LoadPhase.fetching] (issue #63): a run of static,
-  /// two-tone cards shaped like the ones about to load, wrapped in one
-  /// live [Semantics] label — [l10n]'s own `menuLoading` copy — since the
-  /// cards themselves exclude their own semantics.
+  /// [LoadPhase.fetching] (issues #63, #451): a [KetoLoaderStrip] saying
+  /// [l10n]'s `menuLoading` ("Reading the menu…"), the small orbit and a
+  /// line of kitchen talk beside it, over three [DishCardSkeleton]s shaped
+  /// like the dishes about to load, a light sweeping across them.
+  ///
+  /// A screen reader hears `menuLoading` once, from the strip; the cards
+  /// are decoration.
   Widget _fetchingSkeleton(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-      child: Semantics(
-        liveRegion: true,
-        label: l10n.menuLoading,
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            DishCardSkeleton(),
-            SizedBox(height: 12),
-            DishCardSkeleton(),
-            SizedBox(height: 12),
-            DishCardSkeleton(),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          KetoLoaderStrip(status: l10n.menuLoading),
+          const SizedBox(height: 12),
+          const ExcludeSemantics(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DishCardSkeleton(),
+                SizedBox(height: 12),
+                DishCardSkeleton(),
+                SizedBox(height: 12),
+                DishCardSkeleton(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

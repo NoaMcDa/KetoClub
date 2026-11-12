@@ -9,6 +9,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/widgets/keto_loader.dart';
 import 'package:ketoclub/widgets/menu_question_sheet.dart';
 
 /// The English strings this test reads expected copy from.
@@ -132,8 +133,12 @@ void main() {
           ),
         );
 
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.byType(KetoOrbit), findsOneWidget);
         expect(find.text(_en.menuQuestionSheetLoading), findsOneWidget);
+        expect(
+          find.bySemanticsLabel(_en.menuQuestionSheetLoading),
+          findsOneWidget,
+        );
       });
 
       testWidgets('hides the text field and Ask button when loading', (

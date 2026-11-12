@@ -5,6 +5,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/keto_loader.dart';
 
 /// The English strings a test reads expected copy from.
 final AppLocalizations _en = AppLocalizationsEn();
@@ -37,7 +38,7 @@ void main() {
         await _pump(tester, AnalysisProgressRow(phase: phase));
 
         // Assert
-        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(find.byType(KetoOrbit), findsNothing);
         expect(find.byType(Text), findsNothing);
       });
     }
@@ -48,14 +49,17 @@ void main() {
       LoadPhase.classifyingRules: _en.menuProgressApplyingRules,
     };
     for (final entry in expectedCopy.entries) {
-      testWidgets('build shows a spinner and "${entry.value}" for '
-          '${entry.key.name}', (tester) async {
+      testWidgets('build shows the orbit and "${entry.value}" for '
+          '${entry.key.name}, announced once, with kitchen talk under it '
+          '(issue #451)', (tester) async {
         // Arrange
         await _pump(tester, AnalysisProgressRow(phase: entry.key));
 
         // Assert
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.byType(KetoOrbit), findsOneWidget);
+        expect(find.byType(KitchenTalk), findsOneWidget);
         expect(find.text(entry.value), findsOneWidget);
+        expect(find.bySemanticsLabel(entry.value), findsOneWidget);
       });
     }
 

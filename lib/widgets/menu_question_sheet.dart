@@ -8,6 +8,7 @@ import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/services/classifier/menu_question_prompt.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/keto_loader.dart';
 
 /// A modal bottom sheet for asking one free-text question about the
 /// analysed menu (architecture.md §9.5; issue #214).
@@ -147,18 +148,13 @@ class _MenuQuestionSheetState extends State<MenuQuestionSheet> {
     );
   }
 
+  /// The wait for an answer (issue #451): the orbit saying
+  /// `menuQuestionSheetLoading`, with a line of kitchen talk under it.
   Widget _loadingBody(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text(l10n.menuQuestionSheetLoading),
-          ],
-        ),
+        child: KetoLoader(status: l10n.menuQuestionSheetLoading, orbitSize: 88),
       ),
     );
   }

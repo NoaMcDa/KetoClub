@@ -329,6 +329,11 @@
       "total": { "type": "int" }
     }
   },
+  "loadingTalkCarbs": "Counting carbs…",
+  "loadingTalkSauces": "Checking the sauces…",
+  "loadingTalkFries": "Swapping fries for salad…",
+  "loadingTalkSugar": "Looking for hidden sugar…",
+  "loadingTalkBun": "Holding the bun…",
   "venueCardOpenNow": "Open now",
   "venueCardClosed": "Closed",
   "venueCardMinutes": "{minutes} min",

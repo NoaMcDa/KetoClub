@@ -1352,6 +1352,36 @@ abstract class AppLocalizations {
   /// **'Estimating {done} of {total}…'**
   String discoveryEstimating(int done, int total);
 
+  /// No description provided for @loadingTalkCarbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Counting carbs…'**
+  String get loadingTalkCarbs;
+
+  /// No description provided for @loadingTalkSauces.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking the sauces…'**
+  String get loadingTalkSauces;
+
+  /// No description provided for @loadingTalkFries.
+  ///
+  /// In en, this message translates to:
+  /// **'Swapping fries for salad…'**
+  String get loadingTalkFries;
+
+  /// No description provided for @loadingTalkSugar.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking for hidden sugar…'**
+  String get loadingTalkSugar;
+
+  /// No description provided for @loadingTalkBun.
+  ///
+  /// In en, this message translates to:
+  /// **'Holding the bun…'**
+  String get loadingTalkBun;
+
   /// No description provided for @venueCardOpenNow.
   ///
   /// In en, this message translates to:

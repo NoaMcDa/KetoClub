@@ -794,6 +794,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get loadingTalkCarbs => 'Counting carbs…';
+
+  @override
+  String get loadingTalkSauces => 'Checking the sauces…';
+
+  @override
+  String get loadingTalkFries => 'Swapping fries for salad…';
+
+  @override
+  String get loadingTalkSugar => 'Looking for hidden sugar…';
+
+  @override
+  String get loadingTalkBun => 'Holding the bun…';
+
+  @override
   String get venueCardOpenNow => 'Open now';
 
   @override

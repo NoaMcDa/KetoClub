@@ -797,6 +797,21 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get loadingTalkCarbs => 'סופרים פחמימות…';
+
+  @override
+  String get loadingTalkSauces => 'בודקים את הרטבים…';
+
+  @override
+  String get loadingTalkFries => 'מחליפים צ׳יפס בסלט…';
+
+  @override
+  String get loadingTalkSugar => 'מחפשים סוכר נסתר…';
+
+  @override
+  String get loadingTalkBun => 'מוותרים על הלחמנייה…';
+
+  @override
   String get venueCardOpenNow => 'פתוח עכשיו';
 
   @override

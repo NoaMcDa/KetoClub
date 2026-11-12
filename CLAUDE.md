@@ -119,6 +119,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > header with its label, and is saved as `AppSettings.discoveryStreet`
 > (label and coordinates, on the device only) in place of any saved city.
 >
+> **D29 (#450, #451) makes every wait one designed family.** A steak, a fried
+> egg and a lettuce leaf orbit a dashed ring (`KetoOrbit`,
+> `widgets/keto_foods.dart`, `LoaderColors`): round the KetoClub mark on the web
+> splash (`web/index.html`, inline SVG), with the status and a rotating line of
+> kitchen talk on Explore's first wait and the question sheet (`KetoLoader`),
+> and as a small strip on the menu's fetch and analysis (`KetoLoaderStrip`,
+> `AnalysisProgressRow`). Skeletons gain a light sweep; the quick score shows
+> its progress as segments. Reduced motion holds everything still, and a screen
+> reader hears one status line.
+>
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
 > architecture.md wins. **`HANDOFF.md` is the fastest way in**: what exists, what is
@@ -472,6 +482,10 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   field. The Photon dedupe rule lives twice, in `photon_place_mapper.dart`
   and the backend's port: change both together. And the distance filter is `radiusKm`, not a `DiscoveryChip`: do not
   clear it where `_activeChips` is cleared.
+- **A test cannot `pumpAndSettle` while a loader is on screen (D29):** the
+  orbit and the skeleton sweep repeat forever. Pump single frames while a wait
+  is held open, release it, then settle. And the food shapes live twice, in
+  `widgets/keto_foods.dart` and `web/index.html`: change both.
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
 
@@ -788,7 +802,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
    scan issue (#88; §16's Phase 4 steps). §14 has the decisions
-   log D1–D28, §17 the open questions with the default the code follows.
+   log D1–D29, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

@@ -23,6 +23,7 @@ import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/keto_loader.dart';
 import 'package:ketoclub/widgets/location_picker_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
@@ -249,15 +250,25 @@ void main() {
         await tester.tap(find.byTooltip(l10n.discoveryUseLocation));
         await tester.pump();
 
-        // Assert: the skeletons stand in for the old spinner, announced
-        // once through a Semantics label.
+        // Assert: the orbit says what it is waiting for, over the
+        // skeletons, announced once through its Semantics label (#450).
+        expect(find.byType(KetoLoader), findsOneWidget);
+        expect(find.byType(KetoOrbit), findsOneWidget);
+        expect(find.text(l10n.discoveryLocating), findsOneWidget);
         expect(find.byType(VenueCardSkeleton), findsNWidgets(3));
         expect(find.bySemanticsLabel(l10n.discoveryLocating), findsOneWidget);
         expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(
+          tester.getCenter(find.byType(KetoOrbit)).dy,
+          lessThan(tester.getTopLeft(find.byType(VenueCardSkeleton).first).dy),
+        );
 
-        // Cleanup: release the gate so no timer/future is left pending.
+        // Cleanup: release the gate so no timer/future is left pending,
+        // and the loader goes with the wait.
         gate.complete();
         await tester.pumpAndSettle();
+        expect(find.byType(KetoLoader), findsNothing);
+        expect(tester.binding.hasScheduledFrame, isFalse);
       });
 
       testWidgets('typing a name shows three VenueCardSkeletons under the '
@@ -1530,6 +1541,19 @@ void main() {
           ),
         );
         expect(button.onPressed, isNull);
+        // The foods circle as dots in the button, and a segment per
+        // restaurant waits to fill (issue #451).
+        expect(
+          find.descendant(
+            of: find.byWidgetPredicate((w) => w is ButtonStyleButton),
+            matching: find.byType(KetoOrbit),
+          ),
+          findsOneWidget,
+        );
+        final bar = tester.widget<EstimateProgress>(
+          find.byType(EstimateProgress),
+        );
+        expect((bar.done, bar.total), (0, 2));
 
         // Act
         gate.complete();

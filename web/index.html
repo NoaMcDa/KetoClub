@@ -37,24 +37,99 @@
   <meta name="theme-color" content="#FAF7F0" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#14120E" media="(prefers-color-scheme: dark)">
   <style>
-    /* The loading splash (issue #226): without it a first visit is a blank
-       page until CanvasKit arrives. Removed on Flutter's first frame. */
+    /* The loading splash (issues #226, #450): without it a first visit is a
+       blank page until CanvasKit arrives. A steak, an egg and a lettuce
+       leaf circle the KetoClub mark, drawn inline (no request of their
+       own) in the app's tokens: AppTokens and LoaderColors, pinned by
+       test/web_shell_test.dart. Removed on Flutter's first frame. */
     html, body { margin: 0; height: 100%; background: #FAF7F0; }
     #splash {
+      --ink: #1F1C17; --ring: rgba(31, 28, 23, 0.16); --mark: #3C7847;
+      --meat: #B5523B; --meat-fat: #F4E6D7; --bone: #F4EFE4;
+      --egg: #FFFFFF; --egg-edge: rgba(31, 28, 23, 0.16); --yolk: #E29F36;
+      --leaf: #3C7847; --vein: #E9F8EC; --cut: #FAF7F0;
       position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 24px;
+      background: #FAF7F0; color: var(--ink);
+    }
+    #splash .kc-stage { position: relative; width: 196px; height: 196px; }
+    #splash .kc-ring {
+      position: absolute; inset: 30px;
+      border: 1.5px dashed var(--ring); border-radius: 50%;
+    }
+    #splash .kc-mark {
+      position: absolute; left: 70px; top: 70px; width: 56px; height: 56px;
+      border-radius: 15px; background: var(--mark);
       display: flex; align-items: center; justify-content: center;
-      background: #FAF7F0; color: #3C7847;
-      font: 600 28px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #splash .kc-orbit {
+      position: absolute; inset: 0;
+      animation: kc-spin 3.6s linear infinite;
+    }
+    #splash .kc-food {
+      position: absolute; width: 44px; height: 44px;
+      animation: kc-unspin 3.6s linear infinite;
+    }
+    #splash .kc-food svg { display: block; animation: kc-bob 1.2s ease-in-out infinite; }
+    #splash .kc-steak { left: 76px; top: 8px; }
+    #splash .kc-egg { left: 141px; top: 120px; }
+    #splash .kc-egg svg { animation-delay: -0.4s; }
+    #splash .kc-lettuce { left: 11px; top: 120px; }
+    #splash .kc-lettuce svg { animation-delay: -0.8s; }
+    #splash .meat { fill: var(--meat); }
+    #splash .meat-fat { fill: none; stroke: var(--meat-fat); stroke-width: 1.8; stroke-linecap: round; }
+    #splash .bone { fill: var(--bone); }
+    #splash .egg { fill: var(--egg); stroke: var(--egg-edge); stroke-width: 1.5; }
+    #splash .yolk { fill: var(--yolk); }
+    #splash .shine { fill: #FFFFFF; fill-opacity: 0.75; }
+    #splash .leaf { fill: var(--leaf); }
+    #splash .vein { fill: none; stroke: var(--vein); stroke-width: 1.6; stroke-linecap: round; }
+    #splash .cut { fill: var(--cut); }
+    #splash .cut-rib { fill: none; stroke: var(--mark); stroke-width: 2.4; stroke-linecap: round; }
+    #splash .kc-name {
+      font: 400 36px/1.05 "Instrument Serif", Georgia, "Times New Roman", serif;
       letter-spacing: 0.01em;
     }
+    @keyframes kc-spin { to { transform: rotate(360deg); } }
+    @keyframes kc-unspin { to { transform: rotate(-360deg); } }
+    @keyframes kc-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
     @media (prefers-color-scheme: dark) {
       html, body, #splash { background: #14120E; }
-      #splash { color: #6DC17B; }
+      #splash {
+        --ink: #F5F0E4; --ring: rgba(245, 240, 228, 0.18); --mark: #6DC17B;
+        --meat: #D7704F; --meat-fat: #3A2A20; --bone: #E9E1CF;
+        --egg: #F5F0E4; --egg-edge: rgba(245, 240, 228, 0); --yolk: #EDB04A;
+        --leaf: #6DC17B; --vein: #1E3A24; --cut: #14120E;
+      }
+    }
+    /* Reduced motion: the foods hold still on the ring. */
+    @media (prefers-reduced-motion: reduce) {
+      #splash .kc-orbit, #splash .kc-food, #splash .kc-food svg { animation: none; }
     }
   </style>
 </head>
 <body>
-  <div id="splash" role="status" aria-live="polite">KetoClub</div>
+  <div id="splash" role="status" aria-live="polite" aria-label="Loading KetoClub">
+    <div class="kc-stage" aria-hidden="true">
+      <div class="kc-ring"></div>
+      <div class="kc-mark">
+        <svg width="30" height="30" viewBox="0 0 48 48"><path class="cut" d="M24 6C34 12 40 22 36 32C33 39 27 42 24 42C21 42 15 39 12 32C8 22 14 12 24 6Z"/><path class="cut-rib" d="M24 13V39"/></svg>
+      </div>
+      <div class="kc-orbit">
+        <div class="kc-food kc-steak">
+          <svg width="44" height="44" viewBox="0 0 48 48"><path class="meat" d="M8 24C8 14 17 8 27 9C37 10 42 17 41 25C40 34 32 40 22 39C13 38 8 32 8 24Z"/><path class="meat-fat" d="M14 22C17 20 20 21 22 19M15 30C19 31 22 29 25 31"/><circle class="bone" cx="31" cy="22" r="4.5"/></svg>
+        </div>
+        <div class="kc-food kc-egg">
+          <svg width="44" height="44" viewBox="0 0 48 48"><path class="egg" d="M10 26C8 17 15 10 23 11C30 9 39 13 39 21C41 30 35 38 26 37C17 39 11 34 10 26Z"/><circle class="yolk" cx="24" cy="24" r="7"/><circle class="shine" cx="21.6" cy="21.6" r="2"/></svg>
+        </div>
+        <div class="kc-food kc-lettuce">
+          <svg width="44" height="44" viewBox="0 0 48 48"><path class="leaf" d="M24 6C34 12 40 22 36 32C33 39 27 42 24 42C21 42 15 39 12 32C8 22 14 12 24 6Z"/><path class="vein" d="M24 12V40M24 20L18 16M24 20L30 16M24 28L17 24M24 28L31 24M24 35L19 32M24 35L29 32"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="kc-name">KetoClub</div>
+  </div>
   <script>
     // Flutter dispatches `flutter-first-frame` on window once it has painted.
     window.addEventListener('flutter-first-frame', function () {

@@ -41,6 +41,7 @@ import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/keto_loader.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/menu_filters_row.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
@@ -402,9 +403,9 @@ void main() {
       'light': AppTheme.light(),
       'dark': AppTheme.dark(),
     }.entries) {
-      testWidgets('build shows three DishCardSkeletons under the ${entry.key} '
-          'theme before the fetch resolves, instead of the old '
-          'menuLoading text (issue #63)', (tester) async {
+      testWidgets('build shows the loader strip saying menuLoading over '
+          'three DishCardSkeletons under the ${entry.key} theme before the '
+          'fetch resolves (issues #63, #451)', (tester) async {
         // Arrange
         final repository = FakeMenuRepository();
         final controller = _controllerFor(repository: repository);
@@ -415,11 +416,13 @@ void main() {
         // microtask, not this frame.
         await _pump(tester, controller, theme: entry.value);
 
-        // Assert: the skeletons stand in for the text, announced once
-        // through a Semantics label carrying the same copy.
+        // Assert: the orbit and the status on screen, over the
+        // skeletons, announced once through the strip's Semantics label.
+        expect(find.byType(KetoLoaderStrip), findsOneWidget);
+        expect(find.byType(KetoOrbit), findsOneWidget);
         expect(find.byType(DishCardSkeleton), findsNWidgets(3));
         expect(find.bySemanticsLabel(_en.menuLoading), findsOneWidget);
-        expect(find.text(_en.menuLoading), findsNothing);
+        expect(find.text(_en.menuLoading), findsOneWidget);
         expect(find.byType(DishCard), findsNothing);
       });
     }

@@ -282,6 +282,7 @@ ketoclub/
 │   ├── theme/                            # design tokens as the app theme (rank 4, see below)
 │   │   ├── app_tokens.dart               # raw sRGB constants converted from the artboard's oklch tokens
 │   │   ├── verdict_colors.dart           # ThemeExtension<VerdictColors>: green/amber/red tones
+│   │   ├── loader_colors.dart            # ThemeExtension<LoaderColors>: the loaders' foods, ring, sweep (D29)
 │   │   ├── app_typography.dart           # TextTheme over the bundled fonts, with Hebrew fallbacks
 │   │   └── app_theme.dart                # AppTheme.light() / AppTheme.dark()
 │   │
@@ -299,7 +300,9 @@ ketoclub/
 │   │   ├── photo_tile.dart               # dish/venue photo with a placeholder tile (#50)
 │   │   ├── offline_banner.dart           # persistent offline banner (issue #68)
 │   │   ├── fetch_failure_action.dart     # retry action for a failed fetch (#144)
-│   │   ├── analysis_progress_row.dart    # names the engine while a menu is analysed (#137)
+│   │   ├── analysis_progress_row.dart    # names the engine while a menu is analysed (#137), on a loader strip (D29)
+│   │   ├── keto_foods.dart               # the steak, egg and lettuce drawings the loaders circle (#450, D29)
+│   │   ├── keto_loader.dart              # KetoOrbit, KetoLoader, KetoLoaderStrip, KitchenTalk, EstimateProgress (D29)
 │   │   ├── menu_search_field.dart        # search within a loaded menu (#140)
 │   │   ├── note_editor_sheet.dart        # personal, local-only notes on a dish (#131)
 │   │   ├── rules_reason_banner.dart      # why a menu fell back to the rule engine (#125)
@@ -3310,6 +3313,67 @@ the "added later" rule, three controller members (`chooseStreet`,
 two architecture-test boundaries, and eleven new ARB keys in each language
 (one changed: the picker's field now reads "Search for a city or a
 street").
+
+---
+
+### D29 — Loading states are one designed family: three foods in orbit
+
+*(Issues #450, #451. Reverses #63's "never animated" note on the skeletons.)*
+
+**What changed.** Every wait looked the same and said little: a blank cream
+page with the word "KetoClub" while the web build downloaded, then static grey
+shapes, or a plain spinner. The waits were designed as one family first, on a
+design canvas in the KetoClub palette (five artboards, light and dark, with a
+reduced-motion toggle), then built:
+
+- **The orbit** (`widgets/keto_loader.dart`, `KetoOrbit`): a steak, a fried egg
+  and a lettuce leaf (`widgets/keto_foods.dart`, flat drawings on a 48 × 48
+  grid in `LoaderColors`) going round a dashed ring once every 3.6 s, upright
+  all the way, each with a 2 px bob of its own. Below 30 px it is three dots
+  in the foods' colours.
+- **The web splash** (`web/index.html`) draws the same three shapes, inline
+  SVG and CSS with no request of their own, round the KetoClub mark.
+- **A screen's first wait** (`KetoLoader`): the orbit, the status in bold, and a
+  line of **kitchen talk** under it ("Checking the sauces…", five lines,
+  English and Hebrew, a new one every 2.4 s). Explore's locate and search show
+  it over the venue skeletons; the "Ask about this menu" sheet shows it alone.
+- **A wait beside content** (`KetoLoaderStrip`): a 44 px orbit, the status and
+  kitchen talk on one card. The menu's fetch shows it over the dish
+  skeletons, and `AnalysisProgressRow` (menu and scan) is now one.
+- **Skeletons sweep**: each block gets a 40%-wide highlight in
+  `LoaderColors.sweep` crossing it in 1.6 s of a 2.2 s cycle, from the reading
+  side (right to left in Hebrew). No package.
+- **The quick score** shows the dots in its button and an `EstimateProgress`
+  bar under it, one segment per restaurant up to 24, a continuous bar past that.
+
+**Rules the family keeps.** A screen reader hears one stable status, as a live
+region, from the `KetoLoader`/`KetoLoaderStrip`'s own `Semantics`; the orbit,
+the kitchen talk, the skeletons and the progress bar are excluded. Reduced
+motion (`MediaQuery.disableAnimations`, `prefers-reduced-motion` on the splash)
+holds everything still: the foods at twelve, four and eight o'clock, no bob, no
+sweep, the first line of talk. Each animation lives in the widget that shows
+the wait, so it stops the moment the wait ends; an idle screen schedules no
+frames. Every colour is a token (`AppTokens`, `LoaderColors`), pinned on the
+splash by `test/web_shell_test.dart`.
+
+**What it accepts.**
+
+- **A test that holds a wait open cannot `pumpAndSettle`**, since the orbit
+  never settles. The existing tests already pumped single frames there; the new
+  ones do too.
+- **The shapes are drawn twice**, as Flutter `Path`s in `keto_foods.dart` and as
+  SVG paths in `web/index.html`, from the same coordinates. A change to one
+  must be made to the other.
+- **The phones' launch screen is unchanged**: it is the operating system's and
+  cannot move. The orbit appears from the first Flutter frame.
+- **The splash has no words but "KetoClub"**: it is shown before Dart runs, so
+  it cannot know the UI language. It is announced as "Loading KetoClub".
+- **Evidence.** Unit, widget and flow tests, and screenshots of the web splash
+  and Explore's wait from a debug web build in Chrome. No phone has run it.
+
+**What it costs.** Two widget files, one theme extension and twenty tokens,
+five ARB keys in each language, a stateful skeleton block, and the splash's
+inline SVG.
 
 ---
 

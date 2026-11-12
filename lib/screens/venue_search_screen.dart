@@ -16,6 +16,7 @@ import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/keto_loader.dart';
 import 'package:ketoclub/widgets/location_picker_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
@@ -785,7 +786,8 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           onPressed: estimating
               ? null
               : () => unawaited(controller.estimateVisible()),
-          icon: Icon(estimating ? Icons.hourglass_top : Icons.rule),
+          // While a run goes, the three foods circle as dots (issue #451).
+          icon: estimating ? const KetoOrbit(size: 22) : const Icon(Icons.rule),
           label: Text(
             estimating
                 ? l10n.discoveryEstimating(
@@ -795,6 +797,13 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
                 : l10n.discoveryEstimateList,
           ),
         ),
+        if (estimating) ...[
+          const SizedBox(height: 10),
+          EstimateProgress(
+            done: controller.estimatedCount,
+            total: controller.estimateTotal,
+          ),
+        ],
         const SizedBox(height: 6),
         Text(
           l10n.discoveryEstimateHint,
@@ -884,22 +893,28 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     );
   }
 
-  /// Three [VenueCardSkeleton]s in place of the old spinner, for a locate
-  /// or a search in flight (issue #63): a run of static, two-tone cards
-  /// shaped like the ones about to load, rather than a bare progress
-  /// ring. Wrapped in one live [Semantics] label naming what is loading,
-  /// since the cards themselves exclude their own semantics — a screen
-  /// reader hears [label] once, not three times. Laid out in the cards'
-  /// own [VenueGrid] (issue #222), so a wide window shows a row of them.
+  /// A locate or a search in flight (issues #63, #450, #451): the orbit —
+  /// a steak, an egg and a lettuce leaf going round — saying [label], with
+  /// a line of kitchen talk under it, over three [VenueCardSkeleton]s
+  /// shaped like the cards about to load, a light sweeping across them.
+  ///
+  /// A screen reader hears [label] once, from the [KetoLoader]; the cards
+  /// are decoration. Laid out in the cards' own [VenueGrid] (issue #222),
+  /// so a wide window shows a row of them.
   Widget _skeletons(String label) {
-    return Semantics(
-      liveRegion: true,
-      label: label,
-      child: VenueGrid(
-        itemCount: 3,
-        itemBuilder: (context, i, photoAspectRatio) =>
-            VenueCardSkeleton(photoAspectRatio: photoAspectRatio),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Center(child: KetoLoader(status: label)),
+        const SizedBox(height: 24),
+        ExcludeSemantics(
+          child: VenueGrid(
+            itemCount: 3,
+            itemBuilder: (context, i, photoAspectRatio) =>
+                VenueCardSkeleton(photoAspectRatio: photoAspectRatio),
+          ),
+        ),
+      ],
     );
   }
 

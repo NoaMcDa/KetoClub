@@ -618,8 +618,16 @@ final class FlowFakeLocationService implements LocationService {
   /// Settable so a flow can steer it mid-journey.
   LocationResult result;
 
+  /// When set, [current] waits for it before answering, so a flow can
+  /// hold the "Finding your location…" wait open (issue #450).
+  Future<void>? gate;
+
   @override
-  Future<LocationResult> current() async => result;
+  Future<LocationResult> current() async {
+    final pending = gate;
+    if (pending != null) await pending;
+    return result;
+  }
 
   @override
   Future<bool> openSettings({required bool servicesOff}) async => true;

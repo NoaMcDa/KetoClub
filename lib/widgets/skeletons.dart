@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/theme/app_theme.dart';
+import 'package:ketoclub/theme/loader_colors.dart';
+import 'package:ketoclub/widgets/keto_loader.dart' show loaderMotionReduced;
 import 'package:ketoclub/widgets/venue_card.dart';
 
-/// One solid, rounded rectangle of [color] — the shared building block
-/// every skeleton in this file is made of.
+/// How long one sweep across a placeholder block takes, rest included
+/// (the loading-states design canvas, issue #451).
+const Duration skeletonSweepPeriod = Duration(milliseconds: 2200);
+
+/// The share of [skeletonSweepPeriod] the highlight spends crossing the
+/// block; for the rest it is off the block, so the sweep reads as a pulse
+/// rather than a blur.
+const double _sweepCrossing = 0.72;
+
+/// One rounded rectangle of [color] — the shared building block every
+/// skeleton in this file is made of — with a soft highlight sweeping
+/// across it (issue #451), so a placeholder reads as "loading", not
+/// "empty".
 ///
-/// Never animated: a static two-tone placeholder was judged good enough
-/// for issue #63 (`phase2_discovery_research.md` §8.2), so no shimmer
-/// package is pulled in just to draw a loading card.
-class _SkeletonBlock extends StatelessWidget {
+/// Issue #63 left these static ("no shimmer package is pulled in just to
+/// draw a loading card"). The sweep needs no package either: one
+/// gradient band in the theme's [LoaderColors.sweep], moved by an
+/// [AnimationController], from the reading side (right to left in
+/// Hebrew). With reduced motion the block is the static two-tone
+/// placeholder it was.
+class _SkeletonBlock extends StatefulWidget {
   const new({
     required this.color,
     required this.height,
@@ -32,21 +48,86 @@ class _SkeletonBlock extends StatelessWidget {
   final double radius;
 
   @override
+  State<_SkeletonBlock> createState() => _SkeletonBlockState();
+}
+
+class _SkeletonBlockState extends State<_SkeletonBlock>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _sweep = AnimationController(
+    vsync: this,
+    duration: skeletonSweepPeriod,
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (loaderMotionReduced(context)) {
+      _sweep.stop();
+    } else if (!_sweep.isAnimating) {
+      _sweep.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _sweep.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(radius),
-        ),
-      ),
+    final radius = BorderRadius.circular(widget.radius);
+    final block = DecoratedBox(
+      decoration: BoxDecoration(color: widget.color, borderRadius: radius),
     );
+    final Widget child;
+    if (loaderMotionReduced(context)) {
+      child = block;
+    } else {
+      final highlight = LoaderColors.of(context).sweep;
+      final ltr = Directionality.of(context) == TextDirection.ltr;
+      child = ClipRRect(
+        borderRadius: radius,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            block,
+            AnimatedBuilder(
+              animation: _sweep,
+              builder: (context, _) {
+                final crossed = (_sweep.value / _sweepCrossing).clamp(0.0, 1.0);
+                // A band 40% of the block wide, from fully off one edge
+                // (-2.4) to fully off the other (2.4).
+                final x = -2.4 + 4.8 * Curves.easeInOut.transform(crossed);
+                return Align(
+                  alignment: Alignment(ltr ? x : -x, 0),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.4,
+                    heightFactor: 1,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            highlight.withValues(alpha: 0),
+                            highlight,
+                            highlight.withValues(alpha: 0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    }
+    return SizedBox(width: widget.width, height: widget.height, child: child);
   }
 }
 
-/// A static placeholder shaped like [VenueCard] (issue #63): the same
+/// A placeholder shaped like [VenueCard] (issue #63): the same
 /// card surface and photo tile, a title bar with a score-badge-sized
 /// block beside it, and two shorter bars where the blurb and the meta
 /// line sit.
@@ -127,7 +208,7 @@ class VenueCardSkeleton extends StatelessWidget {
   }
 }
 
-/// A static placeholder shaped like `DishCard` (issue #63): a status-badge-
+/// A placeholder shaped like `DishCard` (issue #63): a status-badge-
 /// sized bar, two text bars for the name and description, a price-sized
 /// bar, and the trailing 72×72 photo tile `DishCard` itself uses (it
 /// exports no constant for that size, so this file states it again).
@@ -195,7 +276,7 @@ class DishCardSkeleton extends StatelessWidget {
   }
 }
 
-/// A static placeholder shaped like the Saved tab's own entry tile
+/// A placeholder shaped like the Saved tab's own entry tile
 /// (issue #63): a title bar, then two shorter bars where the source line
 /// and the dish count sit — the same rows `_SavedEntryTile` draws, minus
 /// the photo tile it also has none of.

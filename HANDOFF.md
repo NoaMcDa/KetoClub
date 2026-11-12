@@ -24,6 +24,15 @@ request.
 
 ## What shipped
 
+**D29 — every wait is one designed family (#450, #451).** Designed first on a
+canvas in the KetoClub palette, then built: a steak, a fried egg and a lettuce
+leaf orbit a dashed ring (`KetoOrbit`) on the web splash, on Explore's first
+wait and the question sheet (`KetoLoader`, with a rotating line of kitchen
+talk), and on the menu's fetch and analysis (`KetoLoaderStrip`). Skeletons
+gain a light sweep and the quick score a segmented bar. Reduced motion holds
+everything still; a screen reader hears one status. A test cannot
+`pumpAndSettle` while a loader shows. See `architecture.md` D29.
+
 **D27 — the Discovery list is built lazily (#446).** A nearby search answers
 hundreds of venues (334 around Herzliya); the page built every card at once and
 again on every controller notification, and froze for seconds. It is now a
@@ -747,7 +756,7 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D28, each
+- `architecture.md` §14 — the decisions log, now D1 to D29, each
   recording what was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately

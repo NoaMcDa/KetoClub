@@ -320,6 +320,11 @@
       "total": { "type": "int" }
     }
   },
+  "loadingTalkCarbs": "סופרים פחמימות…",
+  "loadingTalkSauces": "בודקים את הרטבים…",
+  "loadingTalkFries": "מחליפים צ׳יפס בסלט…",
+  "loadingTalkSugar": "מחפשים סוכר נסתר…",
+  "loadingTalkBun": "מוותרים על הלחמנייה…",
   "venueCardOpenNow": "פתוח עכשיו",
   "venueCardClosed": "סגור",
   "venueCardMinutes": "{minutes} דק׳",

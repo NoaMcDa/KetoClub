@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/theme/app_tokens.dart';
 import 'package:ketoclub/theme/app_typography.dart';
+import 'package:ketoclub/theme/loader_colors.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 
 /// Builds the app's light and dark [ThemeData] from [AppTokens]
@@ -52,6 +53,7 @@ abstract final class AppTheme {
         colors: [AppTokens.lightPhotoStart, AppTokens.lightPhotoEnd],
       ),
       photoInk: AppTokens.lightPhotoInk,
+      loaderColors: const LoaderColors.light(),
     );
   }
 
@@ -100,6 +102,7 @@ abstract final class AppTheme {
         colors: [AppTokens.darkPhotoStart, AppTokens.darkPhotoEnd],
       ),
       photoInk: AppTokens.darkPhotoInk,
+      loaderColors: const LoaderColors.dark(),
     );
   }
 
@@ -115,6 +118,7 @@ abstract final class AppTheme {
     required NeutralSurfaces neutralSurfaces,
     required LinearGradient photoGradient,
     required Color photoInk,
+    required LoaderColors loaderColors,
   }) {
     final accent = colorScheme.primary;
     final accentInk = colorScheme.onPrimary;
@@ -254,6 +258,7 @@ abstract final class AppTheme {
         verdictColors,
         neutralSurfaces,
         PhotoPlaceholder(gradient: photoGradient, ink: photoInk),
+        loaderColors,
       ],
     );
   }

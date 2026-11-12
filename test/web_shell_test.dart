@@ -33,6 +33,49 @@ void main() {
       expect(index, contains('background: ${_hex(AppTokens.darkBg)}'));
     });
 
+    test('the splash draws the steak, the egg and the lettuce in the loader '
+        'tokens of both themes (issue #450)', () {
+      expect(index, contains('kc-steak'));
+      expect(index, contains('kc-egg'));
+      expect(index, contains('kc-lettuce'));
+      for (final token in [
+        AppTokens.lightMeat,
+        AppTokens.lightYolk,
+        AppTokens.lightLeaf,
+        AppTokens.lightVein,
+        AppTokens.darkMeat,
+        AppTokens.darkYolk,
+        AppTokens.darkLeaf,
+        AppTokens.darkVein,
+      ]) {
+        expect(index, contains(_hex(token)), reason: _hex(token));
+      }
+    });
+
+    test('the splash orbits, and holds still under reduced motion '
+        '(issue #450)', () {
+      expect(index, contains('@keyframes kc-spin'));
+      expect(index, contains('prefers-reduced-motion: reduce'));
+      final reduced = index.substring(
+        index.indexOf('prefers-reduced-motion: reduce'),
+      );
+      expect(reduced, contains('animation: none'));
+    });
+
+    test('the splash makes no request of its own and announces itself '
+        'once (issue #450)', () {
+      final splash = index.substring(
+        index.indexOf('<div id="splash"'),
+        index.indexOf('<div class="kc-name">'),
+      );
+      expect(splash, isNot(contains('<img')));
+      expect(splash, isNot(contains('href=')));
+      expect(splash, isNot(contains('src=')));
+      expect(index, isNot(contains('url(')));
+      expect(index, contains('aria-label="Loading KetoClub"'));
+      expect(index, contains('class="kc-stage" aria-hidden="true"'));
+    });
+
     test('the splash is removed on the first frame', () {
       expect(index, contains('flutter-first-frame'));
       expect(index, contains('splash.remove()'));
