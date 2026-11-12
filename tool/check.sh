@@ -11,6 +11,9 @@ flutter pub get
 echo "== dart format"
 dart format --output=none --set-exit-if-changed lib test integration_test test_driver
 
+echo "== every flow test lands in exactly one integration shard"
+tool/flow_shard.sh --verify 4
+
 echo "== flutter analyze"
 flutter analyze --fatal-infos --fatal-warnings
 

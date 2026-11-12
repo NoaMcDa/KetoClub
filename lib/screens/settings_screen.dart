@@ -721,7 +721,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// Clear action gated by a confirmation dialog, and the one-shot
   /// confirmation line shown once clearing has actually happened.
   ///
-  /// The count comes from [SettingsController.cachedMenuCount], read on
+  /// The count comes from [SettingsController.recentMenuCount], read on
   /// [SettingsController.load] and refreshed by
   /// [SettingsController.clearCache] itself, so this widget renders
   /// whatever the controller already holds and never counts anything on
@@ -746,7 +746,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      l10n.settingsCacheSummary(controller.cachedMenuCount),
+                      l10n.settingsCacheSummary(controller.recentMenuCount),
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),

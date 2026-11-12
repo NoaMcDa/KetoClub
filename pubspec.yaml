@@ -14,6 +14,7 @@ dependencies:
   # LLM request (architecture.md §8, D10). A hint, never a verdict: a request
   # that fails anyway still maps to `offline`.
   connectivity_plus: ^7.3.1
+  crypto: ^3.0.3
   cupertino_icons: ^1.0.8
   # The Scan tab's "Choose a PDF" (architecture.md D15, issue #82). Only
   # services/platform/device_page_picker.dart imports it.
@@ -165,8 +166,9 @@ flutter_launcher_icons:
   web:
     generate: true
     image_path: "assets/icon/icon.png"
-    background_color: "#3C7847"
-    theme_color: "#3C7847"
+    # Cream, matching web/manifest.json (#226). Do not regenerate with green.
+    background_color: "#FAF7F0"
+    theme_color: "#FAF7F0"
   min_sdk_android: 21
 
 # Native splash screen (issue #66), matching AppTokens.lightBg/darkBg and

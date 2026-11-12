@@ -28,6 +28,9 @@ final class _OrderRecordingHistory implements VisitHistoryStore {
   final List<int> repositoryClearsAtClear = <int>[];
 
   @override
+  Future<List<VisitEntry>> entries() => inner.entries();
+
+  @override
   Future<void> clear() {
     repositoryClearsAtClear.add(repository.clearCacheCallCount);
     return inner.clear();
@@ -266,22 +269,33 @@ void main() {
       expect(states, [true, false]);
     });
 
-    test('load populates cachedMenuCount from the repository', () async {
-      // Arrange: two distinct venues cached.
-      const refA = VenueRef(source: MenuSource.wolt, platformId: 'a');
-      const refB = VenueRef(source: MenuSource.wolt, platformId: 'b');
-      final fetchedA = await repository.load(refA) as MenuFetched;
-      final fetchedB = await repository.load(refB) as MenuFetched;
-      repository
-        ..seedCache(CachedMenu(menu: fetchedA.menu))
-        ..seedCache(CachedMenu(menu: fetchedB.menu));
+    test(
+      'load counts the Recent list, not the raw cache (issue #488)',
+      () async {
+        // Arrange: two quick-score cache entries nobody opened, one visit.
+        const refA = VenueRef(source: MenuSource.wolt, platformId: 'a');
+        const refB = VenueRef(source: MenuSource.wolt, platformId: 'b');
+        final fetchedA = await repository.load(refA) as MenuFetched;
+        final fetchedB = await repository.load(refB) as MenuFetched;
+        repository
+          ..seedCache(CachedMenu(menu: fetchedA.menu))
+          ..seedCache(CachedMenu(menu: fetchedB.menu));
+        final history = FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)));
+        await history.recordVisit(refA);
+        final withHistory = SettingsController(
+          settings,
+          repository,
+          null,
+          history,
+        );
 
-      // Act
-      await controller.load();
+        // Act
+        await withHistory.load();
 
-      // Assert
-      expect(controller.cachedMenuCount, equals(2));
-    });
+        // Assert
+        expect(withHistory.recentMenuCount, equals(1));
+      },
+    );
 
     test('clearCache delegates to the repository', () async {
       // Act
@@ -333,19 +347,22 @@ void main() {
       expect(stored.languageTag, 'he');
     });
 
-    test('clearCache refreshes cachedMenuCount to 0', () async {
+    test('clearCache refreshes recentMenuCount to 0', () async {
       // Arrange
       const ref = VenueRef(source: MenuSource.wolt, platformId: 'a');
       final fetched = await repository.load(ref) as MenuFetched;
       repository.seedCache(CachedMenu(menu: fetched.menu));
+      final history = FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)));
+      await history.recordVisit(ref);
+      controller = SettingsController(settings, repository, null, history);
       await controller.load();
-      expect(controller.cachedMenuCount, equals(1));
+      expect(controller.recentMenuCount, equals(1));
 
       // Act
       await controller.clearCache();
 
       // Assert
-      expect(controller.cachedMenuCount, equals(0));
+      expect(controller.recentMenuCount, equals(0));
     });
 
     test('setConsent toggles isBusy true then false', () async {
