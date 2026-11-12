@@ -328,8 +328,18 @@ const String savedRoutePath = '/saved';
 ///
 /// Matched by string against [MenuSource] names, never by ordinal, so
 /// reordering the enum cannot silently re-point a saved link.
+///
+/// Never throws (issue #461): a path that does not parse, or whose percent
+/// escapes are not valid UTF-8 (a website-menu link cut mid-character), is
+/// null like any other unknown path, so the app opens on Explore rather
+/// than failing to build its first route.
 VenueRef? venueRefFromPath(String path) {
-  final segments = Uri.parse(path).pathSegments;
+  final List<String> segments;
+  try {
+    segments = Uri.parse(path).pathSegments;
+  } on FormatException {
+    return null;
+  }
   if (segments.length != 3 || segments.first != 'venue') return null;
   final source = MenuSource.tryParse(segments[1]);
   if (source == null || segments[2].isEmpty) return null;
