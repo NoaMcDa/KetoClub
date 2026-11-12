@@ -489,3 +489,33 @@ class VenuesResponse(WireModel):
     the venues in Wolt's order (the client sorts nearest-first)."""
 
     venues: list[Venue]
+
+
+class PlaceSearchRequest(BaseModel):
+    """``POST /v1/places/search``: a typed street, ``{query, language?}``.
+
+    ``query`` is trimmed before its 2..120 bounds apply and travels in the
+    body, so no access-log line carries it. ``language`` picks the names
+    Photon answers in: ``he`` (the default) asks for the local names.
+    """
+
+    query: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=2, max_length=120)
+    ]
+    language: Literal["he", "en"] = "he"
+
+
+class PlaceResponse(BaseModel):
+    """One geocoded street or address."""
+
+    label: str
+    city: str | None
+    latitude: float
+    longitude: float
+
+
+class PlacesResponse(BaseModel):
+    """A successful ``POST /v1/places/search``: at most six places, in
+    Photon's order; an empty list means no match."""
+
+    places: list[PlaceResponse]

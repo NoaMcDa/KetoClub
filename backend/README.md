@@ -38,10 +38,11 @@ Routes shipped so far:
 | `POST /v1/website-menu` | #334 | **yes** | **yes** (`WEBSITE_*` for each fetch, `ANALYSIS_RATE_LIMIT_*` for a Gemini call) | A restaurant's site fetched, read and analysed (D19, D25), see below |
 | `GET /v1/venues/nearby` | #335 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`, shared with the discovery proxies) | Wolt venues near a point, mapped to `Venue` JSON (D25), see below |
 | `POST /v1/venues/search` | #335 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | Wolt venues by name, mapped to `Venue` JSON (D25), see below |
+| `POST /v1/places/search` | #449 | **yes** (rate limiting only) | **yes** (`PLACE_SEARCH_RATE_LIMIT_PER_MINUTE`) | A typed street geocoded through Photon into at most six places; nothing stored, see below |
 
 Menu proxies are one fetch per user action and have no per-install
 identity; `/v1/chat`, the two discovery routes, the website route,
-`POST /v1/menus` and all seven D25 routes require
+`POST /v1/menus`, all seven D25 routes and the street search require
 `X-KetoClub-Install-Id` and enforce a per-install limit. A missing or
 malformed install id is answered `400 {"reason":"badResponse"}` — a
 client that misses the header sees the same shape as a bad prompt.
@@ -495,6 +496,50 @@ Errors: 429 `rateLimited`, 502 `offline`, 504 `timeout`, and 502
 that is not JSON or a page the mapper cannot read. The install id and the
 position are used for limiting and the cache key only.
 
+## Street search (#449)
+
+`POST /v1/places/search` turns a typed street into coordinates for
+Discovery's custom location. The geocoder is [Photon](https://photon.komoot.io)
+(OpenStreetMap data, no key), called by this server so the provider sees the
+backend rather than the user's device. The query travels in the body, so no
+access-log line carries it.
+
+- Body: `{"query": "<text>", "language": "he" | "en"}`. `query` is trimmed and
+  must be 2 to 120 characters; `language` is optional (default `he`). Anything
+  else is FastAPI's ordinary 422, before any upstream call.
+- Upstream: `GET {GEOCODER_BASE_URL}/api/?q=&limit=15&lang=&bbox=34.2,29.4,35.9,33.4&layer=house&layer=street`,
+  `lang=en` for `en` and `lang=default` (local, mostly Hebrew, names) for
+  `he`, since Photon refuses `lang=he`. Only `Accept` and
+  `GEOCODER_USER_AGENT` are sent; nothing of the inbound request is forwarded.
+  10 s timeout.
+- 200: `{"places": [{"label", "city", "latitude", "longitude"}]}`, at most 6,
+  in Photon's order; an empty list means no match. A feature is kept only
+  when its `countrycode` is `IL`, its `type` is `house` or `street` and its
+  coordinates are two finite numbers. The street is `street` for a house
+  (`name` for a street), the city `city` else `district` else null, and the
+  label `"<street> <housenumber>, <city>"` without the parts that are
+  missing. Labels are deduplicated exactly, keeping the first. The Flutter
+  app's direct fallback applies the same rules.
+- Errors: 429 `rateLimited` (`PLACE_SEARCH_RATE_LIMIT_PER_MINUTE` per install
+  id, default 20, no daily cap); 502 `offline` (Photon unreachable); 502
+  `providerChanged` (a non-2xx status or a body that is not GeoJSON with a
+  `features` list); 504 `timeout`; 400 `badResponse` for a missing or
+  malformed install id or any `Authorization` header.
+- Stored: nothing. No table, no cache, so every search is one upstream
+  request. The install id keys the in-memory limiter only.
+- Logged: one `places outcome=... features=N places=M` line and the usual
+  request line (path and status). The query, the labels and the coordinates
+  never reach a log record; httpx's own request line for the geocoder host has
+  its query string removed.
+- `PLACE_SEARCH_ENABLED=false` unmounts the route (404). Photon's public
+  instance asks callers to keep request volumes reasonable and may throttle
+  or ban heavy users, with no availability guarantee; a public KetoClub host
+  (#109) should revisit the provider or run its own Photon.
+
+```bash
+curl -sS localhost:8000/v1/places/search   -H 'Content-Type: application/json'   -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef'   -d '{"query": "Dizengoff 50 Tel Aviv", "language": "en"}'
+```
+
 ## Keeping the port honest (D25)
 
 `app/keto`, `app/platforms` and `app/website` are Python ports of Dart code;
@@ -627,6 +672,10 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `ANALYSIS_RATE_LIMIT_PER_MINUTE`, `ANALYSIS_RATE_LIMIT_PER_DAY` | `10`, `60` | Per install id, the D25 analysis bucket: spent only just before a Gemini call (#333); every `/v1/scan` spends it |
 | `ANALYSIS_CACHE_TTL_SECONDS` | `604800` | The D25 analysis cache's TTL (7 days, #333) |
 | `CLASSIFY_MAX_BODY_BYTES` | `786432` | Largest `POST /v1/classify` body (768 KiB); over it → 413 `payloadTooLarge` |
+| `PLACE_SEARCH_ENABLED` | `true` | `false` → `POST /v1/places/search` is not mounted and answers 404 (#449) |
+| `GEOCODER_BASE_URL` | `https://photon.komoot.io` | Photon host for the street search; never taken from a request |
+| `GEOCODER_USER_AGENT` | `KetoClub/1.0 (+https://github.com/NoaMcDa/KetoClub; place search)` | Sent on every geocoder request |
+| `PLACE_SEARCH_RATE_LIMIT_PER_MINUTE` | `20` | Street searches per install id in any 60 s; no daily cap |
 | `WEBSITE_USER_AGENT` | `KetoClubBot/1.0 (+https://github.com/NoaMcDa/KetoClub; menu reader)` | Sent on every website fetch; names the fetcher and a contact URL (D19) |
 | `WEBSITE_MAX_HTML_BYTES`, `WEBSITE_MAX_PDF_BYTES` | `2097152`, `3145728` | Size caps for a fetched page and PDF; the PDF cap matches `VISION_MAX_IMAGE_BYTES` |
 | `WEBSITE_MAX_ROBOTS_BYTES`, `WEBSITE_ROBOTS_TTL_SECONDS` | `524288`, `3600` | How much of `robots.txt` is read, and how long it is cached per host |

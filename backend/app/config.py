@@ -104,6 +104,25 @@ class Settings(BaseSettings):
     # Fetches per install in any 60 s, so the route is no open proxy.
     WEBSITE_RATE_LIMIT_PER_MINUTE: int = 10
 
+    # --- Place search (#449) --------------------------------------------------
+    # POST /v1/places/search turns a typed street into coordinates through
+    # Photon (OpenStreetMap data, no key). When false the router is not
+    # mounted at all, so the route answers 404 like any unknown path.
+    PLACE_SEARCH_ENABLED: bool = True
+    # Photon host. Never taken from a request, for the same reason as
+    # WOLT_BASE_URL.
+    GEOCODER_BASE_URL: str = "https://photon.komoot.io"
+    # The User-Agent every geocoder request sends: it names the caller and a
+    # contact URL, so Photon's operators can see who is calling. Their public
+    # instance asks only that request volumes stay reasonable; it names no
+    # User-Agent rule.
+    GEOCODER_USER_AGENT: str = (
+        "KetoClub/1.0 (+https://github.com/NoaMcDa/KetoClub; place search)"
+    )
+    # Per-install-ID, minute-window-only limit on POST /v1/places/search; no
+    # daily cap, the discovery limiter's pattern.
+    PLACE_SEARCH_RATE_LIMIT_PER_MINUTE: int = 20
+
     # --- Menu store (#310) -----------------------------------------------------
     # POST /v1/menus and GET /v1/menus/{source}/{platform_id}: an anonymous
     # shared store of opened menus, keyed by venue and never by install id.

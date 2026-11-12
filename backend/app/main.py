@@ -30,6 +30,7 @@ from app.routers import (
     discovery,
     health,
     menus,
+    places,
     proxy,
     scan,
     text_menu,
@@ -38,6 +39,7 @@ from app.routers import (
     website,
     website_menu,
 )
+from app.services.places import redact_geocoder_queries
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
 
@@ -122,6 +124,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         per_minute=resolved_settings.WEBSITE_RATE_LIMIT_PER_MINUTE,
         per_day=_DISCOVERY_NO_DAILY_CAP,
     )
+    # The place search's own bucket (#449), minute window only like the
+    # discovery limiter's: it protects the public Photon instance's fair use.
+    app.state.place_search_rate_limiter = RateLimiter(
+        per_minute=resolved_settings.PLACE_SEARCH_RATE_LIMIT_PER_MINUTE,
+        per_day=_DISCOVERY_NO_DAILY_CAP,
+    )
+    # Photon's URL carries the typed street; httpx's request line must not.
+    redact_geocoder_queries(resolved_settings.GEOCODER_BASE_URL)
     app.state.robots_cache = {}
     app.state.website_clock = time.monotonic
     app.state.resolve_host = resolve_host_addresses
@@ -152,6 +162,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(text_menu.router, prefix="/v1")
     app.include_router(scan.router, prefix="/v1")
     app.include_router(website_menu.router, prefix="/v1")
+    # The place search (#449) is opt-out too: disabled, it is a plain 404.
+    if resolved_settings.PLACE_SEARCH_ENABLED:
+        app.include_router(places.router, prefix="/v1")
     # The menu store (#310) is opt-out: when disabled it is not mounted at
     # all, so its paths are an ordinary 404.
     if resolved_settings.MENU_STORE_ENABLED:
