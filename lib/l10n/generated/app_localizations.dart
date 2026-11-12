@@ -1166,6 +1166,12 @@ abstract class AppLocalizations {
   /// **'No city matches that. Try another spelling.'**
   String get locationPickerNoMatch;
 
+  /// In the location picker, when no bundled city matches and the street search action is offered right below (issue #489).
+  ///
+  /// In en, this message translates to:
+  /// **'No city by that name. Search the streets instead:'**
+  String get locationPickerNoCityTryStreets;
+
   /// No description provided for @locationPickerStreetSearch.
   ///
   /// In en, this message translates to:

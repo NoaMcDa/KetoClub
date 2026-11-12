@@ -290,6 +290,10 @@
   "locationPickerUseDevice": "Use my current location",
   "locationPickerSearchLabel": "Search for a city or a street",
   "locationPickerNoMatch": "No city matches that. Try another spelling.",
+  "locationPickerNoCityTryStreets": "No city by that name. Search the streets instead:",
+  "@locationPickerNoCityTryStreets": {
+    "description": "In the location picker, when no bundled city matches and the street search action is offered right below (issue #489)."
+  },
   "locationPickerStreetSearch": "Search streets for “{query}”",
   "@locationPickerStreetSearch": {
     "placeholders": { "query": { "type": "String" } }

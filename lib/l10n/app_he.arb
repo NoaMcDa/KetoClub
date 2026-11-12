@@ -283,6 +283,7 @@
   "locationPickerUseDevice": "השתמש במיקום הנוכחי שלי",
   "locationPickerSearchLabel": "חיפוש עיר או רחוב",
   "locationPickerNoMatch": "לא נמצאה עיר מתאימה. נסו איות אחר.",
+  "locationPickerNoCityTryStreets": "אין עיר בשם הזה. אפשר לחפש ברחובות:",
   "locationPickerStreetSearch": "חיפוש רחובות עבור \"{query}\"",
   "locationPickerStreetCaptionBackend": "מה שהקלדתם יישלח לשרת של קטוקלאב ול‑Photon, שירות חיפוש של OpenStreetMap.",
   "locationPickerStreetCaptionDirect": "מה שהקלדתם יישלח ל‑Photon, שירות חיפוש של OpenStreetMap.",

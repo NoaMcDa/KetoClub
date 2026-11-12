@@ -679,6 +679,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'No city matches that. Try another spelling.';
 
   @override
+  String get locationPickerNoCityTryStreets =>
+      'No city by that name. Search the streets instead:';
+
+  @override
   String locationPickerStreetSearch(String query) {
     return 'Search streets for “$query”';
   }

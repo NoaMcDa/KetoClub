@@ -684,6 +684,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get locationPickerNoMatch => 'לא נמצאה עיר מתאימה. נסו איות אחר.';
 
   @override
+  String get locationPickerNoCityTryStreets =>
+      'אין עיר בשם הזה. אפשר לחפש ברחובות:';
+
+  @override
   String locationPickerStreetSearch(String query) {
     return 'חיפוש רחובות עבור \"$query\"';
   }

@@ -214,8 +214,13 @@ class _LocationPickerSheetState extends State<LocationPickerSheet> {
                           20,
                           16,
                         ),
+                        // With the street action below, the text is most
+                        // likely a street, not a misspelt city: point at
+                        // the action rather than at the spelling (#489).
                         child: Text(
-                          l10n.locationPickerNoMatch,
+                          _offersStreets
+                              ? l10n.locationPickerNoCityTryStreets
+                              : l10n.locationPickerNoMatch,
                           style: theme.textTheme.bodyMedium,
                         ),
                       ),
