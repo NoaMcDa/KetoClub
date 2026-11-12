@@ -52,6 +52,12 @@ void main() {
 
         // Act: "Type a name instead" focuses the field, then type a name
         // and wait out the search debounce.
+        // The action sits in a scroll view and is below the fold on a short
+        // view (flutter-tester's 800x600, a phone), so scroll to it first.
+        await tester.ensureVisible(
+          find.text(_en.discoveryTypeNameInstead, skipOffstage: false),
+        );
+        await tester.pumpAndSettle();
         await tapAndSettle(tester, find.text(_en.discoveryTypeNameInstead));
         final field = tester.widget<TextField>(find.byType(TextField));
         expect(field.focusNode?.hasFocus, isTrue);

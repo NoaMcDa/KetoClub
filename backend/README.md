@@ -739,8 +739,9 @@ type only, since a message can quote request content.
 ## Configuration
 
 Copy `.env.example` to `.env` and fill in values; every variable has a safe
-default except `GEMINI_API_KEY` and `ADMIN_TOKEN`, which gate the routes
-that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
+default except `GEMINI_API_KEY`, which gates the routes that need it
+(`/v1/chat` and the analysis routes). `ADMIN_TOKEN` is reserved for a future
+`/v1/admin/*` router that does not exist yet. See
 `.env.example` for the full list with defaults and descriptions.
 
 | Variable | Default | Meaning |

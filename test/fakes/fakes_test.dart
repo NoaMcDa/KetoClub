@@ -367,46 +367,57 @@ void main() {
       expect(AppSettings.tryFrom(settings.toJson()), equals(settings));
     });
 
-    test('tryFrom returns null when filter is missing', () {
-      expect(AppSettings.tryFrom(const <String, Object?>{}), isNull);
+    test('tryFrom reads an empty record as the defaults', () {
+      expect(
+        AppSettings.tryFrom(const <String, Object?>{}),
+        equals(const AppSettings()),
+      );
     });
 
-    test('tryFrom returns null when filter is an unknown name', () {
-      final json = <String, Object?>{
+    test('tryFrom keeps every other field when filter is an unknown name '
+        '(issue #281)', () {
+      final result = AppSettings.tryFrom(<String, Object?>{
+        'languageTag': 'he',
         'filter': 'greenOnlyish',
         'estimationConsentGiven': false,
-      };
+      });
 
-      expect(AppSettings.tryFrom(json), isNull);
+      expect(result!.filter, equals(MenuFilter.all));
+      expect(result.languageTag, 'he');
+      expect(result.estimationConsentGiven, isFalse);
     });
 
-    test('tryFrom returns null when consent is not a bool', () {
-      final json = <String, Object?>{
-        'filter': 'all',
+    test('tryFrom fails consent closed when it is not a bool (issue #281)', () {
+      final result = AppSettings.tryFrom(<String, Object?>{
+        'filter': 'redOnly',
         'estimationConsentGiven': 'yes',
-      };
+      });
 
-      expect(AppSettings.tryFrom(json), isNull);
+      expect(result!.estimationConsentGiven, isFalse);
+      expect(result.filter, equals(MenuFilter.redOnly));
     });
 
-    test('tryFrom returns null when languageTag is not a String', () {
-      final json = <String, Object?>{
+    test('tryFrom reads a non-string languageTag as follow-the-device', () {
+      final result = AppSettings.tryFrom(<String, Object?>{
         'languageTag': 7,
-        'filter': 'all',
+        'filter': 'redOnly',
         'estimationConsentGiven': false,
-      };
+      });
 
-      expect(AppSettings.tryFrom(json), isNull);
+      expect(result!.languageTag, isNull);
+      expect(result.filter, equals(MenuFilter.redOnly));
+      expect(result.estimationConsentGiven, isFalse);
     });
 
-    test('tryFrom returns null when lastVenue is malformed', () {
-      final json = <String, Object?>{
-        'filter': 'all',
+    test('tryFrom reads a malformed lastVenue as none and keeps the rest', () {
+      final result = AppSettings.tryFrom(<String, Object?>{
+        'filter': 'redOnly',
         'estimationConsentGiven': false,
         'lastVenue': <String, Object?>{'source': 'doordash'},
-      };
+      });
 
-      expect(AppSettings.tryFrom(json), isNull);
+      expect(result!.lastVenue, isNull);
+      expect(result.filter, equals(MenuFilter.redOnly));
     });
 
     test('copyWith with no arguments returns an equal copy', () {
