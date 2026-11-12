@@ -70,12 +70,20 @@ void main() {
       // Act: look around the device first.
       await tapAndSettle(tester, find.byTooltip(_en.discoveryUseLocation));
 
-      // Assert
+      // Assert: the list is a sliver (#446), brought into view first.
+      await showVenueList(tester);
       expect(find.text(aroundDevice.name), findsOneWidget);
       expect(fakes.venueSearchService.nearbyCalls, hasLength(1));
 
-      // Act: open the picker and type a street.
-      await tapAndSettle(tester, find.byTooltip(_en.discoveryChooseLocation));
+      // Act: open the picker and type a street. Found off screen too: the
+      // header may have scrolled out once the list was brought into view.
+      final chooseLocation = find.byTooltip(
+        _en.discoveryChooseLocation,
+        skipOffstage: false,
+      );
+      await tester.ensureVisible(chooseLocation);
+      await tester.pumpAndSettle();
+      await tapAndSettle(tester, chooseLocation);
       await tester.enterText(_pickerField(), 'Herzl 10');
       await tester.pumpAndSettle();
 
@@ -112,6 +120,7 @@ void main() {
       expect(call.longitude, _herzl.longitude);
       expect(fakes.venueSearchService.nearbyCalls, hasLength(2));
       expect(find.text(_herzl.label), findsOneWidget);
+      await showVenueList(tester);
       expect(find.text(nearHerzl.name), findsOneWidget);
       expect(find.text(aroundDevice.name), findsNothing);
       expect(find.byType(VenueCard), findsOneWidget);
