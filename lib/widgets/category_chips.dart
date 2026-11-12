@@ -48,6 +48,10 @@ class CategoryChips extends StatelessWidget {
         Semantics(
           button: true,
           label: l10n.categoryChipSemanticLabel(category),
+          // excludeSemantics drops the chip's own tap action, so the node
+          // carries it (issue #285): otherwise a screen reader announces a
+          // button that a double-tap cannot press.
+          onTap: () => onSelected(category),
           excludeSemantics: true,
           child: FocusRing(
             borderRadius: BorderRadius.circular(8),

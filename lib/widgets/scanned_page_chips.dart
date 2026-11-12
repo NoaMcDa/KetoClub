@@ -46,7 +46,12 @@ class ScannedPageChips extends StatelessWidget {
     if (pageCount < 2 && !hasUnknown) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
     Widget chip(String label, int? value) => Semantics(
+      button: true,
+      selected: selected == value,
       label: l10n.scannedPageChipSemanticLabel(label),
+      // The chip's own tap is excluded with its children, so the node
+      // carries it (issue #285).
+      onTap: () => onSelected(value),
       excludeSemantics: true,
       child: FocusRing(
         borderRadius: BorderRadius.circular(8),
