@@ -16,6 +16,7 @@ dietary-constraints preamble. Nothing here restates them.
 Pure: no framework, no I/O beyond the cached vocabulary read.
 """
 
+import re
 from typing import Any, Final
 
 from app.keto.models import AnalysisOptionsSnapshot, Menu
@@ -111,12 +112,24 @@ def vision_user_prompt(page_count: int) -> str:
     return f"Menu: {page_count} pages, attached in reading order."
 
 
+_LINE_BREAK_OR_BAR: Final = re.compile(
+    r"[ \t]*[\r\n\u000B\u000C\u0085\u2028\u2029|]+[ \t]*"
+)
+"""Dart ``_lineBreakOrBar``: a run of line breaks and ``|`` with the spaces
+and tabs around it, one space inside a field (#279)."""
+
+
+def _one_line(text: str) -> str:
+    """Dart ``_oneLine``."""
+    return _LINE_BREAK_OR_BAR.sub(" ", text)
+
+
 def user_prompt(menu: Menu) -> str:
     """``MenuAnalysisPrompt.userPrompt``: one line per dish, in menu order,
     ``id | category | name | description | options``, joined by ``\\n``.
 
     Prices are omitted. Each option group is ``label: value, value``; groups
-    are joined by ``; ``.
+    are joined by ``; ``. Every field is :func:`_one_line` (#279).
     """
     lines: list[str] = []
     for category in menu.categories:
@@ -126,7 +139,14 @@ def user_prompt(menu: Menu) -> str:
             )
             lines.append(
                 " | ".join(
-                    [dish.id, category.name, dish.name, dish.description, options]
+                    _one_line(field)
+                    for field in (
+                        dish.id,
+                        category.name,
+                        dish.name,
+                        dish.description,
+                        options,
+                    )
                 )
             )
     return "\n".join(lines)
