@@ -8,7 +8,7 @@ now that Phase 2's run (10bis, location and nearby search, the Discovery
 screen, platform setup, and a run of features beyond those) has landed on top
 of both, again for Phase 4's menu-scanning core (paste, photographs, PDF),
 and once more for Phase 8 (the UI/UX review's 44 issues, #221–#264, built in
-parallel on the `phase-8` branch and opened as PR #266), and for the menu
+parallel on the `phase-8` branch, merged as PR #266), and for the menu
 history and the shared menu store that followed it (#305, #306; D23, D24), and
 for D25, the backend serving complete results to every platform (#318, #319,
 #320–#335, branch `claude/d25-wave-4`).

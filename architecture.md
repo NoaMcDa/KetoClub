@@ -1877,11 +1877,14 @@ should not reach a log or a widget, even with no bearer token left to leak.
     fallback for working **without** a backend, not the recommended path; never
     ship with that flag either way.
 - Geolocation requires HTTPS.
-- Secure storage on web is `localStorage`-backed; say so in Settings.
+- The web build has no key store (D17): the Gemini key lives in the backend's
+  environment, and Settings shows no key section on web.
 
 ### iOS
 
-- `NSLocationWhenInUseUsageDescription` in `Info.plist`.
+- `NSLocationWhenInUseUsageDescription`, `NSCameraUsageDescription` and
+  `NSPhotoLibraryUsageDescription` in `Info.plist` (location, the Scan tab's
+  camera and QR reader, and the photo picker).
 - App Transport Security: all endpoints are HTTPS; no exceptions needed.
 
 ### Android
@@ -2043,7 +2046,7 @@ removed.** *(Supersedes D3; closes §17 open question 1 as originally posed —
 Android by D17**, which puts a user-supplied key back on phones; D12 still
 describes the web build exactly.)* The backend holds a
 Gemini key server-side (`GEMINI_API_KEY`, model `GEMINI_MODEL`, default
-`gemini-2.5-flash`) and the app never holds a model key at all:
+`gemini-2.5-flash` at the time; now `gemini-3.5-flash`, see §17.1) and the app never holds a model key at all:
 `flutter_secure_storage` and `KeyStore` are gone, and so is the Settings key
 section. `BackendChatClient` posts `{system_prompt, user_prompt,
 response_schema, schema_name}` to `/v1/chat` with an `X-KetoClub-Install-Id`
