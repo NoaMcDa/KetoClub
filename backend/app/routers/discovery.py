@@ -255,7 +255,9 @@ async def fetch_discovery(
         return DiscoveryFailure(reason="offline", status_code=502)
 
     content_type = upstream.headers.get("content-type", "application/json")
-    if 200 <= upstream.status_code < 300:
+    # An empty 2xx body is never cached (#272), as the menu proxy does not
+    # cache one: it would pin an empty venue list for the whole TTL.
+    if 200 <= upstream.status_code < 300 and upstream.content:
         await run_in_threadpool(
             write_cached_menu,
             engine,

@@ -87,6 +87,7 @@ class RobotsRules:
         """
         if not path:
             path = "/"
+        path = normalise_escapes(path)
         if path == "/robots.txt":
             return True
         best: _Rule | None = None
@@ -134,13 +135,45 @@ def parse_robots(text: str) -> RobotsRules:
         in_rules = True
         if not value:
             continue  # An empty Disallow allows everything: no rule.
-        rule = _Rule(allow=key == "allow", pattern=value)
+        rule = _Rule(allow=key == "allow", pattern=normalise_escapes(value))
         if names_ours:
             ours.append(rule)
         elif "*" in agents:
             anyone.append(rule)
 
     return RobotsRules(rules=ours if found_ours else anyone)
+
+
+_ESCAPE: Final = re.compile(r"%([0-9A-Fa-f]{2})")
+_UNRESERVED: Final = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"
+)
+
+
+def normalise_escapes(text: str) -> str:
+    """``text`` with its percent-escapes in one form, for robots matching.
+
+    RFC 9309 §2.2.2 compares paths and rules after percent-encoding them
+    alike, so ``/%6denu`` is ``/menu`` and must not slip past
+    ``Disallow: /menu`` (#272). An escape of an unreserved character is
+    decoded, any other escape is upper-cased, and a non-ASCII character is
+    encoded as its UTF-8 escapes. One linear pass each.
+    """
+
+    def _escape(match: re.Match[str]) -> str:
+        char = chr(int(match.group(1), 16))
+        return char if char in _UNRESERVED else "%" + match.group(1).upper()
+
+    if not text.isascii():
+        text = "".join(
+            char
+            if char.isascii()
+            else "".join(
+                f"%{byte:02X}" for byte in char.encode("utf-8", "surrogatepass")
+            )
+            for char in text
+        )
+    return _ESCAPE.sub(_escape, text) if "%" in text else text
 
 
 def _matches(pattern: str, path: str) -> bool:

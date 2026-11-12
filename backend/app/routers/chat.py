@@ -37,6 +37,7 @@ from app.services.auth import reject_authorization
 from app.services.install_id import log_safe, require_install_id
 from app.services.rate_limit import RateLimiter
 from app.services.request_body import parse_body, read_capped_body
+from app.services.single_flight import KeyedLocks
 
 router = APIRouter()
 
@@ -123,7 +124,6 @@ async def chat(
     images skips the cache both ways (#170).
     """
     settings: Settings = request.app.state.settings
-    engine = request.app.state.engine
     raw = await read_capped_body(request, max_chat_body_bytes(settings))
     body = await run_in_threadpool(_parse, raw, settings)
     image_count = len(body.images)
@@ -133,20 +133,45 @@ async def chat(
     else:
         logger.info("chat install_id=%s", log_safe(install_id))
 
-    key = None if image_count else chat_cache.cache_key(settings.GEMINI_MODEL, body)
+    if image_count:
+        limiter: RateLimiter = request.app.state.rate_limiter
+        if not limiter.allow(install_id):
+            logger.info("chat install_id=%s rate limited", log_safe(install_id))
+            raise BackendError(429, "rateLimited")
+        result = await gemini.complete(request.app.state.http_client, settings, body)
+        logger.info("chat install_id=%s cache=bypass", log_safe(install_id))
+        response.headers["X-KetoClub-Cache"] = "bypass"
+        return result
 
-    if key is not None:
-        cached = await run_in_threadpool(
-            chat_cache.read_cached,
-            engine,
-            key,
-            settings.CHAT_CACHE_TTL_SECONDS,
-            datetime.now(UTC),
-        )
-        if cached is not None:
-            logger.info("chat install_id=%s cache=hit", log_safe(install_id))
-            response.headers["X-KetoClub-Cache"] = "hit"
-            return cached
+    key = chat_cache.cache_key(settings.GEMINI_MODEL, body)
+    # One Gemini call per key at a time (#272): a request that waited here
+    # finds the first one's answer in the cache below and spends nothing.
+    flights: KeyedLocks = request.app.state.chat_flights
+    async with flights.hold(key):
+        return await _complete_cached(request, response, install_id, body, key)
+
+
+async def _complete_cached(
+    request: Request,
+    response: Response,
+    install_id: str,
+    body: ChatRequest,
+    key: str,
+) -> ChatResponse:
+    """The cache read, rate limit, Gemini call and cache write for ``key``."""
+    settings: Settings = request.app.state.settings
+    engine = request.app.state.engine
+    cached = await run_in_threadpool(
+        chat_cache.read_cached,
+        engine,
+        key,
+        settings.CHAT_CACHE_TTL_SECONDS,
+        datetime.now(UTC),
+    )
+    if cached is not None:
+        logger.info("chat install_id=%s cache=hit", log_safe(install_id))
+        response.headers["X-KetoClub-Cache"] = "hit"
+        return cached
 
     limiter: RateLimiter = request.app.state.rate_limiter
     if not limiter.allow(install_id):
@@ -154,12 +179,6 @@ async def chat(
         raise BackendError(429, "rateLimited")
 
     result = await gemini.complete(request.app.state.http_client, settings, body)
-
-    if key is None:
-        logger.info("chat install_id=%s cache=bypass", log_safe(install_id))
-        response.headers["X-KetoClub-Cache"] = "bypass"
-        return result
-
     await run_in_threadpool(
         chat_cache.write_cached, engine, key, result, datetime.now(UTC)
     )

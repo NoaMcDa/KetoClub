@@ -111,7 +111,9 @@ async def complete(
     schema that is answered 400, for any reason other than an invalid key, is
     re-sent exactly once with ``responseMimeType`` only. 401, 403, 429 and 5xx
     are answers about the key, the quota or the provider and are never
-    re-sent; neither is a second 400.
+    re-sent; neither is a second 400, nor a request carrying images (#272):
+    a 400 there is most often about the pages, and re-sending them would
+    upload up to six pages to Google a second time.
     """
     if not settings.GEMINI_API_KEY:
         raise BackendError(503, "notConfigured")
@@ -136,6 +138,7 @@ async def complete(
     )
     if (
         schema is not None
+        and not request.images
         and response.status_code == 400
         and not _is_invalid_key(response)
     ):

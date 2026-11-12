@@ -8,16 +8,20 @@ environment variables, so tests never share state through the process-wide
 """
 
 import asyncio
+import logging
 import socket
 import time
 import uuid
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 
 import httpx
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import Engine
+from starlette.concurrency import run_in_threadpool
 
 from app import __version__
 from app.config import Settings, get_settings
@@ -45,9 +49,11 @@ from app.routers import (
     website,
     website_menu,
 )
+from app.services.cache_purge import PURGE_INTERVAL_SECONDS, purge_expired
 from app.services.places import redact_geocoder_queries
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
+from app.services.single_flight import KeyedLocks
 from app.services.trusted_host import AllowedHostsMiddleware
 from app.services.website_transport import shared_ssl_context, website_client
 
@@ -64,6 +70,16 @@ async def resolve_host_addresses(host: str) -> list[str]:
         host, None, type=socket.SOCK_STREAM
     )
     return [str(info[4][0]) for info in infos]
+
+
+async def _purge_periodically(engine: Engine, settings: Settings) -> None:
+    """Delete expired cache rows every ``PURGE_INTERVAL_SECONDS`` (#272)."""
+    while True:
+        await asyncio.sleep(PURGE_INTERVAL_SECONDS)
+        try:
+            await run_in_threadpool(purge_expired, engine, settings, datetime.now(UTC))
+        except Exception:  # noqa: BLE001 - housekeeping must never stop the app
+            logging.getLogger("ketoclub.cache").warning("cache purge failed")
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -91,9 +107,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             lambda host: app.state.resolve_host(host),
             app.state.website_network_backend,
         )
+        purge_expired(engine, resolved_settings, datetime.now(UTC))
+        purger = asyncio.create_task(_purge_periodically(engine, resolved_settings))
         try:
             yield
         finally:
+            purger.cancel()
             await app.state.website_http_client.aclose()
             await app.state.http_client.aclose()
             engine.dispose()
@@ -152,6 +171,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Photon's URL carries the typed street; httpx's request line must not.
     redact_geocoder_queries(resolved_settings.GEOCODER_BASE_URL)
     app.state.robots_cache = {}
+    # Concurrent identical /v1/chat cache misses share one call (#272).
+    app.state.chat_flights = KeyedLocks()
     app.state.website_clock = time.monotonic
     app.state.resolve_host = resolve_host_addresses
     # The network under the website client; None is the real one. Tests set

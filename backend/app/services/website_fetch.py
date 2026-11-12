@@ -257,8 +257,35 @@ async def _robots_for(request: Request, scheme: str, host: str) -> RobotsRules:
             rules = RobotsRules()
     finally:
         await response.aclose()
-    cache[key] = (clock(), rules)
+    _remember(
+        cache, key, (clock(), rules), clock(), settings.WEBSITE_ROBOTS_TTL_SECONDS
+    )
     return rules
+
+
+ROBOTS_CACHE_MAX_HOSTS = 1024
+"""How many hosts' robots rules are kept in memory at most (#272)."""
+
+
+def _remember(
+    cache: dict[str, tuple[float, RobotsRules]],
+    key: str,
+    entry: tuple[float, RobotsRules],
+    now: float,
+    ttl_seconds: float,
+) -> None:
+    """Store ``entry``, keeping the cache at ``ROBOTS_CACHE_MAX_HOSTS``.
+
+    When full, expired entries go first, then the oldest stored: a dict
+    keeps insertion order, and a re-stored host moves to the end.
+    """
+    cache.pop(key, None)
+    if len(cache) >= ROBOTS_CACHE_MAX_HOSTS:
+        for stale in [k for k, (at, _) in cache.items() if now - at >= ttl_seconds]:
+            del cache[stale]
+        while len(cache) >= ROBOTS_CACHE_MAX_HOSTS:
+            del cache[next(iter(cache))]
+    cache[key] = entry
 
 
 def _require_host_budget(request: Request, host: str) -> None:

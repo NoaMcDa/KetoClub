@@ -66,8 +66,9 @@ once without the schema, unless it is an invalid key.
 PDF for Gemini to read with its own vision (`architecture.md` D15). `data` is
 standard, padded base64; `mime_type` is one of `image/jpeg`, `image/png`,
 `image/webp` or `application/pdf`. Each part is forwarded to Gemini as an
-`inline_data` part after the user prompt's text part, in the order sent, and
-the schema retry re-sends them unchanged. Omitted or empty, the request is
+`inline_data` part after the user prompt's text part, in the order sent. A
+request with images is never re-sent without its schema after a 400 (#272):
+the pages would be uploaded twice. Omitted or empty, the request is
 exactly the text-only one it always was.
 
 - **Bounds**: at most `VISION_MAX_IMAGES` parts (default 6), each at most
@@ -195,6 +196,12 @@ router) goes much further this way.
   `{model, system_prompt, user_prompt, response_schema, schema_name}`,
   using the server's own `GEMINI_MODEL`. The key is stable across dict key
   order, including inside a nested `response_schema`.
+- **Single flight** (#272): concurrent identical misses wait on one lock
+  per key; the first calls Gemini, the rest are answered from the cache it
+  writes (`hit`) and spend no quota.
+- **Expiry** (#272): expired `chat_cache`, `menu_cache` and
+  `analysis_cache` rows are deleted at startup and hourly
+  (`app/services/cache_purge.py`).
 - **Lookup order**: the cache is checked first — before the Authorization
   rejection's sibling checks have any cost, before the rate limiter and
   before the "no key configured" check. A hit answers directly and spends
@@ -401,7 +408,9 @@ kept in step.
   which is not followed) means no rules; a 5xx or no answer means the site is
   not fetched at all. It is streamed and read only up to
   `WEBSITE_MAX_ROBOTS_BYTES` once inflated (#269); `*` wildcards are matched
-  without a regex, so no pattern can backtrack (#268).
+  without a regex, so no pattern can backtrack (#268). Rules and paths are
+  compared with their percent-escapes normalised (RFC 9309 §2.2.2, #272):
+  `/%6denu` is `/menu`. The cache keeps at most 1024 hosts (#272).
 - **AI opt-outs are honoured** as refusals, not warnings.
 - **Rate limits,** in memory: `WEBSITE_HOST_RATE_LIMIT_PER_MINUTE` fetches per
   site across every install (a paste costs at most two), and
