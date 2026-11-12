@@ -344,7 +344,7 @@ final class Menu {
   Map<String, Object?> toJson() => <String, Object?>{
     'venueRef': venueRef.toJson(),
     'currency': currency,
-    'fetchedAt': fetchedAt.toIso8601String(),
+    'fetchedAt': fetchedAt.toUtc().toIso8601String(),
     'categories': categories.map((category) => category.toJson()).toList(),
     'venueName': venueName,
   };

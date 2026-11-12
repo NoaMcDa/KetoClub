@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 echo "== uv sync"
-uv sync --frozen
+uv sync --locked
 
 echo "== ruff check"
 uv run ruff check .
