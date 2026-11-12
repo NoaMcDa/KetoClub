@@ -519,6 +519,26 @@ void main() {
       expect(search.byNameCalls, isNotEmpty);
     });
 
+    testWidgets('a name search with no location names the place it '
+        'searched around (issue #466)', (tester) async {
+      // Arrange
+      search.queueFound([_venue('sushi-bar')]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await tester.enterText(find.byType(TextField), 'sushi');
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump();
+
+      // Assert
+      expect(
+        find.text(
+          _l10n(tester).discoveryNameSearchAround(defaultSearchPlace.nameEn),
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('an empty field shows no invalid message', (tester) async {
       // Arrange
       await _pump(tester, controller: controller, pushedNames: pushedNames);

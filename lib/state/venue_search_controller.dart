@@ -298,6 +298,13 @@ final class VenueSearchController extends ChangeNotifier {
   /// [position] is the device's own, a [chosenStreet]'s, or there is none.
   KnownPlace? get chosenPlace => _place;
 
+  /// Where a search by name looks while there is no [position] (issue
+  /// #466): [defaultSearchPlace], since Wolt finds nothing for a query
+  /// without one. Null while there is a [position], which a name search
+  /// uses instead. The screen names it beside such a search's results.
+  KnownPlace? get nameSearchPlace =>
+      _position == null ? defaultSearchPlace : null;
+
   /// The street the user chose to look around (issue #449), or null when
   /// [position] is the device's own, a [chosenPlace]'s, or there is none.
   /// Never set together with [chosenPlace].
@@ -827,13 +834,20 @@ final class VenueSearchController extends ChangeNotifier {
   }
 
   Future<void> _searchByName(String query, String language) {
-    final here = _position;
+    // Never without a position: Wolt answers an empty page to a search
+    // with no `lat`/`lon` (issue #466).
+    final here =
+        _position ??
+        (
+          latitude: defaultSearchPlace.latitude,
+          longitude: defaultSearchPlace.longitude,
+        );
     return _run(
       () => _search.byName(
         query,
         language: language,
-        latitude: here?.latitude,
-        longitude: here?.longitude,
+        latitude: here.latitude,
+        longitude: here.longitude,
       ),
       generation: ++_generation,
       isNearby: false,

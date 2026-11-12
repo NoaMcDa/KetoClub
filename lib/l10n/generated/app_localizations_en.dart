@@ -628,6 +628,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryLookingAround => 'Looking around';
 
   @override
+  String discoveryNameSearchAround(String place) {
+    return 'Searching around $place. Choose a location to search somewhere else.';
+  }
+
+  @override
   String get discoveryAroundYou => 'Your location';
 
   @override

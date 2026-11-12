@@ -265,6 +265,7 @@
   "discoveryEmptyBody": "השתמשו במיקום שלכם או בחרו עיר כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.",
   "discoveryDrinksGuideCard": "מזמינים משקה? מדריך בר וקפה",
   "discoveryLookingAround": "מחפשים סביב",
+  "discoveryNameSearchAround": "מחפשים סביב {place}. בחרו מיקום כדי לחפש במקום אחר.",
   "discoveryAroundYou": "המיקום שלך",
   "discoveryLocationInvite": "הקש כדי להשתמש במיקום שלך",
   "discoveryUseLocation": "השתמש במיקום שלי",

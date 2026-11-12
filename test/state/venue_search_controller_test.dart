@@ -594,6 +594,25 @@ void main() {
         expect(controller.results.single.name, 'sushi-bar');
       });
 
+      test('with no position, searches around the default place, never '
+          'without a position (issue #466)', () async {
+        // Arrange: location never read, no place chosen.
+        search.queueFound([_venue('sushi-bar')]);
+
+        // Act
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Assert
+        final call = search.byNameCalls.single;
+        expect(call.latitude, defaultSearchPlace.latitude);
+        expect(call.longitude, defaultSearchPlace.longitude);
+        expect(controller.nameSearchPlace, defaultSearchPlace);
+        // No distances are claimed from a place the user did not choose.
+        expect(controller.position, isNull);
+        expect(controller.distanceKmTo(controller.results.single), isNull);
+      });
+
       test('ranks by the located position once there is one', () async {
         // Arrange
         await controller.locate(language: 'en');

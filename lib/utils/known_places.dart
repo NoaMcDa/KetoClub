@@ -318,6 +318,14 @@ const List<KnownPlace> knownPlaces = <KnownPlace>[
   ),
 ];
 
+/// Where a search by name looks when there is no position at all (issue
+/// #466): no device fix and no city or street chosen. Wolt's search
+/// answers an empty page to a query without `lat`/`lon`, so a name search
+/// is always made around some point, and this is the one with the most
+/// venues. The backend's position-less search uses the same centre
+/// (`backend/app/routers/discovery.py`, `DEFAULT_SEARCH_LAT`/`_LON`).
+final KnownPlace defaultSearchPlace = knownPlaceById('tel-aviv')!;
+
 /// The place whose [KnownPlace.id] is [id], or null when there is none:
 /// an id saved by a version that offered a place this one does not.
 KnownPlace? knownPlaceById(String id) {

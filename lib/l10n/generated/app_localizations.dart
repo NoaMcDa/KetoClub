@@ -1076,6 +1076,12 @@ abstract class AppLocalizations {
   /// **'Looking around'**
   String get discoveryLookingAround;
 
+  /// Above the results of a search by name made with no location (issue #466): the city the search was made around.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching around {place}. Choose a location to search somewhere else.'**
+  String discoveryNameSearchAround(String place);
+
   /// No description provided for @discoveryAroundYou.
   ///
   /// In en, this message translates to:

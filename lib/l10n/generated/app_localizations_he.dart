@@ -634,6 +634,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryLookingAround => 'מחפשים סביב';
 
   @override
+  String discoveryNameSearchAround(String place) {
+    return 'מחפשים סביב $place. בחרו מיקום כדי לחפש במקום אחר.';
+  }
+
+  @override
   String get discoveryAroundYou => 'המיקום שלך';
 
   @override
