@@ -351,6 +351,171 @@ void main() {
       });
     });
 
+    group('price shapes (#282)', () {
+      final cases = <String, String>{
+        'סלט יווני 48 ש"ח': 'סלט יווני',
+        'סלט יווני 48 ש״ח': 'סלט יווני',
+        'סלט יווני 48 שקלים': 'סלט יווני',
+        'Tuna 67 shkalim': 'Tuna',
+        'Cod מחיר: 89': 'Cod',
+        '45 Pasta': 'Pasta',
+        '₪38 Omelette': 'Omelette',
+        'NIS 64 Burger': 'Burger',
+        'Steak (128)': 'Steak',
+        'Soup 32.-': 'Soup',
+        'Wings 48/56': 'Wings',
+        'Salad small 38 / large 52': 'Salad small / large',
+        'Greek salad ........ 48': 'Greek salad',
+        'Caesar salad | 52': 'Caesar salad',
+      };
+      for (final MapEntry(key: line, value: expected) in cases.entries) {
+        test('strips the price from "$line"', () {
+          // Act
+          final menu = _parse('$line\nSteak');
+
+          // Assert
+          expect(menu.allDishes.first.name, expected);
+        });
+      }
+
+      test('keeps a leading weight and a single leading digit', () {
+        // Act
+        final menu = _parse('300 גרם אנטריקוט 120\n200 g steak\n2 eggs');
+
+        // Assert
+        expect(_names(menu), ['300 גרם אנטריקוט', '200 g steak', '2 eggs']);
+      });
+    });
+
+    group('bullets (#282)', () {
+      test('a dashed list is one dish per line, without the dash', () {
+        // Act
+        final menu = _parse(
+          '- Caesar salad 48\n- Greek salad 42\n- Steak frites 98',
+        );
+
+        // Assert
+        expect(_names(menu), ['Caesar salad', 'Greek salad', 'Steak frites']);
+        expect(menu.allDishes.first.description, isEmpty);
+      });
+
+      test('symbol and numbered bullets are removed', () {
+        // Act
+        final menu = _parse(
+          '\u{1F538} סלט יווני 48\n▪\u{FE0F} Burger 64\n• Soup\n'
+          '1. Caesar salad 48\n2) Pasta 52',
+        );
+
+        // Assert
+        expect(_names(menu), [
+          'סלט יווני',
+          'Burger',
+          'Soup',
+          'Caesar salad',
+          'Pasta',
+        ]);
+      });
+
+      test('an all-lowercase list is one dish per line', () {
+        // Act
+        final menu = _parse('caesar salad\ngreek salad\nsteak');
+
+        // Assert
+        expect(_names(menu), ['caesar salad', 'greek salad', 'steak']);
+      });
+    });
+
+    group('priced pastes (#479)', () {
+      test('a price-less line under a priced dish is its description', () {
+        // Act
+        final menu = _parse(
+          'סלט יווני 48\nעגבניות, מלפפון, בצל ופטה\n\nהמבורגר 68\n'
+          'לחמניית בריוש, צ׳יפס בצד\n\nפסטה ברוטב עגבניות 52\n'
+          'פנה, רוטב עגבניות, בזיליקום',
+        );
+
+        // Assert
+        expect(_names(menu), ['סלט יווני', 'המבורגר', 'פסטה ברוטב עגבניות']);
+        expect(
+          menu.allDishes.elementAt(1).description,
+          'לחמניית בריוש, צ׳יפס בצד',
+        );
+      });
+
+      test('a capitalised English description joins its dish', () {
+        // Act
+        final menu = _parse(
+          'Burger 64\nWith brioche bun and fries\nSteak 98\nSalad 42',
+        );
+
+        // Assert
+        expect(_names(menu), ['Burger', 'Steak', 'Salad']);
+        expect(menu.allDishes.first.description, 'With brioche bun and fries');
+      });
+
+      test('a price-less short line before priced dishes is a header', () {
+        // Act
+        final menu = _parse(
+          'ראשונות\nחומוס 32\nמרק 28\n\nמנות עיקריות\nסטייק 120\nשניצל 68',
+        );
+
+        // Assert
+        expect(
+          [for (final c in menu.categories) c.name],
+          ['ראשונות', 'מנות עיקריות'],
+        );
+        expect(_names(menu), ['חומוס', 'מרק', 'סטייק', 'שניצל']);
+      });
+
+      test('an all-capitals line after a dish is a header', () {
+        // Act
+        final menu = _parse(
+          'STARTERS\nHummus 32\nSoup 28\nMAINS\nSteak 120\nSchnitzel 68',
+        );
+
+        // Assert
+        expect(
+          [for (final c in menu.categories) c.name],
+          ['STARTERS', 'MAINS'],
+        );
+        expect(_names(menu), ['Hummus', 'Soup', 'Steak', 'Schnitzel']);
+      });
+
+      test('a paste without prices keeps one dish per line', () {
+        // Act
+        final menu = _parse('Burger\nWith brioche bun and fries\nSteak');
+
+        // Assert
+        expect(_names(menu), ['Burger', 'With brioche bun and fries', 'Steak']);
+      });
+    });
+
+    group('WhatsApp copies (#479)', () {
+      test('a bold or italic line is a header, without its markers', () {
+        // Act
+        final menu = _parse(
+          '*סלטים*\nסלט יווני 48\nסלט קיסר 52\n_עיקריות_\nסטייק 120\n'
+          '*Burger* 64',
+        );
+
+        // Assert
+        expect([for (final c in menu.categories) c.name], ['סלטים', 'עיקריות']);
+        expect(_names(menu), ['סלט יווני', 'סלט קיסר', 'סטייק', 'Burger']);
+      });
+
+      test('the sender and time are removed from each line', () {
+        // Act
+        final menu = _parse(
+          '[12/11/2026, 14:02] Dana: Caesar salad 48\n'
+          '[12/11/2026, 14:03:09 PM] Dana: Steak 98\n'
+          '‎12.11.26, 14:04 - Dana Cohen: Soup 32',
+        );
+
+        // Assert
+        expect(_names(menu), ['Caesar salad', 'Steak', 'Soup']);
+      });
+    });
+
     test('reads a Hebrew menu the same way', () {
       // Act
       final menu = _parse(

@@ -1166,7 +1166,7 @@
               "description": "",
               "id": "p1",
               "imageUrl": null,
-              "name": "Steak 45.905",
+              "name": "Steak 45",
               "options": [],
               "page": null,
               "price": 0.0
@@ -1207,7 +1207,7 @@
       "fetchedAt": "2026-01-01T00:00:00.000Z",
       "venueName": null,
       "venueRef": {
-        "platformId": "fd4de434",
+        "platformId": "30d17e20",
         "source": "scan"
       }
     },
@@ -1508,7 +1508,7 @@
               "description": "",
               "id": "p1",
               "imageUrl": null,
-              "name": ": Tuna",
+              "name": "Tuna",
               "options": [],
               "page": null,
               "price": 0.0
@@ -1538,7 +1538,7 @@
               "description": "",
               "id": "p1",
               "imageUrl": null,
-              "name": "- Steak",
+              "name": "Steak",
               "options": [],
               "page": null,
               "price": 0.0
@@ -1586,7 +1586,7 @@
               "description": "",
               "id": "p2",
               "imageUrl": null,
-              "name": "​Salmon",
+              "name": "Salmon",
               "options": [],
               "page": null,
               "price": 0.0
@@ -1644,6 +1644,831 @@
       }
     },
     "text": "Steak\t\t45\nSalmon\t-\t45",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Caesar salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Greek salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Steak frites",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "9cb48b93",
+        "source": "scan"
+      }
+    },
+    "text": "- Caesar salad 48\n- Greek salad 42\n- Steak frites 98",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "caesar salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "greek salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "e2be3a30",
+        "source": "scan"
+      }
+    },
+    "text": "caesar salad\ngreek salad\nsteak",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "סלט יווני",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "סטייק",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "שניצל",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "פסטה",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "80583511",
+        "source": "scan"
+      }
+    },
+    "text": "סלט יווני 48 ש\"ח\nסטייק 98 ש״ח\nשניצל 52 שח\nפסטה 44 שקלים",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Pasta",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Omelette",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Burger",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p5",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p6",
+              "imageUrl": null,
+              "name": "Wings",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p7",
+              "imageUrl": null,
+              "name": "Salad small / large",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p8",
+              "imageUrl": null,
+              "name": "Greek salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p9",
+              "imageUrl": null,
+              "name": "Caesar salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p10",
+              "imageUrl": null,
+              "name": "Tuna",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p11",
+              "imageUrl": null,
+              "name": "Cod",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "6c045a15",
+        "source": "scan"
+      }
+    },
+    "text": "45 Pasta\n₪38 Omelette\nNIS 64 Burger\nSteak (128)\nSoup 32.-\nWings 48/56\nSalad small 38 / large 52\nGreek salad ........ 48\nCaesar salad | 52\nTuna 67 shkalim\nCod מחיר: 89",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "סלט יווני",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Burger",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "Caesar salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p5",
+              "imageUrl": null,
+              "name": "Pasta",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "04c8be21",
+        "source": "scan"
+      }
+    },
+    "text": "🔸 סלט יווני 48\n▪️ Burger 64\n• Soup 30\n1. Caesar salad 48\n2) Pasta 52",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "300 גרם אנטריקוט",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "200 g steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "2 eggs omelette",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "c551a2c3",
+        "source": "scan"
+      }
+    },
+    "text": "300 גרם אנטריקוט 120\n200 g steak\n2 eggs omelette",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "עגבניות, מלפפון, בצל ופטה",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "סלט יווני",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "לחמניית בריוש, צ׳יפס בצד",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "המבורגר",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "פנה, רוטב עגבניות, בזיליקום",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "פסטה ברוטב עגבניות",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "437858d6",
+        "source": "scan"
+      }
+    },
+    "text": "סלט יווני 48\nעגבניות, מלפפון, בצל ופטה\n\nהמבורגר 68\nלחמניית בריוש, צ׳יפס בצד\n\nפסטה ברוטב עגבניות 52\nפנה, רוטב עגבניות, בזיליקום",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "With brioche bun and fries",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Burger",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "77d7d932",
+        "source": "scan"
+      }
+    },
+    "text": "Burger 64\nWith brioche bun and fries\nSteak 98\nSalad 42",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "חומוס",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "מרק",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "ראשונות"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "סטייק",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "שניצל",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-2",
+          "name": "מנות עיקריות"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "aad0244a",
+        "source": "scan"
+      }
+    },
+    "text": "ראשונות\nחומוס 32\nמרק 28\n\nמנות עיקריות\nסטייק 120\nשניצל 68",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Hummus",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "STARTERS"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "Schnitzel",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-2",
+          "name": "MAINS"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "f900c1bf",
+        "source": "scan"
+      }
+    },
+    "text": "STARTERS\nHummus 32\nSoup 28\nMAINS\nSteak 120\nSchnitzel 68",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "סלט יווני",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "סלט קיסר",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "סלטים"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "סטייק",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "Burger",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-2",
+          "name": "עיקריות"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "012b4a7d",
+        "source": "scan"
+      }
+    },
+    "text": "*סלטים*\nסלט יווני 48\nסלט קיסר 52\n_עיקריות_\nסטייק 120\n*Burger* 64",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Caesar salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "ccd98724",
+        "source": "scan"
+      }
+    },
+    "text": "[12/11/2026, 14:02] Dana: Caesar salad 48\n[12/11/2026, 14:03:09 PM] Dana: Steak 98\n‎12.11.26, 14:04 - Dana Cohen: Soup 32",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "Market fish",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Hummus",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "a7039f61",
+        "source": "scan"
+      }
+    },
+    "text": "Hummus 32\nMarket fish\nSteak 120\nSoup 28",
+    "uncategorisedName": "Pasted menu"
+  },
+  {
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "Fries",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Burger",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "Drinks",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "Cola",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Pasted menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "7e19c275",
+        "source": "scan"
+      }
+    },
+    "text": "Burger 64\n- Fries 12\n• Soup\n1. Salad 40\nDrinks\nCola 12",
     "uncategorisedName": "Pasted menu"
   },
   {

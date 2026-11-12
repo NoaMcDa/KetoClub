@@ -2347,6 +2347,19 @@ fallback when a platform blocks the browser (§6, §13); this builds it.
   also followed by a blank line, and without this it would read as a header. A paste
   where every line is separated by a blank one switches the rule off, since every
   dish would otherwise be a header.
+- **Amended by #282 and #479 (2026-11).** Before the rules above, a line loses a
+  WhatsApp sender prefix, `*bold*`/`_italic_` markers (a wholly emphasised,
+  unpriced line is a header) and a leading bullet (dash, number or symbols). A
+  price may also lead the line (`45 Pasta`, `₪38 Omelette`), sit in parentheses,
+  after dot leaders or `|`, be a `48/56` pair, or carry `ש"ח`/`שקלים`/`shkalim`
+  (`priceCurrencySource`, shared with the website reader). Dashes under a dish
+  that was itself bulleted, and lowercase lines under a lowercase dish, are list
+  items, not descriptions. The price is now a signal: in a paste with at least
+  three priced lines and at least half as many as unpriced ones, an unpriced line
+  under a priced dish is its description (a short all-capitals Latin line is a
+  header), and an unpriced short line before a priced one is a header; a paste
+  without prices reads as before. The Python twin (`app/keto/text_menu.py`) and
+  the `text_menu` goldens move with it.
 - **The reference.** A paste's `VenueRef` is `scan/<hex of
   TextNormaliser.menuFingerprint(menu)>`, eight digits, so the same dishes pasted
   again are the same cache entry (the price does not enter the fingerprint) and
