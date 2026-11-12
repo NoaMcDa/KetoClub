@@ -59,6 +59,15 @@ if [[ "${1:-}" == "--verify" ]]; then
     diff <(echo "$all") <(echo "$dealt") >&2 || true
     exit 1
   fi
+  # An integration test that is not a top-level flows/*_flow_test.dart is
+  # driven by no shard (issue #459). The generated shard entries are exempt.
+  stray="$(find integration_test -name '*_test.dart' ! -name 'flow_shard_*_test.dart' |
+    LC_ALL=C sort | grep -vxE "$flows_dir/[^/]+_flow_test\.dart" || true)"
+  if [[ -n "$stray" ]]; then
+    echo "flow_shard.sh: no shard drives these; put each in $flows_dir/ named"          "*_flow_test.dart:" >&2
+    echo "$stray" >&2
+    exit 1
+  fi
   for ((s = 0; s < count; s++)); do
     if [[ -z "$(shard_files "$s" "$count")" ]]; then
       echo "flow_shard.sh: shard $s of $count is empty; use fewer shards" >&2

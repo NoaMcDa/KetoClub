@@ -274,9 +274,9 @@ class AppLocalizationsHe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count תפריטים שמורים · עובד גם ללא חיבור לאינטרנט',
-      two: 'שני תפריטים שמורים · עובד גם ללא חיבור לאינטרנט',
-      one: 'תפריט אחד שמור · עובד גם ללא חיבור לאינטרנט',
+      other: '$count תפריטים ברשימת האחרונים',
+      two: 'שני תפריטים ברשימת האחרונים',
+      one: 'תפריט אחד ברשימת האחרונים',
     );
     return '$_temp0';
   }

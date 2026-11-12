@@ -24,10 +24,9 @@ android {
         //
         // minSdk/targetSdk are Flutter's own defaults (flutter.minSdkVersion /
         // flutter.targetSdkVersion), not raised for any plugin here.
-        // `flutter_secure_storage` — the one dependency that used to force a
-        // higher floor — is gone (D12: the model key lives server-side, not
-        // on the device). Nothing else in pubspec.yaml needs a newer API
-        // level than Flutter's default floor.
+        // `flutter_secure_storage` is back since D17 (the user's Gemini key
+        // on a phone) and needs API 23 or higher; Flutter's default floor
+        // (flutter.minSdkVersion) is at least that, so nothing is raised here.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION

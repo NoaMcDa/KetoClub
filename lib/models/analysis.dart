@@ -668,7 +668,7 @@ final class MenuAnalysed extends MenuAnalysis {
       final LlmEngine llm => llm.toJson(),
       final RulesEngine rules => rules.toJson(),
     },
-    'analysedAt': analysedAt.toIso8601String(),
+    'analysedAt': analysedAt.toUtc().toIso8601String(),
     'options': options?.toJson(),
     'schemaVersion': schemaVersion,
   };
