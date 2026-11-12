@@ -218,6 +218,9 @@ final class VenueSearchController extends ChangeNotifier {
   Set<VenueRef> _nearbyAttempted = <VenueRef>{};
   Future<VenueSearchResult> Function()? _lastRequest;
   bool _lastRequestWasNearby = false;
+  // The nearby search for [_position], kept until its list arrives as
+  // [_nearbyResults]: what a search that overtook it repeats (issue #455).
+  Future<VenueSearchResult> Function()? _nearbyRequest;
   Timer? _debounceTimer;
   int _generation = 0;
   int _estimateRun = 0;
@@ -489,6 +492,7 @@ final class VenueSearchController extends ChangeNotifier {
         _place = null;
         _street = null;
         _position = (latitude: latitude, longitude: longitude);
+        _forgetNearby();
         // Also when no place is chosen in memory: one saved by an earlier
         // launch must not come back after the user asked for their own.
         final saving = _saveChoice();
@@ -503,8 +507,16 @@ final class VenueSearchController extends ChangeNotifier {
         );
         await saving;
       case LocationDenied() || LocationUnavailable():
-        _phase = DiscoveryPhase.idle;
-        _notify();
+        // A place search this locate overtook never brought its list
+        // (issue #455): ask for it again, so the list under the place's
+        // name is that place's own.
+        final pending = _pendingNearby;
+        if (pending != null) {
+          await _run(pending, generation: generation, isNearby: true);
+        } else {
+          _phase = DiscoveryPhase.idle;
+          _notify();
+        }
     }
     return result;
   }
@@ -527,6 +539,7 @@ final class VenueSearchController extends ChangeNotifier {
     _street = null;
     _position = (latitude: place.latitude, longitude: place.longitude);
     _locationOutcome = null;
+    _forgetNearby();
     final saving = _saveChoice(placeId: place.id);
     await _run(
       () => _search.nearby(
@@ -556,6 +569,7 @@ final class VenueSearchController extends ChangeNotifier {
     _street = street;
     _position = (latitude: street.latitude, longitude: street.longitude);
     _locationOutcome = null;
+    _forgetNearby();
     final saving = _saveChoice(street: street);
     await _run(
       () => _search.nearby(
@@ -838,6 +852,7 @@ final class VenueSearchController extends ChangeNotifier {
     _cancelEstimate();
     _lastRequest = request;
     _lastRequestWasNearby = isNearby;
+    if (isNearby) _nearbyRequest = request;
     _phase = DiscoveryPhase.searching;
     _failure = null;
     _notify();
@@ -983,9 +998,38 @@ final class VenueSearchController extends ChangeNotifier {
     return true;
   }
 
+  /// Drops the list around the previous [position] (issue #455): called
+  /// the moment [position] changes, so no later step — a cleared search,
+  /// a refused locate — can show that list under the new place's name.
+  /// The screen shows skeletons until the new place's own list arrives.
+  void _forgetNearby() {
+    _nearbyResults = null;
+    _nearbyNumbers = const <VenueRef, VenueCardNumbers>{};
+    _nearbyAttempted = <VenueRef>{};
+    _nearbyRequest = null;
+    _results = const <Venue>[];
+    _numbers = const <VenueRef, VenueCardNumbers>{};
+    _attempted = <VenueRef>{};
+    _hasSearched = false;
+  }
+
+  /// The nearby search for [position] when its list never arrived — a
+  /// newer search overtook it, or it failed — else null.
+  Future<VenueSearchResult> Function()? get _pendingNearby =>
+      _nearbyResults == null && _position != null ? _nearbyRequest : null;
+
   /// Puts the last nearby list back, or the untouched idle state when
   /// there is none, clearing any failure. Notifies listeners.
+  ///
+  /// When the nearby search for [position] was overtaken before it
+  /// answered (issue #455: a name typed while a chosen city was loading),
+  /// it is asked again rather than leaving the place with no list.
   void _showNearbyAgain() {
+    final pending = _pendingNearby;
+    if (pending != null) {
+      unawaited(_run(pending, generation: _generation, isNearby: true));
+      return;
+    }
     final nearby = _nearbyResults;
     _phase = DiscoveryPhase.idle;
     _failure = null;
