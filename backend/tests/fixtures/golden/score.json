@@ -6676,110 +6676,6 @@
         "dishes": [
           {
             "dishId": "dish-steak",
-            "hiddenCarbs": [
-              {
-                "certainty": "suspected",
-                "source": "glaze",
-                "waiterQuestion": "Is the glaze sugar-free?"
-              }
-            ],
-            "modification": "Is the glaze sugar-free?",
-            "name": "Grilled Steak",
-            "netCarbsEstimate": 9.0,
-            "verdict": "modifiable",
-            "why": "Plain grilled protein."
-          }
-        ],
-        "engine": {
-          "kind": "llm",
-          "model": "golden-model"
-        },
-        "options": null,
-        "schemaVersion": 1,
-        "unclassified": [
-          "Grilled Salmon",
-          "לחם הבית",
-          "צ'יפס בטטה",
-          "An Egg"
-        ]
-      },
-      "counts": {
-        "green": 0,
-        "hiddenCarbYellow": 1,
-        "red": 0,
-        "score": 2.5,
-        "yellow": 1
-      },
-      "menu": {
-        "categories": [
-          {
-            "dishes": [
-              {
-                "description": "",
-                "id": "dish-steak",
-                "imageUrl": null,
-                "name": "Grilled Steak",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              },
-              {
-                "description": "",
-                "id": "dish-salmon",
-                "imageUrl": null,
-                "name": "Grilled Salmon",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              },
-              {
-                "description": "",
-                "id": "dish-bread",
-                "imageUrl": null,
-                "name": "לחם הבית",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              },
-              {
-                "description": "",
-                "id": "dish-chips",
-                "imageUrl": null,
-                "name": "צ'יפס בטטה",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              },
-              {
-                "description": "",
-                "id": "dish-egg",
-                "imageUrl": null,
-                "name": "An Egg",
-                "options": [],
-                "page": null,
-                "price": 10.0
-              }
-            ],
-            "id": "cat-1",
-            "name": "Mains"
-          }
-        ],
-        "currency": "ILS",
-        "fetchedAt": "2026-01-01T00:00:00.000Z",
-        "venueName": null,
-        "venueRef": {
-          "platformId": "response-parser-test-venue",
-          "source": "wolt"
-        }
-      },
-      "name": "hand_net_carbs_over_limit_with_hidden_carb"
-    },
-    {
-      "analysis": {
-        "analysedAt": "2026-01-01T00:00:00.000Z",
-        "dishes": [
-          {
-            "dishId": "dish-steak",
             "hiddenCarbs": [],
             "modification": null,
             "name": "Grilled Steak",
@@ -7774,15 +7670,6 @@
             "netCarbsEstimate": null,
             "verdict": "orderAsIs",
             "why": "Plain grilled protein."
-          },
-          {
-            "dishId": "dish-steak",
-            "hiddenCarbs": [],
-            "modification": null,
-            "name": "Grilled Steak",
-            "netCarbsEstimate": null,
-            "verdict": "nonKeto",
-            "why": "Second opinion."
           }
         ],
         "engine": {
@@ -7801,8 +7688,8 @@
       "counts": {
         "green": 1,
         "hiddenCarbYellow": 0,
-        "red": 1,
-        "score": 5.0,
+        "red": 0,
+        "score": 10.0,
         "yellow": 0
       },
       "menu": {
@@ -7874,28 +7761,10 @@
         "analysedAt": "2026-01-01T00:00:00.000Z",
         "dishes": [
           {
-            "dishId": "dish-steak",
+            "dishId": "dish-salmon",
             "hiddenCarbs": [],
             "modification": null,
-            "name": "Grilled Steak",
-            "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "Plain grilled protein."
-          },
-          {
-            "dishId": "dish-bread",
-            "hiddenCarbs": [],
-            "modification": null,
-            "name": "לחם הבית",
-            "netCarbsEstimate": null,
-            "verdict": "orderAsIs",
-            "why": "Plain grilled protein."
-          },
-          {
-            "dishId": "dish-chips",
-            "hiddenCarbs": [],
-            "modification": null,
-            "name": "צ'יפס בטטה",
+            "name": "Grilled Salmon",
             "netCarbsEstimate": null,
             "verdict": "orderAsIs",
             "why": "Plain grilled protein."
@@ -7909,15 +7778,19 @@
         "schemaVersion": 1,
         "unclassified": [
           "הלחם",
+          "לחמ",
+          "ציפס",
           "An Eg",
           "Ox",
           "Mystery dish",
-          "Grilled Salmon",
+          "Grilled Steak",
+          "לחם הבית",
+          "צ'יפס בטטה",
           "An Egg"
         ]
       },
       "counts": {
-        "green": 3,
+        "green": 1,
         "hiddenCarbYellow": 0,
         "red": 0,
         "score": 10.0,
@@ -8084,6 +7957,222 @@
         }
       },
       "name": "hand_id_beats_name"
+    },
+    {
+      "analysis": {
+        "analysedAt": "2026-01-01T00:00:00.000Z",
+        "dishes": [
+          {
+            "dishId": "dish-steak",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Grilled Steak",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "Plain grilled protein."
+          }
+        ],
+        "engine": {
+          "kind": "llm",
+          "model": "golden-model"
+        },
+        "options": null,
+        "schemaVersion": 1,
+        "unclassified": [
+          "Grilled Chicken",
+          "Chef special with fries",
+          "לחם פירות",
+          "Grilled Fish",
+          "Grilled Salmon",
+          "לחם הבית",
+          "צ'יפס בטטה",
+          "An Egg"
+        ]
+      },
+      "counts": {
+        "green": 1,
+        "hiddenCarbYellow": 0,
+        "red": 0,
+        "score": 10.0,
+        "yellow": 0
+      },
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "dish-steak",
+                "imageUrl": null,
+                "name": "Grilled Steak",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-salmon",
+                "imageUrl": null,
+                "name": "Grilled Salmon",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-bread",
+                "imageUrl": null,
+                "name": "לחם הבית",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-chips",
+                "imageUrl": null,
+                "name": "צ'יפס בטטה",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-egg",
+                "imageUrl": null,
+                "name": "An Egg",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      },
+      "name": "hand_provenance_strict_overlap"
+    },
+    {
+      "analysis": {
+        "analysedAt": "2026-01-01T00:00:00.000Z",
+        "dishes": [
+          {
+            "dishId": "dish-salmon",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "Grilled Salmon",
+            "netCarbsEstimate": null,
+            "verdict": "orderAsIs",
+            "why": "x"
+          },
+          {
+            "dishId": "dish-bread",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "לחם הבית",
+            "netCarbsEstimate": null,
+            "verdict": "nonKeto",
+            "why": "x"
+          },
+          {
+            "dishId": "dish-egg",
+            "hiddenCarbs": [],
+            "modification": null,
+            "name": "An Egg",
+            "netCarbsEstimate": -0.0,
+            "verdict": "orderAsIs",
+            "why": "x"
+          }
+        ],
+        "engine": {
+          "kind": "llm",
+          "model": "golden-model"
+        },
+        "options": null,
+        "schemaVersion": 1,
+        "unclassified": [
+          "Grilled Steak",
+          "צ'יפס בטטה"
+        ]
+      },
+      "counts": {
+        "green": 2,
+        "hiddenCarbYellow": 0,
+        "red": 1,
+        "score": 6.7,
+        "yellow": 0
+      },
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "dish-steak",
+                "imageUrl": null,
+                "name": "Grilled Steak",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-salmon",
+                "imageUrl": null,
+                "name": "Grilled Salmon",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-bread",
+                "imageUrl": null,
+                "name": "לחם הבית",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-chips",
+                "imageUrl": null,
+                "name": "צ'יפס בטטה",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-egg",
+                "imageUrl": null,
+                "name": "An Egg",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      },
+      "name": "hand_net_carbs_infinite_and_negative"
     },
     {
       "analysis": {

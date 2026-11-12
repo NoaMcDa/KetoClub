@@ -209,7 +209,10 @@ final class AnalysedDish {
   /// non-modifiable verdict that carries one — and never throws. An
   /// absent or null `hiddenCarbs` reads as empty (a dish cached before
   /// issue #213 has none); a malformed entry in the list is dropped
-  /// silently (architecture.md §9.4).
+  /// silently (architecture.md §9.4). A `netCarbsEstimate` that is a
+  /// number but not finite, or negative, reads as no estimate, as the
+  /// parser stores it (issue #478); one that is not a number at all is a
+  /// shape mismatch.
   static AnalysedDish? tryFrom(Map<String, Object?> json) {
     final dishId = json['dishId'];
     final name = json['name'];
@@ -231,7 +234,10 @@ final class AnalysedDish {
     }
     if (!isModifiable && modification != null) return null;
     if (rawNetCarbs != null && rawNetCarbs is! num) return null;
-    final netCarbsEstimate = rawNetCarbs is num ? rawNetCarbs.toDouble() : null;
+    final netCarbsEstimate =
+        rawNetCarbs is num && rawNetCarbs.isFinite && rawNetCarbs >= 0
+        ? rawNetCarbs.toDouble()
+        : null;
     final rawHiddenCarbs = json['hiddenCarbs'];
     final hiddenCarbs = <HiddenCarb>[];
     if (rawHiddenCarbs is List<Object?>) {

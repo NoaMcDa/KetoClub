@@ -275,6 +275,46 @@ void main() {
       expect(logger.warnings, equals(<String>['Menu upload failed: tooLarge']));
     });
 
+    test('an upload JSON cannot carry is rejected with no request, never '
+        'thrown (issue #478)', () async {
+      // Arrange: an estimate built directly, past the parser's guard.
+      var transportCalls = 0;
+      final client = _build(
+        MockClient((_) async {
+          transportCalls++;
+          return http.Response('{}', 201);
+        }),
+      );
+      final upload = MenuUpload(
+        ref: _ref,
+        menu: _menu(),
+        analysis: MenuAnalysed(
+          dishes: const <AnalysedDish>[
+            AnalysedDish(
+              dishId: 'd1',
+              name: 'Steak',
+              verdict: DishVerdict.nonKeto,
+              why: 'Breaded.',
+              netCarbsEstimate: double.infinity,
+            ),
+          ],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: DateTime.utc(2026, 10, 8),
+        ),
+      );
+
+      // Act
+      final result = await client.upload(upload);
+
+      // Assert
+      expect(
+        result,
+        equals(const MenuStoreFailed(reason: MenuStoreFailureReason.rejected)),
+      );
+      expect(transportCalls, equals(0));
+    });
+
     test('the cap counts UTF-8 bytes, not characters', () async {
       // Arrange
       var transportCalls = 0;

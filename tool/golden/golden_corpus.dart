@@ -1378,6 +1378,52 @@ List<ReplyCase> handTextReplies() {
       ]),
     ),
     c('hand_id_beats_name', replyBody(<Object?>[replyDish(id: 'dish-salmon')])),
+    // Issue #277: the name fallback ignores stop-words, needs a high
+    // overlap with one best dish, and judges each dish once.
+    c(
+      'hand_provenance_strict_overlap',
+      replyBody(<Object?>[
+        replyDish(id: '99', name: 'Grilled Chicken'),
+        replyDish(id: '', name: 'Chef special with fries'),
+        replyDish(id: null, name: 'לחם פירות'),
+        replyDish(id: 'x', name: 'Steak, grilled'),
+        replyDish(id: 'y', name: 'Grilled Fish'),
+      ]),
+    ),
+    c(
+      'hand_duplicate_after_demotion',
+      replyBody(<Object?>[
+        replyDish(verdict: 'green'),
+        replyDish(),
+        replyDish(id: 'unknown', verdict: 'nonKeto'),
+      ]),
+    ),
+    c(
+      'hand_yellow_hidden_carb_without_modification',
+      replyBody(<Object?>[
+        replyDish(
+          verdict: 'modifiable',
+          hiddenCarbs: <Object?>[hiddenCarb('glaze')],
+        ),
+      ]),
+    ),
+    // Issue #478: an infinite or negative estimate is stored as none.
+    c(
+      'hand_net_carbs_infinite_and_negative',
+      '{"dishes": ['
+          '{"id": "dish-steak", "name": "Grilled Steak", '
+          '"verdict": "orderAsIs", "why": "x", "modification": null, '
+          '"net_carbs_estimate": 1e400, "hidden_carbs": []}, '
+          '{"id": "dish-salmon", "name": "Grilled Salmon", '
+          '"verdict": "orderAsIs", "why": "x", "modification": null, '
+          '"net_carbs_estimate": -12, "hidden_carbs": []}, '
+          '{"id": "dish-bread", "name": "לחם הבית", '
+          '"verdict": "nonKeto", "why": "x", "modification": null, '
+          '"net_carbs_estimate": 1e400, "hidden_carbs": []}, '
+          '{"id": "dish-egg", "name": "An Egg", '
+          '"verdict": "orderAsIs", "why": "x", "modification": null, '
+          '"net_carbs_estimate": -0.0, "hidden_carbs": []}]}',
+    ),
     c(
       'hand_fence_uppercase_json_tag',
       '```JSON\n${replyBody(<Object?>[replyDish()])}\n```',

@@ -165,7 +165,8 @@ enum MenuStoreFailureReason {
   rateLimited,
 
   /// The backend answered 400 or 422: it read the upload and refused its
-  /// content or shape.
+  /// content or shape; or the upload held a value JSON cannot carry, so
+  /// it was refused before sending (issue #478).
   rejected,
 
   /// The backend answered with any other status, or a success status
@@ -261,7 +262,15 @@ final class BackendMenuStoreClient implements MenuStoreClient {
       return _fail(MenuStoreFailureReason.notConfigured);
     }
 
-    final body = jsonEncode(upload.toJson());
+    final String body;
+    try {
+      body = jsonEncode(upload.toJson());
+      // A value JSON cannot carry (a non-finite number, issue #478): the
+      // upload is refused here, before anything is sent.
+      // ignore: avoid_catching_errors
+    } on JsonUnsupportedObjectError {
+      return _fail(MenuStoreFailureReason.rejected);
+    }
     if (utf8.encode(body).length > maxMenuUploadBytes) {
       return _fail(MenuStoreFailureReason.tooLarge);
     }
