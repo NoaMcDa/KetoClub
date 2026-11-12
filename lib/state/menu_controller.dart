@@ -781,11 +781,17 @@ final class MenuController extends ChangeNotifier {
         await _settings.write(appSettings.copyWith(lastVenue: ref));
 
         final options = _optionsFrom(appSettings);
-        final reusable = _reusableAnalysis(
-          await _repository.cached(ref),
-          fetchedMenu,
-          options,
-        );
+        // An analysis that came with the fetch is this open's answer,
+        // whatever engine made it: a server-side rules(reason) is shown at
+        // once with its reason and Retry, never asked of Gemini a second
+        // time (issue #483, D25). Only without one is the cache consulted.
+        final reusable =
+            _arrivedReusable(fetchedAnalysis, fetchedMenu, options) ??
+            _reusableAnalysis(
+              await _repository.cached(ref),
+              fetchedMenu,
+              options,
+            );
         if (reusable != null) {
           _analysis = reusable;
         } else {
@@ -1112,7 +1118,10 @@ final class MenuController extends ChangeNotifier {
       );
 
   /// [analysis], the one that arrived with the fetch of [menu], when
-  /// [_reusableAnalysis] would reuse it had it been cached; else null.
+  /// [_reusableAnalysis] would reuse it had it been cached — except that
+  /// its engine does not matter: a rules result the server stamped with
+  /// its reason is an answer too, and classifying again would ask the
+  /// model a second time for the same menu (issue #483). Else null.
   static MenuAnalysed? _arrivedReusable(
     MenuAnalysed? analysis,
     Menu menu,
@@ -1123,20 +1132,25 @@ final class MenuController extends ChangeNotifier {
           CachedMenu(menu: menu, analysis: analysis),
           menu,
           options,
+          anyEngine: true,
         );
 
   /// [cached]'s analysis when [open] may show it for [fetched] under
   /// [options] instead of classifying again, or null when it must
   /// classify. See [open] for the three conditions.
+  ///
+  /// [anyEngine] lifts the "made by the model" condition, for an analysis
+  /// that arrived with this very fetch ([_arrivedReusable]).
   static MenuAnalysed? _reusableAnalysis(
     CachedMenu? cached,
     Menu fetched,
-    ClassificationOptions options,
-  ) {
+    ClassificationOptions options, {
+    bool anyEngine = false,
+  }) {
     if (cached == null) return null;
     final analysis = cached.analysis;
     if (analysis is! MenuAnalysed) return null;
-    if (analysis.engine is! LlmEngine) return null;
+    if (!anyEngine && analysis.engine is! LlmEngine) return null;
     if (!options.estimationConsentGiven) return null;
     if (TextNormaliser.menuFingerprint(cached.menu) !=
         TextNormaliser.menuFingerprint(fetched)) {

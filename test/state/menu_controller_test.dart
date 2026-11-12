@@ -3506,34 +3506,27 @@ void main() {
       expect(store.uploads, isEmpty);
     });
 
-    test(
-      'a rules analysis that arrived with the fetch is classified again '
-      'here, and a model analysis made here is uploaded (issue #331)',
-      () async {
-        // Arrange: the server's model failed, so it answered with rules.
-        final menu = _menuOf([steak]);
-        stubArrived(
-          menu,
-          arrivedAnalysis(
-            menu,
-            engine: const RulesEngine(
-              reason: MenuAnalysisFailureReason.rateLimited,
-            ),
-          ),
-        );
-        classifier.derivedEngine = const LlmEngine(model: 'device-model');
+    test('a rules analysis that arrived with the fetch is shown at once, '
+        'with no second model request and no upload (issue #483)', () async {
+      // Arrange: the server's model timed out, so it answered with rules.
+      final menu = _menuOf([steak]);
+      final analysis = arrivedAnalysis(
+        menu,
+        engine: const RulesEngine(reason: MenuAnalysisFailureReason.timeout),
+      );
+      stubArrived(menu, analysis);
 
-        // Act
-        final controller = await openOnce();
+      // Act
+      final controller = await openOnce();
 
-        // Assert
-        expect(classifier.calls, hasLength(1));
-        expect(store.uploads.single.analysis, controller.analysis);
-      },
-    );
+      // Assert
+      expect(controller.analysis, analysis);
+      expect(classifier.calls, isEmpty);
+      expect(store.uploads, isEmpty);
+    });
 
-    test('a rules analysis that arrived with the fetch and a rules result '
-        'here upload nothing: the backend has the menu (issue #331)', () async {
+    test('Retry on an arrived rules analysis still re-analyses '
+        '(issue #483)', () async {
       // Arrange
       final menu = _menuOf([steak]);
       stubArrived(
@@ -3545,14 +3538,28 @@ void main() {
           ),
         ),
       );
+      final controller = await openOnce();
 
       // Act
-      await openOnce();
+      await controller.reanalyse();
 
-      // Assert: the fake classifier's default result is a rules one.
+      // Assert
       expect(classifier.calls, hasLength(1));
-      expect(store.uploads, isEmpty);
     });
+
+    test(
+      'a fetch with no analysis still classifies once (issue #483)',
+      () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+
+        // Act
+        await openOnce();
+
+        // Assert
+        expect(classifier.calls, hasLength(1));
+      },
+    );
 
     test('a refresh whose refetch carried a reusable analysis shows it '
         'without classifying again (issue #331)', () async {
@@ -3572,8 +3579,8 @@ void main() {
       expect(classifier.calls, hasLength(callsBefore));
     });
 
-    test('a refresh whose refetch carried a rules analysis classifies again '
-        '(issue #331)', () async {
+    test('a refresh whose refetch carried a rules analysis shows it '
+        'without classifying again (issue #483)', () async {
       // Arrange
       repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
       final controller = await openOnce();
@@ -3591,7 +3598,8 @@ void main() {
       await controller.refresh();
 
       // Assert
-      expect(classifier.calls, hasLength(callsBefore + 1));
+      expect(classifier.calls, hasLength(callsBefore));
+      expect((controller.analysis! as MenuAnalysed).engine, isA<RulesEngine>());
     });
 
     test('lastUpload completes only once the upload has finished', () async {
