@@ -106,7 +106,7 @@
   "settingsCarnivoreOnlyHint": "רק בשר, דגים וביצים בירוק — ירקות הופכים לצהוב.",
   "settingsFilter": "סינון ברירת מחדל",
   "settingsCacheSection": "תפריטים אחרונים",
-  "settingsCacheSummary": "{count, plural, one{תפריט אחד שמור · עובד גם ללא חיבור לאינטרנט} two{שני תפריטים שמורים · עובד גם ללא חיבור לאינטרנט} other{{count} תפריטים שמורים · עובד גם ללא חיבור לאינטרנט}}",
+  "settingsCacheSummary": "{count, plural, one{תפריט אחד ברשימת האחרונים} two{שני תפריטים ברשימת האחרונים} other{{count} תפריטים ברשימת האחרונים}}",
   "@settingsCacheSummary": {
     "placeholders": { "count": { "type": "num" } }
   },
