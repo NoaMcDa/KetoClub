@@ -16,7 +16,9 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # A superseded run is cancelled on a branch, never on main: every commit that
+  # lands there keeps a complete result (issue #290).
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -53,7 +55,7 @@ jobs:
         run: flutter analyze --fatal-infos --fatal-warnings
 
   test:
-    name: Unit, flow and architecture tests
+    name: Unit and architecture tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -164,11 +166,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [web, apk]
+        target: [web, apk, apk-release]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
-        if: matrix.target == 'apk'
+        if: startsWith(matrix.target, 'apk')
         with:
           distribution: temurin
           java-version: '17'
@@ -184,10 +186,14 @@ jobs:
       - name: Build Android (debug)
         if: matrix.target == 'apk'
         run: flutter build apk --debug
+      # Release mode runs R8 shrinking, which the debug build never does; it
+      # signs with the debug key unless a release config exists (issue #290).
+      - name: Build Android (release)
+        if: matrix.target == 'apk-release'
+        run: flutter build apk --release
 
   ios:
     name: Build iOS (no codesign)
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4

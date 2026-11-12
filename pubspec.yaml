@@ -165,8 +165,9 @@ flutter_launcher_icons:
   web:
     generate: true
     image_path: "assets/icon/icon.png"
-    background_color: "#3C7847"
-    theme_color: "#3C7847"
+    # Cream, matching web/manifest.json (#226). Do not regenerate with green.
+    background_color: "#FAF7F0"
+    theme_color: "#FAF7F0"
   min_sdk_android: 21
 
 # Native splash screen (issue #66), matching AppTokens.lightBg/darkBg and
