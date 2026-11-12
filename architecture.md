@@ -1003,14 +1003,17 @@ an install id alongside its content (§11, `backend_plan.md` §3.5). *(D25 adds 
 third, below.)*
 
 **Server-side, the analysis cache (D25).** `analysis_cache` holds one complete
-**language-model** analysis per `sha256(menu fingerprint | GEMINI_MODEL |
+**language-model** analysis per `sha256(menu digest | GEMINI_MODEL |
 schemaVersion | netCarbLimitGrams | dietaryConstraints)`, for
 `ANALYSIS_CACHE_TTL_SECONDS` (default 7 days, against the chat cache's 24 h:
 a menu's dish text rarely changes, and a changed one is a different
-fingerprint). Only an `llm` analysis is ever written — a rules fallback never
+digest). Only an `llm` analysis is ever written — a rules fallback never
 is, so a Gemini outage cannot pin rules verdicts for a week — and a scan, whose
-input is images, never touches it. The fingerprint is the 32-bit dish-text hash
-a scan is addressed by, so a hit is re-checked before it is served: the same
+input is images, never touches it. The menu digest is a sha256 of everything
+the classifier reads (category names; dish ids, names, descriptions and
+options), not the 32-bit fingerprint a scan is addressed by (#464): FNV-1a can
+be run backwards, so a crafted menu could otherwise take a real venue's key and
+plant its verdicts there. A hit is still re-checked before it is served: the same
 engine, schema version and options, and every verdict naming a dish id and name
 the menu holds. Two venues with the same dishes under different ids (a chain on
 two platforms) therefore miss rather than get verdicts for ids they lack. A

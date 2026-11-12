@@ -453,7 +453,10 @@ below. `backend_plan.md` §3.3 is the contract; in short:
   `offline`, `timeout`, `rateLimited`, `badResponse`): a Gemini failure is
   never an error here, as the client's `RoutingMenuClassifier` falls back.
 - **Analysis cache** (`analysis_cache`, `ANALYSIS_CACHE_TTL_SECONDS`): keyed
-  by `sha256(fingerprint|model|schemaVersion|netCarbLimitGrams|constraints)`.
+  by `sha256(menuDigest|model|schemaVersion|netCarbLimitGrams|constraints)`,
+  where `menuDigest` is a sha256 of every category name and dish id, name,
+  description and option the classifier reads (#464; never the 32-bit scan
+  fingerprint, which a crafted menu can be made to match).
   A hit is free; only an `llm` analysis is written. A hit whose dish ids do
   not match the menu's (the same dishes under other ids) is a miss.
 - **Analysis bucket** (`ANALYSIS_RATE_LIMIT_*`): spent only just before a
