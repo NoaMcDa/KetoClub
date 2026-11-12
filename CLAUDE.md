@@ -505,8 +505,8 @@ The section this replaces described a heuristic-first design that predates the c
    `consentWithheld`; offline means the heuristic stamped `offline`; otherwise the
    LLM path via `GeminiChatClient` on a phone or `BackendChatClient` on web (D17),
    falling back to the heuristic on `offline`, `timeout`, `rateLimited`,
-   `badResponse`, `backendUnreachable`, `notConfigured`, `apiKeyMissing` and
-   `apiKeyRejected` with that reason carried through so the UI can say why.
+   `badResponse`, `unavailable` (Google busy, #485), `backendUnreachable`,
+   `notConfigured`, `apiKeyMissing` and `apiKeyRejected` with that reason carried through so the UI can say why.
    `apiKeyMissing` (no key saved; nothing sent) and `apiKeyRejected` (Google
    refused it) exist only on phones, arise only from the device engine (with a
    backend, only when it could not answer) and point the user to Settings; a web
