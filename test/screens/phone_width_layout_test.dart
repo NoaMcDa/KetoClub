@@ -98,7 +98,6 @@ void main() {
           final controller = SettingsController(
             FakeSettingsStore(),
             FakeMenuRepository(),
-            null,
           );
           await tester.pumpWidget(
             MaterialApp(
@@ -121,7 +120,6 @@ void main() {
                 child: SettingsScreen(
                   appInfo: FakeAppInfo(),
                   externalLinkOpener: FakeExternalLinkOpener(),
-                  backendConfigured: false,
                 ),
               ),
             ),
@@ -198,7 +196,7 @@ void main() {
         'in its own direction', (tester) async {
       // Arrange
       _setView(tester, 390);
-      const raw = '‫בחירה ירוקה 🌿';
+      const raw = '\u202bבחירה ירוקה 🌿';
       String? selected;
 
       // Act
@@ -262,7 +260,6 @@ void main() {
       final controller = SettingsController(
         FakeSettingsStore(),
         FakeMenuRepository(),
-        null,
       );
 
       // Act
@@ -286,7 +283,6 @@ void main() {
             child: SettingsScreen(
               appInfo: FakeAppInfo(),
               externalLinkOpener: FakeExternalLinkOpener(),
-              backendConfigured: false,
             ),
           ),
         ),

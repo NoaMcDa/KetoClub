@@ -4248,8 +4248,8 @@ void main() {
         venueRef: _ref,
         currency: 'ILS',
         fetchedAt: DateTime.utc(2026),
-        categories: <MenuCategory>[
-          const MenuCategory(
+        categories: const <MenuCategory>[
+          MenuCategory(
             id: 'c1',
             name: 'מבצעים:',
             dishes: [
