@@ -130,6 +130,7 @@
     "placeholders": { "platform": { "type": "String" } }
   },
   "fetchFailedNotFound": "לא נמצאה מסעדה ב{platform}. בדקו את הקישור.",
+  "fetchFailedNotARestaurant": "המקום הזה מופיע ב{platform} כחנות ולא כמסעדה, ולכן אין בו תפריט ש-KetoClub יכולה לקרוא.",
   "@fetchFailedNotFound": {
     "placeholders": { "platform": { "type": "String" } }
   },

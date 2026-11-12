@@ -4,7 +4,8 @@ Python twin of Dart ``WoltVenueMapper`` (``lib/services/venue/wolt/
 wolt_venue_mapper.dart``), whose doc comment holds the rules. Pure and never
 raising. Every ``sections[].items[]`` entry is walked in order; one without a
 ``venue`` object, or whose venue lacks a non-blank ``slug`` or ``name``, is
-skipped; the first occurrence of a slug wins. Only a body with no
+skipped, and so is one whose ``product_line`` is a string other than
+``restaurant`` (a shop, #476); the first occurrence of a slug wins. Only a body with no
 ``sections`` list answers ``None``.
 """
 
@@ -20,6 +21,9 @@ from app.platforms._dart import (
 )
 
 _SOURCE: MenuSourceName = "wolt"
+
+RESTAURANT_PRODUCT_LINE = "restaurant"
+"""The ``product_line`` of a venue that serves a menu; any other is a shop."""
 
 
 def map_wolt_venues(raw: object) -> list[Venue] | None:
@@ -61,6 +65,9 @@ def _try_build_venue(item: dict[str, Any]) -> Venue | None:
     slug = _non_empty_string(raw.get("slug"))
     name = _non_empty_string(raw.get("name"))
     if slug is None or name is None:
+        return None
+    product_line = raw.get("product_line")
+    if isinstance(product_line, str) and product_line != RESTAURANT_PRODUCT_LINE:
         return None
 
     position = _read_position(raw.get("location"))

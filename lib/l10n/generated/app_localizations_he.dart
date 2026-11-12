@@ -339,6 +339,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String fetchFailedNotARestaurant(String platform) {
+    return 'המקום הזה מופיע ב$platform כחנות ולא כמסעדה, ולכן אין בו תפריט ש-KetoClub יכולה לקרוא.';
+  }
+
+  @override
   String fetchFailedPlatformChanged(String platform, String statusCode) {
     return '$platform שינתה את מבנה התפריט (HTTP $statusCode), ולכן קטוקלאב לא הצליח לקרוא אותו. אנא דווחו על זה.';
   }

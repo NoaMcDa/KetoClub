@@ -133,6 +133,11 @@
     "placeholders": { "platform": { "type": "String" } }
   },
   "fetchFailedNotFound": "No venue found on {platform}. Check the link.",
+  "fetchFailedNotARestaurant": "{platform} lists this place as a shop, not a restaurant, so there is no menu for KetoClub to read.",
+  "@fetchFailedNotARestaurant": {
+    "description": "A Wolt venue that is a supermarket, pet shop or other store (issue #476).",
+    "placeholders": { "platform": { "type": "String" } }
+  },
   "@fetchFailedNotFound": {
     "placeholders": { "platform": { "type": "String" } }
   },

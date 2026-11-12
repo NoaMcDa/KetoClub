@@ -57,6 +57,9 @@ String fetchFailureMessage(
   MenuFetchFailureReason.websitePdfUnread => l10n.websitePdfUnread(
     platform ?? '',
   ),
+  MenuFetchFailureReason.notARestaurant => l10n.fetchFailedNotARestaurant(
+    platform ?? '',
+  ),
 };
 
 /// The message for a menu-analysis failure (architecture.md §10).

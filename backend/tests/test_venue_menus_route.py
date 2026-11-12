@@ -291,6 +291,11 @@ def test_a_store_failure_never_fails_the_read(
             502,
             "platformChanged",
         ),
+        (
+            httpx.Response(200, json=_wolt("synthetic_shop_partial")["raw"]),
+            422,
+            "notARestaurant",
+        ),
         (httpx.ConnectError("no route"), 502, "offline"),
         (httpx.ConnectTimeout("slow"), 504, "timeout"),
     ],

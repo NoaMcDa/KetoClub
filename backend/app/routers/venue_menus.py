@@ -26,7 +26,8 @@ without its ``options``, keyed by venue, never by install id.
 Errors are ``{reason, status_code}`` bodies the client's
 ``BackendMenuAdapter.venueReasonFor`` maps: 404 ``notFound`` (the
 platform's 404), 502 ``platformChanged`` (any other non-2xx, an empty or
-non-JSON body, or a payload the mapper cannot read), 502 ``offline``, 504
+non-JSON body, or a payload the mapper cannot read), 422 ``notARestaurant``
+(a Wolt shop's assortment, #476), 502 ``offline``, 504
 ``timeout``, plus the shared 400 ``badResponse`` for a missing install id
 or an ``Authorization`` header.
 """
@@ -45,7 +46,7 @@ from starlette.concurrency import run_in_threadpool
 from app.errors import BackendError
 from app.keto.models import LlmEngine, Menu, MenuAnalysed, VenueRef, to_json
 from app.platforms.tenbis_menu import map_tenbis_menu
-from app.platforms.wolt_menu import map_wolt_menu
+from app.platforms.wolt_menu import is_shop_assortment, map_wolt_menu
 from app.schemas import ClassificationOptionsBody, ErrorResponse, VenueMenuResponse
 from app.services import menu_store
 from app.services.auth import reject_authorization
@@ -155,6 +156,8 @@ def _mapped(upstream: UpstreamMenu, ref: VenueRef, fetched_at: str) -> Menu:
         raw: object = json.loads(upstream.body, parse_constant=_reject_constant)
     except (ValueError, RecursionError):
         raise BackendError(502, "platformChanged") from None
+    if ref.source == "wolt" and is_shop_assortment(raw):
+        raise BackendError(422, "notARestaurant")
     mapper = map_wolt_menu if ref.source == "wolt" else map_tenbis_menu
     menu = mapper(raw, ref=ref, fetched_at=fetched_at)
     if menu is None:

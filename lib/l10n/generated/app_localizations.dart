@@ -668,6 +668,12 @@ abstract class AppLocalizations {
   /// **'No venue found on {platform}. Check the link.'**
   String fetchFailedNotFound(String platform);
 
+  /// A Wolt venue that is a supermarket, pet shop or other store (issue #476).
+  ///
+  /// In en, this message translates to:
+  /// **'{platform} lists this place as a shop, not a restaurant, so there is no menu for KetoClub to read.'**
+  String fetchFailedNotARestaurant(String platform);
+
   /// No description provided for @fetchFailedPlatformChanged.
   ///
   /// In en, this message translates to:

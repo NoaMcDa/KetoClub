@@ -337,6 +337,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String fetchFailedNotARestaurant(String platform) {
+    return '$platform lists this place as a shop, not a restaurant, so there is no menu for KetoClub to read.';
+  }
+
+  @override
   String fetchFailedPlatformChanged(String platform, String statusCode) {
     return '$platform changed its menu format (HTTP $statusCode), so KetoClub could not read it. Please report this.';
   }

@@ -1648,6 +1648,20 @@ Map<String, Map<String, Object?>> woltSyntheticPayloads() {
       ],
       'options': groups,
     },
+    // A shop's assortment (issue #476): products load per category, so
+    // `items` is empty. Not a menu, whatever its categories say.
+    'synthetic_shop_partial': <String, Object?>{
+      'loading_strategy': 'partial',
+      'categories': <Object?>[woltCategory('c1', <Object?>[])],
+      'items': <Object?>[],
+    },
+    'synthetic_full_strategy': <String, Object?>{
+      'loading_strategy': 'full',
+      'categories': <Object?>[
+        woltCategory('c1', <Object?>['i1']),
+      ],
+      'items': <Object?>[woltItem('i1')],
+    },
     'synthetic_fail_item_id_not_string': <String, Object?>{
       'categories': <Object?>[
         woltCategory('c1', <Object?>[1]),
@@ -1805,6 +1819,32 @@ Map<String, Map<String, Object?>> woltVenueSyntheticPayloads() =>
                 'name': 'קפה תל אביב',
                 'location': <Object?>['34.7', 32],
               }),
+            ],
+          },
+        ],
+      },
+      // Wolt's shops are not restaurants (issue #476): only a
+      // `restaurant` product line, or none at all, is kept.
+      'synthetic_product_lines': <String, Object?>{
+        'sections': <Object?>[
+          <String, Object?>{
+            'items': <Object?>[
+              woltVenueItem('kept-restaurant', <String, Object?>{
+                'product_line': 'restaurant',
+              }),
+              woltVenueItem('dropped-grocery', <String, Object?>{
+                'product_line': 'grocery',
+              }),
+              woltVenueItem('dropped-pets', <String, Object?>{
+                'product_line': 'pet_supply',
+              }),
+              woltVenueItem('dropped-blank', <String, Object?>{
+                'product_line': '',
+              }),
+              woltVenueItem('kept-not-a-string', <String, Object?>{
+                'product_line': 7,
+              }),
+              woltVenueItem('kept-none'),
             ],
           },
         ],
