@@ -196,6 +196,22 @@ void main() {
         expect(controller.isInvalid, isTrue);
       });
 
+      test('a plain name is never invalid, English, Hebrew or several '
+          'words (issue #481)', () {
+        for (final name in const [
+          'sushi',
+          '\u05D7\u05D5\u05DE\u05D5\u05E1',
+          'Cafe Noir',
+        ]) {
+          // Act
+          controller.setInput(name);
+
+          // Assert
+          expect(controller.resolved, isNull, reason: name);
+          expect(controller.isInvalid, isFalse, reason: name);
+        }
+      });
+
       test('setInput with empty input is neither resolved nor invalid', () {
         // Act
         controller.setInput('');

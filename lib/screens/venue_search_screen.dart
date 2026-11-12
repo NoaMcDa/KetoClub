@@ -368,6 +368,9 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             labelText: l10n.venueSearchLabel,
             hintText: l10n.venueSearchHint,
             errorText: controller.isInvalid ? l10n.venueSearchInvalid : null,
+            // The hint after the first sentence is the useful half; at
+            // 390px one line cut it off (issue #481).
+            errorMaxLines: 3,
             suffixIcon: controller.isExplicitLink && resolved != null
                 ? IconButton(
                     icon: const Icon(Icons.arrow_forward),

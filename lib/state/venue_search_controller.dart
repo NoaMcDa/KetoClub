@@ -231,12 +231,14 @@ final class VenueSearchController extends ChangeNotifier {
   /// The reference [input] resolves to, or null when it does not resolve.
   VenueRef? get resolved => _resolved;
 
-  /// True when [input] is non-empty but does not resolve to anything
-  /// readable.
+  /// True when [input] is a paste ([isPaste]: a link or an id) that does
+  /// not resolve to anything readable.
   ///
-  /// Empty input is deliberately not invalid: it is nothing typed yet, and
-  /// flagging an error before the user has typed anything would be wrong.
-  bool get isInvalid => _input.isNotEmpty && _resolved == null;
+  /// A name is never invalid (issue #481): a plain word such as `sushi` or
+  /// `חומוס` resolves to nothing, but it is searched by name, and flagging
+  /// it read as "this search failed" (audit D8, #229). Empty input is not
+  /// invalid either: it is nothing typed yet.
+  bool get isInvalid => isPaste && _resolved == null;
 
   /// Whether [input] is a pasted link or platform id rather than a name
   /// to search for: it holds a `/` (any URL, readable or not) or is all

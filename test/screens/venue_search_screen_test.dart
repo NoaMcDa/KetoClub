@@ -504,6 +504,21 @@ void main() {
       expect(search.byNameCalls, isEmpty);
     });
 
+    testWidgets('typing a plain name shows no invalid message and searches '
+        'by name (issue #481)', (tester) async {
+      // Arrange
+      search.queueFound([_venue('sushi-bar')]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await tester.enterText(find.byType(TextField), 'sushi');
+      await tester.pump(const Duration(seconds: 1));
+
+      // Assert
+      expect(find.text(_l10n(tester).venueSearchInvalid), findsNothing);
+      expect(search.byNameCalls, isNotEmpty);
+    });
+
     testWidgets('an empty field shows no invalid message', (tester) async {
       // Arrange
       await _pump(tester, controller: controller, pushedNames: pushedNames);
