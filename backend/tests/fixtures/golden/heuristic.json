@@ -15373,6 +15373,15 @@
           "why": "המנה מבוססת על קרואסון, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
+          "dishId": "x16",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Pasta Bolognese",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on pasta, which cannot be made keto."
+        },
+        {
           "dishId": "x13",
           "hiddenCarbs": [],
           "modification": null,
@@ -15541,6 +15550,23 @@
               "imageUrl": null,
               "name": "קרואסון חמאה",
               "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "x16",
+              "imageUrl": null,
+              "name": "Pasta Bolognese",
+              "options": [
+                {
+                  "name": "תוספות",
+                  "values": [
+                    "פרמזן",
+                    "צ׳יפס"
+                  ]
+                }
+              ],
               "page": null,
               "price": 40.0
             }
@@ -15718,6 +15744,15 @@
           "why": "המנה מבוססת על קרואסון, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
+          "dishId": "x16",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Pasta Bolognese",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on pasta, which cannot be made keto."
+        },
+        {
           "dishId": "x13",
           "hiddenCarbs": [],
           "modification": null,
@@ -15889,6 +15924,23 @@
               "imageUrl": null,
               "name": "קרואסון חמאה",
               "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "x16",
+              "imageUrl": null,
+              "name": "Pasta Bolognese",
+              "options": [
+                {
+                  "name": "תוספות",
+                  "values": [
+                    "פרמזן",
+                    "צ׳יפס"
+                  ]
+                }
+              ],
               "page": null,
               "price": 40.0
             }
@@ -16069,6 +16121,15 @@
           "why": "המנה מבוססת על קרואסון, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
+          "dishId": "x16",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Pasta Bolognese",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on pasta, which cannot be made keto."
+        },
+        {
           "dishId": "x13",
           "hiddenCarbs": [],
           "modification": null,
@@ -16239,6 +16300,23 @@
               "imageUrl": null,
               "name": "קרואסון חמאה",
               "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "x16",
+              "imageUrl": null,
+              "name": "Pasta Bolognese",
+              "options": [
+                {
+                  "name": "תוספות",
+                  "values": [
+                    "פרמזן",
+                    "צ׳יפס"
+                  ]
+                }
+              ],
               "page": null,
               "price": 40.0
             }
@@ -16418,6 +16496,15 @@
           "why": "המנה מבוססת על קרואסון, ואי אפשר להפוך אותה לקטוגנית."
         },
         {
+          "dishId": "x16",
+          "hiddenCarbs": [],
+          "modification": null,
+          "name": "Pasta Bolognese",
+          "netCarbsEstimate": null,
+          "verdict": "nonKeto",
+          "why": "Built on pasta, which cannot be made keto."
+        },
+        {
           "dishId": "x13",
           "hiddenCarbs": [],
           "modification": null,
@@ -16590,6 +16677,23 @@
               "imageUrl": null,
               "name": "קרואסון חמאה",
               "options": [],
+              "page": null,
+              "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "x16",
+              "imageUrl": null,
+              "name": "Pasta Bolognese",
+              "options": [
+                {
+                  "name": "תוספות",
+                  "values": [
+                    "פרמזן",
+                    "צ׳יפס"
+                  ]
+                }
+              ],
               "page": null,
               "price": 40.0
             }

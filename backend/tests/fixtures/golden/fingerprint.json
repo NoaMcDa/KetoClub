@@ -3376,7 +3376,7 @@
     ]
   },
   {
-    "hex": "ce1516e2",
+    "hex": "d38bfb68",
     "menu": {
       "categories": [
         {
@@ -3509,6 +3509,23 @@
               "options": [],
               "page": null,
               "price": 40.0
+            },
+            {
+              "description": "",
+              "id": "x16",
+              "imageUrl": null,
+              "name": "Pasta Bolognese",
+              "options": [
+                {
+                  "name": "תוספות",
+                  "values": [
+                    "פרמזן",
+                    "צ׳יפס"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 40.0
             }
           ],
           "id": "m-mains",
@@ -3571,6 +3588,7 @@
       "dear customers",
       "𝐁𝐞𝐞𝐟 steak",
       "קרואסונ חמאה listed twice",
+      "pasta bolognese תוספות פרמזנ ציפס",
       "goldstar",
       "diet coke",
       "cheeseburger"

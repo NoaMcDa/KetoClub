@@ -888,6 +888,14 @@ final Menu goldenMixedMenu = Menu(
         menuDish('x11', 'Dear customers', price: 0),
         menuDish('x12', '\u{1D401}\u{1D41E}\u{1D41E}\u{1D41F} steak'),
         menuDish('x2', 'קרואסון חמאה', description: 'listed twice'),
+        // Issue #279: the dish's own text decides the script's language.
+        menuDish(
+          'x16',
+          'Pasta Bolognese',
+          options: const <DishOption>[
+            DishOption(name: 'תוספות', values: <String>['פרמזן', 'צ׳יפס']),
+          ],
+        ),
       ],
     ),
     MenuCategory(

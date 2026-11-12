@@ -234,6 +234,30 @@ void main() {
       expect(result.dishes.single.verdict, DishVerdict.modifiable);
     });
 
+    test('classify writes an English dish with Hebrew option labels in '
+        'English (issue #279)', () async {
+      // Arrange
+      final menu = _menuOf([
+        const Dish(
+          id: 'd1',
+          name: 'Pasta Bolognese',
+          description: '',
+          price: 50,
+          options: [
+            DishOption(name: 'תוספות', values: ['פרמזן']),
+          ],
+        ),
+      ]);
+
+      // Act
+      final result = await _classify(menu);
+
+      // Assert
+      final dish = result.dishes.single;
+      expect(dish.verdict, DishVerdict.nonKeto);
+      expect(dish.why, redWhyEn.replaceAll('{base}', 'pasta'));
+    });
+
     test('classify given a plain grilled protein returns orderAsIs', () async {
       // Arrange
       const dish = Dish(

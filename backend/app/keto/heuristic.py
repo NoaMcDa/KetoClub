@@ -35,7 +35,7 @@ from app.keto.models import (
     MenuAnalysed,
     RulesEngine,
 )
-from app.keto.normaliser import contains_hebrew, dish_rules_text
+from app.keto.normaliser import contains_hebrew, dish_core_text, dish_rules_text
 from app.keto.rules import (
     match_dish,
     mentions_dairy,
@@ -65,7 +65,10 @@ def classify_heuristic(
 def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
     templates = vocabulary().templates
     text = dish_rules_text(dish)
-    is_hebrew = contains_hebrew(text)
+    # Dart ``_analyse``: the dish's own name and description decide the
+    # language; option text only when they are empty (#279).
+    core = dish_core_text(dish)
+    is_hebrew = contains_hebrew(core if core else text)
     found = match_dish(dish)
 
     if found.is_non_keto:
