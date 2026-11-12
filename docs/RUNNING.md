@@ -204,6 +204,7 @@ flutter analyze --fatal-infos --fatal-warnings    # an info-level lint fails CI
 flutter test                                      # unit, widget, architecture
 flutter drive --driver=test_driver/integration_test.dart \
   --target=integration_test/flows/menu_display_flow_test.dart -d chrome   # one flow test
+tool/flow_shard.sh 0 4    # writes the entry CI drives for shard 0 of 4 (#453)
 cd backend && uv run pytest
 ```
 

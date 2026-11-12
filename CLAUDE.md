@@ -486,6 +486,10 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   orbit and the skeleton sweep repeat forever. Pump single frames while a wait
   is held open, release it, then settle. And the food shapes live twice, in
   `widgets/keto_foods.dart` and `web/index.html`: change both.
+- **CI drives the flows in four shards, one compile each (#453).** A flow file
+  must be `integration_test/flows/*_flow_test.dart` for `tool/flow_shard.sh` to
+  pick it up, and must leave nothing behind: the flows of a shard share one app
+  process and one browser tab. `FLOW_TEST_CONVENTIONS.md`, "CI/CD Integration".
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
 
