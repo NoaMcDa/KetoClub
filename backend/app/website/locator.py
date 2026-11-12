@@ -6,7 +6,8 @@ The Python twin of ``WebsiteMenuLocator``. Pure: no I/O and nothing raises.
 1. JSON-LD ``Menu`` / ``MenuSection`` / ``MenuItem`` markup with named items.
 2. A link to the menu: the JSON-LD ``hasMenu`` URL first, then the page's own
    links whose address or text says "menu" or "תפריט", or that end in
-   ``.pdf``. A menu-named PDF comes first, then a menu-named page, then any
+   ``.pdf``. A menu-named PDF comes first, then a page whose own address
+   names the menu, then a page only its link text names (#480), then any
    PDF, each group in page order. A page link must stay on the same site
    (``www.`` aside); a PDF may live elsewhere. A link back to the page itself
    is skipped.
@@ -19,7 +20,14 @@ from typing import Final
 
 from app.keto.dart_text import dart_lower, dart_trim
 from app.keto.models import MenuCategory, to_json
-from app.keto.text_menu import WS, dart_upper_first, has_letter, starts_lowercase
+from app.keto.text_menu import (
+    CURRENCY_SOURCE,
+    WS,
+    WS_CLASS,
+    dart_upper_first,
+    has_letter,
+    starts_lowercase,
+)
 from app.keto.vocabulary import vocabulary
 from app.website.html import (
     DartUri,
@@ -88,10 +96,14 @@ def locate(html: str, page_url: DartUri) -> MenuLocation:
         if _same_page(link.uri, page_url):
             continue
         is_pdf = _is_pdf(link.uri)
-        named = _names_menu(link)
+        address_named = _address_names_menu(link)
+        named = address_named or _text_names_menu(link)
         if not is_pdf and not (named and _same_site(link.uri, page_url)):
             continue
-        score = 3 if named and is_pdf else (2 if named else 1)
+        if is_pdf:
+            score = 4 if named else 1
+        else:
+            score = 3 if address_named else 2
         if score > best_score:
             best = MenuLinkFound(link.uri)
             best_score = score
@@ -99,14 +111,39 @@ def locate(html: str, page_url: DartUri) -> MenuLocation:
 
 
 _PRICE_ONLY: Final = re.compile(
-    rf'^(?:₪{WS}*)?[0-9]{{1,4}}(?:[.,][0-9]{{1,2}})?{WS}*(?:₪|NIS|ILS|ש["״]ח)?\Z',
+    rf"^(?:(?:מחיר|price){WS}*:?{WS}*)?(?:{CURRENCY_SOURCE}{WS}*)?"
+    rf"[0-9]{{1,4}}(?:[.,][0-9]{{1,2}})?{WS}*(?:{CURRENCY_SOURCE})?\Z",
     re.IGNORECASE | re.ASCII,
 )
 _TRAILING_PRICE: Final = re.compile(
-    rf"(?:{WS}+|{WS}*[-–—:.…|]+{WS}*)(?:₪{WS}*)?[0-9]{{1,4}}(?:[.,][0-9]{{1,2}})?"
-    rf'(?:{WS}*(?:₪|NIS|ILS|ש["״]ח))?{WS}*\Z',
+    rf"(?:{WS}+|{WS}*[-–—:.…|]+{WS}*)(?:(?:מחיר|price){WS}*:?{WS}*)?"
+    rf"(?:{CURRENCY_SOURCE}{WS}*)?[0-9]{{1,4}}(?:[.,][0-9]{{1,2}})?"
+    rf"(?:{WS}*{CURRENCY_SOURCE})?{WS}*\Z",
     re.IGNORECASE | re.ASCII,
 )
+_DIETARY_TAG: Final = re.compile(
+    rf"^\(?(?:(?:מנה{WS}+)?(?:צמחונית|צמחוני|טבעונית|טבעוני|חריפה|חריף"
+    rf"|(?:ללא|נטול(?:ת)?){WS}+גלוטן)|vegan|vegetarian|veggie|spicy|v|vg|gf|df"
+    rf"|gluten[{WS_CLASS}-]free|dairy[{WS_CLASS}-]free)\)?\Z",
+    re.IGNORECASE | re.ASCII,
+)
+"""``WebsiteMenuLocator._dietaryTag``: a tag line dropped before reading."""
+_ADDRESS: Final = re.compile(
+    rf"(?:^|[{WS_CLASS},(])(?:רחוב|רח['׳\"]|שד['׳\"]|שדרות|דרך|כיכר|סמטת){WS}"
+    r"|\b(?:st|street|ave|avenue|road|rd|blvd|boulevard)\b"
+    rf"|^(?:tel[{WS_CLASS}-]aviv(?:[{WS_CLASS}-]yafo)?|jerusalem|haifa|herzliya"
+    rf"|ramat[{WS_CLASS}-]gan|givatayim|holon|bat[{WS_CLASS}-]yam"
+    rf"|petah[{WS_CLASS}-]tikva|ra'?anana|kfar[{WS_CLASS}-]saba"
+    rf"|netanya|rishon[{WS_CLASS}-]le[{WS_CLASS}-]?zion|rehovot|ashdod|ashkelon"
+    rf"|be'?er[{WS_CLASS}-]sheva|eilat|modi'?in|hod[{WS_CLASS}-]hasharon"
+    rf"|ramat[{WS_CLASS}-]hasharon|תל[{WS_CLASS}-]אביב(?:[{WS_CLASS}-]יפו)?"
+    rf"|ירושלים|חיפה|הרצליה|רמת[{WS_CLASS}-]גן|גבעתיים|חולון|בת[{WS_CLASS}-]ים"
+    rf"|פתח[{WS_CLASS}-]תקו?וה|רעננה|כפר[{WS_CLASS}-]סבא|נתניה"
+    rf"|ראשון[{WS_CLASS}-]לציון|רחובות|אשדוד|אשקלון|באר[{WS_CLASS}-]שבע|אילת"
+    rf"|מודיעין|הוד[{WS_CLASS}-]השרון|רמת[{WS_CLASS}-]השרון){WS}*,",
+    re.IGNORECASE | re.ASCII,
+)
+"""``WebsiteMenuLocator._address``: a street address, never a dish."""
 _ENDS_IN_DIGIT: Final = re.compile(r"[0-9\-–/]\Z")
 _BULLET: Final = re.compile(rf"^[-•*·▪►]+{WS}*")
 _WHITESPACE: Final = re.compile(f"{WS}+")
@@ -130,7 +167,7 @@ def menu_text(html: str) -> str | None:
     dish, which is a header. Nothing after the last priced dish is read. The
     prices themselves are dropped, as a paste's are.
     """
-    page_lines = lines(html)
+    page_lines = [line for line in lines(html) if not _DIETARY_TAG.search(line)]
     price_only = 0
     inline = 0
     for line in page_lines:
@@ -140,12 +177,72 @@ def menu_text(html: str) -> str | None:
             inline += 1
     if price_only + inline < vocabulary().website.min_priced_lines:
         return None
-    out = (
-        _from_separate_prices(page_lines)
-        if price_only >= inline
-        else _from_inline_prices(page_lines)
-    )
+    if price_only < inline:
+        out = _from_inline_prices(page_lines)
+    elif _price_follows_name(page_lines):
+        out = _from_name_then_price(page_lines)
+    else:
+        out = _from_separate_prices(page_lines)
     return "\n".join(out) if out else None
+
+
+def _runs_between_prices(page_lines: list[str]) -> list[list[str]]:
+    """The runs of lines between price-only lines (Dart
+    ``_runsBetweenPrices``)."""
+    runs: list[list[str]] = [[]]
+    for line in page_lines:
+        if _PRICE_ONLY.search(line):
+            runs.append([])
+        else:
+            runs[-1].append(line)
+    return runs
+
+
+def _price_follows_name(page_lines: list[str]) -> bool:
+    """Whether the page reads ``name / price / description`` (#480)."""
+    runs = _runs_between_prices(page_lines)
+    after = 0
+    before = 0
+    for index in range(len(runs) - 1):
+        if not runs[index] or not runs[index + 1]:
+            continue
+        words_before = len(_WHITESPACE.split(runs[index][-1]))
+        words_after = len(_WHITESPACE.split(runs[index + 1][0]))
+        if words_after > words_before:
+            after += 1
+        elif words_after < words_before:
+            before += 1
+    return after > before
+
+
+def _from_name_then_price(page_lines: list[str]) -> list[str]:
+    """Dart ``_fromNameThenPrice``."""
+    out: list[str] = []
+    runs = _runs_between_prices(page_lines)
+    name: str | None = None
+    for index, run in enumerate(runs):
+        is_last = index == len(runs) - 1
+        description: list[str] = []
+        rest = run
+        if name is not None and run:
+            description.append(run[0])
+            rest = run[1:]
+        following: str | None = None
+        header: str | None = None
+        if not is_last and rest:
+            following = rest[-1]
+            between = rest[:-1]
+            if between and _looks_like_header(between[-1]):
+                header = between[-1]
+                description.extend(between[:-1])
+            else:
+                description.extend(between)
+        if name is not None:
+            _emit_dish(out, name, description)
+        if header is not None:
+            _emit_header(out, header)
+        name = following
+    return out
 
 
 def _from_separate_prices(page_lines: list[str]) -> list[str]:
@@ -217,6 +314,8 @@ def _inline_dish_name(line: str) -> str | None:
     rest = dart_trim(line[: match.start()])
     if not has_letter(rest) or _ENDS_IN_DIGIT.search(rest):
         return None
+    if _ADDRESS.search(rest):
+        return None
     return rest
 
 
@@ -259,12 +358,14 @@ def _lower(text: str) -> str:
     return text.lower() if text.isascii() else dart_lower(text)
 
 
-def _names_menu(link: PageLink) -> bool:
+def _address_names_menu(link: PageLink) -> bool:
     address = _lower(_decode_path(link.uri.path))
+    return any(word in address for word in vocabulary().website.menu_words)
+
+
+def _text_names_menu(link: PageLink) -> bool:
     text = _lower(link.text)
-    return any(
-        word in address or word in text for word in vocabulary().website.menu_words
-    )
+    return any(word in text for word in vocabulary().website.menu_words)
 
 
 def _decode_path(path: str) -> str:

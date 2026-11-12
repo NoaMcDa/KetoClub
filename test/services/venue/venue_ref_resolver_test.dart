@@ -121,12 +121,30 @@ const _accepted = <_Accepted>[
     ),
   ),
   _Accepted(
-    'a plain http website keeps its scheme and a non-default port',
-    'http://cafe-noir.co.il:8080/menu',
+    'a plain http website keeps its scheme',
+    'http://cafe-noir.co.il/menu',
     VenueRef(
       source: MenuSource.website,
-      platformId: 'http://cafe-noir.co.il:8080/menu',
+      platformId: 'http://cafe-noir.co.il/menu',
     ),
+  ),
+  _Accepted(
+    'a bare domain, read as https (#283)',
+    'www.mycafe.co.il',
+    VenueRef(
+      source: MenuSource.website,
+      platformId: 'https://www.mycafe.co.il',
+    ),
+  ),
+  _Accepted(
+    'a bare hyphenated domain (#283)',
+    'my-cafe.co.il',
+    VenueRef(source: MenuSource.website, platformId: 'https://my-cafe.co.il'),
+  ),
+  _Accepted(
+    'a Wolt /venue/ link (#283)',
+    'https://wolt.com/he/isr/tel-aviv/venue/vitrina-lilinblum',
+    VenueRef(source: MenuSource.wolt, platformId: 'vitrina-lilinblum'),
   ),
   _Accepted(
     "a lookalike wolt host, which is someone else's website",
@@ -158,6 +176,9 @@ const _rejected = <_Rejected>[
   _Rejected('a private IP address', 'http://192.168.1.1/menu'),
   _Rejected('a scheme-less private IP address', '10.0.0.8/menu'),
   _Rejected('a .local name', 'http://printer.local/menu'),
+  // The website fetcher refuses every port but 80 and 443 (#283).
+  _Rejected('a non-default port', 'http://cafe-noir.co.il:8080/menu'),
+  _Rejected('a Wolt short link (#283)', 'https://wolt.app.link/AbCdEf'),
   _Rejected('a mailto link', 'mailto:owner@cafe-noir.co.il'),
   _Rejected(
     'a wolt.com URL with no restaurant segment',
@@ -403,6 +424,7 @@ void main() {
         'https://wolt.com/en/isr/tel-aviv/restaurant/vitrina',
         'wolt.com/en/isr/tel-aviv/restaurant/vitrina',
         'https://www.cafe.co.il/menu',
+        'www.mycafe.co.il',
         '  123456  ',
       ]) {
         expect(VenueRefResolver.isExplicitLink(input), isTrue, reason: input);

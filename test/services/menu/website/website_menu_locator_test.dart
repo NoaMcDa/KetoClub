@@ -53,6 +53,21 @@ void main() {
       expect(link.isPdf, isFalse);
     });
 
+    test('step 2: a link whose address names the menu beats one whose '
+        'text alone does (#480)', () {
+      // Act
+      final location = WebsiteMenuLocator.locate(
+        _fixture('menu_text_link_first.html'),
+        Uri.parse('https://www.cafe.example/'),
+      );
+
+      // Assert
+      expect(
+        (location as MenuLinkFound).uri,
+        Uri.parse('https://www.cafe.example/dairy_menu/morning/'),
+      );
+    });
+
     test('step 2: a Hebrew תפריט link is found by its text', () {
       final location = WebsiteMenuLocator.locate(
         _fixture('hebrew_menu_link.html'),
@@ -188,6 +203,78 @@ Grilled salmon
 Burger & fries'''
             .trim(),
       );
+    });
+
+    test('reads name / tags / price / description, dropping the tags and '
+        'the screen-reader currency word (#480)', () {
+      // Act
+      final text = WebsiteMenuLocator.menuText(
+        _fixture('name_price_description_menu.html'),
+      );
+
+      // Assert
+      expect(
+        text,
+        '''
+ראשונות:
+חציל שרוף באש
+- טחינה, שמן זית, עגבניות שרי ופלפל חריף
+כרובית וברוקולי פריכים
+- רוטב יוגורט, לימון כבוש ועשבי תיבול
+עיקריות:
+שניצל עוף
+- פירורי לחם, תפוחי אדמה מעוכים וסלט ירוק
+סטייק אנטריקוט
+- 300 גרם, חמאת עשבים, צ׳יפס בצד'''
+            .trim(),
+      );
+    });
+
+    test('reads "מחיר: 89 שקלים" as a price (#480)', () {
+      // Act
+      final text = WebsiteMenuLocator.menuText(
+        _fixture('price_label_menu.html'),
+      );
+
+      // Assert
+      expect(
+        text,
+        '''
+ארוחות בוקר:
+ארוחת בוקר ישראלית
+- ארוחת הבוקר מוגשת עם סלסלת לחמים, סלט קצוץ, גבינות וממרחים
+שקשוקה
+- עגבניות, פלפלים ושתי ביצים, מוגשת עם לחם
+חביתת ירק
+- שלוש ביצים, עשבי תיבול וסלט ירוק'''
+            .trim(),
+      );
+    });
+
+    test('a price followed by a currency word counts (#480)', () {
+      // Act
+      final text = WebsiteMenuLocator.menuText(
+        '<p>Salad 42 shekels</p><p>Soup 30 שקלים</p><p>Steak 98 ש״ח</p>',
+      );
+
+      // Assert
+      expect(text, 'Salad\nSoup\nSteak');
+    });
+
+    test('a street address is not a priced dish (#283)', () {
+      // Act
+      final text = WebsiteMenuLocator.menuText(
+        '<p>Tel Aviv, Dizengoff 99</p><p>Salad 42</p><p>Soup 30</p>'
+        '<p>Steak 98</p><p>רחוב הרצל 12</p>',
+      );
+      final notEnough = WebsiteMenuLocator.menuText(
+        '<p>Tel Aviv, Dizengoff 99</p><p>Salad 42</p><p>Soup 30</p>'
+        '<p>רח׳ אלנבי 5</p>',
+      );
+
+      // Assert
+      expect(text, 'Salad\nSoup\nSteak');
+      expect(notEnough, isNull);
     });
 
     test('a page with fewer than three prices is not a menu', () {

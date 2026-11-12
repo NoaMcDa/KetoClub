@@ -14,6 +14,14 @@ final RegExp _digitsOnly = RegExp(r'^[0-9]+$');
 /// `hamosad-food`), not an English word.
 final RegExp _hyphenatedSlug = RegExp(r'^[a-z0-9][a-z0-9-]*-[a-z0-9-]*$');
 
+/// A bare domain with no path (`www.mycafe.co.il`, `my-cafe.co.il`):
+/// dot-separated labels ending in a letters-only top-level domain
+/// (#283). Read as `https://` plus the domain.
+final RegExp _bareDomain = RegExp(
+  r'^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,24}$',
+  caseSensitive: false,
+);
+
 /// Turns what a user pasted into a [VenueRef] (architecture.md §6.5,
 /// Tier A: paste a URL or ID, shipped before venue search).
 ///
@@ -104,7 +112,9 @@ abstract final class VenueRefResolver {
   /// link" action (issue #229, audit D8).
   static bool isExplicitLink(String input) {
     final trimmed = input.trim();
-    if (!trimmed.contains('/') && !_digitsOnly.hasMatch(trimmed)) {
+    if (!trimmed.contains('/') &&
+        !_digitsOnly.hasMatch(trimmed) &&
+        !_bareDomain.hasMatch(trimmed)) {
       return false;
     }
     return resolve(trimmed) != null;
@@ -134,6 +144,9 @@ abstract final class VenueRefResolver {
     final direct = Uri.tryParse(trimmed);
     if (direct != null && direct.host.isNotEmpty) return direct;
 
+    if (_bareDomain.hasMatch(trimmed)) {
+      return Uri.tryParse('https://$trimmed');
+    }
     final firstSlash = trimmed.indexOf('/');
     if (firstSlash <= 0) return null;
     if (!trimmed.substring(0, firstSlash).contains('.')) return null;
@@ -153,6 +166,9 @@ abstract final class VenueRefResolver {
     if (host == '10bis.co.il' || host.endsWith('.10bis.co.il')) {
       return _fromTenBisUri(uri);
     }
+    // A short link (`wolt.app.link/…`) names its venue only behind a
+    // redirect, which resolving here cannot follow; it is not a website.
+    if (host == 'app.link' || host.endsWith('.app.link')) return null;
     return _fromWebsiteUri(uri);
   }
 
@@ -167,7 +183,8 @@ abstract final class VenueRefResolver {
   /// The form a website URL is stored in (D19), or null when [uri] is not
   /// one: not `http`/`https`, a host with no dot (`localhost`), a host
   /// [isPublicHost] refuses (a private or loopback IP address, `*.local`),
-  /// or user info in the URL.
+  /// user info in the URL, or a port other than 80 and 443, which the
+  /// website fetcher refuses too (`isPublicWebUrl`, #283).
   ///
   /// Lower-cases the scheme and host, drops the fragment, a default port
   /// and one trailing `/`, and keeps the path and query as given, so the
@@ -181,6 +198,7 @@ abstract final class VenueRefResolver {
     }
     if (!isPublicHost(host)) return null;
     if (uri.userInfo.isNotEmpty) return null;
+    if (uri.hasPort && uri.port != 80 && uri.port != 443) return null;
     final path = uri.path.endsWith('/')
         ? uri.path.substring(0, uri.path.length - 1)
         : uri.path;
@@ -202,10 +220,13 @@ abstract final class VenueRefResolver {
   }
 
   /// Resolves a `wolt.com` [uri]: null unless its path holds a
-  /// `restaurant` segment followed by a non-empty slug.
+  /// `restaurant` (or, on some pages, `venue`, #283) segment followed by a
+  /// non-empty slug.
   static VenueRef? _fromWoltUri(Uri uri) {
     final segments = uri.pathSegments;
-    final restaurantIndex = segments.indexOf('restaurant');
+    final restaurantIndex = segments.indexWhere(
+      (segment) => segment == 'restaurant' || segment == 'venue',
+    );
     if (restaurantIndex == -1 || restaurantIndex + 1 >= segments.length) {
       return null;
     }

@@ -2438,6 +2438,19 @@ often appear on neither.
   is proof of reversed text. A geresh or gershayim between two letters is part
   of the word (פרמז'ן, תנ"ך), so a loanword's final letter is not read as the
   start of one (issue #442).
+- **Amended by #480 and #283 (2026-11).** A price may carry a currency word or
+  a `מחיר:` label (`priceCurrencySource`, one source with the paste reader);
+  visually hidden text (`sr-only` and kin) and dietary tag lines (`מנה
+  צמחונית`, `vegan`, `GF`) are dropped before lines are read; a page set as
+  `name / price / description` (most prices followed by a longer line than
+  the one before) is read in that order; a line that reads as a street address
+  is never a priced dish. Among menu links, one whose own address names the
+  menu beats one only its text names (an events page linked "תפריט בהתאמה").
+  A page's charset may come from a `<meta>` tag, and the `iso-8859-8` labels
+  all read as Hebrew. The resolver reads a bare domain as `https://`, refuses a
+  port the fetcher would refuse (anything but 80 and 443), reads Wolt
+  `/venue/` links, and refuses `*.app.link` short links rather than fetching
+  them as a website.
 - **Fetching it (crawl hygiene).** Web goes through the backend's new
   `POST /v1/website/fetch` (`{"url"}` in the body, so no URL reaches a request
   log; answers `{kind: html|pdf, content_type, body, final_url}`, a PDF's body in

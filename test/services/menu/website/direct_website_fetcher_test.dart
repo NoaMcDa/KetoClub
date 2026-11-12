@@ -513,6 +513,31 @@ void main() {
       });
     });
 
+    test('decodePage reads a charset a <meta> tag declares (#283)', () {
+      // "סלט" in windows-1255, declared only in the page.
+      Uint8List page(String meta) => Uint8List.fromList([
+        ...latin1.encode('<html><head>$meta</head><body>'),
+        0xF1,
+        0xEC,
+        0xE8,
+      ]);
+
+      const httpEquiv =
+          '<meta http-equiv="Content-Type" '
+          'content="text/html; charset=ISO-8859-8">';
+      for (final meta in const [
+        '<meta charset=windows-1255>',
+        '<meta charset="iso-8859-8-i">',
+        httpEquiv,
+      ]) {
+        expect(
+          DirectWebsiteFetcher.decodePage(page(meta), 'text/html'),
+          endsWith('<body>סלט'),
+          reason: meta,
+        );
+      }
+    });
+
     test('decodePage reads the legacy Hebrew code pages', () {
       // "סלט" and a shekel sign in windows-1255, then plain UTF-8.
       final legacy = Uint8List.fromList([0xF1, 0xEC, 0xE8, 0x20, 0xA4]);

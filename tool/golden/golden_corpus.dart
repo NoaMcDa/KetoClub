@@ -1876,6 +1876,9 @@ const Map<String, String> websiteFixtureBases = <String, String>{
   'menu_link.html': websiteHome,
   'menu_page_inline_prices.html': websiteHome,
   'menu_page_separate_prices.html': websiteHome,
+  'menu_text_link_first.html': 'https://www.cafe.example/',
+  'name_price_description_menu.html': websiteHome,
+  'price_label_menu.html': websiteHome,
   'no_menu.html': websiteHome,
   'pdf_link.html': websiteHome,
 };
@@ -1883,6 +1886,28 @@ const Map<String, String> websiteFixtureBases = <String, String>{
 /// Inline website cases lifted from `website_menu_locator_test.dart` and
 /// `website_html_test.dart`, plus the AI opt-out and JavaScript signals.
 const List<WebsiteCase> websiteInlineCases = <WebsiteCase>[
+  (
+    name: 'inline_currency_words',
+    html:
+        '<p>Salad 42 shekels</p><p>Soup 30 shkalim</p><p>Steak 98 NIS</p>'
+        '<p>Cola price: 12</p>',
+    baseUrl: websiteHome,
+  ),
+  (
+    name: 'inline_addresses_are_not_dishes',
+    html:
+        '<p>Tel Aviv, Dizengoff 99</p><p>Salad 42</p><p>Soup 30</p>'
+        '<p>Steak 98</p><p>Herzl St 12</p>',
+    baseUrl: websiteHome,
+  ),
+  (
+    name: 'inline_screen_reader_text',
+    html:
+        '<p>Salad</p><p>Greens</p><p>42<span class="sr-only">NIS</span></p>'
+        '<p>Soup</p><p>Lentils</p><p>30<span class=visually-hidden>'
+        'shekels</span></p><p>Steak</p><p>Aged</p><p>98</p>',
+    baseUrl: websiteHome,
+  ),
   (
     name: 'inline_any_pdf',
     html: '<a href="/docs/today.pdf">Today</a>',

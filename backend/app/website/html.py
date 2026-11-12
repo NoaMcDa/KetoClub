@@ -587,6 +587,12 @@ _INVISIBLE: Final = re.compile(
     rf"<(script|style|noscript|template|svg|head|nav|footer)\b[^>]*>.*?</\1{WS}*>",
     _FLAGS | re.DOTALL,
 )
+_SCREEN_READER_ONLY: Final = re.compile(
+    "(sr-only|scr-reader-only|screen-reader-text|visually-hidden|visuallyhidden)"
+    "([^<>]{0,1000})>[^<]{0,300}",
+    _FLAGS,
+)
+"""``WebsiteHtml._screenReaderOnly``: an element's visually hidden text."""
 _SCRIPTS_ONLY: Final = re.compile(
     rf"<(script|style|noscript|template|svg)\b[^>]*>.*?</\1{WS}*>",
     _FLAGS | re.DOTALL,
@@ -672,11 +678,14 @@ def decode_entities(text: str) -> str:
 def lines(html: str) -> list[str]:
     """The page's visible text as trimmed, non-blank lines in reading order.
 
-    Drops comments, ``<head>``, scripts, styles, templates, SVG, ``<nav>``
-    and ``<footer>``; starts a new line at every block element and joins
-    table cells with a space, so a row reads ``Dish 52`` as one line.
+    Drops comments, ``<head>``, scripts, styles, templates, SVG, ``<nav>``,
+    ``<footer>`` and visually hidden text (``sr-only`` and kin, #480); starts
+    a new line at every block element and joins table cells with a space, so a
+    row reads ``Dish 52`` as one line.
     """
-    without_hidden = _INVISIBLE.sub("\n", _COMMENT.sub(" ", html))
+    without_hidden = _SCREEN_READER_ONLY.sub(
+        r"\1\2>", _INVISIBLE.sub("\n", _COMMENT.sub(" ", html))
+    )
     broken = _TAG.sub(" ", _CELL_TAG.sub(" ", _BLOCK_TAG.sub("\n", without_hidden)))
     found = (
         dart_trim(_SPACES.sub(" ", raw))

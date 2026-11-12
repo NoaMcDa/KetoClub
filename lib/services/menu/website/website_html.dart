@@ -48,6 +48,16 @@ abstract final class WebsiteHtml {
     caseSensitive: false,
     dotAll: true,
   );
+
+  /// A visually hidden element's text (`<span class="sr-only">shkalim`),
+  /// which a screen reader speaks and a sighted reader never sees (#480):
+  /// the class name, the rest of its tag, then its text up to the next
+  /// tag. Bounded, so a long run without `>` or `<` stays linear.
+  static final RegExp _screenReaderOnly = RegExp(
+    '(sr-only|scr-reader-only|screen-reader-text|visually-hidden'
+    '|visuallyhidden)([^<>]{0,1000})>[^<]{0,300}',
+    caseSensitive: false,
+  );
   static final RegExp _scriptsOnly = RegExp(
     r'<(script|style|noscript|template|svg)\b[^>]*>.*?</\1\s*>',
     caseSensitive: false,
@@ -109,13 +119,18 @@ abstract final class WebsiteHtml {
 
   /// The page's visible text as trimmed, non-blank lines in reading order.
   ///
-  /// Drops comments, `<head>`, scripts, styles, templates, SVG, `<nav>` and
-  /// `<footer>`; starts a new line at every block element and joins table
-  /// cells with a space, so a row reads "Dish 52" as one line.
+  /// Drops comments, `<head>`, scripts, styles, templates, SVG, `<nav>`,
+  /// `<footer>` and visually hidden text (`sr-only` and kin, #480); starts
+  /// a new line at every block element and joins table cells with a space,
+  /// so a row reads "Dish 52" as one line.
   static List<String> lines(String html) {
     final withoutHidden = html
         .replaceAll(_comment, ' ')
-        .replaceAll(_invisible, '\n');
+        .replaceAll(_invisible, '\n')
+        .replaceAllMapped(
+          _screenReaderOnly,
+          (match) => '${match.group(1)}${match.group(2)}>',
+        );
     final broken = withoutHidden
         .replaceAll(_blockTag, '\n')
         .replaceAll(_cellTag, ' ')
