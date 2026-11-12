@@ -2939,6 +2939,12 @@ every platform, and keeps the Dart code as its fallback. Nine decisions:
    questions `FallbackChatClient`. What falls through, and what is reported:
    - Menus: `backendUnreachable` and `offline`. Every other reason is the
      platform's or the site's own answer, which the device would only hear again.
+     A website's PDF the server could not read at all (a 502 `notConfigured`,
+     `timeout` or `rateLimited` from `/v1/website-menu`) reads as
+     `backendUnreachable`, as the same failure falls through on `/v1/scan`; a
+     502 `badResponse` and a 422 `noDishesFound` stay `websitePdfUnread`
+     (#465). When the device then fails with `websitePdfUnread` too, that is
+     reported: it names what to fix.
    - Classifiers and chat: `notConfigured`, `backendUnreachable`, `timeout`,
      `rateLimited`. `offline`, `badResponse`, `noDishesFound`, `consentWithheld`
      and the key reasons are returned as they are.
