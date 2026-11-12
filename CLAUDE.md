@@ -56,7 +56,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > `POST /v1/menus`, keyed by venue, never by install id) that every platform
 > built with a backend URL uploads opened menus to, under the AI consent.
 > **Phase 8 ("UI Polish & Desktop Web", issues #221–#264, `docs/UX_REVIEW.md`)
-> shipped on top of all of that, on the `phase-8` branch (PR #266):** every
+> shipped on top of all of that, and merged (PR #266):** every
 > screen body sits in a `ContentWidth` cap (680px; Discovery 1080px), Discovery
 > is a 1/2/3-column venue grid with a card surface, a `NavigationRail` replaces
 > the bottom bar at 840px and wider, modal sheets are capped at 560px, the menu
@@ -329,7 +329,7 @@ lib/
 │                              # screen, including venue_search_controller and saved_controller,
 │                              # scan_controller and scanned_pages_registry (the in-memory
 │                              # page thumbnails behind "View pages")
-├── widgets/                   # dish_card, status_badge, engine_chip, waiter_script,
+├── widgets/                   # dish_card, status_badge, engine_chip, waiter_script_widget,
 │                              # verdict_counter_tiles, keto_score_badge, app_shell, failure_copy,
 │                              # venue_card, category_chips, photo_tile, offline_banner,
 │                              # fetch_failure_action, analysis_progress_row, menu_search_field,
@@ -624,7 +624,7 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
   rules are not Phase 4 work: they shipped earlier under Phase 2 (#56, #143).
 
 - **Phase 8**: UI Polish & Desktop Web (one GitHub milestone, issues #221–#264,
-  from `docs/UX_REVIEW.md`) → **Built on the `phase-8` branch, PR #266.** The
+  from `docs/UX_REVIEW.md`) → **Built and merged (PR #266).** The
   desktop web layout (content-width cap, venue grid, navigation rail, sheet
   width, two-pane menu, web shell) and the per-screen polish listed in the
   status banner above. Phases 5–7 exist on GitHub as milestones; see
@@ -785,9 +785,7 @@ Built, but not confirmed end to end, and not to be reported as done:
   chromedriver/Chromium mismatch; runs hang after "Debug service listening",
   including flows that predate D25), so the two new flows
   (`backend_classify_flow_test.dart`, `backend_fallback_flow_test.dart`) are
-  proven only under `flutter-tester`. The `app_launch` and `discovery_denied`
-  flows already fail under `flutter-tester` at the pre-D25 commit (`680845e`);
-  that is not a D25 regression.
+  proven only under `flutter-tester`.
 - **No human has reviewed this code.**
 - The three colour pairs that failed WCAG AA contrast (green-on-green at
   4.08:1, light `ink3`-on-bg at 2.78:1, dark `ink3`-on-bg at 4.02:1) were
@@ -806,7 +804,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
    scan issue (#88; §16's Phase 4 steps). §14 has the decisions
-   log D1–D29, §17 the open questions with the default the code follows.
+   log D1–D29 (D20 exists), §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing
