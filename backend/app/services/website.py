@@ -21,6 +21,8 @@ from dataclasses import dataclass, field
 from typing import Final, Literal
 from urllib.parse import urlsplit
 
+from app.website.linear import PairedTags, find_tags, sub_comments, sub_tags
+
 # The product token KetoClub's fetcher answers to in robots.txt, matched
 # case-insensitively against each ``User-agent`` line (RFC 9309 §2.2.1).
 ROBOTS_TOKEN: Final = "ketoclubbot"
@@ -35,15 +37,25 @@ JS_ONLY_NOSCRIPT_TEXT_CHARS: Final = 200
 
 DocumentKind = Literal["html", "pdf"]
 
-_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
-_INVISIBLE = re.compile(
-    r"<(script|style|noscript|template|svg)\b[^>]*>.*?</\1\s*>",
-    re.DOTALL | re.IGNORECASE,
+_EMBEDDED_IPV4_NETWORKS: Final = (
+    ipaddress.IPv6Network("64:ff9b::/96"),  # NAT64, RFC 6052
+    ipaddress.IPv6Network("64:ff9b:1::/48"),  # local-use NAT64, RFC 8215
+    ipaddress.IPv6Network("::/96"),  # IPv4-compatible, RFC 4291 §2.5.5.1
 )
-_NOSCRIPT = re.compile(
-    r"<noscript\b[^>]*>(.*?)</noscript\s*>", re.DOTALL | re.IGNORECASE
+
+# ``<!--.*?-->``, ``<(script|style|noscript|template|svg)\b[^>]*>.*?</\1\s*>``
+# and ``<noscript\b[^>]*>(.*?)</noscript\s*>``, run in linear time with the
+# regexes' exact results by ``app.website.linear`` (#268): as regexes they
+# rescan the rest of the page at every unclosed tag.
+_INVISIBLE = PairedTags(
+    "script|style|noscript|template|svg",
+    space=r"\s",
+    flags=re.IGNORECASE,
+    same_name=True,
 )
+_NOSCRIPT = PairedTags("noscript", space=r"\s", flags=re.IGNORECASE, same_name=False)
 _TAG = re.compile(r"<[^>]+>")
+_HUGE_DECIMAL_REFERENCE = re.compile(r"&#0*+[0-9]{8,};?")
 _WHITESPACE = re.compile(r"\s+")
 _META = re.compile(r"<meta\b[^>]*>", re.IGNORECASE)
 _ATTRIBUTE = re.compile(
@@ -132,11 +144,33 @@ def parse_robots(text: str) -> RobotsRules:
 
 
 def _matches(pattern: str, path: str) -> bool:
-    """Whether a robots ``pattern`` (``*`` wildcards, ``$`` end) matches."""
+    """Whether a robots ``pattern`` (``*`` wildcards, ``$`` end) matches.
+
+    The pattern matches from the start of ``path``; without a trailing ``$``
+    it need only match a prefix. Every other character is literal. Matched
+    without a regex (#268): ``*`` as an unbounded ``.*`` backtracks
+    exponentially in the number of stars, so a hostile robots.txt could
+    stall the server. Each literal piece between stars is found at its
+    leftmost place after the previous one, which is the same answer: a
+    leftmost place leaves the most path for every piece after it.
+    """
     anchored = pattern.endswith("$")
-    body = pattern[:-1] if anchored else pattern
-    regex = ".*".join(re.escape(part) for part in body.split("*"))
-    return re.match(regex + ("$" if anchored else ""), path) is not None
+    pieces = (pattern[:-1] if anchored else pattern).split("*")
+    head, *rest = pieces
+    if not path.startswith(head):
+        return False
+    if not rest:
+        return path == head if anchored else True
+    *middle, tail = rest
+    position = len(head)
+    for piece in middle:
+        found = path.find(piece, position)
+        if found == -1:
+            return False
+        position = found + len(piece)
+    if anchored:
+        return len(path) - len(tail) >= position and path.endswith(tail)
+    return path.find(tail, position) != -1
 
 
 def path_of(url: str) -> str:
@@ -151,12 +185,22 @@ def is_public_address(address: str) -> bool:
 
     Loopback, private, link-local, multicast, reserved and unspecified
     addresses are all refused, so a pasted URL cannot make this server
-    fetch something on its own network.
+    fetch something on its own network. An IPv4-mapped IPv6 address is
+    judged by the IPv4 address it maps; NAT64 and IPv4-compatible ones are
+    refused outright.
     """
     try:
         ip = ipaddress.ip_address(address)
     except ValueError:
         return False
+    if isinstance(ip, ipaddress.IPv6Address):
+        if ip.ipv4_mapped is not None:
+            return is_public_address(str(ip.ipv4_mapped))
+        # IPv4 behind an IPv6 form that Python calls global (#267): NAT64
+        # (64:ff9b::a00:1 reaches 10.0.0.1 through a NAT64 gateway) and the
+        # deprecated IPv4-compatible ::a.b.c.d, refused whatever they embed.
+        if any(ip in network for network in _EMBEDDED_IPV4_NETWORKS):
+            return False
     return ip.is_global and not ip.is_multicast
 
 
@@ -178,12 +222,12 @@ def html_reserves_ai(page: str) -> bool:
     ``<meta name="robots" content="noai">`` (or a ``name`` naming KetoClub)
     and ``<meta name="tdm-reservation" content="1">``.
     """
-    for tag in _META.findall(page):
+    for meta in find_tags(_META, page):
         attributes = {
             match.group(1).lower(): (
                 match.group(2) or match.group(3) or match.group(4) or ""
             )
-            for match in _ATTRIBUTE.finditer(tag)
+            for match in _ATTRIBUTE.finditer(meta.group(0))
         }
         name = attributes.get("name", "").strip().lower()
         content = attributes.get("content", "").strip().lower()
@@ -200,8 +244,16 @@ def _directives(value: str) -> set[str]:
 
 def visible_text(page: str) -> str:
     """The text a reader would see in ``page``, whitespace collapsed."""
-    without = _INVISIBLE.sub(" ", _COMMENT.sub(" ", page))
-    return _WHITESPACE.sub(" ", html.unescape(_TAG.sub(" ", without))).strip()
+    without = _INVISIBLE.sub(" ", sub_comments(" ", page))
+    return _WHITESPACE.sub(" ", _unescape(sub_tags(_TAG, " ", without))).strip()
+
+
+def _unescape(text: str) -> str:
+    """``html.unescape``, which raises ``ValueError`` on a decimal reference
+    longer than Python's integer-string limit; any reference of eight or
+    more significant digits is past U+10FFFF, which ``html.unescape`` reads
+    as U+FFFD anyway."""
+    return html.unescape(_HUGE_DECIMAL_REFERENCE.sub("\ufffd", text))
 
 
 def looks_javascript_only(page: str) -> bool:
@@ -221,8 +273,8 @@ def looks_javascript_only(page: str) -> bool:
     text_length = len(visible_text(page))
     if "<script" in lowered and text_length < JS_ONLY_TEXT_CHARS:
         return True
-    for inner in _NOSCRIPT.findall(page):
-        if "javascript" in inner.lower():
+    for block in _NOSCRIPT.finditer(page):
+        if "javascript" in page[block.content_start : block.content_end].lower():
             return text_length < JS_ONLY_NOSCRIPT_TEXT_CHARS
     return False
 
