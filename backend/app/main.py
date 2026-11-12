@@ -49,7 +49,7 @@ from app.services.places import redact_geocoder_queries
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
 from app.services.trusted_host import AllowedHostsMiddleware
-from app.services.website_transport import website_client
+from app.services.website_transport import shared_ssl_context, website_client
 
 # "No daily cap" (#123) expressed as a bound no real install could reach in
 # a day, so the discovery limiter's day window never binds.
@@ -81,7 +81,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         engine = build_engine(resolved_settings)
         Base.metadata.create_all(engine)
         app.state.engine = engine
-        app.state.http_client = httpx.AsyncClient()
+        app.state.http_client = httpx.AsyncClient(
+            verify=shared_ssl_context(trust_env=True)
+        )
         # The website routes' own client (#267): it dials only the public
         # addresses it resolved, ignores HTTP(S)_PROXY, and resolves through
         # ``app.state.resolve_host`` so tests can stand in for DNS.

@@ -19,6 +19,8 @@ The client is built with ``trust_env=False``: an ``HTTP(S)_PROXY`` from the
 environment would make the proxy resolve the name, outside this guard.
 """
 
+import functools
+import ssl
 from collections.abc import Awaitable, Callable, Iterable
 from typing import Final
 
@@ -98,15 +100,27 @@ class PublicOnlyNetworkBackend(httpcore.AsyncNetworkBackend):
         await self._inner.sleep(seconds)
 
 
+@functools.cache
+def shared_ssl_context(*, trust_env: bool = False) -> ssl.SSLContext:
+    """One verifying TLS context per process and ``trust_env``, shared by
+    every client ``create_app`` builds.
+
+    Building one loads the whole CA bundle, which took seconds on a loaded
+    Windows machine, and every ``create_app`` built three (the test suite
+    builds hundreds). A context is safe to share between clients.
+    """
+    return httpx.create_ssl_context(trust_env=trust_env)
+
+
 class _PublicOnlyTransport(httpx.AsyncHTTPTransport):
     """httpx's own transport over a pool whose network layer is
     :class:`PublicOnlyNetworkBackend`. httpx takes no network backend, so
     the pool it built is replaced with an equivalent one that has it."""
 
     def __init__(self, backend: httpcore.AsyncNetworkBackend) -> None:
-        super().__init__(trust_env=False, limits=_LIMITS)
+        super().__init__(verify=shared_ssl_context(), trust_env=False, limits=_LIMITS)
         self._pool = httpcore.AsyncConnectionPool(
-            ssl_context=httpx.create_ssl_context(trust_env=False),
+            ssl_context=shared_ssl_context(),
             max_connections=_LIMITS.max_connections,
             max_keepalive_connections=_LIMITS.max_keepalive_connections,
             keepalive_expiry=_LIMITS.keepalive_expiry,

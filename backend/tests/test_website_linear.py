@@ -419,7 +419,9 @@ def test_other_two_megabyte_traps_take_seconds_not_hours(page: str) -> None:
     # here, linear but in Python, not one pattern.
     base = DartUri.parse("https://cafe.example/")
     assert _seconds(lambda: read_page(page, base, now="2026-10-01T00:00:00.000Z")) < 3.0
-    assert _seconds(lambda: fetch_judge.looks_javascript_only(page)) < 1.0
+    # 3 s, not 1: about a second of CPU on a loaded Windows machine, against
+    # hours before (#268).
+    assert _seconds(lambda: fetch_judge.looks_javascript_only(page)) < 3.0
 
 
 def test_a_twelve_star_robots_pattern_takes_well_under_a_second() -> None:
