@@ -226,6 +226,45 @@ void main() {
       expect(find.text('0badf00d'), findsNothing);
     });
 
+    testWidgets('a menu opened a moment ago reads "Opened just now" in '
+        'lower case (issue #487)', (tester) async {
+      // Arrange
+      final now = DateTime.now();
+      final h = _Harness()
+        ..open(
+          CachedMenu(menu: _menuWith(_woltRef, now, venueName: 'Vitrina')),
+          openedAt: now,
+        );
+
+      // Act
+      await _pump(tester, h.controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text(_en.menuSourceLine('Wolt', _en.savedOpenedJustNow)),
+        findsOneWidget,
+      );
+      expect(_en.savedOpenedJustNow, 'Opened just now');
+    });
+
+    testWidgets('a cached scan shows no expiry and no Keep pin '
+        '(issue #288)', (tester) async {
+      // Arrange
+      const scanRef = VenueRef(source: MenuSource.scan, platformId: '0badf00d');
+      final h = _Harness()
+        ..open(CachedMenu(menu: _menuWith(scanRef, DateTime.now().toUtc())));
+
+      // Act
+      await _pump(tester, h.controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.savedKept), findsOneWidget);
+      expect(find.byTooltip(_en.savedKeep), findsNothing);
+      expect(find.byTooltip(_en.savedUnkeep), findsNothing);
+    });
+
     for (final entry in {
       'light': AppTheme.light(),
       'dark': AppTheme.dark(),

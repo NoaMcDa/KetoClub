@@ -20,6 +20,25 @@ import 'package:ketoclub/utils/text_normaliser.dart';
 /// analysis, so there is nothing about the person reading it for this
 /// function to leak even by accident.
 abstract final class MenuShareText {
+  /// Whether [build] would list at least one dish: a green or yellow one
+  /// that is not a notice line (#460). The menu screen offers Share on this.
+  static bool hasContent(Menu menu, MenuAnalysed analysis) =>
+      _orderable(menu, analysis).any(
+        (dish) =>
+            dish.verdict == DishVerdict.orderAsIs ||
+            dish.verdict == DishVerdict.modifiable,
+      );
+
+  // A notice line ("for allergen information contact the restaurant") is
+  // not something to order, whatever verdict it was given (#445).
+  static List<AnalysedDish> _orderable(Menu menu, MenuAnalysed analysis) {
+    final kinds = dishKindsOf(menu);
+    return <AnalysedDish>[
+      for (final dish in analysis.dishes)
+        if (kinds[dish.dishId] != DishKind.notice) dish,
+    ];
+  }
+
   /// Builds the summary for [venueName]'s [menu], judged by [analysis].
   ///
   /// Lists every [DishVerdict.orderAsIs] dish under a green heading, then
@@ -49,13 +68,7 @@ abstract final class MenuShareText {
     required MenuAnalysed analysis,
   }) {
     final isHebrew = _menuIsHebrew(menu);
-    // A notice line ("for allergen information contact the restaurant")
-    // is not something to order, whatever verdict it was given (#445).
-    final kinds = dishKindsOf(menu);
-    final dishes = <AnalysedDish>[
-      for (final dish in analysis.dishes)
-        if (kinds[dish.dishId] != DishKind.notice) dish,
-    ];
+    final dishes = _orderable(menu, analysis);
     final green = <AnalysedDish>[
       for (final dish in dishes)
         if (dish.verdict == DishVerdict.orderAsIs) dish,

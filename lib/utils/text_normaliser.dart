@@ -209,6 +209,14 @@ abstract final class TextNormaliser {
   /// locale").
   static bool containsHebrew(String raw) => _hebrewLetter.hasMatch(raw);
 
+  /// [raw] without its bidirectional control characters, for display only:
+  /// Wolt opens many Hebrew names with an unclosed right-to-left embedding,
+  /// which a chip sizing itself to its label measures narrower than it
+  /// paints, cutting off the first letters (#484). Matching already drops
+  /// them in [normalise]; the stored name keeps them.
+  static String stripBidiControls(String raw) =>
+      raw.replaceAll(_bidiControls, '');
+
   /// The normalised words of [raw] that are at least [minLength]
   /// characters long, in order.
   static List<String> words(String raw, {int minLength = 1}) {
