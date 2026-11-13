@@ -22,7 +22,16 @@ typedef _CompiledModifier = ({String key, RegExp pattern, String sentence});
 /// One surviving (unguarded) carb-modifier occurrence, in match order.
 /// `end` is exclusive, so `start`..`end` is the matched span — which the
 /// carb-only-dish rule blanks out to see what else a dish name says.
-typedef _Occurrence = ({int start, int end, String key, String sentence});
+/// `hebrew` says which table the trigger came from, so its sentence can
+/// be swapped for the counterpart's when the dish is in the other
+/// language (issue #279).
+typedef _Occurrence = ({
+  int start,
+  int end,
+  String key,
+  String sentence,
+  bool hebrew,
+});
 
 /// Hebrew letters, including final forms — they are ordinary codepoints
 /// inside this range, not appended ones (`vocabulary_spec.md` "regex
@@ -512,7 +521,11 @@ List<_Occurrence> _unguardedModifierOccurrences(
   required String name,
 }) {
   final occurrences = <_Occurrence>[];
-  void scan(List<_CompiledModifier> table, Map<String, GuardWords> guards) {
+  void scan(
+    List<_CompiledModifier> table,
+    Map<String, GuardWords> guards, {
+    required bool hebrew,
+  }) {
     for (final entry in table) {
       for (final match in entry.pattern.allMatches(haystack)) {
         if (_isCancelled(
@@ -530,13 +543,14 @@ List<_Occurrence> _unguardedModifierOccurrences(
           end: match.end,
           key: entry.key,
           sentence: entry.sentence,
+          hebrew: hebrew,
         ));
       }
     }
   }
 
-  scan(_carbEn, ketoQualifierGuardsEn);
-  scan(_carbHe, ketoQualifierGuardsHe);
+  scan(_carbEn, ketoQualifierGuardsEn, hebrew: false);
+  scan(_carbHe, ketoQualifierGuardsHe, hebrew: true);
   occurrences.sort((a, b) => a.start.compareTo(b.start));
   return occurrences;
 }
@@ -545,7 +559,15 @@ List<_Occurrence> _unguardedModifierOccurrences(
 /// deduplicated sentence list, in match-start order: the more specific
 /// phrase's trigger wins, so `sweet potato` does not also emit the bare
 /// `potato` sentence.
-List<String> _sentencesAfterSuppression(List<_Occurrence> occurrences) {
+///
+/// Every sentence is in the dish's language ([hebrew]), whichever table
+/// its trigger came from (issue #279): a trigger from the other table
+/// gives its counterpart's sentence ([carbModifierCounterpartsEn],
+/// [carbModifierCounterpartsHe]), so "המבורגר BBQ" asks in Hebrew.
+List<String> _sentencesAfterSuppression(
+  List<_Occurrence> occurrences, {
+  required bool hebrew,
+}) {
   final firedKeys = occurrences.map((occurrence) => occurrence.key).toSet();
   final suppressedKeys = <String>{};
   for (final key in firedKeys) {
@@ -556,9 +578,21 @@ List<String> _sentencesAfterSuppression(List<_Occurrence> occurrences) {
   final sentences = <String>{};
   for (final occurrence in occurrences) {
     if (suppressedKeys.contains(occurrence.key)) continue;
-    sentences.add(occurrence.sentence);
+    sentences.add(_sentenceIn(occurrence, hebrew: hebrew));
   }
   return sentences.toList(growable: false);
+}
+
+/// [occurrence]'s waiter sentence in Hebrew when [hebrew], else English:
+/// its own sentence when its trigger is in that language's table,
+/// otherwise its counterpart's. A trigger with no counterpart keeps its
+/// own sentence; a test pins that none is missing.
+String _sentenceIn(_Occurrence occurrence, {required bool hebrew}) {
+  if (occurrence.hebrew == hebrew) return occurrence.sentence;
+  final translated = hebrew
+      ? carbModifiersHe[carbModifierCounterpartsEn[occurrence.key]]
+      : carbModifiersEn[carbModifierCounterpartsHe[occurrence.key]];
+  return translated ?? occurrence.sentence;
 }
 
 /// What the rule vocabulary found in one dish's text.
@@ -639,7 +673,10 @@ abstract final class ClassificationRules {
     final occurrences = _unguardedModifierOccurrences(haystack, name: haystack);
     return RuleMatch(
       isNonKeto: false,
-      instructions: _sentencesAfterSuppression(occurrences),
+      instructions: _sentencesAfterSuppression(
+        occurrences,
+        hebrew: TextNormaliser.containsHebrew(haystack),
+      ),
     );
   }
 
@@ -675,6 +712,9 @@ abstract final class ClassificationRules {
   ///
   /// [match] stays for callers with only a string; the heuristic
   /// classifier uses this. Never throws.
+  ///
+  /// Every instruction is in [isHebrewDish]'s language, whichever table
+  /// its trigger came from (issue #279).
   static RuleMatch matchDish(Dish dish) {
     final carbOnly = carbOnlyBase(dish.name);
     if (carbOnly != null &&
@@ -714,7 +754,8 @@ abstract final class ClassificationRules {
       TextNormaliser.dishRulesText(dish),
       name: name,
     );
-    final sentences = _sentencesAfterSuppression(occurrences);
+    final hebrew = isHebrewDish(dish);
+    final sentences = _sentencesAfterSuppression(occurrences, hebrew: hebrew);
 
     // A red base offered only as an option ("Choice of side: pasta or
     // salad") is something to steer around, not a reason to skip the
@@ -729,7 +770,7 @@ abstract final class ClassificationRules {
         )?.label ??
         _doughChoices(dish).firstOrNull?.label;
     if (optionBase != null) {
-      final template = TextNormaliser.containsHebrew(optionBase)
+      final template = hebrew
           ? optionBaseModificationHe
           : optionBaseModificationEn;
       return RuleMatch(
@@ -742,6 +783,19 @@ abstract final class ClassificationRules {
     }
 
     return RuleMatch(isNonKeto: false, instructions: sentences);
+  }
+
+  /// Whether [dish]'s waiter script and `why` are written in Hebrew: the
+  /// language of its name and description, or of its options when it has
+  /// no name or description text of its own (issue #279). The script is
+  /// read aloud in that restaurant, so the dish's text decides it, never
+  /// the UI locale (architecture.md §12): "Pasta" with Hebrew option
+  /// labels is an English dish.
+  static bool isHebrewDish(Dish dish) {
+    final core = TextNormaliser.dishCoreText(dish);
+    return TextNormaliser.containsHebrew(
+      core.isEmpty ? TextNormaliser.dishRulesText(dish) : core,
+    );
   }
 
   /// The dough [dish] is built on, when one of its option groups is a

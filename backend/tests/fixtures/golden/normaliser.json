@@ -2555,6 +2555,36 @@
   },
   {
     "containsHebrew": false,
+    "in": "candied nuts",
+    "isRemovalOptionValue": false,
+    "normalised": "candied nuts",
+    "words": [
+      "candied",
+      "nuts"
+    ],
+    "wordsMin3": [
+      "candied",
+      "nuts"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "candied pine nuts",
+    "isRemovalOptionValue": false,
+    "normalised": "candied pine nuts",
+    "words": [
+      "candied",
+      "pine",
+      "nuts"
+    ],
+    "wordsMin3": [
+      "candied",
+      "pine",
+      "nuts"
+    ]
+  },
+  {
+    "containsHebrew": false,
     "in": "cranberries",
     "isRemovalOptionValue": false,
     "normalised": "cranberries",
@@ -3957,6 +3987,28 @@
       "salad",
       "without",
       "croutons"
+    ]
+  },
+  {
+    "containsHebrew": false,
+    "in": "Please leave out the candied nuts.",
+    "isRemovalOptionValue": false,
+    "normalised": "please leave out the candied nuts",
+    "words": [
+      "please",
+      "leave",
+      "out",
+      "the",
+      "candied",
+      "nuts"
+    ],
+    "wordsMin3": [
+      "please",
+      "leave",
+      "out",
+      "the",
+      "candied",
+      "nuts"
     ]
   },
   {

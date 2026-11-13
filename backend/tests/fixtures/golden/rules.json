@@ -8175,7 +8175,6 @@
       "match": {
         "baseLabel": null,
         "instructions": [
-          "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg.",
           "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
         ],
         "isNonKeto": false,
@@ -8193,6 +8192,19 @@
         "kind": "yellow"
       },
       "text": "Beef burger on a brioche bun"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+          "אפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר.",
+          "אפשר בבקשה להחליף את האש בראון בסלט ירוק או בביצה נוספת?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "המבורגר BBQ עם hash browns"
     },
     {
       "match": {
@@ -9117,8 +9129,7 @@
       "match": {
         "baseLabel": null,
         "instructions": [
-          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
-          "Replace French fries with a fresh green salad or a fried egg"
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
         ],
         "isNonKeto": false,
         "kind": "yellow"
@@ -9129,7 +9140,6 @@
       "match": {
         "baseLabel": null,
         "instructions": [
-          "Replace French fries with a fresh green salad or a fried egg",
           "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
         ],
         "isNonKeto": false,
@@ -12491,6 +12501,72 @@
         "kind": "yellow"
       },
       "text": "Grilled salmon with CROUTONS for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the candied nuts."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "candied nuts"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the candied nuts."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Grilled salmon with candied nuts for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the candied nuts."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Grilled salmon with CANDIED NUTS for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the candied nuts."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "candied pine nuts"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the candied nuts."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Grilled salmon with candied pine nuts for dinner"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please leave out the candied nuts."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "Grilled salmon with CANDIED PINE NUTS for dinner"
     },
     {
       "match": {

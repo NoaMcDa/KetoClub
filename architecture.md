@@ -1899,7 +1899,13 @@ should not reach a log or a widget, even with no bearer token left to leak.
 - **Waiter scripts follow the menu, not the UI.** A Hebrew menu gets a Hebrew script,
   an English menu an English one, because the script is read to a waiter in a
   specific restaurant. The prompt says so; the heuristic engine picks its template
-  language by detecting Hebrew letters in the dish text.
+  language by detecting Hebrew letters in the dish's name and description
+  (`ClassificationRules.isHebrewDish`; its options only when it has neither).
+  The whole script is in that language, whichever table a trigger came from
+  (issue #279): every carb-modifier trigger names its counterpart in the other
+  table (`carbModifierCounterpartsEn`/`He`), so the English `bbq` in
+  "המבורגר BBQ" asks in Hebrew with `ברביקיו`'s sentence. A `{base}` label
+  in the option-base sentence is still printed as the menu wrote it.
 - **Dish names are shown exactly as the platform prints them**, untranslated, so the
   user can point at the same line on the physical or in-app menu.
 - **Heuristic vocabulary is bilingual.** Every English trigger in `constants.dart`

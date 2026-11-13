@@ -95,12 +95,8 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     final text = TextNormaliser.dishRulesText(dish);
     // The script a waiter script is read in follows the dish's own
     // text, not the UI locale (architecture.md §12): a Hebrew menu
-    // read by an English-UI user still gets a Hebrew script. The dish's
-    // name and description decide it, not its options: "Pasta" with
-    // Hebrew option labels is an English dish (issue #279). Only a dish
-    // with no name or description text of its own goes by its options.
-    final core = TextNormaliser.dishCoreText(dish);
-    final isHebrew = TextNormaliser.containsHebrew(core.isEmpty ? text : core);
+    // read by an English-UI user still gets a Hebrew script (issue #279).
+    final isHebrew = ClassificationRules.isHebrewDish(dish);
     var match = ClassificationRules.matchDish(dish);
     // A brand or a fruit under a beer or juice heading is that drink
     // (issue #474): the heading names the base the dish text does not.

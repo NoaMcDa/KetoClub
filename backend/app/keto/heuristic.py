@@ -36,9 +36,10 @@ from app.keto.models import (
     MenuAnalysed,
     RulesEngine,
 )
-from app.keto.normaliser import contains_hebrew, dish_core_text, dish_rules_text
+from app.keto.normaliser import dish_rules_text
 from app.keto.rules import (
     RuleMatch,
+    is_hebrew_dish,
     match_dish,
     mentions_dairy,
     mentions_plant,
@@ -75,8 +76,7 @@ def _analyse(
     text = dish_rules_text(dish)
     # Dart ``_analyse``: the dish's own name and description decide the
     # language; option text only when they are empty (#279).
-    core = dish_core_text(dish)
-    is_hebrew = contains_hebrew(core if core else text)
+    is_hebrew = is_hebrew_dish(dish)
     found = match_dish(dish)
     # A brand or a fruit under a beer or juice heading is that drink
     # (issue #474).

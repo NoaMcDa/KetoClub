@@ -83,12 +83,14 @@ class _Compiled:
 
 @dataclass(frozen=True, slots=True)
 class _Occurrence:
-    """One surviving carb-modifier occurrence. ``end`` is exclusive."""
+    """One surviving carb-modifier occurrence. ``end`` is exclusive;
+    ``hebrew`` names the table its trigger came from (issue #279)."""
 
     start: int
     end: int
     key: str
     sentence: str
+    hebrew: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -432,9 +434,9 @@ def _any_unguarded_match(
 def _unguarded_modifier_occurrences(haystack: str, *, name: str) -> list[_Occurrence]:
     vocab = vocabulary()
     occurrences: list[_Occurrence] = []
-    for table, guards in (
-        (_carb_en(), vocab.keto_qualifier_guards_en),
-        (_carb_he(), vocab.keto_qualifier_guards_he),
+    for table, guards, hebrew in (
+        (_carb_en(), vocab.keto_qualifier_guards_en, False),
+        (_carb_he(), vocab.keto_qualifier_guards_he, True),
     ):
         for entry in table:
             for found in entry.pattern.finditer(haystack):
@@ -443,13 +445,35 @@ def _unguarded_modifier_occurrences(haystack: str, *, name: str) -> list[_Occurr
                 ):
                     continue
                 occurrences.append(
-                    _Occurrence(found.start(), found.end(), entry.key, entry.sentence)
+                    _Occurrence(
+                        found.start(), found.end(), entry.key, entry.sentence, hebrew
+                    )
                 )
     occurrences.sort(key=lambda occurrence: occurrence.start)
     return occurrences
 
 
-def _sentences_after_suppression(occurrences: Sequence[_Occurrence]) -> list[str]:
+def _sentence_in(occurrence: _Occurrence, *, hebrew: bool) -> str:
+    """Dart ``_sentenceIn``: the occurrence's sentence in the dish's
+    language, through its counterpart trigger when it came from the other
+    table (issue #279); its own sentence when no counterpart exists."""
+    if occurrence.hebrew == hebrew:
+        return occurrence.sentence
+    vocab = vocabulary()
+    if hebrew:
+        counterpart = vocab.carb_modifier_counterparts_en.get(occurrence.key)
+        table = dict(vocab.carb_modifiers_he)
+    else:
+        counterpart = vocab.carb_modifier_counterparts_he.get(occurrence.key)
+        table = dict(vocab.carb_modifiers_en)
+    if counterpart is None or counterpart not in table:
+        return occurrence.sentence
+    return table[counterpart]
+
+
+def _sentences_after_suppression(
+    occurrences: Sequence[_Occurrence], *, hebrew: bool
+) -> list[str]:
     suppresses = vocabulary().trigger_suppresses
     suppressed: set[str] = set()
     for key in {occurrence.key for occurrence in occurrences}:
@@ -457,7 +481,7 @@ def _sentences_after_suppression(occurrences: Sequence[_Occurrence]) -> list[str
     sentences: dict[str, None] = {}
     for occurrence in occurrences:
         if occurrence.key not in suppressed:
-            sentences.setdefault(occurrence.sentence, None)
+            sentences.setdefault(_sentence_in(occurrence, hebrew=hebrew), None)
     return list(sentences)
 
 
@@ -477,8 +501,18 @@ def match(raw_text: str) -> RuleMatch:
     occurrences = _unguarded_modifier_occurrences(haystack, name=haystack)
     return RuleMatch(
         is_non_keto=False,
-        instructions=tuple(_sentences_after_suppression(occurrences)),
+        instructions=tuple(
+            _sentences_after_suppression(occurrences, hebrew=contains_hebrew(haystack))
+        ),
     )
+
+
+def is_hebrew_dish(dish: Dish) -> bool:
+    """``ClassificationRules.isHebrewDish``: whether the dish's script and
+    ``why`` are Hebrew. Its name and description decide; only a dish with
+    neither goes by its options (issue #279)."""
+    core = dish_core_text(dish)
+    return contains_hebrew(core if core else dish_rules_text(dish))
 
 
 def match_dish(dish: Dish) -> RuleMatch:
@@ -494,6 +528,9 @@ def match_dish(dish: Dish) -> RuleMatch:
     4. Carb modifiers are read from the rules text (options included,
        removals dropped). A non-keto base offered only as an option makes
        the dish yellow with ``optionBaseModification`` first.
+
+    Every instruction is in :func:`is_hebrew_dish`'s language, whichever
+    table its trigger came from (issue #279).
     """
     carb_only = carb_only_base(dish.name)
     if carb_only is not None and not (
@@ -512,8 +549,10 @@ def match_dish(dish: Dish) -> RuleMatch:
     if dough is not None:
         return RuleMatch(is_non_keto=True, base_label=dough)
 
+    hebrew = is_hebrew_dish(dish)
     sentences = _sentences_after_suppression(
-        _unguarded_modifier_occurrences(dish_rules_text(dish), name=name)
+        _unguarded_modifier_occurrences(dish_rules_text(dish), name=name),
+        hebrew=hebrew,
     )
     option_base = _first_unguarded_base_match(dish_option_rules_text(dish), name=name)
     # A choice of dough that reaches this line offers a rescued one; it is
@@ -524,7 +563,7 @@ def match_dish(dish: Dish) -> RuleMatch:
         templates = vocabulary().templates
         template = (
             templates.option_base_modification_he
-            if contains_hebrew(label)
+            if hebrew
             else templates.option_base_modification_en
         )
         return RuleMatch(

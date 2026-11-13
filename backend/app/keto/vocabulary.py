@@ -308,6 +308,10 @@ class Vocabulary:
 
     carb_modifiers_en: tuple[tuple[str, str], ...]
     carb_modifiers_he: tuple[tuple[str, str], ...]
+    carb_modifier_counterparts_en: Mapping[str, str]
+    """Each English trigger's Hebrew counterpart trigger (issue #279)."""
+    carb_modifier_counterparts_he: Mapping[str, str]
+    """Each Hebrew trigger's English counterpart trigger (issue #279)."""
     non_keto_drink_bases_en: tuple[str, ...]
     non_keto_drink_bases_he: tuple[str, ...]
     dough_bases_en: tuple[str, ...]
@@ -399,6 +403,12 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
     return Vocabulary(
         carb_modifiers_en=_pairs(root["carbModifiersEn"], "carbModifiersEn"),
         carb_modifiers_he=_pairs(root["carbModifiersHe"], "carbModifiersHe"),
+        carb_modifier_counterparts_en=_str_map(
+            root["carbModifierCounterpartsEn"], "carbModifierCounterpartsEn"
+        ),
+        carb_modifier_counterparts_he=_str_map(
+            root["carbModifierCounterpartsHe"], "carbModifierCounterpartsHe"
+        ),
         non_keto_drink_bases_en=strs("nonKetoDrinkBasesEn"),
         non_keto_drink_bases_he=strs("nonKetoDrinkBasesHe"),
         dough_bases_en=strs("doughBasesEn"),
