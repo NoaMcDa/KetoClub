@@ -326,13 +326,33 @@ def document_kind(content_type: str, head: bytes) -> DocumentKind | None:
     return None
 
 
-def charset_of(content_type: str) -> str:
-    """The ``charset`` parameter of ``content_type``, defaulting to UTF-8."""
+def charset_of(content_type: str, content: bytes = b"") -> str:
+    """The ``charset`` parameter of ``content_type``; when it names none, the
+    charset a ``<meta>`` tag in the first 1024 bytes of ``content`` declares
+    (#283); else UTF-8. The ``iso-8859-8`` variants Python does not know
+    (``-i``, ``-e``) read as ``iso-8859-8``."""
     for parameter in content_type.split(";")[1:]:
         key, _, value = parameter.partition("=")
         if key.strip().lower() == "charset" and value.strip():
-            return value.strip().strip('"').lower()
+            return _known(value.strip().strip('"').lower())
+    meta = _META_CHARSET.search(content[:1024])
+    if meta is not None:
+        return _known(meta.group(1).decode("ascii").lower())
     return "utf-8"
+
+
+_META_CHARSET: Final = re.compile(
+    rb"<meta\b[^>]{0,200}?charset\s*=\s*[\"']?\s*([A-Za-z0-9_-]+)", re.IGNORECASE
+)
+_HEBREW_ALIASES: Final = frozenset(
+    {"iso-8859-8-i", "iso-8859-8-e", "logical", "visual", "x-cp1255"}
+)
+
+
+def _known(charset: str) -> str:
+    if charset in _HEBREW_ALIASES:
+        return "windows-1255" if charset == "x-cp1255" else "iso-8859-8"
+    return charset
 
 
 def decode_page(content: bytes, content_type: str) -> str:
@@ -343,6 +363,6 @@ def decode_page(content: bytes, content_type: str) -> str:
     to UTF-8 with replacement characters, so a mislabelled page still reads.
     """
     try:
-        return content.decode(charset_of(content_type), errors="replace")
+        return content.decode(charset_of(content_type, content), errors="replace")
     except (LookupError, ValueError):
         return content.decode("utf-8", errors="replace")

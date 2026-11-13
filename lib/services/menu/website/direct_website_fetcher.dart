@@ -291,15 +291,20 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
       bytes[3] == 0x46 &&
       bytes[4] == 0x2D;
 
-  /// [bytes] decoded by [contentType]'s charset: UTF-8 by default, and the
-  /// two legacy Hebrew code pages (`windows-1255`, `iso-8859-8`) that older
-  /// Israeli sites still serve, whose letters sit at 0xE0–0xFA.
+  /// [bytes] decoded by [contentType]'s charset, or, when the header names
+  /// none, the one a `<meta>` tag in the page's first bytes declares
+  /// (`<meta charset=windows-1255>`, #283): UTF-8 by default, and the
+  /// legacy Hebrew code pages (`windows-1255`, `iso-8859-8` and its
+  /// `-i`/`-e` variants) that older Israeli sites still serve, whose
+  /// letters sit at 0xE0–0xFA.
   static String decodePage(Uint8List bytes, String contentType) {
-    final charset = RegExp(r'charset\s*=\s*"?([\w-]+)')
-        .firstMatch(contentType)
-        ?.group(1)
-        ?.toLowerCase();
-    if (charset == 'windows-1255' || charset == 'iso-8859-8') {
+    final charset =
+        _charset.firstMatch(contentType)?.group(1)?.toLowerCase() ??
+        _metaCharset
+            .firstMatch(String.fromCharCodes(bytes.take(_metaCharsetBytes)))
+            ?.group(1)
+            ?.toLowerCase();
+    if (_legacyHebrew.contains(charset)) {
       return String.fromCharCodes(<int>[
         for (final byte in bytes)
           if (byte >= 0xE0 && byte <= 0xFA)
@@ -312,4 +317,34 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
     }
     return utf8.decode(bytes, allowMalformed: true);
   }
+
+  static final RegExp _charset = RegExp(r'charset\s*=\s*"?([\w-]+)');
+
+  /// A `<meta charset=…>` or `<meta http-equiv content="…; charset=…">`.
+  static final RegExp _metaCharset = RegExp(
+    r'<meta\b[^>]{0,200}?charset\s*=\s*["\x27]?\s*([\w-]+)',
+    caseSensitive: false,
+  );
+
+  /// How far into a page a `<meta>` charset is looked for: the HTML
+  /// standard's own prescan length.
+  static const int _metaCharsetBytes = 1024;
+
+  /// The labels of the legacy Hebrew code pages, as the Encoding Standard
+  /// names them.
+  static const Set<String> _legacyHebrew = <String>{
+    'windows-1255',
+    'cp1255',
+    'x-cp1255',
+    'iso-8859-8',
+    'iso-8859-8-i',
+    'iso-8859-8-e',
+    'iso_8859-8',
+    'iso8859-8',
+    'iso-ir-138',
+    'csisolatinhebrew',
+    'visual',
+    'logical',
+    'hebrew',
+  };
 }

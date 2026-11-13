@@ -351,5 +351,89 @@ void main() {
       expect(requests, hasLength(1));
       expect((result as MenuFetched).menu.venueName, 'device');
     });
+
+    group('a website PDF the server could not read (#465)', () {
+      const websiteRef = VenueRef(
+        source: MenuSource.website,
+        platformId: 'https://cafe.example/menu.pdf',
+      );
+
+      FallbackMenuAdapter overServer(
+        String reason,
+        FakePlatformMenuAdapter device,
+      ) => FallbackMenuAdapter(
+        primary: BackendMenuAdapter(
+          client: MockClient(
+            (_) async => http.Response(
+              '{"reason":"$reason","status_code":502}',
+              502,
+              headers: const {'content-type': 'application/json'},
+            ),
+          ),
+          baseUrl: Uri.parse('http://localhost:8000'),
+          installIdStore: FakeInstallIdStore(),
+          source: MenuSource.website,
+          readOptions: () async => const ClassificationOptions(),
+        ),
+        fallback: device,
+      );
+
+      for (final reason in <String>[
+        'notConfigured',
+        'timeout',
+        'rateLimited',
+      ]) {
+        test('a 502 $reason is read again by the device', () async {
+          // Arrange
+          final device = FakePlatformMenuAdapter(source: MenuSource.website)
+            ..queueFetched(_menu('device'));
+
+          // Act
+          final result = await overServer(reason, device).fetch(websiteRef);
+
+          // Assert
+          expect((result as MenuFetched).menu.venueName, 'device');
+          expect(device.fetchCalls, <VenueRef>[websiteRef]);
+        });
+      }
+
+      test('a 502 badResponse is the server reading it, not retried', () async {
+        // Arrange
+        final device = FakePlatformMenuAdapter(source: MenuSource.website);
+
+        // Act
+        final result = await overServer(
+          'badResponse',
+          device,
+        ).fetch(websiteRef);
+
+        // Assert
+        expect(
+          (result as MenuFetchFailed).reason,
+          MenuFetchFailureReason.websitePdfUnread,
+        );
+        expect(device.fetchCalls, isEmpty);
+      });
+
+      test('when the device cannot read it either, says so', () async {
+        // Arrange
+        final device = FakePlatformMenuAdapter(source: MenuSource.website)
+          ..queueFailed(MenuFetchFailureReason.websitePdfUnread);
+
+        // Act
+        final result = await overServer(
+          'notConfigured',
+          device,
+        ).fetch(websiteRef);
+
+        // Assert
+        expect(
+          result,
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.websitePdfUnread,
+          ),
+        );
+      });
+    });
   });
 }

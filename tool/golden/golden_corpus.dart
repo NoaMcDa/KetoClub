@@ -1382,6 +1382,34 @@ const String _pastedWrapped =
     'Grilled salmon\nwith lemon and herbs\n- served with greens\n'
     '(gluten free)\nCaesar salad';
 
+/// Every price shape #282 lists, one per line.
+const String _pastedPriceShapes =
+    '45 Pasta\n₪38 Omelette\nNIS 64 Burger\nSteak (128)\nSoup 32.-\n'
+    'Wings 48/56\nSalad small 38 / large 52\nGreek salad ........ 48\n'
+    'Caesar salad | 52\nTuna 67 shkalim\nCod מחיר: 89';
+
+/// Symbol, emoji and numbered bullets (#282).
+const String _pastedBullets =
+    '\u{1F538} סלט יווני 48\n▪\u{FE0F} Burger 64\n• Soup 30\n'
+    '1. Caesar salad 48\n2) Pasta 52';
+
+/// A Hebrew paste whose descriptions sit under priced dishes (#479).
+const String _pastedDescriptions =
+    'סלט יווני 48\nעגבניות, מלפפון, בצל ופטה\n\nהמבורגר 68\n'
+    'לחמניית בריוש, צ׳יפס בצד\n\nפסטה ברוטב עגבניות 52\n'
+    'פנה, רוטב עגבניות, בזיליקום';
+
+/// WhatsApp bold and italic headings, and a bold dish name (#479).
+const String _pastedEmphasis =
+    '*סלטים*\nסלט יווני 48\nסלט קיסר 52\n_עיקריות_\nסטייק 120\n'
+    '*Burger* 64';
+
+/// Lines copied from a WhatsApp chat, iOS and Android (#479).
+const String _pastedChat =
+    '[12/11/2026, 14:02] Dana: Caesar salad 48\n'
+    '[12/11/2026, 14:03:09 PM] Dana: Steak 98\n'
+    '‎12.11.26, 14:04 - Dana Cohen: Soup 32';
+
 /// `TextMenuSource.parse` inputs, lifted from `text_menu_source_test.dart`
 /// and extended with the regex edges a Python port could read
 /// differently (`\d`, `\s`, line breaks, `\p{Ll}`).
@@ -1428,6 +1456,22 @@ const List<String> pastedTexts = <String>[
   '--- \n- Steak\nSalmon\n--- extra',
   '\uFEFFSteak\n\u200BSalmon',
   'Steak\t\t45\nSalmon\t-\t45',
+  // Bullets and price shapes (#282).
+  '- Caesar salad 48\n- Greek salad 42\n- Steak frites 98',
+  'caesar salad\ngreek salad\nsteak',
+  'סלט יווני 48 ש"ח\nסטייק 98 ש״ח\nשניצל 52 שח\nפסטה 44 שקלים',
+  _pastedPriceShapes,
+  _pastedBullets,
+  '300 גרם אנטריקוט 120\n200 g steak\n2 eggs omelette',
+  // Descriptions, headings and chat copies (#479).
+  _pastedDescriptions,
+  'Burger 64\nWith brioche bun and fries\nSteak 98\nSalad 42',
+  'ראשונות\nחומוס 32\nמרק 28\n\nמנות עיקריות\nסטייק 120\nשניצל 68',
+  'STARTERS\nHummus 32\nSoup 28\nMAINS\nSteak 120\nSchnitzel 68',
+  _pastedEmphasis,
+  _pastedChat,
+  'Hummus 32\nMarket fish\nSteak 120\nSoup 28',
+  'Burger 64\n- Fries 12\n• Soup\n1. Salad 40\nDrinks\nCola 12',
 ];
 
 // ---------------------------------------------------------------------------
@@ -2242,6 +2286,9 @@ const Map<String, String> websiteFixtureBases = <String, String>{
   'menu_link.html': websiteHome,
   'menu_page_inline_prices.html': websiteHome,
   'menu_page_separate_prices.html': websiteHome,
+  'menu_text_link_first.html': 'https://www.cafe.example/',
+  'name_price_description_menu.html': websiteHome,
+  'price_label_menu.html': websiteHome,
   'no_menu.html': websiteHome,
   'pdf_link.html': websiteHome,
 };
@@ -2249,6 +2296,28 @@ const Map<String, String> websiteFixtureBases = <String, String>{
 /// Inline website cases lifted from `website_menu_locator_test.dart` and
 /// `website_html_test.dart`, plus the AI opt-out and JavaScript signals.
 const List<WebsiteCase> websiteInlineCases = <WebsiteCase>[
+  (
+    name: 'inline_currency_words',
+    html:
+        '<p>Salad 42 shekels</p><p>Soup 30 shkalim</p><p>Steak 98 NIS</p>'
+        '<p>Cola price: 12</p>',
+    baseUrl: websiteHome,
+  ),
+  (
+    name: 'inline_addresses_are_not_dishes',
+    html:
+        '<p>Tel Aviv, Dizengoff 99</p><p>Salad 42</p><p>Soup 30</p>'
+        '<p>Steak 98</p><p>Herzl St 12</p>',
+    baseUrl: websiteHome,
+  ),
+  (
+    name: 'inline_screen_reader_text',
+    html:
+        '<p>Salad</p><p>Greens</p><p>42<span class="sr-only">NIS</span></p>'
+        '<p>Soup</p><p>Lentils</p><p>30<span class=visually-hidden>'
+        'shekels</span></p><p>Steak</p><p>Aged</p><p>98</p>',
+    baseUrl: websiteHome,
+  ),
   (
     name: 'inline_any_pdf',
     html: '<a href="/docs/today.pdf">Today</a>',

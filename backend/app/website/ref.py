@@ -9,7 +9,8 @@ Normalising lower-cases the scheme and host (``DartUri.parse`` does), drops
 the fragment, a default port and one trailing ``/``, and keeps the path and
 query as given. A URL that is not ``http``/``https``, has user info, or whose
 host has no inner dot or is not public by name (``*.local``,
-``*.localhost``, a private IPv4 literal) has no ref. The route still checks
+``*.localhost``, a private IPv4 literal), or whose port is not 80 or 443
+(#283), has no ref. The route still checks
 every address the host resolves to before it fetches anything.
 """
 
@@ -38,6 +39,8 @@ def normalise_website_url(raw: str) -> str | None:
     if "." not in host or host.startswith(".") or host.endswith("."):
         return None
     if not _is_public_name(host):
+        return None
+    if uri.port is not None and uri.port not in (80, 443):
         return None
     path = uri.path[:-1] if uri.path.endswith("/") else uri.path
     return DartUri(

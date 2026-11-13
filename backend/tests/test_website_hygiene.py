@@ -4,6 +4,7 @@ import pytest
 
 from app.services.website import (
     charset_of,
+    decode_page,
     document_kind,
     header_reserves_ai,
     html_reserves_ai,
@@ -205,3 +206,18 @@ def test_charset_of() -> None:
 )
 def test_is_public_address(address: str, public: bool) -> None:
     assert is_public_address(address) is public
+
+
+def test_charset_of_reads_a_meta_tag_when_the_header_names_none() -> None:
+    # #283: an older Hebrew site declares its code page only in the page.
+    assert charset_of("text/html", b"<meta charset=windows-1255>") == "windows-1255"
+    assert charset_of("text/html", b'<meta charset="ISO-8859-8-I">') == "iso-8859-8"
+    page = b'<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-8">'
+    assert charset_of("text/html", page) == "iso-8859-8"
+    assert charset_of("text/html; charset=utf-8", page) == "utf-8"
+    assert charset_of("text/html", b"<p>no meta</p>") == "utf-8"
+
+
+def test_decode_page_reads_a_meta_declared_hebrew_page() -> None:
+    page = b"<meta charset=iso-8859-8-i><body>\xf1\xec\xe8"
+    assert decode_page(page, "text/html").endswith("<body>סלט")

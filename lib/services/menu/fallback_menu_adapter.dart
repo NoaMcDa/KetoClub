@@ -18,7 +18,11 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 ///    allowed, or failed with a reason [shouldFallBack] accepts;
 /// 3. returns the primary's failure when the fallback fails too, since
 ///    that failure was the first and better explanation — unless the
-///    primary never handled the ref, when the fallback's is the only one.
+///    primary never handled the ref, when the fallback's is the only one,
+///    or the fallback reached a website's PDF menu and could not read it
+///    ([MenuFetchFailureReason.websitePdfUnread]): the device's own verdict
+///    on the same document says what to fix, where the primary's only says
+///    the server could not answer (#465).
 ///
 /// Never throws: both adapters promise not to, and [usePrimary] must not
 /// either.
@@ -78,6 +82,10 @@ final class FallbackMenuAdapter implements PlatformMenuAdapter {
     }
     if (!fallback.canHandle(ref)) return first;
     final second = await fallback.fetch(ref);
-    return second is MenuFetched ? second : first;
+    if (second is MenuFetched) return second;
+    return second is MenuFetchFailed &&
+            second.reason == MenuFetchFailureReason.websitePdfUnread
+        ? second
+        : first;
   }
 }

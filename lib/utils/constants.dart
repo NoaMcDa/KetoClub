@@ -2873,20 +2873,81 @@ const String dietaryRuleWhyHe =
 // Pasted menus (architecture.md D18; issue #83)
 // ---------------------------------------------------------------------------
 
-/// A price a pasted line ends with, for `TextMenuSource` to strip: an
-/// optional separator (`-`, an en or em dash, `:`), an optional leading
-/// `₪`, the number (`45`, `45.90`, `45,90`) and an optional trailing `₪`,
-/// `NIS` or `ILS`, anchored at the end of the line.
+/// The currency a menu price may carry, before or after the number: the
+/// sign, `NIS`, `ILS`, the Hebrew abbreviation (`ש"ח`, `ש״ח`, `שח`) and the
+/// written word (`שקל`, `שקלים`, `shekel`, `shekels`, `shkalim`). One
+/// source, so a paste (D18) and a website's page text (D19) read the same
+/// prices (#282, #480). Matched case-insensitively wherever it is used.
+const String priceCurrencySource =
+    r"(?:₪|NIS|ILS|ש[\x22״׳']?ח|שקלים|שקל|shekels?|shkalim|sheqalim)";
+
+/// A price a pasted line ends with, for `TextMenuSource` to strip: a
+/// separator (whitespace, or a run of `-`, an en or em dash, `:`, `.`, `…`
+/// or `|`, so dot leaders count), an optional `מחיר:`/`price:` label, an
+/// optional opening parenthesis and leading currency, the number (`45`,
+/// `45.90`, `45,90`, `32.-`), more numbers after a `/` (`48/56`), an
+/// optional trailing currency ([priceCurrencySource]) and closing
+/// parenthesis, anchored at the end of the line.
 ///
 /// A bare trailing number counts as a price, so `Steak 300` loses its
 /// `300`; that is the deliberate trade for never letting a price into the
 /// text the classifier reads. The token must follow whitespace, a
 /// separator or the start of the line, so a digit inside a word (`B12`)
 /// is left alone. Matched case-insensitively.
+///
+/// A separator starts only where a run of whitespace or marks starts
+/// (the lookbehinds), so a long run is scanned once, not once per
+/// character: the pattern stays linear on a pasted line of 2 MB of
+/// dashes (#268's trap, which `+` on the marks would reopen).
 final RegExp pastedPriceSuffix = RegExp(
-  r'(?:^|\s+|\s*[-–—:]\s*)(?:₪\s*)?\d+(?:[.,]\d{1,2})?'
-  r'(?:\s*(?:₪|NIS|ILS))?\s*$',
+  r'(?:^|(?<!\s)\s+|(?<!\s)(?<![-–—:.…|])\s*[-–—:.…|]+\s*)'
+  r'(?:(?:מחיר|price)\s*:?\s*)?(?:\(\s*)?'
+  '(?:$priceCurrencySource'
+  r'\s*)?\d+(?:[.,]\d{1,2})?(?:[.,]-)?(?:\s*/\s*\d+(?:[.,]\d{1,2})?)*(?:\s*'
+  '$priceCurrencySource'
+  r')?(?:\s*\))?\s*$',
   caseSensitive: false,
+);
+
+/// A price a pasted line starts with (`45 Pasta`, `₪38 Omelette`,
+/// `NIS 64 Burger`), for `TextMenuSource` to strip (#282): a currency and
+/// a number, or a number of at least two digits with an optional currency,
+/// then a separator and more text. A number followed by a unit
+/// (`300 גרם`, `200 g`) is a weight, not a price, and stays; so does a
+/// single digit (`2 eggs`).
+final RegExp pastedPricePrefix = RegExp(
+  '^(?:$priceCurrencySource'
+  r'\s*\d+(?:[.,]\d{1,2})?|\d{2,}(?:[.,]\d{1,2})?(?:\s*'
+  '$priceCurrencySource)?)'
+  r'(?:\s*[-–—:.…|]+\s*|\s+)'
+  '(?!(?:g|gr|grams?|kg|ml|cl|oz|pcs|pieces|ג|גר|גרם|יח|יחידות|מ"ל|ק"ג)'
+  r'(?:\s|[.,)]|$))'
+  r'(?=\S)',
+  caseSensitive: false,
+);
+
+/// A size's price inside a pasted line, before a `/` and the next size
+/// (`Salad small 38 / large 52`): stripped after [pastedPriceSuffix]
+/// takes the last one (#282). At least two digits, so `4 / 8 slices`
+/// stays.
+final RegExp pastedSizedPrice = RegExp(
+  r'(?<!\s)\s+\d{2,}(?:[.,]\d{1,2})?(?:\s*'
+  '$priceCurrencySource'
+  r')?(?=\s*/)',
+  caseSensitive: false,
+);
+
+/// The sender prefix of a line copied from a WhatsApp chat (#479):
+/// `[12/11/2026, 14:02] Dana: ` (iOS) or `12/11/2026, 14:02 - Dana: `
+/// (Android), with optional seconds, `AM`/`PM` and leading direction
+/// marks. Removed, so neither the time nor the sender's name reaches a
+/// dish or the prompt.
+final RegExp pastedChatPrefix = RegExp(
+  r'^[\u200E\u200F]*(?:\[\d{1,4}[./-]\d{1,2}[./-]\d{1,4},?\s+\d{1,2}:\d{2}'
+  r'(?::\d{2})?(?:\s*[AaPp]\.?[Mm]\.?)?\]\s*'
+  r'|\d{1,4}[./-]\d{1,2}[./-]\d{1,4},?\s+\d{1,2}:\d{2}'
+  r'(?::\d{2})?(?:\s*[AaPp]\.?[Mm]\.?)?\s+[-–]\s+)'
+  r'[^:\[\]]{1,60}?:\s*',
 );
 
 /// The most words a line may have and still be read as a section header
