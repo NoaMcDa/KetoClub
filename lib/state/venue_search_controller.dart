@@ -218,6 +218,9 @@ final class VenueSearchController extends ChangeNotifier {
   Set<VenueRef> _nearbyAttempted = <VenueRef>{};
   Future<VenueSearchResult> Function()? _lastRequest;
   bool _lastRequestWasNearby = false;
+  // The nearby search for [_position], kept until its list arrives as
+  // [_nearbyResults]: what a search that overtook it repeats (issue #455).
+  Future<VenueSearchResult> Function()? _nearbyRequest;
   Timer? _debounceTimer;
   int _generation = 0;
   int _estimateRun = 0;
@@ -231,12 +234,14 @@ final class VenueSearchController extends ChangeNotifier {
   /// The reference [input] resolves to, or null when it does not resolve.
   VenueRef? get resolved => _resolved;
 
-  /// True when [input] is non-empty but does not resolve to anything
-  /// readable.
+  /// True when [input] is a paste ([isPaste]: a link or an id) that does
+  /// not resolve to anything readable.
   ///
-  /// Empty input is deliberately not invalid: it is nothing typed yet, and
-  /// flagging an error before the user has typed anything would be wrong.
-  bool get isInvalid => _input.isNotEmpty && _resolved == null;
+  /// A name is never invalid (issue #481): a plain word such as `sushi` or
+  /// `חומוס` resolves to nothing, but it is searched by name, and flagging
+  /// it read as "this search failed" (audit D8, #229). Empty input is not
+  /// invalid either: it is nothing typed yet.
+  bool get isInvalid => isPaste && _resolved == null;
 
   /// Whether [input] is a pasted link or platform id rather than a name
   /// to search for: it holds a `/` (any URL, readable or not) or is all
@@ -292,6 +297,13 @@ final class VenueSearchController extends ChangeNotifier {
   /// The place the user chose to look around (issue #443), or null when
   /// [position] is the device's own, a [chosenStreet]'s, or there is none.
   KnownPlace? get chosenPlace => _place;
+
+  /// Where a search by name looks while there is no [position] (issue
+  /// #466): [defaultSearchPlace], since Wolt finds nothing for a query
+  /// without one. Null while there is a [position], which a name search
+  /// uses instead. The screen names it beside such a search's results.
+  KnownPlace? get nameSearchPlace =>
+      _position == null ? defaultSearchPlace : null;
 
   /// The street the user chose to look around (issue #449), or null when
   /// [position] is the device's own, a [chosenPlace]'s, or there is none.
@@ -490,6 +502,7 @@ final class VenueSearchController extends ChangeNotifier {
         _input = '';
         _resolved = null;
         _position = (latitude: latitude, longitude: longitude);
+        _forgetNearby();
         // Also when no place is chosen in memory: one saved by an earlier
         // launch must not come back after the user asked for their own.
         final saving = _saveChoice();
@@ -504,8 +517,16 @@ final class VenueSearchController extends ChangeNotifier {
         );
         await saving;
       case LocationDenied() || LocationUnavailable():
-        _phase = DiscoveryPhase.idle;
-        _notify();
+        // A place search this locate overtook never brought its list
+        // (issue #455): ask for it again, so the list under the place's
+        // name is that place's own.
+        final pending = _pendingNearby;
+        if (pending != null) {
+          await _run(pending, generation: generation, isNearby: true);
+        } else {
+          _phase = DiscoveryPhase.idle;
+          _notify();
+        }
     }
     return result;
   }
@@ -528,6 +549,7 @@ final class VenueSearchController extends ChangeNotifier {
     _street = null;
     _position = (latitude: place.latitude, longitude: place.longitude);
     _locationOutcome = null;
+    _forgetNearby();
     final saving = _saveChoice(placeId: place.id);
     await _run(
       () => _search.nearby(
@@ -557,6 +579,7 @@ final class VenueSearchController extends ChangeNotifier {
     _street = street;
     _position = (latitude: street.latitude, longitude: street.longitude);
     _locationOutcome = null;
+    _forgetNearby();
     final saving = _saveChoice(street: street);
     await _run(
       () => _search.nearby(
@@ -821,13 +844,20 @@ final class VenueSearchController extends ChangeNotifier {
   }
 
   Future<void> _searchByName(String query, String language) {
-    final here = _position;
+    // Never without a position: Wolt answers an empty page to a search
+    // with no `lat`/`lon` (issue #466).
+    final here =
+        _position ??
+        (
+          latitude: defaultSearchPlace.latitude,
+          longitude: defaultSearchPlace.longitude,
+        );
     return _run(
       () => _search.byName(
         query,
         language: language,
-        latitude: here?.latitude,
-        longitude: here?.longitude,
+        latitude: here.latitude,
+        longitude: here.longitude,
       ),
       generation: ++_generation,
       isNearby: false,
@@ -846,6 +876,7 @@ final class VenueSearchController extends ChangeNotifier {
     _cancelEstimate();
     _lastRequest = request;
     _lastRequestWasNearby = isNearby;
+    if (isNearby) _nearbyRequest = request;
     _phase = DiscoveryPhase.searching;
     _failure = null;
     _notify();
@@ -991,9 +1022,38 @@ final class VenueSearchController extends ChangeNotifier {
     return true;
   }
 
+  /// Drops the list around the previous [position] (issue #455): called
+  /// the moment [position] changes, so no later step — a cleared search,
+  /// a refused locate — can show that list under the new place's name.
+  /// The screen shows skeletons until the new place's own list arrives.
+  void _forgetNearby() {
+    _nearbyResults = null;
+    _nearbyNumbers = const <VenueRef, VenueCardNumbers>{};
+    _nearbyAttempted = <VenueRef>{};
+    _nearbyRequest = null;
+    _results = const <Venue>[];
+    _numbers = const <VenueRef, VenueCardNumbers>{};
+    _attempted = <VenueRef>{};
+    _hasSearched = false;
+  }
+
+  /// The nearby search for [position] when its list never arrived — a
+  /// newer search overtook it, or it failed — else null.
+  Future<VenueSearchResult> Function()? get _pendingNearby =>
+      _nearbyResults == null && _position != null ? _nearbyRequest : null;
+
   /// Puts the last nearby list back, or the untouched idle state when
   /// there is none, clearing any failure. Notifies listeners.
+  ///
+  /// When the nearby search for [position] was overtaken before it
+  /// answered (issue #455: a name typed while a chosen city was loading),
+  /// it is asked again rather than leaving the place with no list.
   void _showNearbyAgain() {
+    final pending = _pendingNearby;
+    if (pending != null) {
+      unawaited(_run(pending, generation: _generation, isNearby: true));
+      return;
+    }
     final nearby = _nearbyResults;
     _phase = DiscoveryPhase.idle;
     _failure = null;

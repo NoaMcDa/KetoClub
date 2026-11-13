@@ -282,6 +282,26 @@ void main() {
     Finder action(AppLocalizations l10n, String text) =>
         find.widgetWithText(ListTile, l10n.locationPickerStreetSearch(text));
 
+    testWidgets('with the street action offered, points at it rather than '
+        'at the spelling (issue #489)', (tester) async {
+      // Arrange
+      await _pump(tester, picks: [], searchStreets: recording([]));
+      await _open(tester);
+      final l10n = _l10n(tester);
+
+      // Act
+      await tester.enterText(find.byType(TextField), 'Dizengoff');
+      await tester.pump();
+
+      // Assert
+      expect(find.text(l10n.locationPickerNoCityTryStreets), findsOneWidget);
+      expect(find.text(l10n.locationPickerNoMatch), findsNothing);
+      expect(
+        find.text(l10n.locationPickerStreetSearch('Dizengoff')),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('offers the action only from three characters, and typing '
         'sends nothing', (tester) async {
       // Arrange

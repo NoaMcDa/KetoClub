@@ -196,6 +196,22 @@ void main() {
         expect(controller.isInvalid, isTrue);
       });
 
+      test('a plain name is never invalid, English, Hebrew or several '
+          'words (issue #481)', () {
+        for (final name in const [
+          'sushi',
+          '\u05D7\u05D5\u05DE\u05D5\u05E1',
+          'Cafe Noir',
+        ]) {
+          // Act
+          controller.setInput(name);
+
+          // Assert
+          expect(controller.resolved, isNull, reason: name);
+          expect(controller.isInvalid, isFalse, reason: name);
+        }
+      });
+
       test('setInput with empty input is neither resolved nor invalid', () {
         // Act
         controller.setInput('');
@@ -576,6 +592,25 @@ void main() {
         // Assert
         expect(search.byNameCalls.single.language, 'he');
         expect(controller.results.single.name, 'sushi-bar');
+      });
+
+      test('with no position, searches around the default place, never '
+          'without a position (issue #466)', () async {
+        // Arrange: location never read, no place chosen.
+        search.queueFound([_venue('sushi-bar')]);
+
+        // Act
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Assert
+        final call = search.byNameCalls.single;
+        expect(call.latitude, defaultSearchPlace.latitude);
+        expect(call.longitude, defaultSearchPlace.longitude);
+        expect(controller.nameSearchPlace, defaultSearchPlace);
+        // No distances are claimed from a place the user did not choose.
+        expect(controller.position, isNull);
+        expect(controller.distanceKmTo(controller.results.single), isNull);
       });
 
       test('ranks by the located position once there is one', () async {
@@ -1786,6 +1821,86 @@ void main() {
           expect(controller.results.map((v) => v.name), ['near-haifa']);
           expect((await settings.read()).discoveryPlaceId, 'haifa');
         }
+      });
+
+      test('a refused locate that overtook a city search shows the '
+          "city's own list, never the previous place's (issue #455)", () async {
+        // Arrange: a list around the device, then a city whose search
+        // hangs.
+        search.queueFound([_venue('tlv-a', latitude: 32.08, longitude: 34.78)]);
+        await controller.locate(language: 'en');
+        final gate = Completer<void>();
+        search
+          ..gate = gate.future
+          ..queueFound([_venue('haifa-a', latitude: 32.79, longitude: 34.99)]);
+        final choosing = controller.choosePlace(haifa, language: 'en');
+        await Future<void>.delayed(Duration.zero);
+        location.result = const LocationDenied(permanently: false);
+        search.gate = null;
+
+        // Act: "Use my location" while the city loads; the device refuses.
+        final locating = controller.locate(language: 'en');
+        gate.complete();
+        await choosing;
+        await locating;
+
+        // Assert
+        expect(controller.chosenPlace, haifa);
+        expect(controller.results.map((v) => v.name), ['haifa-a']);
+        expect(controller.phase, DiscoveryPhase.idle);
+      });
+
+      test('a name typed and cleared while a city search loads puts back '
+          "the city's list, never the previous place's (issue #455)", () async {
+        // Arrange
+        search.queueFound([_venue('tlv-a', latitude: 32.08, longitude: 34.78)]);
+        await controller.locate(language: 'en');
+        final gate = Completer<void>();
+        search
+          ..gate = gate.future
+          ..queueFound([_venue('pizza-place')])
+          ..queueFound([_venue('haifa-a', latitude: 32.79, longitude: 34.99)]);
+        final choosing = controller.choosePlace(haifa, language: 'en');
+        await Future<void>.delayed(Duration.zero);
+
+        // Act: a name search overtakes the city search, then is cleared.
+        search.gate = null;
+        controller.search('pizza', language: 'en', immediate: true);
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        controller.clearSearch();
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        gate.complete();
+        await choosing;
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert
+        expect(controller.chosenPlace, haifa);
+        expect(controller.results.map((v) => v.name), ['haifa-a']);
+        expect(controller.results.map((v) => v.name), isNot(contains('tlv-a')));
+      });
+
+      test("a failed city search never leaves the previous place's list to "
+          'come back (issue #455)', () async {
+        // Arrange
+        search.queueFound([_venue('tlv-a')]);
+        await controller.locate(language: 'en');
+        search.queueFailed(VenueSearchFailureReason.timeout);
+        await controller.choosePlace(haifa, language: 'en');
+
+        // Act: a name search, then cleared.
+        search.queueFound([_venue('pizza-place')]);
+        controller.search('pizza', language: 'en', immediate: true);
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        search.queueFound([_venue('haifa-a')]);
+        controller.clearSearch();
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+
+        // Assert: the city's search was asked again, not Tel Aviv's list.
+        expect(controller.results.map((v) => v.name), ['haifa-a']);
       });
 
       test('locate completes with null when a newer search superseded '

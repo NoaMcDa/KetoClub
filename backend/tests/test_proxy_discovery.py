@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 
 from app.config import Settings
 from app.main import create_app
+from app.routers.discovery import DEFAULT_SEARCH_LAT, DEFAULT_SEARCH_LON
 from app.services.wolt import WOLT_USER_AGENT
 
 _INSTALL_ID = "0123456789abcdef0123456789abcdef"
@@ -412,9 +413,10 @@ def test_search_target_is_fixed_server_side(
     }
 
 
-def test_search_without_a_position_forwards_no_lat_lon(
+def test_search_without_a_position_searches_around_the_default_centre(
     client: TestClient, wolt_discovery: respx.MockRouter
 ) -> None:
+    # Wolt answers an empty page to a search with no lat/lon (#466).
     wolt_discovery.post(_UPSTREAM_SEARCH).mock(
         return_value=httpx.Response(200, json={})
     )
@@ -425,7 +427,12 @@ def test_search_without_a_position_forwards_no_lat_lon(
 
     assert response.status_code == 200
     sent_body = json.loads(wolt_discovery.calls.last.request.content)
-    assert sent_body == {"q": "vitrina", "target": "venues"}
+    assert sent_body == {
+        "q": "vitrina",
+        "target": "venues",
+        "lat": DEFAULT_SEARCH_LAT,
+        "lon": DEFAULT_SEARCH_LON,
+    }
 
 
 @pytest.mark.parametrize(

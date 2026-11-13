@@ -96,6 +96,48 @@ void _expectPlatformChanged(Map<String, Object?> json) {
 }
 
 void main() {
+  group('a shop is not a menu (issue #476)', () {
+    test('a partial assortment is notARestaurant, never an empty menu', () {
+      // Arrange: what Wolt answers for a supermarket.
+      final shop = <String, Object?>{
+        'loading_strategy': 'partial',
+        ..._payload(categories: [_category('c1', <Object?>[])]),
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        shop,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      );
+
+      // Assert
+      expect(
+        result,
+        const MenuFetchFailed(reason: MenuFetchFailureReason.notARestaurant),
+      );
+      expect(WoltMenuMapper.isShopAssortment(shop), isTrue);
+    });
+
+    test('a full assortment, or none named, is a menu', () {
+      // Act and assert
+      for (final strategy in <Object?>['full', null, 7]) {
+        final json = <String, Object?>{
+          'loading_strategy': ?strategy,
+          ..._payload(
+            categories: [
+              _category('c1', ['i1']),
+            ],
+            items: [_item('i1')],
+          ),
+        };
+        expect(WoltMenuMapper.isShopAssortment(json), isFalse);
+        expect(_map(json).allDishes, hasLength(1));
+      }
+      expect(WoltMenuMapper.isShopAssortment(_realFixture()), isFalse);
+    });
+  });
+
   group('WoltMenuMapper against the real recording', () {
     test('toMenu succeeds and ignores the leading _fixture_note key', () {
       // Arrange

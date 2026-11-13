@@ -248,8 +248,9 @@ class DiscoverySearchRequest(BaseModel):
     ``q`` is trimmed and bounded before it ever reaches Wolt. ``lat``/``lon``
     share the ``GET /v1/proxy/wolt/pages/restaurants`` route's range and are
     optional together: the app searches by name without a position when
-    location was denied (#37), and Wolt ranks by proximity only when both
-    are given, so one without the other is rejected rather than half-sent.
+    location was denied (#37), and one without the other is rejected rather
+    than half-sent. Without them the search is made around a default centre
+    (#466), since Wolt finds nothing for a query with no position.
     There is no ``target`` field: the route itself fixes it to ``"venues"``,
     so a client cannot ask this backend to proxy a dish search instead.
     """

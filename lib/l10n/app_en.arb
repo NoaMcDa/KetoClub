@@ -136,6 +136,11 @@
     "placeholders": { "platform": { "type": "String" } }
   },
   "fetchFailedNotFound": "No venue found on {platform}. Check the link.",
+  "fetchFailedNotARestaurant": "{platform} lists this place as a shop, not a restaurant, so there is no menu for KetoClub to read.",
+  "@fetchFailedNotARestaurant": {
+    "description": "A Wolt venue that is a supermarket, pet shop or other store (issue #476).",
+    "placeholders": { "platform": { "type": "String" } }
+  },
   "@fetchFailedNotFound": {
     "placeholders": { "platform": { "type": "String" } }
   },
@@ -273,6 +278,11 @@
   "discoveryEmptyBody": "Use your location or choose a city to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.",
   "discoveryDrinksGuideCard": "Ordering a drink? Bar and coffee guide",
   "discoveryLookingAround": "Looking around",
+  "discoveryNameSearchAround": "Searching around {place}. Choose a location to search somewhere else.",
+  "@discoveryNameSearchAround": {
+    "description": "Above the results of a search by name made with no location (issue #466): the city the search was made around.",
+    "placeholders": { "place": { "type": "String" } }
+  },
   "discoveryAroundYou": "Your location",
   "discoveryLocationInvite": "Tap to use your location",
   "discoveryUseLocation": "Use my location",
@@ -290,6 +300,10 @@
   "locationPickerUseDevice": "Use my current location",
   "locationPickerSearchLabel": "Search for a city or a street",
   "locationPickerNoMatch": "No city matches that. Try another spelling.",
+  "locationPickerNoCityTryStreets": "No city by that name. Search the streets instead:",
+  "@locationPickerNoCityTryStreets": {
+    "description": "In the location picker, when no bundled city matches and the street search action is offered right below (issue #489)."
+  },
   "locationPickerStreetSearch": "Search streets for “{query}”",
   "@locationPickerStreetSearch": {
     "placeholders": { "query": { "type": "String" } }

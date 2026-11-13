@@ -1110,6 +1110,7 @@ void main() {
           MenuFetchFailureReason.disallowedByRobots,
           MenuFetchFailureReason.jsOnlyPage,
           MenuFetchFailureReason.websiteTooLarge,
+          MenuFetchFailureReason.notARestaurant,
         };
 
         for (final reason in MenuFetchFailureReason.values) {

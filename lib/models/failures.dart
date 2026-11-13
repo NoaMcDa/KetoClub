@@ -78,6 +78,13 @@ enum MenuFetchFailureReason {
   /// read, and it could not be read now. Check AI analysis in Settings,
   /// then try again."
   websitePdfUnread,
+
+  /// The venue is a shop, not a restaurant: Wolt answered its assortment
+  /// with `loading_strategy: partial`, the products of a supermarket or
+  /// pet shop loaded per category, not a menu (issue #476). Shown as
+  /// "{platform} lists this place as a shop, not a restaurant, so there is
+  /// no menu for KetoClub to read."
+  notARestaurant,
 }
 
 /// Why menu analysis could not be produced, or fell back to the rules

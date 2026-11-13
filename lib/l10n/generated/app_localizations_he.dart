@@ -351,6 +351,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String fetchFailedNotARestaurant(String platform) {
+    return 'המקום הזה מופיע ב$platform כחנות ולא כמסעדה, ולכן אין בו תפריט ש-KetoClub יכולה לקרוא.';
+  }
+
+  @override
   String fetchFailedPlatformChanged(String platform, String statusCode) {
     return '$platform שינתה את מבנה התפריט (HTTP $statusCode), ולכן קטוקלאב לא הצליח לקרוא אותו. אנא דווחו על זה.';
   }
@@ -653,6 +658,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryLookingAround => 'מחפשים סביב';
 
   @override
+  String discoveryNameSearchAround(String place) {
+    return 'מחפשים סביב $place. בחרו מיקום כדי לחפש במקום אחר.';
+  }
+
+  @override
   String get discoveryAroundYou => 'המיקום שלך';
 
   @override
@@ -696,6 +706,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get locationPickerNoMatch => 'לא נמצאה עיר מתאימה. נסו איות אחר.';
+
+  @override
+  String get locationPickerNoCityTryStreets =>
+      'אין עיר בשם הזה. אפשר לחפש ברחובות:';
 
   @override
   String locationPickerStreetSearch(String query) {

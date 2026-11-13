@@ -1069,6 +1069,7 @@ List<Object?> _woltMenus(_Inputs inputs) {
         'menu': _mapped(
           WoltMenuMapper.toMenu(raw, ref: goldenWoltRef, fetchedAt: goldenNow),
         )?.toJson(),
+        'shop': WoltMenuMapper.isShopAssortment(raw),
       },
   ];
 }
