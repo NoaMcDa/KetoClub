@@ -8,21 +8,31 @@ environment variables, so tests never share state through the process-wide
 """
 
 import asyncio
+import logging
 import socket
 import time
 import uuid
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 
 import httpx
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import Engine
+from starlette.concurrency import run_in_threadpool
 
 from app import __version__
 from app.config import Settings, get_settings
 from app.db import build_engine
-from app.errors import BackendError, handle_backend_error, handle_validation_error
+from app.errors import (
+    BackendError,
+    UnhandledErrorMiddleware,
+    handle_backend_error,
+    handle_validation_error,
+)
+from app.logs import configure_logging
 from app.models import Base
 from app.routers import (
     chat,
@@ -39,9 +49,13 @@ from app.routers import (
     website,
     website_menu,
 )
+from app.services.cache_purge import PURGE_INTERVAL_SECONDS, purge_expired
 from app.services.places import redact_geocoder_queries
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
+from app.services.single_flight import KeyedLocks
+from app.services.trusted_host import AllowedHostsMiddleware
+from app.services.website_transport import shared_ssl_context, website_client
 
 # "No daily cap" (#123) expressed as a bound no real install could reach in
 # a day, so the discovery limiter's day window never binds.
@@ -58,6 +72,16 @@ async def resolve_host_addresses(host: str) -> list[str]:
     return [str(info[4][0]) for info in infos]
 
 
+async def _purge_periodically(engine: Engine, settings: Settings) -> None:
+    """Delete expired cache rows every ``PURGE_INTERVAL_SECONDS`` (#272)."""
+    while True:
+        await asyncio.sleep(PURGE_INTERVAL_SECONDS)
+        try:
+            await run_in_threadpool(purge_expired, engine, settings, datetime.now(UTC))
+        except Exception:  # noqa: BLE001 - housekeeping must never stop the app
+            logging.getLogger("ketoclub.cache").warning("cache purge failed")
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     """Build a configured ``FastAPI`` app.
 
@@ -66,16 +90,30 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     caller all reading the same instance.
     """
     resolved_settings = settings or get_settings()
+    configure_logging()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         engine = build_engine(resolved_settings)
         Base.metadata.create_all(engine)
         app.state.engine = engine
-        app.state.http_client = httpx.AsyncClient()
+        app.state.http_client = httpx.AsyncClient(
+            verify=shared_ssl_context(trust_env=True)
+        )
+        # The website routes' own client (#267): it dials only the public
+        # addresses it resolved, ignores HTTP(S)_PROXY, and resolves through
+        # ``app.state.resolve_host`` so tests can stand in for DNS.
+        app.state.website_http_client = website_client(
+            lambda host: app.state.resolve_host(host),
+            app.state.website_network_backend,
+        )
+        purge_expired(engine, resolved_settings, datetime.now(UTC))
+        purger = asyncio.create_task(_purge_periodically(engine, resolved_settings))
         try:
             yield
         finally:
+            purger.cancel()
+            await app.state.website_http_client.aclose()
             await app.state.http_client.aclose()
             engine.dispose()
 
@@ -133,11 +171,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Photon's URL carries the typed street; httpx's request line must not.
     redact_geocoder_queries(resolved_settings.GEOCODER_BASE_URL)
     app.state.robots_cache = {}
+    # Concurrent identical /v1/chat cache misses share one call (#272).
+    app.state.chat_flights = KeyedLocks()
     app.state.website_clock = time.monotonic
     app.state.resolve_host = resolve_host_addresses
+    # The network under the website client; None is the real one. Tests set
+    # a fake (``httpcore.AsyncMockBackend``) before the lifespan runs.
+    app.state.website_network_backend = None
     app.add_exception_handler(BackendError, handle_backend_error)
     app.add_exception_handler(RequestValidationError, handle_validation_error)
 
+    # Added first, so it runs innermost (#270): an exception a route did not
+    # handle becomes a 500 body that the request log and CORS both see.
+    app.add_middleware(UnhandledErrorMiddleware)
     app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(
         CORSMiddleware,
@@ -149,6 +195,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # here (issue #103): both /v1/chat and the Wolt proxy answer
         # X-KetoClub-Cache, and the client needs to read it.
         expose_headers=["X-KetoClub-Cache"],
+    )
+    # Added last, so it runs first (#271): a request naming a host this
+    # server is not never reaches CORS, the log or a route.
+    app.add_middleware(
+        AllowedHostsMiddleware, allowed_hosts=resolved_settings.allowed_hosts
     )
 
     app.include_router(health.router, prefix="/v1")

@@ -81,7 +81,13 @@ def dart_lower(text: str) -> str:
 
     No final-sigma rule (``Σ`` is always ``σ``) and no multi-character
     mapping (``İ`` is ``i``, not ``i`` plus U+0307).
+
+    Those two are the only places Python's own ``str.lower`` differs from a
+    per-character one, so a text holding neither takes ``str.lower``: the
+    same answer, without a Python loop over a 2 MB page (#268).
     """
+    if "Σ" not in text and "İ" not in text:
+        return text.lower()
     out: list[str] = []
     for char in text:
         lowered = char.lower()

@@ -103,6 +103,29 @@ class ImagePart(BaseModel):
         return self._decoded_size
 
 
+MAX_SCHEMA_DEPTH: Final = 32
+"""How deeply ``ChatRequest.response_schema`` may nest dicts and lists."""
+
+
+def _nesting_depth(value: object) -> int:
+    """How many dicts and lists deep ``value`` goes, walked without recursion."""
+    deepest = 0
+    stack: list[tuple[object, int]] = [(value, 1)]
+    while stack:
+        item, depth = stack.pop()
+        if isinstance(item, dict):
+            children: list[object] = list(item.values())
+        elif isinstance(item, list):
+            children = list(item)
+        else:
+            continue
+        deepest = max(deepest, depth)
+        if deepest > MAX_SCHEMA_DEPTH:
+            return deepest
+        stack.extend((child, depth + 1) for child in children)
+    return deepest
+
+
 class ChatRequest(BaseModel):
     """Request body for ``POST /v1/chat``.
 
@@ -131,6 +154,21 @@ class ChatRequest(BaseModel):
     schema_name: str | None = Field(default=None, max_length=64)
     images: list[ImagePart] = Field(default_factory=list)
 
+    @field_validator("response_schema")
+    @classmethod
+    def _schema_is_shallow(
+        cls, value: dict[str, object] | None
+    ) -> dict[str, object] | None:
+        """Refuse a schema nested deeper than ``MAX_SCHEMA_DEPTH`` (#270).
+
+        ``to_gemini_schema`` and the cache key walk it recursively, so a
+        hostile one a thousand levels deep was a ``RecursionError`` and a
+        bare 500. Measured without recursion; the real schema is 6 deep.
+        """
+        if value is not None and _nesting_depth(value) > MAX_SCHEMA_DEPTH:
+            raise ValueError(f"response_schema is nested over {MAX_SCHEMA_DEPTH} deep")
+        return value
+
     def image_bound_violation(self, max_images: int, max_bytes: int) -> str | None:
         """Why ``images`` breaks the configured bounds, or None when it does not.
 
@@ -141,6 +179,34 @@ class ChatRequest(BaseModel):
             return f"at most {max_images} images per request"
         for index, image in enumerate(self.images):
             if image.decoded_size > max_bytes:
+                return f"image {index} is over {max_bytes} bytes once decoded"
+        return None
+
+    @staticmethod
+    def raw_image_bound_violation(
+        body: object, max_images: int, max_bytes: int
+    ) -> str | None:
+        """:meth:`image_bound_violation` on the body as parsed JSON, before
+        any part is validated (#269).
+
+        Validating a part base64-decodes it, so a body of many large parts
+        cost its full decoded size in memory before the bounds were looked
+        at. This counts the parts and measures each ``data`` string as
+        sent: strict, padded base64 longer than ``4 * ceil(max_bytes / 3)``
+        characters decodes to more than ``max_bytes``. Anything shaped
+        wrong is left to the model's own validation.
+        """
+        if not isinstance(body, dict):
+            return None
+        images = body.get("images")
+        if not isinstance(images, list):
+            return None
+        if len(images) > max_images:
+            return f"at most {max_images} images per request"
+        longest = 4 * -(-max_bytes // 3)
+        for index, image in enumerate(images):
+            data = image.get("data") if isinstance(image, dict) else None
+            if isinstance(data, str) and len(data) > longest:
                 return f"image {index} is over {max_bytes} bytes once decoded"
         return None
 
