@@ -143,7 +143,9 @@ adapter or mapper.
 
 Find `<lan-ip>` with `ipconfig getifaddr en0` (macOS) or `ip addr` (Linux),
 on the same network as the phone. There is no hosted backend yet (#109);
-`--dart-define` is the only way to point a phone at one today.
+`--dart-define` is the only way to point a phone at one today. The backend answers
+only the host names in `ALLOWED_HOSTS` (#271): add the LAN IP (or `10.0.2.2`)
+there, or every request from the phone is 400 `invalidHost`.
 
 ### Flows to walk
 

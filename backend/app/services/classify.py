@@ -291,8 +291,9 @@ def scrubbed(value: Any) -> Any:
 def _fits(analysis: MenuAnalysed, menu: Menu, options: AnalysisOptionsSnapshot) -> bool:
     """Whether a cached ``analysis`` answers ``menu`` under ``options``.
 
-    The cache key holds a 32-bit dish-text fingerprint, so a hit is checked
-    before it is served: an ``llm`` analysis at the current schema version,
+    The cache key holds a sha256 of the dish text (#464), so a hit is
+    still checked before it is served: an ``llm`` analysis at the current
+    schema version,
     made under exactly these options, whose every verdict names a dish this
     menu holds under that id and name. Two venues with the same dishes under
     different ids (a chain on two platforms) therefore miss rather than get

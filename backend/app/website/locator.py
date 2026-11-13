@@ -19,7 +19,13 @@ from typing import Final
 
 from app.keto.dart_text import dart_lower, dart_trim
 from app.keto.models import MenuCategory, to_json
-from app.keto.text_menu import WS, dart_upper_first, has_letter, starts_lowercase
+from app.keto.text_menu import (
+    WS,
+    WS_CLASS,
+    dart_upper_first,
+    has_letter,
+    starts_lowercase,
+)
 from app.keto.vocabulary import vocabulary
 from app.website.html import (
     DartUri,
@@ -107,10 +113,26 @@ _TRAILING_PRICE: Final = re.compile(
     rf'(?:{WS}*(?:₪|NIS|ILS|ש["״]ח))?{WS}*\Z',
     re.IGNORECASE | re.ASCII,
 )
+# Where a ``_TRAILING_PRICE`` match can start (#268). ``re.search`` tries
+# every position, and on a long run of dashes or spaces each try scans the
+# rest of the run: cubic time. Two facts bound the tries without changing
+# the answer:
+# * the separator opens with whitespace or a dash-like mark, and a match
+#   starting inside a run of either also starts at the run's first
+#   character, so only run starts are tried;
+# * a match ends the line and spans at most eleven runs of whitespace,
+#   marks, digits and anything else (separator 3, shekel sign and space 2,
+#   whole part 1, fraction 2, currency and its space 2, trailing space 1),
+#   so only the line's last ``_PRICE_RUNS`` runs are tried.
+_SEPARATOR_MARK: Final = "[-–—:.…|]"
+_SEPARATOR_RUN_START: Final = re.compile(
+    rf"(?<!{WS}){WS}|(?<!{_SEPARATOR_MARK}){_SEPARATOR_MARK}"
+)
+_RUN: Final = re.compile(rf"{WS}+|{_SEPARATOR_MARK}+|[0-9]+|[^0-9{WS_CLASS}\-–—:.…|]+")
+_PRICE_RUNS: Final = 12
 _ENDS_IN_DIGIT: Final = re.compile(r"[0-9\-–/]\Z")
 _BULLET: Final = re.compile(rf"^[-•*·▪►]+{WS}*")
 _WHITESPACE: Final = re.compile(f"{WS}+")
-_TRAILING_COLONS: Final = re.compile(r":+\Z")
 _ESCAPE: Final = re.compile("%([0-9A-Fa-f]{2})")
 
 
@@ -211,7 +233,7 @@ def _from_inline_prices(page_lines: list[str]) -> list[str]:
 def _inline_dish_name(line: str) -> str | None:
     """The dish name in ``line`` when it ends in a price, else ``None``. The
     name must hold a letter and must not itself end in a digit or a dash."""
-    match = _TRAILING_PRICE.search(line)
+    match = _trailing_price(line)
     if match is None:
         return None
     rest = dart_trim(line[: match.start()])
@@ -220,12 +242,28 @@ def _inline_dish_name(line: str) -> str | None:
     return rest
 
 
+def _trailing_price(line: str) -> re.Match[str] | None:
+    """``_TRAILING_PRICE.search(line)``, in linear time (#268)."""
+    first = len(line)
+    for count, run in enumerate(_RUN.finditer(line[::-1]), start=1):
+        first = len(line) - run.end()
+        if count == _PRICE_RUNS:
+            break
+    for start in _SEPARATOR_RUN_START.finditer(line, first):
+        match = _TRAILING_PRICE.match(line, start.start())
+        if match is not None:
+            return match
+    return None
+
+
 def _looks_like_header(line: str) -> bool:
     return "," not in line and len(_WHITESPACE.split(line)) <= 3
 
 
 def _emit_header(out: list[str], line: str) -> None:
-    name = dart_trim(_TRAILING_COLONS.sub("", _clean(line)))
+    # ``_TRAILING_COLONS.sub("", ...)``: one trailing run of colons, removed
+    # without the regex's quadratic retries on a long run (#268).
+    name = dart_trim(_clean(line).rstrip(":"))
     if has_letter(name):
         out.append(f"{name}:")
 

@@ -66,15 +66,24 @@ once without the schema, unless it is an invalid key.
 PDF for Gemini to read with its own vision (`architecture.md` D15). `data` is
 standard, padded base64; `mime_type` is one of `image/jpeg`, `image/png`,
 `image/webp` or `application/pdf`. Each part is forwarded to Gemini as an
-`inline_data` part after the user prompt's text part, in the order sent, and
-the schema retry re-sends them unchanged. Omitted or empty, the request is
+`inline_data` part after the user prompt's text part, in the order sent. A
+request with images is never re-sent without its schema after a 400 (#272):
+the pages would be uploaded twice. Omitted or empty, the request is
 exactly the text-only one it always was.
 
 - **Bounds**: at most `VISION_MAX_IMAGES` parts (default 6), each at most
   `VISION_MAX_IMAGE_BYTES` once decoded (default 3 MiB). Over either, a
   malformed base64 string or any other `mime_type` (`image/gif`,
   `image/heic`) is FastAPI's 422 before any upstream call and before the
-  rate limiter; the app reads 422 as `badResponse`.
+  rate limiter; the app reads 422 as `badResponse`. The count and each
+  part's length as sent are checked **before any part is decoded** (#269),
+  so a body of many large pages costs nothing to refuse.
+- **Body cap** (#269): the whole body may be at most
+  `CHAT_MAX_TEXT_BODY_BYTES` (3 MiB, both prompts and the schema) plus
+  `VISION_MAX_IMAGES` base64 pages of `VISION_MAX_IMAGE_BYTES`, about 27 MiB
+  by default. Over it is `413 {"reason":"payloadTooLarge"}`, refused on the
+  declared `Content-Length` or as soon as the bytes read pass the cap, never
+  after reading the whole body.
 - **Never cached**: a request with images neither reads nor writes the
   shared completion cache below, and answers `X-KetoClub-Cache: bypass`.
   Images never enter the cache key.
@@ -187,6 +196,12 @@ router) goes much further this way.
   `{model, system_prompt, user_prompt, response_schema, schema_name}`,
   using the server's own `GEMINI_MODEL`. The key is stable across dict key
   order, including inside a nested `response_schema`.
+- **Single flight** (#272): concurrent identical misses wait on one lock
+  per key; the first calls Gemini, the rest are answered from the cache it
+  writes (`hit`) and spend no quota.
+- **Expiry** (#272): expired `chat_cache`, `menu_cache` and
+  `analysis_cache` rows are deleted at startup and hourly
+  (`app/services/cache_purge.py`).
 - **Lookup order**: the cache is checked first — before the Authorization
   rejection's sibling checks have any cost, before the rate limiter and
   before the "no key configured" check. A hit answers directly and spends
@@ -353,7 +368,7 @@ kept in step.
 
   | Status | `reason` | When |
   |---|---|---|
-  | 400 | `invalidUrl` | not `http`/`https`, user info in the URL, a port other than 80/443, or a host that resolves to a non-public address (checked again on every redirect) |
+  | 400 | `invalidUrl` | not `http`/`https`, user info in the URL, a port other than 80/443, or a host that resolves to a non-public address (checked again on every redirect, and by the connection itself) |
   | 400 | `badResponse` | missing or malformed install id |
   | 403 | `disallowedByRobots` | the site's `robots.txt` disallows `ketoclubbot` (or `*`) for the path |
   | 403 | `aiReserved` | `X-Robots-Tag: noai`, `tdm-reservation: 1`, or their `<meta>` forms |
@@ -364,7 +379,7 @@ kept in step.
   | 429 | `rateLimited` | the per-host or per-install limit |
   | 502 | `offline` | the site (or its `robots.txt`) could not be reached, answered 5xx on `robots.txt`, or its host did not resolve |
   | 502 | `upstreamStatus` | any other non-2xx from the site, or more than five redirects |
-  | 504 | `timeout` | the site did not answer in time |
+  | 504 | `timeout` | the site did not answer in time: one read over 15 s, the whole fetch (every hop and its `robots.txt`) over `WEBSITE_FETCH_DEADLINE_SECONDS`, or reading the page over `WEBSITE_PARSE_BUDGET_SECONDS` |
 
 **Crawl hygiene** (the research's §4.4 and §6 posture):
 
@@ -375,16 +390,47 @@ kept in step.
 - **Public hosts only.** The host must resolve only to globally routable
   addresses; loopback, private, link-local, multicast and reserved addresses
   are refused before any request, on the first URL and on every redirect.
+  NAT64 (`64:ff9b::/96`, `64:ff9b:1::/48`) and IPv4-compatible (`::a.b.c.d`)
+  addresses are refused outright, and an IPv4-mapped one is judged by the
+  IPv4 address it maps.
+- **The connection dials what was checked** (#267). The website routes have
+  their own HTTP client (`app/services/website_transport.py`) whose network
+  layer resolves the host once per connection, refuses it unless every
+  address is public, and connects to those addresses, never to the name.
+  A DNS server that answers a public address to the check and a private one
+  to the connection (DNS rebinding) gets `invalidUrl`, on every hop and on
+  `robots.txt` alike; TLS still verifies the certificate for the host name.
+  The client ignores `HTTP(S)_PROXY`/`ALL_PROXY` (`trust_env=False`): a proxy
+  would resolve the name itself, outside this guard. A deployment that can
+  only reach the internet through a proxy cannot use the website routes.
 - **`robots.txt` first,** per scheme and host, cached in memory for
   `WEBSITE_ROBOTS_TTL_SECONDS`: the groups naming `ketoclubbot`, else `*`;
   longest match wins, a tie goes to `Allow` (RFC 9309). A 4xx (or a 3xx,
   which is not followed) means no rules; a 5xx or no answer means the site is
-  not fetched at all.
+  not fetched at all. It is streamed and read only up to
+  `WEBSITE_MAX_ROBOTS_BYTES` once inflated (#269); `*` wildcards are matched
+  without a regex, so no pattern can backtrack (#268). Rules and paths are
+  compared with their percent-escapes normalised (RFC 9309 §2.2.2, #272):
+  `/%6denu` is `/menu`. The cache keeps at most 1024 hosts (#272).
 - **AI opt-outs are honoured** as refusals, not warnings.
 - **Rate limits,** in memory: `WEBSITE_HOST_RATE_LIMIT_PER_MINUTE` fetches per
   site across every install (a paste costs at most two), and
   `WEBSITE_RATE_LIMIT_PER_MINUTE` per install, so the route is no open proxy.
-- **Size caps** before and while reading the body.
+- **Size caps** before and while reading the body, on the bytes after
+  decompression and checked as they are inflated (#269): only `gzip` and
+  `deflate` are asked for, zlib never inflates more than a byte past the
+  cap, and any other `Content-Encoding` is `unsupportedContent`. A gzip bomb
+  costs its cap, not its inflated size.
+- **Time bounds** (#269): 5 s to connect and 15 s per read, and one
+  deadline, `WEBSITE_FETCH_DEADLINE_SECONDS` (20 s), for the whole fetch, so
+  a server dripping a byte at a time cannot hold the request open.
+- **Reading off the event loop** (#268): the page judge (and, for
+  `/v1/website-menu`, the ported reader) runs in a worker thread within
+  `WEBSITE_PARSE_BUDGET_SECONDS` (10 s). The tag-stripping passes are linear
+  (`app/website/linear.py`): a 2 MB page of unclosed `<script>` tags, which
+  took about half an hour as regexes, takes well under a second. They give
+  the regexes' exact results, pinned by a differential test and, for the D25
+  port, by the goldens.
 - **Nothing is kept or republished.** No page is cached server-side; the one
   log line per fetch (logger `ketoclub.website`) carries the host and the
   outcome only — never the path, the query or the body.
@@ -417,7 +463,10 @@ below. `backend_plan.md` §3.3 is the contract; in short:
   `offline`, `timeout`, `rateLimited`, `badResponse`): a Gemini failure is
   never an error here, as the client's `RoutingMenuClassifier` falls back.
 - **Analysis cache** (`analysis_cache`, `ANALYSIS_CACHE_TTL_SECONDS`): keyed
-  by `sha256(fingerprint|model|schemaVersion|netCarbLimitGrams|constraints)`.
+  by `sha256(menuDigest|model|schemaVersion|netCarbLimitGrams|constraints)`,
+  where `menuDigest` is a sha256 of every category name and dish id, name,
+  description and option the classifier reads (#464; never the 32-bit scan
+  fingerprint, which a crafted menu can be made to match).
   A hit is free; only an `llm` analysis is written. A hit whose dish ids do
   not match the menu's (the same dishes under other ids) is a miss.
 - **Analysis bucket** (`ANALYSIS_RATE_LIMIT_*`): spent only just before a
@@ -471,13 +520,16 @@ schema, and the answer is `{menu, analysis}`: `menu.venueRef` is
 
 `{url, options}`. The server does what the app's `WebsiteMenuAdapter` does:
 it fetches the pasted URL through the `/v1/website/fetch` rules (public hosts
-only, robots.txt and the AI opt-outs, size caps, the per-install and per-site
-budgets, now in `app/services/website_fetch.py` and shared by both routes),
+only, checked by the connection too, robots.txt and the AI opt-outs, size and
+decompression caps, the fetch deadline, the per-install and per-site budgets,
+now in `app/services/website_fetch.py` and shared by both routes),
 reads the page with the ported locator (JSON-LD, or the page's own priced
 text), follows **one** menu link, and sends a PDF to the scan path. A text or
 JSON-LD menu is analysed with the rules fallback and the "empty bucket keeps the
 menu, stamps `rateLimited`" rule; a menu with no dish answers `analysis: null`.
 The menu is `website/<normalised url>`, priced in ILS, with no venue name.
+The reading runs in a worker thread within `WEBSITE_PARSE_BUDGET_SECONDS`, or
+504 `timeout`.
 
 Errors are every `/v1/website/fetch` reason at its status, plus 404
 `menuNotFound` and, for an unreadable linked PDF, 502 with the scan reason (or
@@ -642,11 +694,48 @@ address, not `localhost`:
 
 ```bash
 flutter run -d <device> --dart-define=KETOCLUB_BACKEND_URL=http://<lan-ip>:8000
-uv run uvicorn app.main:app --host 0.0.0.0 --port 8000   # listen beyond localhost
+# listen beyond localhost, and answer to the LAN address (#99, #271)
+ALLOWED_HOSTS='localhost,127.0.0.1,[::1],<lan-ip>' \
+  uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 CORS does not matter to a phone; the install id and the 10/60 analysis bucket
 do. Hosting beyond a developer's machine is still open (#109).
+
+### The `Host` check (#271)
+
+Every request's `Host` header must name a host in `ALLOWED_HOSTS` (any
+port), or it is `400 {"reason":"invalidHost"}` before CORS, the log or any
+route sees it. The default, `localhost,127.0.0.1,[::1]`, is the developer's
+own machine. The check exists because CORS cannot stop **DNS rebinding**: a
+page on `evil.example` can point its own name at 127.0.0.1, and the browser
+then treats `http://evil.example:8000` as the page's own origin and lets it
+call `/v1/chat` on the server's Gemini key, or `/v1/website/fetch`, with no
+cross-origin check at all. The request still says `Host: evil.example`.
+
+- **Phones on the LAN (#99):** add the machine's LAN address, exactly as the
+  phone's `KETOCLUB_BACKEND_URL` spells it (`192.168.1.20`). The Android
+  emulator reaches the host as `10.0.2.2`; add that when using it.
+- **A hosted deploy (#171):** set it to the public host name
+  (`api.example.com`), or a pattern for its subdomains
+  (`*.preview.example.com`); behind a reverse proxy, the name the proxy
+  forwards in `Host`. `*` alone turns the check off; do not use it on a
+  machine a browser can reach.
+
+### The log and unexpected errors
+
+Every `ketoclub.*` logger prints through one stream handler on the
+`ketoclub` parent, at INFO, installed by `create_app` (`app/logs.py`, #467):
+uvicorn configures only its own loggers, so a module logger with no handler
+of its own was silently dropped. Lines read `<time> <logger> <message>`, for
+example `ketoclub.request request request_id=… method=GET route=/v1/health
+status=200 latency_ms=1.2` or `ketoclub.classify classify engine=rules
+reason=timeout`.
+
+An exception no route handles is `500 {"reason":"internalError"}`, answered
+inside CORS so a browser sees the status rather than a CORS failure (#270),
+and logged as `ketoclub.errors unhandled error type=<ExceptionType>`: the
+type only, since a message can quote request content.
 
 ## Configuration
 
@@ -687,6 +776,10 @@ default except `GEMINI_API_KEY`, which gates the routes that need it
 | `WEBSITE_MAX_ROBOTS_BYTES`, `WEBSITE_ROBOTS_TTL_SECONDS` | `524288`, `3600` | How much of `robots.txt` is read, and how long it is cached per host |
 | `WEBSITE_HOST_RATE_LIMIT_PER_MINUTE` | `6` | Website fetches per site across every install |
 | `WEBSITE_RATE_LIMIT_PER_MINUTE` | `10` | Website fetches per install id |
+| `WEBSITE_FETCH_DEADLINE_SECONDS` | `20` | One deadline for a whole website fetch: every hop, its `robots.txt` and every read (#269); past it → 504 `timeout` |
+| `WEBSITE_PARSE_BUDGET_SECONDS` | `10` | How long reading one fetched page may take in its worker thread (#268); past it → 504 `timeout` |
+| `CHAT_MAX_TEXT_BODY_BYTES` | `3145728` | The prompts-and-schema half of the largest `/v1/chat` body; the images' allowance is added on top (#269); over it → 413 `payloadTooLarge` |
+| `ALLOWED_HOSTS` | `localhost,127.0.0.1,[::1]` | Host names (any port) a request's `Host` header may carry; anything else → 400 `invalidHost` (#271). Add the LAN address for phones (#99) and the public name on a hosted deploy (#171) |
 
 ## Smoke test against the real API
 
