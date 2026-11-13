@@ -1099,6 +1099,7 @@ void main() {
           MenuFetchFailureReason.backendUnreachable,
           MenuFetchFailureReason.websiteUnreachable,
           MenuFetchFailureReason.websiteRateLimited,
+          MenuFetchFailureReason.backendRateLimited,
           MenuFetchFailureReason.websitePdfUnread,
         };
         const backToSearch = <MenuFetchFailureReason>{

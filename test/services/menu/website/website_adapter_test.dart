@@ -231,6 +231,11 @@ void main() {
         final result = await _adapter(fetcher, scanned: scanned).fetch(_ref);
 
         expect(_reason(result), MenuFetchFailureReason.websitePdfUnread);
+        // The cause rides along, so the copy can say what to fix (#284).
+        expect(
+          (result as MenuFetchFailed).pdfFailure,
+          MenuAnalysisFailureReason.consentWithheld,
+        );
       });
     });
 

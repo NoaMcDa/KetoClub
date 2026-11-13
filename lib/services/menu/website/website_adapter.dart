@@ -192,8 +192,9 @@ final class WebsiteMenuAdapter implements PlatformMenuAdapter {
         menu: _stamp(ref, menu.categories),
         analysis: analysis,
       ),
-      ScannedMenuFailed() => const MenuFetchFailed(
+      ScannedMenuFailed(:final reason) => MenuFetchFailed(
         reason: MenuFetchFailureReason.websitePdfUnread,
+        pdfFailure: reason,
       ),
     };
   }

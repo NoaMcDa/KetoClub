@@ -147,6 +147,16 @@ final class GeolocatorLocationService implements LocationService {
       return const LocationUnavailable(
         reason: LocationUnavailableReason.timeout,
       );
+      // The services can be switched off, or the permission withdrawn,
+      // between the checks above and the position read (issue #284):
+      // geolocator then throws rather than answering, and each is the
+      // reason the checks would have given, not `unsupported`.
+    } on geo.LocationServiceDisabledException {
+      return const LocationUnavailable(
+        reason: LocationUnavailableReason.servicesOff,
+      );
+    } on geo.PermissionDeniedException {
+      return const LocationDenied(permanently: false);
       // `services/` may import neither `dart:io` nor
       // `package:flutter/services.dart` (architecture.md §5), so
       // geolocator's platform exceptions — all of which implement

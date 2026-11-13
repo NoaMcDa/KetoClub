@@ -8,7 +8,10 @@ import 'package:http/testing.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
 import 'package:ketoclub/services/menu/website/website_fetcher.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/utils/constants.dart';
+
+import '../../../fakes/fake_connectivity.dart';
 
 final Uri _home = Uri.parse('https://cafe.example/');
 const String _page = '<p>Caesar salad 52</p>';
@@ -43,9 +46,11 @@ Future<WebsiteFetchResult> _fetch(
   http.Client client, {
   Uri? url,
   bool runsInBrowser = false,
+  Connectivity? connectivity,
 }) => DirectWebsiteFetcher(
   client: client,
   runsInBrowser: runsInBrowser,
+  connectivity: connectivity,
 ).fetch(url ?? _home);
 
 MenuFetchFailureReason? _reason(WebsiteFetchResult result) =>
@@ -292,6 +297,35 @@ void main() {
           );
         },
       );
+
+      test('a failed request on a connected phone is the site not '
+          'answering, not offline (#284)', () async {
+        // Arrange: a domain that does not resolve reaches package:http as
+        // the same ClientException as no network at all.
+        final client = MockClient(
+          (request) async => throw http.ClientException(
+            "Failed host lookup: '${request.url.host}'",
+            request.url,
+          ),
+        );
+
+        // Act
+        final online = await _fetch(client, connectivity: FakeConnectivity());
+        final offline = await _fetch(
+          client,
+          connectivity: FakeConnectivity(online: false),
+        );
+        final browser = await _fetch(
+          client,
+          runsInBrowser: true,
+          connectivity: FakeConnectivity(),
+        );
+
+        // Assert
+        expect(_reason(online), MenuFetchFailureReason.websiteUnreachable);
+        expect(_reason(offline), MenuFetchFailureReason.offline);
+        expect(_reason(browser), MenuFetchFailureReason.blockedByBrowser);
+      });
 
       test(
         'a failed page request after robots.txt maps the same way',

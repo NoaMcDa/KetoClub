@@ -68,15 +68,26 @@ enum MenuFetchFailureReason {
   websiteTooLarge,
 
   /// KetoClub already read this site several times in the last minute,
-  /// and spaces its requests to any one site (D19). Shown as "KetoClub
+  /// and spaces its requests to any one site (D19): the backend's
+  /// per-site budget, `siteRateLimited` on the wire. Shown as "KetoClub
   /// read {site} a moment ago. Wait a minute, then try again."
   websiteRateLimited,
 
+  /// KetoClub's backend refused the request because this install sent
+  /// too many in the last minute: its per-install budget, a 429
+  /// `rateLimited` (issue #284). Kept apart from [websiteRateLimited],
+  /// which is the site's budget, not this device's. Shown as "KetoClub's
+  /// server has had many requests from this device in the last minute.
+  /// Wait a minute, then try again."
+  backendRateLimited,
+
   /// The website's menu is a PDF, and only AI analysis can read a PDF: the
   /// vision read failed, was not allowed, or found no dish (D19; D15).
-  /// Shown as "The menu on {site} is a PDF, which only AI analysis can
-  /// read, and it could not be read now. Check AI analysis in Settings,
-  /// then try again."
+  /// `MenuFetchFailed.pdfFailure` names why when it is known, and the copy
+  /// says it (issue #284): "The menu on {site} is a PDF, which only AI
+  /// analysis can read. {why}". With no known cause it is "The menu on
+  /// {site} is a PDF, which only AI analysis can read, and it could not
+  /// be read now. Check AI analysis in Settings, then try again."
   websitePdfUnread,
 
   /// The venue is a shop, not a restaurant: Wolt answered its assortment

@@ -2198,6 +2198,102 @@ abstract class AppLocalizations {
   /// **'The menu on {site} is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again.'**
   String websitePdfUnread(String site);
 
+  /// No description provided for @websitePdfUnreadBecause.
+  ///
+  /// In en, this message translates to:
+  /// **'The menu on {site} is a PDF, which only AI analysis can read. {why}'**
+  String websitePdfUnreadBecause(String site, String why);
+
+  /// No description provided for @websitePdfWhyNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'AI analysis is not available on this build or server.'**
+  String get websitePdfWhyNotConfigured;
+
+  /// No description provided for @websitePdfWhyOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'You look offline. Reconnect, then try again.'**
+  String get websitePdfWhyOffline;
+
+  /// No description provided for @websitePdfWhyTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI model was too slow. Try again.'**
+  String get websitePdfWhyTimeout;
+
+  /// No description provided for @websitePdfWhyRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'The daily AI limit is used up. Try again later.'**
+  String get websitePdfWhyRateLimited;
+
+  /// No description provided for @websitePdfWhyBadResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI model gave an unusable answer. Try again.'**
+  String get websitePdfWhyBadResponse;
+
+  /// No description provided for @websitePdfWhyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service is busy right now. Try again in a minute.'**
+  String get websitePdfWhyUnavailable;
+
+  /// No description provided for @websitePdfWhyNoDishesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No dishes could be read from it.'**
+  String get websitePdfWhyNoDishesFound;
+
+  /// No description provided for @websitePdfWhyBackendUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub\'s server could not be reached. Try again.'**
+  String get websitePdfWhyBackendUnreachable;
+
+  /// No description provided for @websitePdfWhyConsentWithheld.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow AI analysis in Settings to read it.'**
+  String get websitePdfWhyConsentWithheld;
+
+  /// No description provided for @websitePdfWhyApiKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your Gemini API key in Settings to read it.'**
+  String get websitePdfWhyApiKeyMissing;
+
+  /// No description provided for @websitePdfWhyApiKeyRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini rejected your API key. Check it in Settings.'**
+  String get websitePdfWhyApiKeyRejected;
+
+  /// No description provided for @fetchFailedBackendRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub\'s server has had many requests from this device in the last minute. Wait a minute, then try again.'**
+  String get fetchFailedBackendRateLimited;
+
+  /// No description provided for @scanPickCameraDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub is not allowed to use the camera. Allow camera access in your device settings, then try again.'**
+  String get scanPickCameraDenied;
+
+  /// No description provided for @scanPickLibraryDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub is not allowed to open your photos or files. Allow access in your device settings, then try again.'**
+  String get scanPickLibraryDenied;
+
+  /// No description provided for @scanPickFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The file could not be opened. Try again.'**
+  String get scanPickFailed;
+
   /// No description provided for @scanQrAction.
   ///
   /// In en, this message translates to:

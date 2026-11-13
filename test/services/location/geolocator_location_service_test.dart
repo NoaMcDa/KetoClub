@@ -238,12 +238,49 @@ void main() {
       );
     });
 
+    test('current returns servicesOff when the services go off before the '
+        'position is read (#284)', () async {
+      // Arrange
+      final service = _buildService(
+        getCurrentPosition: ({locationSettings}) => Future<geo.Position>.error(
+          const geo.LocationServiceDisabledException(),
+        ),
+      );
+
+      // Act
+      final result = await service.current();
+
+      // Assert
+      expect(
+        result,
+        const LocationUnavailable(
+          reason: LocationUnavailableReason.servicesOff,
+        ),
+      );
+    });
+
+    test('current returns denied when the permission is withdrawn before '
+        'the position is read (#284)', () async {
+      // Arrange
+      final service = _buildService(
+        getCurrentPosition: ({locationSettings}) => Future<geo.Position>.error(
+          const geo.PermissionDeniedException('withdrawn'),
+        ),
+      );
+
+      // Act
+      final result = await service.current();
+
+      // Assert
+      expect(result, const LocationDenied(permanently: false));
+    });
+
     test('current returns unsupported — never throws — for an unexpected '
         'plugin exception from getCurrentPosition', () async {
       // Arrange
       final service = _buildService(
         getCurrentPosition: ({locationSettings}) => Future<geo.Position>.error(
-          const geo.LocationServiceDisabledException(),
+          const geo.PositionUpdateException('unexpected'),
         ),
       );
 

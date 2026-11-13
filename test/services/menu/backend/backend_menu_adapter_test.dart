@@ -691,7 +691,8 @@ void main() {
 
   group('website route errors', () {
     final cases = <(int, String?, MenuFetchFailureReason)>[
-      (429, 'rateLimited', MenuFetchFailureReason.websiteRateLimited),
+      (429, 'siteRateLimited', MenuFetchFailureReason.websiteRateLimited),
+      (429, 'rateLimited', MenuFetchFailureReason.backendRateLimited),
       (404, 'menuNotFound', MenuFetchFailureReason.menuNotFound),
       (404, 'notFound', MenuFetchFailureReason.notFound),
       (403, 'disallowedByRobots', MenuFetchFailureReason.disallowedByRobots),
@@ -726,7 +727,15 @@ void main() {
 
         expect(
           await adapter.fetch(_websiteRef),
-          MenuFetchFailed(reason: reason, statusCode: status),
+          MenuFetchFailed(
+            reason: reason,
+            statusCode: status,
+            pdfFailure: switch (wire) {
+              _ when reason != MenuFetchFailureReason.websitePdfUnread => null,
+              'noDishesFound' => MenuAnalysisFailureReason.noDishesFound,
+              _ => MenuAnalysisFailureReason.badResponse,
+            },
+          ),
         );
       });
     }
@@ -748,11 +757,13 @@ void main() {
   });
 
   group('shouldFallBack', () {
-    test('is true for backendUnreachable and offline only', () {
+    test('is true for backendUnreachable, backendRateLimited and offline '
+        'only', () {
       for (final reason in MenuFetchFailureReason.values) {
         expect(
           BackendMenuAdapter.shouldFallBack(reason),
           reason == MenuFetchFailureReason.backendUnreachable ||
+              reason == MenuFetchFailureReason.backendRateLimited ||
               reason == MenuFetchFailureReason.offline,
           reason: reason.name,
         );

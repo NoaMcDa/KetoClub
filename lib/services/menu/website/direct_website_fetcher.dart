@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/services/menu/website/robots_txt.dart';
 import 'package:ketoclub/services/menu/website/website_fetcher.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/public_web_address.dart';
 
@@ -34,13 +35,36 @@ const String websiteUserAgent =
 /// keeps one. Never throws: an error `package:http` does not wrap in a
 /// `ClientException` (a TLS failure) is
 /// [MenuFetchFailureReason.websiteUnreachable].
+///
+/// **A failed request on a connected phone is the site's (issue #284).**
+/// `package:http` reports a domain that does not resolve — a mistyped or
+/// lapsed restaurant domain — as the same `ClientException` as no network
+/// at all, and names neither by type. So a `ClientException` outside a
+/// browser asks the [Connectivity] hint: when the device looks online it is
+/// [MenuFetchFailureReason.websiteUnreachable] ("{site} did not answer"),
+/// and only otherwise [MenuFetchFailureReason.offline]. Connectivity is a
+/// hint (architecture.md D10): a device on a network with no route out
+/// still reads as online, and is then told the site did not answer, which
+/// is the more useful of the two wrong answers. With no `connectivity`
+/// every such failure is `offline`, as before.
 final class DirectWebsiteFetcher implements WebsiteFetcher {
   /// Creates a fetcher over [client]. [runsInBrowser] exists so a test can
-  /// exercise the browser mapping of a failed request on any platform.
-  new({required http.Client client, this.runsInBrowser = kIsWeb})
-    // A private field, a public parameter name.
+  /// exercise the browser mapping of a failed request on any platform;
+  /// [connectivity] tells a dead site from a dead network (see the class
+  /// doc).
+  new({
+    required http.Client client,
+    this.runsInBrowser = kIsWeb,
+    Connectivity? connectivity,
+  })
+    // Private fields, public parameter names.
     // ignore: prefer_initializing_formals
-    : _client = client;
+    : _client = client,
+       // Same reason: a private field, a public parameter name.
+       // ignore: prefer_initializing_formals
+       _connectivity = connectivity;
+
+  final Connectivity? _connectivity;
 
   /// The most redirects one fetch follows.
   static const int maxRedirects = 5;
@@ -89,7 +113,7 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
             .send(_request(current, accept: _accept))
             .timeout(websiteFetchTimeout);
       } on http.ClientException {
-        return _clientFailure();
+        return await _clientFailure();
       } on Object {
         // A timeout, or a TLS failure `package:http` does not wrap.
         return _unreachable;
@@ -143,7 +167,7 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
         websiteMaxRobotsBytes,
       ).timeout(websiteFetchTimeout);
     } on http.ClientException {
-      return _clientFailure();
+      return await _clientFailure();
     } on Object {
       return _unreachable;
     }
@@ -164,15 +188,21 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
     reason: MenuFetchFailureReason.websiteUnreachable,
   );
 
-  WebsiteFetchFailed _clientFailure() {
+  Future<WebsiteFetchFailed> _clientFailure() async {
     // A browser reports a cross-origin refusal exactly as it reports a
     // dead network, and almost no restaurant site allows KetoClub's
     // origin, so in a browser a failed request is the block (§13).
-    return WebsiteFetchFailed(
-      reason: runsInBrowser
-          ? MenuFetchFailureReason.blockedByBrowser
-          : MenuFetchFailureReason.offline,
-    );
+    if (runsInBrowser) {
+      return const WebsiteFetchFailed(
+        reason: MenuFetchFailureReason.blockedByBrowser,
+      );
+    }
+    // A connected device that could not reach the site: a domain that does
+    // not resolve, a refused connection. See the class doc.
+    final online = await _connectivity?.isOnline() ?? false;
+    return online
+        ? _unreachable
+        : const WebsiteFetchFailed(reason: MenuFetchFailureReason.offline);
   }
 
   Future<WebsiteFetchResult> _read(
@@ -218,7 +248,7 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
       }
       bytes = read;
     } on http.ClientException {
-      return _clientFailure();
+      return await _clientFailure();
     } on Object {
       return _unreachable;
     }

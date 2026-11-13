@@ -612,6 +612,25 @@
   "@websitePdfUnread": {
     "placeholders": { "site": { "type": "String" } }
   },
+  "websitePdfUnreadBecause": "The menu on {site} is a PDF, which only AI analysis can read. {why}",
+  "@websitePdfUnreadBecause": {
+    "placeholders": { "site": { "type": "String" }, "why": { "type": "String" } }
+  },
+  "websitePdfWhyNotConfigured": "AI analysis is not available on this build or server.",
+  "websitePdfWhyOffline": "You look offline. Reconnect, then try again.",
+  "websitePdfWhyTimeout": "The AI model was too slow. Try again.",
+  "websitePdfWhyRateLimited": "The daily AI limit is used up. Try again later.",
+  "websitePdfWhyBadResponse": "The AI model gave an unusable answer. Try again.",
+  "websitePdfWhyUnavailable": "The AI service is busy right now. Try again in a minute.",
+  "websitePdfWhyNoDishesFound": "No dishes could be read from it.",
+  "websitePdfWhyBackendUnreachable": "KetoClub's server could not be reached. Try again.",
+  "websitePdfWhyConsentWithheld": "Allow AI analysis in Settings to read it.",
+  "websitePdfWhyApiKeyMissing": "Add your Gemini API key in Settings to read it.",
+  "websitePdfWhyApiKeyRejected": "Gemini rejected your API key. Check it in Settings.",
+  "fetchFailedBackendRateLimited": "KetoClub's server has had many requests from this device in the last minute. Wait a minute, then try again.",
+  "scanPickCameraDenied": "KetoClub is not allowed to use the camera. Allow camera access in your device settings, then try again.",
+  "scanPickLibraryDenied": "KetoClub is not allowed to open your photos or files. Allow access in your device settings, then try again.",
+  "scanPickFailed": "The file could not be opened. Try again.",
   "scanQrAction": "Scan QR code",
   "scanQrTitle": "Scan QR code",
   "scanQrInstruction": "Point the camera at the QR code on the table.",

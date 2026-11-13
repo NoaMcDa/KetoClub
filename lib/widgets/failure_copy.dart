@@ -1,6 +1,7 @@
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/services/place/place_search_service.dart';
+import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 
 /// The message for a menu-fetch failure (architecture.md §10).
@@ -11,7 +12,9 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 /// [MenuFetchFailureReason.platformChanged], and — as the site's host —
 /// by every website reason (architecture.md D19); [statusCode] is required
 /// by
-/// [MenuFetchFailureReason.platformChanged].
+/// [MenuFetchFailureReason.platformChanged]; [pdfFailure], when known,
+/// says why [MenuFetchFailureReason.websitePdfUnread] could not read the
+/// PDF (issue #284), each cause in its own words.
 /// A caller that omits one where it is expected gets an empty
 /// placeholder rather than a thrown error, since a failure screen must
 /// never itself fail.
@@ -24,6 +27,7 @@ String fetchFailureMessage(
   AppLocalizations l10n, {
   String? platform,
   int? statusCode,
+  MenuAnalysisFailureReason? pdfFailure,
 }) => switch (reason) {
   MenuFetchFailureReason.offline => l10n.fetchFailedOffline,
   MenuFetchFailureReason.blockedByBrowser => l10n.fetchFailedBlockedByBrowser(
@@ -54,12 +58,54 @@ String fetchFailureMessage(
   MenuFetchFailureReason.websiteRateLimited => l10n.websiteRateLimited(
     platform ?? '',
   ),
-  MenuFetchFailureReason.websitePdfUnread => l10n.websitePdfUnread(
-    platform ?? '',
-  ),
+  MenuFetchFailureReason.backendRateLimited =>
+    l10n.fetchFailedBackendRateLimited,
+  MenuFetchFailureReason.websitePdfUnread =>
+    pdfFailure == null
+        ? l10n.websitePdfUnread(platform ?? '')
+        : l10n.websitePdfUnreadBecause(
+            platform ?? '',
+            _websitePdfWhy(pdfFailure, l10n),
+          ),
   MenuFetchFailureReason.notARestaurant => l10n.fetchFailedNotARestaurant(
     platform ?? '',
   ),
+};
+
+/// Why a website's PDF menu could not be read, one sentence per
+/// [MenuAnalysisFailureReason] (issue #284).
+String _websitePdfWhy(
+  MenuAnalysisFailureReason reason,
+  AppLocalizations l10n,
+) => switch (reason) {
+  MenuAnalysisFailureReason.notConfigured => l10n.websitePdfWhyNotConfigured,
+  MenuAnalysisFailureReason.offline => l10n.websitePdfWhyOffline,
+  MenuAnalysisFailureReason.timeout => l10n.websitePdfWhyTimeout,
+  MenuAnalysisFailureReason.rateLimited => l10n.websitePdfWhyRateLimited,
+  MenuAnalysisFailureReason.badResponse => l10n.websitePdfWhyBadResponse,
+  MenuAnalysisFailureReason.unavailable => l10n.websitePdfWhyUnavailable,
+  MenuAnalysisFailureReason.noDishesFound => l10n.websitePdfWhyNoDishesFound,
+  MenuAnalysisFailureReason.backendUnreachable =>
+    l10n.websitePdfWhyBackendUnreachable,
+  MenuAnalysisFailureReason.consentWithheld =>
+    l10n.websitePdfWhyConsentWithheld,
+  MenuAnalysisFailureReason.apiKeyMissing => l10n.websitePdfWhyApiKeyMissing,
+  MenuAnalysisFailureReason.apiKeyRejected => l10n.websitePdfWhyApiKeyRejected,
+};
+
+/// The message for a page picker that collected nothing although the
+/// user did not cancel it (issue #284).
+///
+/// An exhaustive switch with no `default`: adding a reason without adding
+/// its copy here is a compile error, never a silently collapsed message
+/// (architecture.md §10, "collapsing reasons is a bug").
+String pagePickFailureMessage(
+  PagePickFailureReason reason,
+  AppLocalizations l10n,
+) => switch (reason) {
+  PagePickFailureReason.cameraDenied => l10n.scanPickCameraDenied,
+  PagePickFailureReason.libraryDenied => l10n.scanPickLibraryDenied,
+  PagePickFailureReason.failed => l10n.scanPickFailed,
 };
 
 /// The message for a menu-analysis failure (architecture.md §10).

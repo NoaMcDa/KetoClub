@@ -17,8 +17,9 @@ enum PagePickerCall {
 ///
 /// Each method draws from its own queue: [queueTakePhoto],
 /// [queuePickImages] and [queuePickPdf] each add one answer, returned in
-/// order. With its queue empty a method answers an empty list, exactly as
-/// a cancelled picker does. Every call, of any method, is recorded in
+/// order, and [queueFailure] queues a [PagePickFailed] for one method.
+/// With its queue empty a method answers [PagesPicked.none], exactly as a
+/// cancelled picker does. Every call, of any method, is recorded in
 /// [calls] in call order.
 final class FakePagePicker implements PagePicker {
   /// Creates a picker with nothing queued and nothing recorded yet.
@@ -28,40 +29,49 @@ final class FakePagePicker implements PagePicker {
   @override
   final bool canTakePhoto;
 
-  final List<List<ScannedPage>> _photos = <List<ScannedPage>>[];
-  final List<List<ScannedPage>> _images = <List<ScannedPage>>[];
-  final List<List<ScannedPage>> _pdfs = <List<ScannedPage>>[];
+  final List<PagePickResult> _photos = <PagePickResult>[];
+  final List<PagePickResult> _images = <PagePickResult>[];
+  final List<PagePickResult> _pdfs = <PagePickResult>[];
 
   /// Every call made, in call order.
   final List<PagePickerCall> calls = <PagePickerCall>[];
 
   /// Queues [pages] as the answer to the next unanswered [takePhoto].
-  void queueTakePhoto(List<ScannedPage> pages) => _photos.add(pages);
+  void queueTakePhoto(List<ScannedPage> pages) =>
+      _photos.add(PagesPicked(List<ScannedPage>.unmodifiable(pages)));
 
   /// Queues [pages] as the answer to the next unanswered [pickImages].
-  void queuePickImages(List<ScannedPage> pages) => _images.add(pages);
+  void queuePickImages(List<ScannedPage> pages) =>
+      _images.add(PagesPicked(List<ScannedPage>.unmodifiable(pages)));
 
   /// Queues [pages] as the answer to the next unanswered [pickPdf].
-  void queuePickPdf(List<ScannedPage> pages) => _pdfs.add(pages);
+  void queuePickPdf(List<ScannedPage> pages) =>
+      _pdfs.add(PagesPicked(List<ScannedPage>.unmodifiable(pages)));
+
+  /// Queues a [PagePickFailed] for [reason] as the answer to the next
+  /// unanswered [call].
+  void queueFailure(PagePickerCall call, PagePickFailureReason reason) =>
+      switch (call) {
+        PagePickerCall.takePhoto => _photos,
+        PagePickerCall.pickImages => _images,
+        PagePickerCall.pickPdf => _pdfs,
+      }.add(PagePickFailed(reason));
 
   @override
-  Future<List<ScannedPage>> takePhoto() async =>
+  Future<PagePickResult> takePhoto() async =>
       _answer(PagePickerCall.takePhoto, _photos);
 
   @override
-  Future<List<ScannedPage>> pickImages() async =>
+  Future<PagePickResult> pickImages() async =>
       _answer(PagePickerCall.pickImages, _images);
 
   @override
-  Future<List<ScannedPage>> pickPdf() async =>
+  Future<PagePickResult> pickPdf() async =>
       _answer(PagePickerCall.pickPdf, _pdfs);
 
-  List<ScannedPage> _answer(
-    PagePickerCall call,
-    List<List<ScannedPage>> queue,
-  ) {
+  PagePickResult _answer(PagePickerCall call, List<PagePickResult> queue) {
     calls.add(call);
-    if (queue.isEmpty) return const <ScannedPage>[];
-    return List<ScannedPage>.unmodifiable(queue.removeAt(0));
+    if (queue.isEmpty) return PagesPicked.none;
+    return queue.removeAt(0);
   }
 }

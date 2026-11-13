@@ -166,6 +166,33 @@ void main() {
       expect(repository.savedAnalyses, isEmpty);
     });
 
+    test(
+      'open on an unread website PDF keeps why it was unread (#284)',
+      () async {
+        // Arrange
+        repository.stub(
+          _ref,
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.websitePdfUnread,
+            pdfFailure: MenuAnalysisFailureReason.apiKeyMissing,
+          ),
+        );
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(
+          controller.fetchFailure,
+          MenuFetchFailureReason.websitePdfUnread,
+        );
+        expect(
+          controller.fetchPdfFailure,
+          MenuAnalysisFailureReason.apiKeyMissing,
+        );
+      },
+    );
+
     test('open when fetch succeeds but analysis fails still shows the '
         'raw menu', () async {
       // Arrange

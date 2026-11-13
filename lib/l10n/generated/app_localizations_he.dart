@@ -1396,6 +1396,67 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String websitePdfUnreadBecause(String site, String why) {
+    return 'התפריט ב־$site הוא קובץ PDF, שרק ניתוח AI יכול לקרוא. $why';
+  }
+
+  @override
+  String get websitePdfWhyNotConfigured =>
+      'ניתוח AI אינו זמין בגרסה הזו או בשרת.';
+
+  @override
+  String get websitePdfWhyOffline => 'נראה שאין חיבור. התחברו ונסו שוב.';
+
+  @override
+  String get websitePdfWhyTimeout => 'מודל ה-AI היה איטי מדי. נסו שוב.';
+
+  @override
+  String get websitePdfWhyRateLimited =>
+      'מכסת ה-AI היומית נוצלה. נסו שוב מאוחר יותר.';
+
+  @override
+  String get websitePdfWhyBadResponse =>
+      'מודל ה-AI החזיר תשובה שאי אפשר להשתמש בה. נסו שוב.';
+
+  @override
+  String get websitePdfWhyUnavailable =>
+      'שירות ה-AI עמוס כרגע. נסו שוב בעוד דקה.';
+
+  @override
+  String get websitePdfWhyNoDishesFound => 'לא ניתן היה לקרוא ממנו אף מנה.';
+
+  @override
+  String get websitePdfWhyBackendUnreachable =>
+      'השרת של KetoClub לא היה זמין. נסו שוב.';
+
+  @override
+  String get websitePdfWhyConsentWithheld =>
+      'אפשרו ניתוח AI בהגדרות כדי לקרוא אותו.';
+
+  @override
+  String get websitePdfWhyApiKeyMissing =>
+      'הוסיפו את מפתח ה-API של Gemini בהגדרות כדי לקרוא אותו.';
+
+  @override
+  String get websitePdfWhyApiKeyRejected =>
+      'Gemini דחה את מפתח ה-API שלכם. בדקו אותו בהגדרות.';
+
+  @override
+  String get fetchFailedBackendRateLimited =>
+      'השרת של KetoClub קיבל ממכשיר זה בקשות רבות בדקה האחרונה. חכו דקה ונסו שוב.';
+
+  @override
+  String get scanPickCameraDenied =>
+      'ל-KetoClub אין הרשאה להשתמש במצלמה. אפשרו גישה למצלמה בהגדרות המכשיר ונסו שוב.';
+
+  @override
+  String get scanPickLibraryDenied =>
+      'ל-KetoClub אין הרשאה לפתוח את התמונות או הקבצים שלכם. אפשרו גישה בהגדרות המכשיר ונסו שוב.';
+
+  @override
+  String get scanPickFailed => 'לא ניתן היה לפתוח את הקובץ. נסו שוב.';
+
+  @override
   String get scanQrAction => 'סריקת קוד QR';
 
   @override

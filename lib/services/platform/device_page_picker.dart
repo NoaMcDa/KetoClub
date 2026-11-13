@@ -25,9 +25,11 @@ const int pickedImageQuality = 80;
 ///
 /// Bytes are read through `XFile.readAsBytes()` and
 /// `PlatformFile.readAsBytes()`, never `dart:io`, so this file builds for
-/// the web. Every method never throws: a denied camera permission, a
-/// plugin error (an `Exception` or an `Error`) or a cancelled picker all
-/// answer an empty list. A picked
+/// the web. Every method never throws: a cancelled picker answers
+/// [PagesPicked.none], a refused permission a [PagePickFailed] naming the
+/// camera or the library ([isPermissionDenial]), and any other plugin
+/// error (an `Exception` or an `Error`) [PagePickFailureReason.failed]
+/// (issue #284). A picked
 /// file whose type is not one KetoClub sends on (JPEG, PNG, WebP, or a
 /// PDF for [pickPdf]) is dropped rather than passed to the model.
 ///
@@ -67,50 +69,70 @@ final class DevicePagePicker implements PagePicker {
   bool get canTakePhoto => !runsInBrowser;
 
   @override
-  Future<List<ScannedPage>> takePhoto() async {
+  Future<PagePickResult> takePhoto() async {
     try {
       final photo = await _images.pickImage(
         source: ImageSource.camera,
         maxWidth: pickedImageMaxWidth.toDouble(),
         imageQuality: pickedImageQuality,
       );
-      if (photo == null) return const <ScannedPage>[];
-      return await _pagesFrom(<XFile>[photo]);
-    } on Object {
-      return const <ScannedPage>[];
+      if (photo == null) return PagesPicked.none;
+      return PagesPicked(await _pagesFrom(<XFile>[photo]));
+    } on Object catch (error) {
+      return _failed(error, PagePickFailureReason.cameraDenied);
     }
   }
 
   @override
-  Future<List<ScannedPage>> pickImages() async {
+  Future<PagePickResult> pickImages() async {
     try {
       final photos = await _images.pickMultiImage(
         maxWidth: pickedImageMaxWidth.toDouble(),
         imageQuality: pickedImageQuality,
       );
-      return await _pagesFrom(photos);
-    } on Object {
-      return const <ScannedPage>[];
+      return PagesPicked(await _pagesFrom(photos));
+    } on Object catch (error) {
+      return _failed(error, PagePickFailureReason.libraryDenied);
     }
   }
 
   @override
-  Future<List<ScannedPage>> pickPdf() async {
+  Future<PagePickResult> pickPdf() async {
     try {
       final file = await _pdfPick();
-      if (file == null) return const <ScannedPage>[];
+      if (file == null) return PagesPicked.none;
       final extension = (file.extension ?? _extensionOf(file.name))
           ?.toLowerCase();
-      if (extension != 'pdf') return const <ScannedPage>[];
+      if (extension != 'pdf') return PagesPicked.none;
       final bytes = await file.readAsBytes();
-      if (bytes.isEmpty) return const <ScannedPage>[];
-      return <ScannedPage>[
+      if (bytes.isEmpty) return PagesPicked.none;
+      return PagesPicked(<ScannedPage>[
         ScannedPage(mimeType: ScannedPage.pdf, bytes: bytes),
-      ];
-    } on Object {
-      return const <ScannedPage>[];
+      ]);
+    } on Object catch (error) {
+      return _failed(error, PagePickFailureReason.libraryDenied);
     }
   }
+
+  /// [error] as a failure: [denied] when it is a refused permission, else
+  /// [PagePickFailureReason.failed].
+  static PagePickFailed _failed(Object error, PagePickFailureReason denied) =>
+      PagePickFailed(
+        isPermissionDenial(error) ? denied : PagePickFailureReason.failed,
+      );
+
+  /// Whether [error] is a refused permission. `services/` may not import
+  /// `package:flutter/services.dart` to name `PlatformException`, so its
+  /// code is read from its text: `image_picker` throws
+  /// `camera_access_denied` and `photo_access_denied`, and `file_picker`
+  /// `read_external_storage_denied`.
+  static bool isPermissionDenial(Object error) =>
+      _denied.hasMatch(error.toString());
+
+  static final RegExp _denied = RegExp(
+    'access_denied|storage_denied|permission',
+    caseSensitive: false,
+  );
 
   /// Reads each of [files], keeping those whose type is an accepted image.
   /// A file that cannot be read is skipped, not fatal to the others. Every

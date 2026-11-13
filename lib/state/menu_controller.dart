@@ -225,6 +225,7 @@ final class MenuController extends ChangeNotifier {
   MenuAnalysis? _analysis;
   MenuFetchFailureReason? _fetchFailure;
   int? _fetchStatusCode;
+  MenuAnalysisFailureReason? _fetchPdfFailure;
   bool _isFromCache = false;
   MenuFetchFailureReason? _staleReason;
   MenuFilter _filter = MenuFilter.all;
@@ -290,6 +291,11 @@ final class MenuController extends ChangeNotifier {
 
   /// The HTTP status code behind [fetchFailure], when there is one.
   int? get fetchStatusCode => _fetchStatusCode;
+
+  /// Why a website's PDF menu could not be read, when [fetchFailure] is
+  /// [MenuFetchFailureReason.websitePdfUnread] and the cause is known
+  /// (issue #284).
+  MenuAnalysisFailureReason? get fetchPdfFailure => _fetchPdfFailure;
 
   /// Whether [menu] was served from cache instead of freshly fetched.
   bool get isFromCache => _isFromCache;
@@ -807,6 +813,7 @@ final class MenuController extends ChangeNotifier {
     // copy gives way to the loading state at once.
     _fetchFailure = null;
     _fetchStatusCode = null;
+    _fetchPdfFailure = null;
     if (openHint != null) {
       _historyName = openHint.name ?? _historyName;
       _historyCity = openHint.city ?? _historyCity;
@@ -850,6 +857,7 @@ final class MenuController extends ChangeNotifier {
         _staleReason = staleReason;
         _fetchFailure = null;
         _fetchStatusCode = null;
+        _fetchPdfFailure = null;
         // A successful open is remembered so the Explore screen can offer
         // to resume it (issue #55); a failed one is not.
         // Onto the latest stored settings, not the ones read before the
@@ -884,13 +892,14 @@ final class MenuController extends ChangeNotifier {
           analysedByFetch: fetchedAnalysis != null,
           generation: generation,
         );
-      case MenuFetchFailed(:final reason, :final statusCode):
+      case MenuFetchFailed(:final reason, :final statusCode, :final pdfFailure):
         _menu = null;
         _analysis = null;
         _isFromCache = false;
         _staleReason = null;
         _fetchFailure = reason;
         _fetchStatusCode = statusCode;
+        _fetchPdfFailure = pdfFailure;
     }
 
     if (!_isCurrent(generation)) return;
@@ -1079,6 +1088,7 @@ final class MenuController extends ChangeNotifier {
         _staleReason = staleReason;
         _fetchFailure = null;
         _fetchStatusCode = null;
+        _fetchPdfFailure = null;
         final options = _optionsFrom(await _settings.read());
         if (!_isCurrent(generation)) return;
         if (unchanged &&

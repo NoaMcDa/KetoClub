@@ -74,16 +74,10 @@ final class BackendWebsiteFetcher implements WebsiteFetcher {
     try {
       decoded = jsonDecode(utf8.decode(response.bodyBytes));
     } on FormatException {
-      return WebsiteFetchFailed(
-        reason: MenuFetchFailureReason.platformChanged,
-        statusCode: response.statusCode,
-      );
+      return _offContract(response.statusCode);
     }
     if (decoded is! Map<String, Object?>) {
-      return WebsiteFetchFailed(
-        reason: MenuFetchFailureReason.platformChanged,
-        statusCode: response.statusCode,
-      );
+      return _offContract(response.statusCode);
     }
     if (response.statusCode != 200) {
       return WebsiteFetchFailed(
@@ -94,9 +88,26 @@ final class BackendWebsiteFetcher implements WebsiteFetcher {
     return _document(decoded, url, response.statusCode);
   }
 
+  /// A body that is not the backend's JSON. On a 200 the backend and the
+  /// app disagree about the contract: [MenuFetchFailureReason.platformChanged].
+  /// On any other status it is not the backend's answer at all — a proxy
+  /// or load balancer in front of it, an HTML 502 page (issue #284) — so
+  /// KetoClub's server could not be reached:
+  /// [MenuFetchFailureReason.backendUnreachable].
+  static WebsiteFetchFailed _offContract(int statusCode) => WebsiteFetchFailed(
+    reason: statusCode == 200
+        ? MenuFetchFailureReason.platformChanged
+        : MenuFetchFailureReason.backendUnreachable,
+    statusCode: statusCode,
+  );
+
   /// The [MenuFetchFailureReason] for a backend failure [reason]; an
   /// unknown one is [MenuFetchFailureReason.platformChanged], since the
-  /// backend and the app disagree about the contract.
+  /// backend and the app disagree about the contract. The site's budget
+  /// (`siteRateLimited`) and this install's (`rateLimited`) are told
+  /// apart (issue #284): the first is
+  /// [MenuFetchFailureReason.websiteRateLimited], the second
+  /// [MenuFetchFailureReason.backendRateLimited].
   static MenuFetchFailureReason reasonFor(Object? reason) => switch (reason) {
     'invalidUrl' => MenuFetchFailureReason.unsupportedSource,
     'disallowedByRobots' ||
@@ -108,7 +119,8 @@ final class BackendWebsiteFetcher implements WebsiteFetcher {
     'offline' ||
     'timeout' ||
     'upstreamStatus' => MenuFetchFailureReason.websiteUnreachable,
-    'rateLimited' => MenuFetchFailureReason.websiteRateLimited,
+    'siteRateLimited' => MenuFetchFailureReason.websiteRateLimited,
+    'rateLimited' => MenuFetchFailureReason.backendRateLimited,
     _ => MenuFetchFailureReason.platformChanged,
   };
 

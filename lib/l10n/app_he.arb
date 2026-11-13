@@ -592,6 +592,25 @@
   "@websitePdfUnread": {
     "placeholders": { "site": { "type": "String" } }
   },
+  "websitePdfUnreadBecause": "התפריט ב־{site} הוא קובץ PDF, שרק ניתוח AI יכול לקרוא. {why}",
+  "@websitePdfUnreadBecause": {
+    "placeholders": { "site": { "type": "String" }, "why": { "type": "String" } }
+  },
+  "websitePdfWhyNotConfigured": "ניתוח AI אינו זמין בגרסה הזו או בשרת.",
+  "websitePdfWhyOffline": "נראה שאין חיבור. התחברו ונסו שוב.",
+  "websitePdfWhyTimeout": "מודל ה-AI היה איטי מדי. נסו שוב.",
+  "websitePdfWhyRateLimited": "מכסת ה-AI היומית נוצלה. נסו שוב מאוחר יותר.",
+  "websitePdfWhyBadResponse": "מודל ה-AI החזיר תשובה שאי אפשר להשתמש בה. נסו שוב.",
+  "websitePdfWhyUnavailable": "שירות ה-AI עמוס כרגע. נסו שוב בעוד דקה.",
+  "websitePdfWhyNoDishesFound": "לא ניתן היה לקרוא ממנו אף מנה.",
+  "websitePdfWhyBackendUnreachable": "השרת של KetoClub לא היה זמין. נסו שוב.",
+  "websitePdfWhyConsentWithheld": "אפשרו ניתוח AI בהגדרות כדי לקרוא אותו.",
+  "websitePdfWhyApiKeyMissing": "הוסיפו את מפתח ה-API של Gemini בהגדרות כדי לקרוא אותו.",
+  "websitePdfWhyApiKeyRejected": "Gemini דחה את מפתח ה-API שלכם. בדקו אותו בהגדרות.",
+  "fetchFailedBackendRateLimited": "השרת של KetoClub קיבל ממכשיר זה בקשות רבות בדקה האחרונה. חכו דקה ונסו שוב.",
+  "scanPickCameraDenied": "ל-KetoClub אין הרשאה להשתמש במצלמה. אפשרו גישה למצלמה בהגדרות המכשיר ונסו שוב.",
+  "scanPickLibraryDenied": "ל-KetoClub אין הרשאה לפתוח את התמונות או הקבצים שלכם. אפשרו גישה בהגדרות המכשיר ונסו שוב.",
+  "scanPickFailed": "לא ניתן היה לפתוח את הקובץ. נסו שוב.",
   "scanQrAction": "סריקת קוד QR",
   "scanQrTitle": "סריקת קוד QR",
   "scanQrInstruction": "כוונו את המצלמה אל קוד ה-QR שעל השולחן.",

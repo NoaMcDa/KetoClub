@@ -414,7 +414,7 @@ def test_the_link_hop_spends_the_site_budget_too(web: respx.MockRouter) -> None:
     ) as test_client:
         response = _post(test_client)
 
-    assert response.json() == {"reason": "rateLimited", "status_code": 429}
+    assert response.json() == {"reason": "siteRateLimited", "status_code": 429}
 
 
 def test_a_failed_link_falls_back_to_the_pages_own_text(

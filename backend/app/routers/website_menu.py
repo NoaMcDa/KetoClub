@@ -34,7 +34,8 @@ Errors are ``{reason, status_code}`` bodies the client's
 reason at its status (400 ``invalidUrl``, 403 ``disallowedByRobots`` /
 ``aiReserved`` (a ``<meta>`` opt-out too), 404 ``notFound``, 413
 ``tooLarge``, 415 ``unsupportedContent``, 422 ``jsOnlyPage``, 429
-``rateLimited``, 502 ``offline`` / ``upstreamStatus``, 504 ``timeout``),
+``siteRateLimited`` (the site's budget) / ``rateLimited`` (this install's),
+502 ``offline`` / ``upstreamStatus``, 504 ``timeout``),
 404 ``menuNotFound`` (no menu on the site or its one linked page), and, for
 a PDF that could not be read, 502 with the ``/v1/scan`` reason
 (``notConfigured``, ``offline``, ``timeout``, ``rateLimited``,

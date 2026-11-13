@@ -289,9 +289,13 @@ def _remember(
 
 
 def _require_host_budget(request: Request, host: str) -> None:
+    """Spend one fetch of ``host``'s budget, or refuse with 429
+    ``siteRateLimited``: the site's budget, shared by every install, kept
+    apart from this install's own ``rateLimited`` so the app can say which
+    one ran out (#284)."""
     limiter: RateLimiter = request.app.state.website_host_limiter
     if not limiter.allow(host):
-        raise BackendError(429, "rateLimited")
+        raise BackendError(429, "siteRateLimited")
 
 
 async def _fetch(request: Request, url: str) -> httpx.Response | None:

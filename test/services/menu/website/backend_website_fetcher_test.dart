@@ -84,7 +84,8 @@ void main() {
         'offline': MenuFetchFailureReason.websiteUnreachable,
         'timeout': MenuFetchFailureReason.websiteUnreachable,
         'upstreamStatus': MenuFetchFailureReason.websiteUnreachable,
-        'rateLimited': MenuFetchFailureReason.websiteRateLimited,
+        'siteRateLimited': MenuFetchFailureReason.websiteRateLimited,
+        'rateLimited': MenuFetchFailureReason.backendRateLimited,
         'somethingNew': MenuFetchFailureReason.platformChanged,
       };
       for (final MapEntry(key: wire, value: reason) in expected.entries) {
@@ -146,6 +147,32 @@ void main() {
         expect(
           (result as WebsiteFetchFailed).reason,
           MenuFetchFailureReason.platformChanged,
+          reason: response.body,
+        );
+      }
+    });
+
+    test('a non-JSON error page from a proxy in front of the backend is '
+        'backendUnreachable, not platformChanged (#284)', () async {
+      for (final response in [
+        http.Response('<html>502 Bad Gateway</html>', 502),
+        http.Response('upstream connect error', 503),
+        _json(<Object?>['x'], 504),
+      ]) {
+        final result = await _fetch(MockClient((_) async => response));
+        expect(
+          result,
+          isA<WebsiteFetchFailed>()
+              .having(
+                (failed) => failed.reason,
+                'reason',
+                MenuFetchFailureReason.backendUnreachable,
+              )
+              .having(
+                (failed) => failed.statusCode,
+                'statusCode',
+                response.statusCode,
+              ),
           reason: response.body,
         );
       }

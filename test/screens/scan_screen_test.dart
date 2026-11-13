@@ -379,6 +379,33 @@ void main() {
       expect(find.text(_en.scanScreenPagesHeading), findsNothing);
     });
 
+    testWidgets('a refused camera says so, unlike a cancel (#284)', (
+      tester,
+    ) async {
+      // Arrange
+      picker.queueFailure(
+        PagePickerCall.takePhoto,
+        PagePickFailureReason.cameraDenied,
+      );
+      await _pump(tester, controller, picker: picker);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanPickCameraDenied), findsOneWidget);
+      expect(controller.pages, isEmpty);
+      expect(_enabled(tester, _action(_en.scanScreenActionTakePhoto)), isTrue);
+
+      // Act: a later cancelled pick clears the notice.
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanPickCameraDenied), findsNothing);
+    });
+
     testWidgets('dragging a row handle reorders the pages', (tester) async {
       // Arrange
       picker.queuePickImages([_jpeg(1), _jpeg(2), _jpeg(3)]);
@@ -1299,11 +1326,11 @@ final class _ThrowingPagePicker implements PagePicker {
   bool get canTakePhoto => true;
 
   @override
-  Future<List<ScannedPage>> takePhoto() async => throw StateError('camera');
+  Future<PagePickResult> takePhoto() async => throw StateError('camera');
 
   @override
-  Future<List<ScannedPage>> pickImages() async => throw StateError('images');
+  Future<PagePickResult> pickImages() async => throw StateError('images');
 
   @override
-  Future<List<ScannedPage>> pickPdf() async => throw StateError('pdf');
+  Future<PagePickResult> pickPdf() async => throw StateError('pdf');
 }

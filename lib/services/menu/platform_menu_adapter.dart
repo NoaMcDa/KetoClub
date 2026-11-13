@@ -73,7 +73,7 @@ final class MenuFetchFailed extends MenuFetchResult {
   /// Creates a failed result for [reason]. [statusCode] is present for
   /// [MenuFetchFailureReason.platformChanged], so a schema drift is
   /// diagnosable from the failure copy.
-  const new({required this.reason, this.statusCode});
+  const new({required this.reason, this.statusCode, this.pdfFailure});
 
   /// Why the fetch failed.
   final MenuFetchFailureReason reason;
@@ -81,14 +81,21 @@ final class MenuFetchFailed extends MenuFetchResult {
   /// The HTTP status code that triggered [reason], when there is one.
   final int? statusCode;
 
+  /// Why a website's PDF menu could not be read, for
+  /// [MenuFetchFailureReason.websitePdfUnread] when the cause is known
+  /// (issue #284): consent withheld, no key, offline and the rest each
+  /// need a different way out. Null for every other reason.
+  final MenuAnalysisFailureReason? pdfFailure;
+
   @override
   bool operator ==(Object other) =>
       other is MenuFetchFailed &&
       other.reason == reason &&
-      other.statusCode == statusCode;
+      other.statusCode == statusCode &&
+      other.pdfFailure == pdfFailure;
 
   @override
-  int get hashCode => Object.hash(reason, statusCode);
+  int get hashCode => Object.hash(reason, statusCode, pdfFailure);
 
   @override
   String toString() => 'MenuFetchFailed($reason)';

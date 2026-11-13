@@ -1389,6 +1389,68 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String websitePdfUnreadBecause(String site, String why) {
+    return 'The menu on $site is a PDF, which only AI analysis can read. $why';
+  }
+
+  @override
+  String get websitePdfWhyNotConfigured =>
+      'AI analysis is not available on this build or server.';
+
+  @override
+  String get websitePdfWhyOffline =>
+      'You look offline. Reconnect, then try again.';
+
+  @override
+  String get websitePdfWhyTimeout => 'The AI model was too slow. Try again.';
+
+  @override
+  String get websitePdfWhyRateLimited =>
+      'The daily AI limit is used up. Try again later.';
+
+  @override
+  String get websitePdfWhyBadResponse =>
+      'The AI model gave an unusable answer. Try again.';
+
+  @override
+  String get websitePdfWhyUnavailable =>
+      'The AI service is busy right now. Try again in a minute.';
+
+  @override
+  String get websitePdfWhyNoDishesFound => 'No dishes could be read from it.';
+
+  @override
+  String get websitePdfWhyBackendUnreachable =>
+      'KetoClub\'s server could not be reached. Try again.';
+
+  @override
+  String get websitePdfWhyConsentWithheld =>
+      'Allow AI analysis in Settings to read it.';
+
+  @override
+  String get websitePdfWhyApiKeyMissing =>
+      'Add your Gemini API key in Settings to read it.';
+
+  @override
+  String get websitePdfWhyApiKeyRejected =>
+      'Gemini rejected your API key. Check it in Settings.';
+
+  @override
+  String get fetchFailedBackendRateLimited =>
+      'KetoClub\'s server has had many requests from this device in the last minute. Wait a minute, then try again.';
+
+  @override
+  String get scanPickCameraDenied =>
+      'KetoClub is not allowed to use the camera. Allow camera access in your device settings, then try again.';
+
+  @override
+  String get scanPickLibraryDenied =>
+      'KetoClub is not allowed to open your photos or files. Allow access in your device settings, then try again.';
+
+  @override
+  String get scanPickFailed => 'The file could not be opened. Try again.';
+
+  @override
   String get scanQrAction => 'Scan QR code';
 
   @override

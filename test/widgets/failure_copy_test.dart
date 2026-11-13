@@ -4,6 +4,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/services/place/place_search_service.dart';
+import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 
@@ -48,6 +49,57 @@ void main() {
         ];
 
         // Assert: collapsing reasons is a bug (architecture.md §10).
+        expect(messages.toSet(), hasLength(messages.length));
+      });
+    }
+  });
+
+  group('a website PDF that could not be read (#284)', () {
+    for (final locale in _locales) {
+      test('gives every cause its own copy in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final messages = [
+          fetchFailureMessage(
+            MenuFetchFailureReason.websitePdfUnread,
+            l10n,
+            platform: 'cafe.example',
+          ),
+          for (final cause in MenuAnalysisFailureReason.values)
+            fetchFailureMessage(
+              MenuFetchFailureReason.websitePdfUnread,
+              l10n,
+              platform: 'cafe.example',
+              pdfFailure: cause,
+            ),
+        ];
+
+        // Assert: every cause, and the unknown one, reads differently, and
+        // each still names the site.
+        expect(messages.toSet(), hasLength(messages.length));
+        for (final message in messages) {
+          expect(message, contains('cafe.example'));
+        }
+      });
+    }
+  });
+
+  group('pagePickFailureMessage (#284)', () {
+    for (final locale in _locales) {
+      test('gives every reason its own copy in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final messages = [
+          for (final reason in PagePickFailureReason.values)
+            pagePickFailureMessage(reason, l10n),
+        ];
+
+        // Assert
+        expect(messages.every((message) => message.isNotEmpty), isTrue);
         expect(messages.toSet(), hasLength(messages.length));
       });
     }

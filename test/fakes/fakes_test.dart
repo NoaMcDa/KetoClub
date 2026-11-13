@@ -761,20 +761,23 @@ void main() {
         ..queuePickPdf(<ScannedPage>[pdf]);
 
       // Act / Assert
-      expect(await picker.takePhoto(), equals(<ScannedPage>[photo]));
-      expect(await picker.pickImages(), equals(<ScannedPage>[image, photo]));
-      expect(await picker.pickPdf(), equals(<ScannedPage>[pdf]));
-      expect(await picker.takePhoto(), isEmpty);
-      expect(await picker.pickImages(), isEmpty);
-      expect(await picker.pickPdf(), isEmpty);
+      expect((await picker.takePhoto()).pages, equals(<ScannedPage>[photo]));
+      expect(
+        (await picker.pickImages()).pages,
+        equals(<ScannedPage>[image, photo]),
+      );
+      expect((await picker.pickPdf()).pages, equals(<ScannedPage>[pdf]));
+      expect((await picker.takePhoto()).pages, isEmpty);
+      expect((await picker.pickImages()).pages, isEmpty);
+      expect((await picker.pickPdf()).pages, isEmpty);
     });
 
     test('records every call in order', () async {
       final picker = FakePagePicker();
 
-      await picker.pickPdf();
-      await picker.takePhoto();
-      await picker.pickImages();
+      (await picker.pickPdf()).pages;
+      (await picker.takePhoto()).pages;
+      (await picker.pickImages()).pages;
 
       expect(
         picker.calls,

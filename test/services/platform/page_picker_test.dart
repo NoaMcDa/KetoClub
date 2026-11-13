@@ -14,9 +14,9 @@ void main() {
     test('answers every method as cancelled', () async {
       const picker = NoPagePicker();
 
-      expect(await picker.takePhoto(), isEmpty);
-      expect(await picker.pickImages(), isEmpty);
-      expect(await picker.pickPdf(), isEmpty);
+      expect((await picker.takePhoto()).pages, isEmpty);
+      expect((await picker.pickImages()).pages, isEmpty);
+      expect((await picker.pickPdf()).pages, isEmpty);
     });
   });
 }

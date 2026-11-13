@@ -509,6 +509,7 @@ class _MenuScreenState extends State<MenuScreen> {
       l10n,
       platform: _platformName(widget.ref, l10n),
       statusCode: controller.fetchStatusCode,
+      pdfFailure: controller.fetchPdfFailure,
     );
     return Center(
       child: Padding(

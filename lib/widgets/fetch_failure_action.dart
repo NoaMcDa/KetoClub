@@ -13,7 +13,8 @@ import 'package:ketoclub/models/failures.dart';
 ///   [MenuFetchFailureReason.backendUnreachable] and the website reasons
 ///   that pass ([MenuFetchFailureReason.websiteUnreachable],
 ///   [MenuFetchFailureReason.websiteRateLimited],
-///   [MenuFetchFailureReason.websitePdfUnread]): retry. Each may already
+///   [MenuFetchFailureReason.websitePdfUnread]) and
+///   [MenuFetchFailureReason.backendRateLimited]: retry. Each may already
 ///   have cleared by the time the user taps the button.
 /// - [MenuFetchFailureReason.notFound],
 ///   [MenuFetchFailureReason.platformChanged],
@@ -65,6 +66,7 @@ class FetchFailureAction extends StatelessWidget {
       MenuFetchFailureReason.backendUnreachable ||
       MenuFetchFailureReason.websiteUnreachable ||
       MenuFetchFailureReason.websiteRateLimited ||
+      MenuFetchFailureReason.backendRateLimited ||
       MenuFetchFailureReason.websitePdfUnread => FilledButton(
         onPressed: onRetry,
         child: Text(l10n.actionRetry),

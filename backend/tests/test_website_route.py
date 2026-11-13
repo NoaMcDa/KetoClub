@@ -360,7 +360,7 @@ def test_the_per_host_limit_refuses_the_extra_fetch(settings: Settings) -> None:
         other = _post(client, "https://other.example/")
 
     assert third.status_code == 429
-    assert _reason(third) == "rateLimited"
+    assert _reason(third) == "siteRateLimited"
     assert other.status_code == 200
 
 

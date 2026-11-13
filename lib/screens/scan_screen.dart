@@ -13,6 +13,7 @@ import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/content_width.dart';
+import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/scan_failure_copy.dart';
 import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:provider/provider.dart';
@@ -80,6 +81,10 @@ class _ScanScreenState extends State<ScanScreen> {
   final TextEditingController _field = TextEditingController();
   bool _picking = false;
   ScanPageRejection? _rejection;
+
+  /// Why the last picker call collected nothing although it was not
+  /// cancelled (issue #284), until the next pick.
+  PagePickFailureReason? _pickFailure;
   _ScanMode _mode = _ScanMode.pages;
 
   @override
@@ -88,17 +93,24 @@ class _ScanScreenState extends State<ScanScreen> {
     super.dispose();
   }
 
-  Future<void> _pick(Future<List<ScannedPage>> Function() source) async {
+  Future<void> _pick(Future<PagePickResult> Function() source) async {
     final controller = context.read<ScanController>();
     setState(() {
       _picking = true;
       _rejection = null;
+      _pickFailure = null;
     });
     ScanPageRejection? rejection;
+    PagePickFailureReason? pickFailure;
     try {
       final picked = await source();
       if (!mounted) return;
-      rejection = controller.addPages(picked);
+      switch (picked) {
+        case PagesPicked(:final pages):
+          rejection = controller.addPages(pages);
+        case PagePickFailed(:final reason):
+          pickFailure = reason;
+      }
     } finally {
       // Reset even if a picker ever throws, so the buttons never stay
       // disabled for good.
@@ -106,6 +118,7 @@ class _ScanScreenState extends State<ScanScreen> {
         setState(() {
           _picking = false;
           _rejection = rejection;
+          _pickFailure = pickFailure;
         });
       }
     }
@@ -254,6 +267,18 @@ class _ScanScreenState extends State<ScanScreen> {
           ),
         ],
       ),
+      if (_pickFailure case final pickFailure?) ...[
+        const SizedBox(height: 12),
+        Semantics(
+          liveRegion: true,
+          child: Text(
+            pagePickFailureMessage(pickFailure, l10n),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.error,
+            ),
+          ),
+        ),
+      ],
       if (_rejection != null) ...[
         const SizedBox(height: 12),
         Semantics(

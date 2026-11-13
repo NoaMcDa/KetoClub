@@ -139,17 +139,21 @@ Uri? menuProxyBase({required bool runsInBrowser, required String configured}) =>
 /// (`blockedByBrowser`). Constructing either performs no I/O.
 ///
 /// A pure, top-level function so `di_test.dart` can cover both branches.
+///
+/// [connectivity] lets the direct fetcher tell a site that does not
+/// answer from a device that is offline (issue #284).
 WebsiteFetcher websiteFetcherFor({
   required http.Client client,
   required Uri? proxyBase,
   required InstallIdStore installIdStore,
+  Connectivity? connectivity,
 }) => proxyBase != null
     ? BackendWebsiteFetcher(
         client: client,
         proxyBase: proxyBase,
         installIdStore: installIdStore,
       )
-    : DirectWebsiteFetcher(client: client);
+    : DirectWebsiteFetcher(client: client, connectivity: connectivity);
 
 /// Where the user's own Gemini API key is kept, or null when this build
 /// has none (architecture.md D17).
@@ -505,6 +509,7 @@ AppDependencies buildDependencies() {
         client: client,
         proxyBase: proxyBase,
         installIdStore: installIdStore,
+        connectivity: connectivity,
       ),
       scannedClassifier: scannedMenuClassifier,
       readOptions: readOptions,

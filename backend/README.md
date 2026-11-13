@@ -376,7 +376,8 @@ kept in step.
   | 413 | `tooLarge` | over `WEBSITE_MAX_HTML_BYTES` or `WEBSITE_MAX_PDF_BYTES` (declared or streamed) |
   | 415 | `unsupportedContent` | neither HTML nor a PDF |
   | 422 | `jsOnlyPage` | a page that renders only with JavaScript: almost no text beside an executable script, or a `<noscript>` asking for JavaScript (a page carrying JSON-LD is left to the app) |
-  | 429 | `rateLimited` | the per-host or per-install limit |
+  | 429 | `siteRateLimited` | the per-host limit (the site's budget, shared by every install) |
+  | 429 | `rateLimited` | the per-install limit |
   | 502 | `offline` | the site (or its `robots.txt`) could not be reached, answered 5xx on `robots.txt`, or its host did not resolve |
   | 502 | `upstreamStatus` | any other non-2xx from the site, or more than five redirects |
   | 504 | `timeout` | the site did not answer in time: one read over 15 s, the whole fetch (every hop and its `robots.txt`) over `WEBSITE_FETCH_DEADLINE_SECONDS`, or reading the page over `WEBSITE_PARSE_BUDGET_SECONDS` |

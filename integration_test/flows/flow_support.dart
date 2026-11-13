@@ -864,21 +864,21 @@ final class FlowFakePagePicker implements PagePicker {
   bool get canTakePhoto => true;
 
   @override
-  Future<List<ScannedPage>> takePhoto() async {
+  Future<PagePickResult> takePhoto() async {
     calls.add('takePhoto');
-    return photos;
+    return PagesPicked(photos);
   }
 
   @override
-  Future<List<ScannedPage>> pickImages() async {
+  Future<PagePickResult> pickImages() async {
     calls.add('pickImages');
-    return images;
+    return PagesPicked(images);
   }
 
   @override
-  Future<List<ScannedPage>> pickPdf() async {
+  Future<PagePickResult> pickPdf() async {
     calls.add('pickPdf');
-    return pdf;
+    return PagesPicked(pdf);
   }
 }
 

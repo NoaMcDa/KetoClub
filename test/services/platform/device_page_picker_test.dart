@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/services/platform/device_page_picker.dart';
 import 'package:ketoclub/services/platform/image_downscaler.dart';
+import 'package:ketoclub/services/platform/page_picker.dart';
 
 import 'page_picker_contract.dart';
 
@@ -148,7 +149,7 @@ void main() {
         final picker = DevicePagePicker(imagePicker: images);
 
         // Act
-        final pages = await picker.takePhoto();
+        final pages = (await picker.takePhoto()).pages;
 
         // Assert
         expect(images.lastSource, ImageSource.camera);
@@ -162,17 +163,20 @@ void main() {
       test('answers empty when the user cancels', () async {
         final picker = DevicePagePicker(imagePicker: _FakeImagePicker());
 
-        expect(await picker.takePhoto(), isEmpty);
+        expect((await picker.takePhoto()).pages, isEmpty);
       });
 
-      test('answers empty when the plugin throws', () async {
+      test('a refused camera is cameraDenied, not a cancel (#284)', () async {
         final picker = DevicePagePicker(
           imagePicker: _FakeImagePicker(
             error: PlatformException(code: 'camera_access_denied'),
           ),
         );
 
-        expect(await picker.takePhoto(), isEmpty);
+        expect(
+          await picker.takePhoto(),
+          const PagePickFailed(PagePickFailureReason.cameraDenied),
+        );
       });
     });
 
@@ -189,7 +193,7 @@ void main() {
         final picker = DevicePagePicker(imagePicker: images);
 
         // Act
-        final pages = await picker.pickImages();
+        final pages = (await picker.pickImages()).pages;
 
         // Assert
         expect(images.lastMaxWidth, pickedImageMaxWidth.toDouble());
@@ -204,17 +208,20 @@ void main() {
       test('answers empty when the user cancels', () async {
         final picker = DevicePagePicker(imagePicker: _FakeImagePicker());
 
-        expect(await picker.pickImages(), isEmpty);
+        expect((await picker.pickImages()).pages, isEmpty);
       });
 
-      test('answers empty when the plugin throws', () async {
+      test('a refused library is libraryDenied (#284)', () async {
         final picker = DevicePagePicker(
           imagePicker: _FakeImagePicker(
             error: PlatformException(code: 'photo_access_denied'),
           ),
         );
 
-        expect(await picker.pickImages(), isEmpty);
+        expect(
+          await picker.pickImages(),
+          const PagePickFailed(PagePickFailureReason.libraryDenied),
+        );
       });
 
       test('drops an unsupported type but keeps the others', () async {
@@ -230,7 +237,7 @@ void main() {
         );
 
         // Act
-        final pages = await picker.pickImages();
+        final pages = (await picker.pickImages()).pages;
 
         // Assert
         expect(pages.single.mimeType, ScannedPage.jpeg);
@@ -245,7 +252,10 @@ void main() {
             ),
           );
 
-          expect((await picker.pickImages()).single.mimeType, ScannedPage.png);
+          expect(
+            (await picker.pickImages()).pages.single.mimeType,
+            ScannedPage.png,
+          );
         },
       );
 
@@ -263,7 +273,7 @@ void main() {
         );
 
         // Act
-        final pages = await picker.pickImages();
+        final pages = (await picker.pickImages()).pages;
 
         // Assert
         expect(pages.map((p) => p.mimeType), [
@@ -280,7 +290,7 @@ void main() {
           ),
         );
 
-        expect(await picker.pickImages(), isEmpty);
+        expect((await picker.pickImages()).pages, isEmpty);
       });
     });
 
@@ -292,7 +302,7 @@ void main() {
         );
 
         // Act
-        final pages = await picker.pickPdf();
+        final pages = (await picker.pickPdf()).pages;
 
         // Assert
         expect(pages, [
@@ -304,7 +314,7 @@ void main() {
       test('answers empty when the user cancels', () async {
         final picker = DevicePagePicker(pdfPick: () async => null);
 
-        expect(await picker.pickPdf(), isEmpty);
+        expect((await picker.pickPdf()).pages, isEmpty);
       });
 
       test('answers empty for a file that is not a pdf', () async {
@@ -312,7 +322,7 @@ void main() {
           pdfPick: () async => _FakePlatformFile('menu.docx', _pdfBytes),
         );
 
-        expect(await picker.pickPdf(), isEmpty);
+        expect((await picker.pickPdf()).pages, isEmpty);
       });
 
       test('answers empty for a file with no extension', () async {
@@ -320,7 +330,7 @@ void main() {
           pdfPick: () async => _FakePlatformFile('menu', _pdfBytes),
         );
 
-        expect(await picker.pickPdf(), isEmpty);
+        expect((await picker.pickPdf()).pages, isEmpty);
       });
 
       test('answers empty for an empty file', () async {
@@ -328,7 +338,7 @@ void main() {
           pdfPick: () async => _FakePlatformFile('menu.pdf', Uint8List(0)),
         );
 
-        expect(await picker.pickPdf(), isEmpty);
+        expect((await picker.pickPdf()).pages, isEmpty);
       });
 
       test('answers empty when the bytes cannot be read', () async {
@@ -337,32 +347,48 @@ void main() {
               _FakePlatformFile('menu.pdf', _pdfBytes, failRead: true),
         );
 
-        expect(await picker.pickPdf(), isEmpty);
+        expect((await picker.pickPdf()).pages, isEmpty);
       });
 
-      test('answers empty when the plugin throws', () async {
+      test('a refused storage permission is libraryDenied (#284)', () async {
+        final picker = DevicePagePicker(
+          pdfPick: () async =>
+              throw PlatformException(code: 'read_external_storage_denied'),
+        );
+
+        expect(
+          await picker.pickPdf(),
+          const PagePickFailed(PagePickFailureReason.libraryDenied),
+        );
+      });
+
+      test('answers failed when the plugin throws', () async {
         final picker = DevicePagePicker(
           pdfPick: () async => throw PlatformException(code: 'denied'),
         );
 
-        expect(await picker.pickPdf(), isEmpty);
+        expect(
+          await picker.pickPdf(),
+          const PagePickFailed(PagePickFailureReason.failed),
+        );
       });
     });
 
     _downscalerSuite();
 
     group('an Error thrown by a plugin', () {
-      test('answers empty from every method, never throws', () async {
+      test('answers failed from every method, never throws', () async {
         // Arrange
         final picker = DevicePagePicker(
           imagePicker: _FakeImagePicker(fault: StateError('plugin')),
           pdfPick: () async => throw ArgumentError('plugin'),
         );
+        const failed = PagePickFailed(PagePickFailureReason.failed);
 
         // Act & Assert
-        expect(await picker.takePhoto(), isEmpty);
-        expect(await picker.pickImages(), isEmpty);
-        expect(await picker.pickPdf(), isEmpty);
+        expect(await picker.takePhoto(), failed);
+        expect(await picker.pickImages(), failed);
+        expect(await picker.pickPdf(), failed);
       });
 
       test('an Error reading one file skips it, not the others', () async {
@@ -377,7 +403,7 @@ void main() {
         );
 
         // Act
-        final pages = await picker.pickImages();
+        final pages = (await picker.pickImages()).pages;
 
         // Assert
         expect(pages.single.mimeType, ScannedPage.jpeg);
@@ -441,7 +467,7 @@ void _downscalerSuite() {
       );
 
       // Act
-      final pages = await picker.pickImages();
+      final pages = (await picker.pickImages()).pages;
 
       // Assert
       expect(stub.seen.map((p) => p.mimeType), [
@@ -466,7 +492,7 @@ void _downscalerSuite() {
       );
 
       // Act
-      final pages = await picker.takePhoto();
+      final pages = (await picker.takePhoto()).pages;
 
       // Assert
       expect(stub.seen.single.mimeType, ScannedPage.jpeg);
@@ -486,7 +512,7 @@ void _downscalerSuite() {
       );
 
       // Act
-      final pages = await picker.pickPdf();
+      final pages = (await picker.pickPdf()).pages;
 
       // Assert
       expect(stub.seen, isEmpty);

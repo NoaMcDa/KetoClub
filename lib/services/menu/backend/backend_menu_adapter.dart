@@ -107,6 +107,7 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
     'offline',
     'timeout',
     'upstreamStatus',
+    'siteRateLimited',
     'rateLimited',
   };
 
@@ -139,6 +140,7 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
   /// the site's own answer, which the device would only hear again.
   static bool shouldFallBack(MenuFetchFailureReason reason) =>
       reason == MenuFetchFailureReason.backendUnreachable ||
+      reason == MenuFetchFailureReason.backendRateLimited ||
       reason == MenuFetchFailureReason.offline;
 
   @override
@@ -198,6 +200,7 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
             ? websiteReasonFor(statusCode, reason)
             : venueReasonFor(reason),
         statusCode: statusCode,
+        pdfFailure: isWebsite ? websitePdfFailureFor(statusCode, reason) : null,
       );
     }
     return _fetched(ref, decoded, options);
@@ -255,7 +258,11 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
   /// [MenuFetchFailureReason.backendUnreachable] and the device tries its
   /// own key (#465, as a scan's chain does); every website fetch route
   /// reason reads as [BackendWebsiteFetcher.reasonFor] reads it (so a 429
-  /// `rateLimited` is [MenuFetchFailureReason.websiteRateLimited]).
+  /// `siteRateLimited` is [MenuFetchFailureReason.websiteRateLimited] and
+  /// a 429 `rateLimited`, this install's budget,
+  /// [MenuFetchFailureReason.backendRateLimited]).
+  /// [MenuFetchFailureReason.backendRateLimited] falls back to the device
+  /// ([shouldFallBack]), which spends no backend budget.
   /// Anything else — a refused header (400 `badResponse`), a validation
   /// 422, a route this backend does not have, an unknown name — is
   /// [MenuFetchFailureReason.backendUnreachable].
@@ -276,6 +283,22 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
       return BackendWebsiteFetcher.reasonFor(reason);
     }
     return MenuFetchFailureReason.backendUnreachable;
+  }
+
+  /// Why the website route could not read a PDF menu, when its failure
+  /// [reason] (with [statusCode]) is [MenuFetchFailureReason.websitePdfUnread]
+  /// (issue #284); null for every other failure.
+  static MenuAnalysisFailureReason? websitePdfFailureFor(
+    int statusCode,
+    String? reason,
+  ) {
+    if (websiteReasonFor(statusCode, reason) !=
+        MenuFetchFailureReason.websitePdfUnread) {
+      return null;
+    }
+    return reason == 'noDishesFound'
+        ? MenuAnalysisFailureReason.noDishesFound
+        : MenuAnalysisFailureReason.badResponse;
   }
 
   /// A 200 body [decoded] as a [MenuFetched] for [ref], or

@@ -869,7 +869,9 @@ Hive JSON cache. A `ScannedMenu` (`lib/models/scanned_menu.dart`, pages of
 `{mimeType, bytes}`) has no `toJson` and lives only in memory; the `Menu` a
 `ScannedMenuRead` returns is `MenuSource.scan`-sourced and carries no byte of
 it, so it is stored and cached like a pasted menu. The Scan tab's pages come
-from a `PagePicker` (`services/platform/page_picker.dart`, #82). The bounds
+from a `PagePicker` (`services/platform/page_picker.dart`, #82), whose
+sealed `PagePickResult` keeps a cancel (`PagesPicked.none`) apart from a refused
+camera or library permission or a plugin error (`PagePickFailed`, #284). The bounds
 `maxScanPages` (6) and `maxScanPageBytes` (3 MiB) in `constants.dart` match
 the backend's `VISION_MAX_IMAGES` and `VISION_MAX_IMAGE_BYTES`.
 
@@ -1738,20 +1740,21 @@ languages. Collapsing reasons is a bug.
 
 | Reason | Where it arises | What the user sees | Way out |
 |---|---|---|---|
-| `MenuFetch.offline` | adapter, socket/DNS error; also a proxy 502/504 (Wolt unreachable or timed out through the backend, D11 — retry is the same way out either way) | "No connection. Showing the cached menu from {date}." (if any) | retry |
+| `MenuFetch.offline` | adapter, socket/DNS error — any exception sending or reading, a TLS handshake failure and a socket closed mid-body included, caught as `Exception` (#278); also a proxy 502/504 (Wolt unreachable or timed out through the backend, D11 — retry is the same way out either way) | "No connection. Showing the cached menu from {date}." (if any) | retry |
 | `MenuFetch.blockedByBrowser` | adapter, request refused by the browser (CORS, §13), only when no backend proxy is configured | "A web browser cannot read {platform} menus. Open this link in the KetoClub phone app." | phone app |
 | `MenuFetch.notFound` | adapter, 404 (passed through unchanged by the proxy) | "Venue not found on {platform}. Check the link." | edit input |
 | `MenuFetch.platformChanged` | adapter, non-JSON / unexpected shape | "{platform} changed its menu format. Please report this." | report |
 | `MenuFetch.unsupportedSource` | repository | "KetoClub cannot read menus from this site yet." | paste text (Phase 4) |
-| `MenuFetch.backendUnreachable` | adapter, `ClientException` reaching the backend itself (D11) | "KetoClub's server could not be reached, so the menu could not be read." | retry, or unset the backend define |
+| `MenuFetch.backendUnreachable` | adapter, any exception reaching the backend itself (D11; #278); a non-JSON error page from a proxy in front of it (#284) | "KetoClub's server could not be reached, so the menu could not be read." | retry, or unset the backend define |
 | `MenuFetch.scanNotSaved` | repository, a `MenuSource.scan` ref whose cache entry is gone (D18) | "This pasted menu is no longer saved on this device. Paste it again to analyse it." | back, paste again |
 | `MenuFetch.menuNotFound` | website adapter: no JSON-LD menu, no menu link or PDF, and fewer than three priced lines; or the text read as reversed Hebrew (D19) | "KetoClub could not find a menu it can read on {site}." | back, paste another link |
 | `MenuFetch.disallowedByRobots` | website fetch: `robots.txt` disallows KetoClub, or the page opts out of AI use (`noai`, `tdm-reservation`) (D19) | "{site} asks apps like KetoClub not to read its pages, so KetoClub does not." | back |
 | `MenuFetch.jsOnlyPage` | website fetch or adapter: the page renders only with JavaScript (D19) | "{site} only shows its menu with JavaScript, which KetoClub cannot read yet." | back, paste the menu text |
-| `MenuFetch.websiteUnreachable` | website fetch: the site timed out, failed or answered a non-404 error, or its `robots.txt` did (D19) | "{site} did not answer. Try again later." | retry |
+| `MenuFetch.websiteUnreachable` | website fetch: the site timed out, failed or answered a non-404 error, or its `robots.txt` did (D19); on a phone, a failed request while `Connectivity` says the device is online — a domain that does not resolve reaches `package:http` as the same `ClientException` as no network, so the hint decides, and a connected user is told the site did not answer rather than that they are offline (#284) | "{site} did not answer. Try again later." | retry |
 | `MenuFetch.websiteTooLarge` | website fetch: a page over 2 MiB or a PDF over 3 MiB (D19) | "The menu on {site} is too large for KetoClub to read." | back |
-| `MenuFetch.websiteRateLimited` | backend website route: the per-host or per-install limit (D19) | "KetoClub read {site} a moment ago. Wait a minute, then try again." | retry |
-| `MenuFetch.websitePdfUnread` | website adapter: a PDF menu the vision path could not read, was not allowed to, or found nothing in (D19, D15) | "The menu on {site} is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again." | retry, settings |
+| `MenuFetch.websiteRateLimited` | backend website route: the per-host limit, 429 `siteRateLimited` (D19; #284) | "KetoClub read {site} a moment ago. Wait a minute, then try again." | retry |
+| `MenuFetch.backendRateLimited` | backend website routes: this install's limit, 429 `rateLimited` (#284); a fallback chain passes it to the device | "KetoClub's server has had many requests from this device in the last minute. Wait a minute, then try again." | retry |
+| `MenuFetch.websitePdfUnread` | website adapter: a PDF menu the vision path could not read, was not allowed to, or found nothing in (D19, D15). `MenuFetchFailed.pdfFailure` carries the vision path's `Analysis` reason when known, and the copy names it (#284) | "The menu on {site} is a PDF, which only AI analysis can read." + one sentence per cause (offline, consent, key missing or rejected, …); with no known cause, "…and it could not be read now. Check AI analysis in Settings, then try again." | retry, settings |
 | `MenuFetch.notARestaurant` | Wolt adapter and `/v1/venue-menus` (422): the venue is a shop, its assortment `loading_strategy: partial` (#476) | "{platform} lists this place as a shop, not a restaurant, so there is no menu for KetoClub to read." | back to search |
 | `Analysis.notConfigured` | web only: no backend URL compiled in, or the backend has no Gemini key (D12) | rules result + "AI analysis is not available on this build or server. Showing rule-based results." | none from the app |
 | `Analysis.consentWithheld` | router, consent toggle off (client-only, §11) | rules result + "Allow AI analysis in Settings to analyse this menu. Showing rule-based results." | settings |
