@@ -28,5 +28,14 @@ SOURCE = "tenbis"
 
 
 def tenbis_menu_url(base_url: str, restaurant_id: str) -> str:
-    """Build the upstream 10bis menu URL for ``restaurant_id``."""
-    return f"{base_url}/api/v1.0/Restaurants/{restaurant_id}/Menu"
+    """Build the upstream 10bis menu URL for ``restaurant_id``.
+
+    ``NextApi/GetRestaurantMenu``, the endpoint 10bis's own web app reads,
+    with the query it sends: Hebrew, for delivery. The older
+    ``api/v1.0/Restaurants/{id}/Menu`` answers 404 for every id (#468). The
+    Dart ``TenBisAdapter.menuQuery`` sends the same query.
+    """
+    return (
+        f"{base_url}/NextApi/GetRestaurantMenu?culture=he-IL&uiCulture=he"
+        f"&restaurantId={restaurant_id}&deliveryMethod=delivery"
+    )

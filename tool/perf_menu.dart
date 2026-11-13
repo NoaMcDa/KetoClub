@@ -226,8 +226,8 @@ Map<String, Object?> syntheticWoltPayload({int dishCount = defaultDishCount}) {
 }
 
 /// A 10bis `Menu` payload holding [dishCount] dishes in the shape
-/// `TenBisMenuMapper` reads: `categoriesList` with nested `dishList`s,
-/// decimal prices and inline `dishOptionsList`s.
+/// `TenBisMenuMapper` reads: a `Data.categoriesList` with nested
+/// `dishList`s, `dishPrice`s and inline `choices` (#468).
 Map<String, Object?> syntheticTenBisPayload({
   int dishCount = defaultDishCount,
 }) {
@@ -242,13 +242,13 @@ Map<String, Object?> syntheticTenBisPayload({
       'dishId': 1000 + i,
       'dishName': '$name #$i',
       'dishDescription': description,
-      'price': 42.0 + i,
+      'dishPrice': 42.0 + i,
       'dishImageUrl': 'https://example.invalid/dish_$i.jpg',
-      'dishOptionsList': <Map<String, Object?>>[
+      'choices': <Map<String, Object?>>[
         if (_hasSides(i))
           <String, Object?>{
-            'name': _sideGroupName,
-            'values': <Map<String, Object?>>[
+            'textBeforeChoosing': _sideGroupName,
+            'subs': <Map<String, Object?>>[
               for (final value in _sideValues) <String, Object?>{'name': value},
             ],
           },
@@ -256,14 +256,17 @@ Map<String, Object?> syntheticTenBisPayload({
     });
   }
   return <String, Object?>{
-    'restaurantName': 'Synthetic Venue',
-    'categoriesList': <Map<String, Object?>>[
-      for (var c = 0; c < categoryCount; c++)
-        <String, Object?>{
-          'categoryName': 'Category $c',
-          'dishList': dishesByCategory[c],
-        },
-    ],
+    'Success': true,
+    'Data': <String, Object?>{
+      'categoriesList': <Map<String, Object?>>[
+        for (var c = 0; c < categoryCount; c++)
+          <String, Object?>{
+            'categoryID': c,
+            'categoryName': 'Category $c',
+            'dishList': dishesByCategory[c],
+          },
+      ],
+    },
   };
 }
 

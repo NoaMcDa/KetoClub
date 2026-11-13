@@ -205,7 +205,8 @@ Key fetch patterns:
   with the web-client header set (`lib/utils/wolt_headers.dart`; issue #168). The older
   `restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data` answers every anonymous
   caller with `200` and an empty body and is no longer called
-- **10bis**: `GET https://www.10bis.co.il/api/v1.0/Restaurants/{restaurantId}/Menu`
+- **10bis**: `GET https://www.10bis.co.il/NextApi/GetRestaurantMenu?culture=he-IL&uiCulture=he&restaurantId={restaurantId}&deliveryMethod=delivery`
+  (#468; the older `api/v1.0/Restaurants/{id}/Menu` answers 404 for every id)
 - **Tabit**: `GET https://tgp-api.tabit.cloud/menu/v2/{site_id}`
 - **Ontopo**: `POST /api/loginAnonymously` → `GET /api/venue/{venue_id}` with bearer token
 
@@ -609,8 +610,8 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
   `TenBisAdapter` is registered in `di.dart` (#134); `LocationService` (#37),
   the Wolt venue-search proxy (#123, #149) and `WoltVenueSearchService` (#39,
   #150) back a real Discovery screen (#40, #154; `architecture.md` D13). What's
-  left is recordings, not code: the discovery and 10bis fixtures are still
-  synthetic (#38, #44) and the performance numbers (#65) need a real phone —
+  left is recordings, not code: the discovery fixtures are still
+  synthetic (#38) and the performance numbers (#65) need a real phone —
   see "What is NOT verified yet". See `MILESTONE_CONVENTIONS.md` for the real
   GitHub milestone names — they differ from earlier drafts of this document.
 - **Phase 3**: the backend (`backend_plan.md`) → **Foundations and hosted
@@ -717,9 +718,10 @@ Built, but not confirmed end to end, and not to be reported as done:
   `restaurant-api.wolt.com` is reachable from this environment, so both were
   hand-built from third-party documentation rather than recorded
   (`test/fixtures/README.md`, `phase2_discovery_research.md` §2).
-- **The 10bis fixture is synthetic** (`tenbis_synthetic_menu.json`; issue #44,
-  tracked separately from #22). `www.10bis.co.il` is blocked the same way; see
-  `test/fixtures/README.md` for the curl to run once a machine can reach it.
+- **The 10bis fixture is real but trimmed** (`tenbis_19156_menu.json`,
+  recorded 2026-11-13 from `NextApi/GetRestaurantMenu`, #468): one venue, 38
+  of its 247 dishes, from a laptop. No app build has fetched a live 10bis
+  menu on a phone or through a running backend yet.
 - **Website menus (#181, D19) have never read a real restaurant site.** The
   locator, page reader and both fetchers are tested against synthetic HTML
   (`test/fixtures/website/`) and mocked HTTP only; no browser has run the web
@@ -761,8 +763,8 @@ Built, but not confirmed end to end, and not to be reported as done:
   upstreams and the Dart clients against fakes, the Python port against the
   golden corpus. In particular, whether Wolt answers a server's IP as it answers
   a phone's is unobserved, and a non-2xx from Wolt is 502 `platformChanged`,
-  which does **not** fall back to the phone. The `wolt_venues` and `tenbis_menu`
-  goldens replay synthetic payloads (#38, #44).
+  which does **not** fall back to the phone. The `wolt_venues` golden replays
+  synthetic payloads (#38).
 - **The location picker and distance filter (D26, #443) are evidenced by
   fakes only.** No phone or browser has run the picker, and no live Wolt
   search has been made at a bundled city centre, so whether Wolt answers a

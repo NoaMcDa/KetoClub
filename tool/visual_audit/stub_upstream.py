@@ -14,7 +14,7 @@ Routes, at the paths backend/app/services/{wolt,tenbis}.py call:
                                          a menu mirroring .design/Main.dc.html
   GET  /v1/pages/restaurants             wolt_pages_restaurants
   POST /v1/pages/search                  wolt_pages_search
-  GET  /api/v1.0/Restaurants/<id>/Menu   the 10bis fixture
+  GET  /NextApi/GetRestaurantMenu       the 10bis fixture
   GET  /img/<name>.png                   a generated dish photo
 
 Needs Pillow only for /img/ (every other route is standard library).
@@ -119,8 +119,8 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/v1/pages/restaurants":
             fixture = FIXTURES / "wolt_pages_restaurants.json"
             return self._send(fixture.read_bytes())
-        if path.startswith("/api/v1.0/Restaurants/"):
-            fixture = FIXTURES / "tenbis_synthetic_menu.json"
+        if path == "/NextApi/GetRestaurantMenu":
+            fixture = FIXTURES / "tenbis_19156_menu.json"
             return self._send(fixture.read_bytes())
         if path.startswith("/img/"):
             return self._send(_photo(path), "image/png")

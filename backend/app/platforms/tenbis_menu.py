@@ -1,13 +1,18 @@
-"""10bis ``Restaurants/{id}/Menu`` payload to ``Menu`` (D25, #323).
+"""10bis ``NextApi/GetRestaurantMenu`` payload to ``Menu`` (D25, #323, #468).
 
 Python twin of Dart ``TenBisMenuMapper`` (``lib/services/menu/tenbis/
 tenbis_menu_mapper.dart``), whose doc comment holds the rules. Pure and never
-raising: any shape the mapper does not know answers ``None``.
+raising: any shape the mapper does not know answers ``None``, and
+``tenbis_menu_not_found`` tells 10bis's two "no such restaurant" answers
+apart from that.
 
-The payload is nested (``categoriesList`` -> ``dishList`` -> ``dishOptionsList``).
-A category id is derived from its name (``cat_<slug>``); a ``dishId`` is a
-non-empty string or a number written as Dart's ``toString`` writes it
-(``12.0`` stays ``"12.0"``); prices are already in shekels.
+The menu sits in an envelope (``{Errors, Success, Data: {resId,
+categoriesList}}``) and is nested (``categoriesList`` -> ``dishList`` ->
+``choices`` -> ``subs``). A category id is ``cat_`` plus its numeric
+``categoryID``, or a slug of its name without one; a ``dishId`` or
+``categoryID`` number is written as Dart's ``toString`` writes it (``12.0``
+stays ``"12.0"``); ``dishPrice`` is already in shekels. The payload names no
+currency (``ILS``) and no restaurant (``venue_name`` is ``None``).
 """
 
 import re
@@ -17,11 +22,28 @@ from pydantic import ValidationError
 from app.keto.models import Dish, DishOption, Menu, MenuCategory, VenueRef
 from app.platforms._dart import dart_num_to_string, dart_string_hash, is_num
 
-_DEFAULT_CURRENCY = "ILS"
-"""10bis is Israel-only and no observed payload names a currency."""
+_CURRENCY = "ILS"
+"""10bis is Israel-only and its payload names no currency."""
 
 _DASH_RUNS = re.compile(r"-+")
 _EDGE_DASHES = re.compile(r"^-|-$")
+
+
+def tenbis_menu_not_found(raw: object) -> bool:
+    """Whether ``raw`` is 10bis saying it has no such restaurant: an explicit
+    ``Success: false`` (a malformed id), or a ``Data`` whose
+    ``categoriesList`` is null (an id no restaurant has). Dart
+    ``TenBisMenuMapper.isNotFound``; both answers come with a 200."""
+    if not isinstance(raw, dict):
+        return False
+    if raw.get("Success") is False:
+        return True
+    data = raw.get("Data")
+    return (
+        isinstance(data, dict)
+        and "categoriesList" in data
+        and data["categoriesList"] is None
+    )
 
 
 def map_tenbis_menu(raw: object, *, ref: VenueRef, fetched_at: str) -> Menu | None:
@@ -37,9 +59,12 @@ def map_tenbis_menu(raw: object, *, ref: VenueRef, fetched_at: str) -> Menu | No
 
 
 def _try_build_menu(raw: object, ref: VenueRef, fetched_at: str) -> Menu | None:
-    if not isinstance(raw, dict):
+    if not isinstance(raw, dict) or tenbis_menu_not_found(raw):
         return None
-    raw_categories = raw.get("categoriesList")
+    data = raw.get("Data")
+    if not isinstance(data, dict):
+        return None
+    raw_categories = data.get("categoriesList")
     if not isinstance(raw_categories, list):
         return None
 
@@ -51,16 +76,12 @@ def _try_build_menu(raw: object, ref: VenueRef, fetched_at: str) -> Menu | None:
             return None
         categories.append(category)
 
-    currency = raw.get("currency")
-    venue_name = raw.get("restaurantName")
     return Menu(
         venue_ref=ref,
-        currency=currency
-        if isinstance(currency, str) and currency
-        else _DEFAULT_CURRENCY,
+        currency=_CURRENCY,
         fetched_at=fetched_at,
         categories=categories,
-        venue_name=venue_name if isinstance(venue_name, str) and venue_name else None,
+        venue_name=None,
     )
 
 
@@ -85,20 +106,25 @@ def _try_build_category(raw: object, used_dish_ids: set[str]) -> MenuCategory | 
             continue
         used_dish_ids.add(dish.id)
         dishes.append(dish)
+    category_id = raw.get("categoryID")
     return MenuCategory(
-        id=_slugify_category_name(category_name), name=category_name, dishes=dishes
+        id=f"cat_{dart_num_to_string(category_id)}"
+        if is_num(category_id)
+        else _slugify_category_name(category_name),
+        name=category_name,
+        dishes=dishes,
     )
 
 
 def _try_build_dish(raw: object) -> Dish | None:
-    """One ``dishList[]`` entry; ``price`` is read as-is, never divided."""
+    """One ``dishList[]`` entry; ``dishPrice`` is read as-is, never divided."""
     if not isinstance(raw, dict):
         return None
     dish_id = _try_read_dish_id(raw.get("dishId"))
     name = raw.get("dishName")
     raw_description = raw.get("dishDescription")
-    raw_price = raw.get("price")
-    raw_options = raw.get("dishOptionsList")
+    raw_price = raw.get("dishPrice")
+    raw_options = raw.get("choices")
     raw_image = raw.get("dishImageUrl")
     if dish_id is None:
         return None
@@ -139,11 +165,11 @@ def _try_read_dish_id(raw: object) -> str | None:
 
 
 def _try_build_option_group(raw: object) -> DishOption | None:
-    """One ``dishOptionsList[]`` entry: ``{name, values: [{name}]}``."""
+    """One ``choices[]`` entry: ``{textBeforeChoosing, subs: [{name}]}``."""
     if not isinstance(raw, dict):
         return None
-    name = raw.get("name")
-    raw_values = raw.get("values")
+    name = raw.get("textBeforeChoosing")
+    raw_values = raw.get("subs")
     if not isinstance(name, str) or not name:
         return None
     if not isinstance(raw_values, list):
@@ -167,7 +193,8 @@ def _dart_lower(char: str) -> str:
 
 
 def _slugify_category_name(name: str) -> str:
-    """``cat_`` plus ``name`` lower-cased, every character that is not an
+    """For a category with no numeric ``categoryID``: ``cat_`` plus ``name``
+    lower-cased, every character that is not an
     ASCII letter or digit or in the Hebrew block U+0590-U+05FF turned into
     ``-``, dash runs collapsed and edge dashes trimmed.
 
