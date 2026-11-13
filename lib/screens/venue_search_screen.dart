@@ -167,6 +167,9 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     _field.text = context.read<VenueSearchController>().input;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      // The cache may have changed since the list arrived: a menu analysed
+      // or cleared on another tab (issue #288).
+      unawaited(context.read<VenueSearchController>().refreshNumbers());
       // With the language, so the first load can list the venues around a
       // place saved by an earlier launch (issue #443).
       unawaited(
@@ -201,10 +204,13 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   /// payload names the venue, so without it the header falls back to the
   /// slug.
   void _openVenue(VenueRef ref, {VenueOpenHint? hint}) {
-    Navigator.pushNamed(
-      context,
-      venueRoutePath(ref),
-      arguments: hint ?? const VenueOpenHint(),
+    final controller = context.read<VenueSearchController>();
+    unawaited(
+      Navigator.pushNamed<Object?>(
+        context,
+        venueRoutePath(ref),
+        arguments: hint ?? const VenueOpenHint(),
+      ).then((_) => unawaited(controller.refreshNumbers())),
     );
   }
 
@@ -524,14 +530,15 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
 
   /// The header's place once a position exists: the chosen place's name
   /// in the UI language (issue #443), or the chosen street's label as the
-  /// geocoder wrote it (issue #449), else the nearest result's address,
-  /// or "Your location" without one.
+  /// geocoder wrote it (issue #449), else the address of the nearest venue
+  /// of the nearby list, or "Your location" without one. Never a by-name
+  /// result's address: that venue may be across town (issue #288).
   String _place(AppLocalizations l10n, VenueSearchController controller) {
     final chosen = controller.chosenPlace;
     if (chosen != null) return chosen.nameFor(_language);
     final street = controller.chosenStreet;
     if (street != null) return street.label;
-    for (final venue in controller.results) {
+    for (final venue in controller.nearbyVenues) {
       final address = venue.address;
       if (address != null && address.trim().isNotEmpty) return address;
     }

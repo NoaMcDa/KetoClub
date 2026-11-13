@@ -36,11 +36,21 @@ const String _hePrefixes = 'בהוכלמש';
 /// The entries where the permissive prefix lookbehind is unsafe: folded
 /// `חלה` also spells "began" (a common verb form), and `שמרים` with a מ
 /// prefix is `משמרים` ("preservatives", as in "ללא חומרים משמרים"), and
-/// `הפוך` collides with "to flip/reverse" (e.g. `להפוך`), so all three
-/// are compiled with no permissive prefix — see
-/// [hebrewTriggerPattern]'s `allowPrefix`. Applied to both
-/// [_compileBasesHe] and [_compileCarbHe].
-const Set<String> _noPrefixHebrewTriggers = <String>{'חלה', 'שמרים', 'הפוך'};
+/// `הפוך` collides with "to flip/reverse" (e.g. `להפוך`), and `חלבה`
+/// with a מ prefix is `מחלבה` ("dairy", issue #273), so all of them are
+/// compiled with no permissive prefix — see [hebrewTriggerPattern]'s
+/// `allowPrefix`. `חלבה`'s two commonest particles (`וחלבה`, `בחלבה`)
+/// are entries of their own, also prefix-free; `החלבה` deliberately is
+/// not, so the golden exporter's ה-prefix probe still finds `חלבה`
+/// prefix-free. Applied to both [_compileBasesHe] and [_compileCarbHe].
+const Set<String> _noPrefixHebrewTriggers = <String>{
+  'חלה',
+  'שמרים',
+  'הפוך',
+  'חלבה',
+  'וחלבה',
+  'בחלבה',
+};
 
 /// Builds a Hebrew trigger pattern for one already-normalised trigger.
 ///
@@ -83,17 +93,34 @@ RegExp hebrewTriggerPattern(
 /// substring match: `toasted almonds` and `Sacramento tomato salad` would
 /// turn red if it were. Public for the same reason as
 /// [hebrewTriggerPattern].
-RegExp latinTriggerPattern(String normalisedTrigger) =>
-    RegExp('\\b${RegExp.escape(normalisedTrigger)}\\b', caseSensitive: false);
+///
+/// [allowPlural] accepts a regular English plural, an `s` or `es` right
+/// after the trigger and before the boundary, so `dumpling` also finds
+/// "dumplings" and `blintz` "blintzes" (issue #274). Only the keto
+/// engine's non-keto bases turn it on; every other caller keeps the
+/// exact word.
+RegExp latinTriggerPattern(
+  String normalisedTrigger, {
+  bool allowPlural = false,
+}) => RegExp(
+  '\\b${RegExp.escape(normalisedTrigger)}${allowPlural ? '(?:e?s)?' : ''}'
+  r'\b',
+  caseSensitive: false,
+);
 
 /// Compiles [nonKetoBasesEn], normalising each key at compile time so a
 /// human-readable, correctly-spelled `constants.dart` still matches
-/// normalised dish text.
+/// normalised dish text. Each base also matches its regular `s`/`es`
+/// plural (issue #274) under its own key, so the singular's guard and
+/// label apply to "dumplings" and "zucchini noodles" alike.
 List<_CompiledBase> _compileBasesEn() => nonKetoBasesEn
     .map(
       (key) => (
         key: key,
-        pattern: latinTriggerPattern(TextNormaliser.normalise(key)),
+        pattern: latinTriggerPattern(
+          TextNormaliser.normalise(key),
+          allowPlural: true,
+        ),
       ),
     )
     .toList(growable: false);
@@ -175,6 +202,30 @@ final List<_CompiledBase> _doughEn = _compileDietaryEn(doughBasesEn);
 /// See [_doughEn].
 final List<_CompiledBase> _doughHe = _compileDietaryHe(doughBasesHe);
 
+/// See [_baseEn]; the other bases a choice-of-base option group can name
+/// (issue #473), with the regular English plural like every base.
+final List<_CompiledBase> _choiceBaseEn = choiceBasesEn
+    .map(
+      (key) => (
+        key: key,
+        pattern: latinTriggerPattern(
+          TextNormaliser.normalise(key),
+          allowPlural: true,
+        ),
+      ),
+    )
+    .toList(growable: false);
+
+/// See [_choiceBaseEn].
+final List<_CompiledBase> _choiceBaseHe = _compileDietaryHe(choiceBasesHe);
+
+/// See [_baseEn]; the choice words that make a group named after a
+/// [choiceBasesEn] word a choice of base (issue #473).
+final List<_CompiledBase> _choiceWords = <_CompiledBase>[
+  ..._compileDietaryEn(choiceGroupWordsEn),
+  ..._compileDietaryHe(choiceGroupWordsHe),
+];
+
 /// See [_baseEn].
 final List<_CompiledModifier> _carbEn = _compileCarbEn();
 
@@ -212,11 +263,22 @@ final List<_CompiledBase> _fillingProteinHe = _compileDietaryHe(
 
 /// Every carb-only qualifier word, both languages, normalised once
 /// (issue #191) — the set [ClassificationRules.carbOnlyBase] tests a dish
-/// name's leftover words against.
+/// name's leftover words against. The toppings ([carbOnlyToppingsEn],
+/// [carbOnlyToppingsHe]) qualify too (issue #273).
 final Set<String> _carbOnlyQualifiers = <String>{
   for (final word in carbOnlyQualifiersEn) TextNormaliser.normalise(word),
   for (final word in carbOnlyQualifiersHe) TextNormaliser.normalise(word),
+  for (final word in carbOnlyToppingsEn) TextNormaliser.normalise(word),
+  for (final word in carbOnlyToppingsHe) TextNormaliser.normalise(word),
 };
+
+/// See [_baseEn]; the toppings [ClassificationRules.describesFilling]
+/// blanks out before it looks for a filling (issue #273), English then
+/// Hebrew, in list order.
+final List<_CompiledBase> _toppings = <_CompiledBase>[
+  ..._compileDietaryEn(carbOnlyToppingsEn),
+  ..._compileDietaryHe(carbOnlyToppingsHe),
+];
 
 /// No dietary rule but dairy has guards; the seed-oil and plant tables
 /// scan against this empty map.
@@ -265,13 +327,40 @@ bool _isGuarded(String haystack, int start, int end, GuardWords? guard) {
   return false;
 }
 
+/// True when the normalised dish [name] contains, as whole words, one of
+/// the keto-substitute phrases [ketoSubstituteNameWordsEn] or
+/// [ketoSubstituteNameWordsHe] list for [key] (issue #273): the guard
+/// that reaches past the two-word window, across the whole name.
+bool _isNameGuarded(String name, String key) {
+  final phrases =
+      ketoSubstituteNameWordsEn[key] ?? ketoSubstituteNameWordsHe[key];
+  if (phrases == null || name.isEmpty) return false;
+  return _windowContainsAnyPhrase(<String>[name], phrases);
+}
+
+/// Whether the match of [key] spanning [start]-[end] in [haystack] is
+/// cancelled: by its two-word-window guard in [guards] (D-V1), or by a
+/// keto substitute named anywhere in the dish [name] (issue #273).
+bool _isCancelled(
+  String haystack,
+  String name,
+  int start,
+  int end,
+  String key,
+  Map<String, GuardWords> guards,
+) => _isGuarded(haystack, start, end, guards[key]) || _isNameGuarded(name, key);
+
 /// The earliest-occurring, unguarded non-keto-base match in [haystack]
-/// across both language tables, or null when none survives.
+/// across both language tables, or null when none survives. [name] is
+/// the normalised dish name the name-wide substitute guard reads.
 ///
 /// "Earliest-occurring" (smallest match-start offset) is this file's own
 /// tie-break for when more than one base matches one dish — the spec
 /// does not name one, since [RuleMatch.baseLabel] holds a single label.
-({int start, String label})? _firstUnguardedBaseMatch(String haystack) {
+({int start, String label})? _firstUnguardedBaseMatch(
+  String haystack, {
+  required String name,
+}) {
   ({int start, String label})? best;
   void scan(
     List<_CompiledBase> table,
@@ -280,7 +369,14 @@ bool _isGuarded(String haystack, int start, int end, GuardWords? guard) {
   ) {
     for (final entry in table) {
       for (final match in entry.pattern.allMatches(haystack)) {
-        if (_isGuarded(haystack, match.start, match.end, guards[entry.key])) {
+        if (_isCancelled(
+          haystack,
+          name,
+          match.start,
+          match.end,
+          entry.key,
+          guards,
+        )) {
           continue;
         }
         final current = best;
@@ -319,8 +415,35 @@ String? _unguardedDoughLabel(String haystack) {
       scan(_doughHe, ketoQualifierGuardsHe, nonKetoBaseLabelsHe);
 }
 
+/// The label of the first [choiceBasesEn]/[choiceBasesHe] word that
+/// survives its guards in an option group's normalised [name], English
+/// table first, when the name also holds a choice word ("בחרו סוג
+/// פסטה", "Choose your pasta"; issue #473); null otherwise.
+String? _unguardedChoiceBaseLabel(String name) {
+  if (!_choiceWords.any((word) => word.pattern.hasMatch(name))) return null;
+  String? scan(
+    List<_CompiledBase> table,
+    Map<String, GuardWords> guards,
+    Map<String, String> labels,
+  ) {
+    for (final entry in table) {
+      for (final match in entry.pattern.allMatches(name)) {
+        if (!_isGuarded(name, match.start, match.end, guards[entry.key])) {
+          return labels[entry.key] ?? entry.key;
+        }
+      }
+    }
+    return null;
+  }
+
+  return scan(_choiceBaseEn, ketoQualifierGuardsEn, nonKetoBaseLabelsEn) ??
+      scan(_choiceBaseHe, ketoQualifierGuardsHe, nonKetoBaseLabelsHe);
+}
+
 /// Whether a dough word in [haystack] is rescued by one of its guards: a
-/// cauliflower, almond or keto dough is named there.
+/// cauliflower, almond or keto dough is named there. A pasta or noodle
+/// word rescued the same way ("פסטה קישואים", "zucchini noodles") counts
+/// too (issue #473).
 bool _namesRescuedDough(String haystack) {
   bool scan(List<_CompiledBase> table, Map<String, GuardWords> guards) {
     for (final entry in table) {
@@ -334,18 +457,23 @@ bool _namesRescuedDough(String haystack) {
   }
 
   return scan(_doughEn, ketoQualifierGuardsEn) ||
-      scan(_doughHe, ketoQualifierGuardsHe);
+      scan(_doughHe, ketoQualifierGuardsHe) ||
+      scan(_choiceBaseEn, ketoQualifierGuardsEn) ||
+      scan(_choiceBaseHe, ketoQualifierGuardsHe);
 }
 
-/// Every choice-of-dough option group of [dish], in option order: the
-/// label of the dough word its **name** holds unguarded, and whether one
-/// of its non-removal values offers a rescued dough. Each value is read
-/// after the group's name, so a guard word reaches the name's dough word
+/// Every choice-of-base option group of [dish], in option order: the
+/// label of the dough word its **name** holds unguarded — or, beside a
+/// choice word, the pasta or noodle word (issue #473) — and whether one
+/// of its non-removal values offers a rescued base. Each value is read
+/// after the group's name, so a guard word reaches the name's base word
 /// too ("בחרו סוג בצק" with a bare "כרובית" among its values).
 Iterable<({String label, bool offersRescued})> _doughChoices(Dish dish) sync* {
   for (final option in dish.options) {
+    // An upsell is never what the dish is made of (issue #475).
+    if (TextNormaliser.isAddOnOptionGroup(option.name)) continue;
     final name = TextNormaliser.normalise(option.name);
-    final label = _unguardedDoughLabel(name);
+    final label = _unguardedDoughLabel(name) ?? _unguardedChoiceBaseLabel(name);
     if (label == null) continue;
     yield (
       label: label,
@@ -377,13 +505,24 @@ bool _anyUnguardedMatch(
 }
 
 /// Every unguarded carb-modifier occurrence in [haystack], across both
-/// language tables, in match-start order.
-List<_Occurrence> _unguardedModifierOccurrences(String haystack) {
+/// language tables, in match-start order. [name] is the normalised dish
+/// name, as for [_firstUnguardedBaseMatch].
+List<_Occurrence> _unguardedModifierOccurrences(
+  String haystack, {
+  required String name,
+}) {
   final occurrences = <_Occurrence>[];
   void scan(List<_CompiledModifier> table, Map<String, GuardWords> guards) {
     for (final entry in table) {
       for (final match in entry.pattern.allMatches(haystack)) {
-        if (_isGuarded(haystack, match.start, match.end, guards[entry.key])) {
+        if (_isCancelled(
+          haystack,
+          name,
+          match.start,
+          match.end,
+          entry.key,
+          guards,
+        )) {
           continue;
         }
         occurrences.add((
@@ -482,11 +621,13 @@ abstract final class ClassificationRules {
   /// Order: keto-substitute guards (D-V1) cancel matches first; then a
   /// surviving non-keto base makes the dish red with no instructions;
   /// then carb-modifier matches (after suppression, §"triggerSuppresses")
-  /// make it yellow with their deduplicated sentences.
+  /// make it yellow with their deduplicated sentences. The whole of
+  /// [rawText] is read as the dish name for the name-wide substitute
+  /// guard (issue #273).
   static RuleMatch match(String rawText) {
     final haystack = TextNormaliser.normalise(rawText);
 
-    final base = _firstUnguardedBaseMatch(haystack);
+    final base = _firstUnguardedBaseMatch(haystack, name: haystack);
     if (base != null) {
       return RuleMatch(
         isNonKeto: true,
@@ -495,7 +636,7 @@ abstract final class ClassificationRules {
       );
     }
 
-    final occurrences = _unguardedModifierOccurrences(haystack);
+    final occurrences = _unguardedModifierOccurrences(haystack, name: haystack);
     return RuleMatch(
       isNonKeto: false,
       instructions: _sentencesAfterSuppression(occurrences),
@@ -509,7 +650,10 @@ abstract final class ClassificationRules {
   ///    is red — "פיתה רגילה", "Portion of fries" — unless the description
   ///    or an option names a filling ([describesFilling]): D-V3's "serve
   ///    it without the pita" cannot be followed when the pita is the dish,
-  ///    but "לאפה" filled with shawarma is exactly the dish D-V3 means.
+  ///    but "לאפה" filled with shawarma is exactly the dish D-V3 means. A
+  ///    starch that is not a bread ([carbOnlyBreadTriggers]) is rescued
+  ///    only by a protein (issue #276): "Rice" with "basmati rice with
+  ///    herbs", or "פירה" with butter and cream, is still the starch.
   /// 2. A non-keto base is matched on [TextNormaliser.dishCoreText] —
   ///    the name and description only. Option text can make a dish
   ///    yellow, never red: an option group named after a red base is
@@ -517,17 +661,26 @@ abstract final class ClassificationRules {
   /// 3. The one exception: a choice of dough ([doughChoiceBase]). An
   ///    option group named "בחרו סוג בצק" does not offer dough beside
   ///    something else, it asks which dough the dish is made of, so the
-  ///    dish is red — a pizza listed by its toppings alone.
+  ///    dish is red — a pizza listed by its toppings alone. "בחרו סוג
+  ///    פסטה" is the same for a pasta listed by its sauce (issue #473).
   /// 4. Carb modifiers are matched on [TextNormaliser.dishRulesText],
   ///    which keeps a "choice of side" value and drops removal values
   ///    ("ללא אלף האיים"), so a burger is not told to swap a dressing it
   ///    only ever had the option to leave off.
   ///
+  /// Steps 2 and 4, and the option scan, also apply the name-wide
+  /// substitute guard (issue #273) with the dish's own name: "Pizza with
+  /// cauliflower crust" is not red, and a name with `keto` in it rescues
+  /// the description's `rice` too.
+  ///
   /// [match] stays for callers with only a string; the heuristic
   /// classifier uses this. Never throws.
   static RuleMatch matchDish(Dish dish) {
     final carbOnly = carbOnlyBase(dish.name);
-    if (carbOnly != null && !describesFilling(dish)) {
+    if (carbOnly != null &&
+        !(carbOnlyBreadTriggers.contains(carbOnly)
+            ? describesFilling(dish)
+            : _describesProtein(dish))) {
       return RuleMatch(
         isNonKeto: true,
         baseLabel: carbOnly,
@@ -535,7 +688,11 @@ abstract final class ClassificationRules {
       );
     }
 
-    final base = _firstUnguardedBaseMatch(TextNormaliser.dishCoreText(dish));
+    final name = TextNormaliser.normalise(dish.name);
+    final base = _firstUnguardedBaseMatch(
+      TextNormaliser.dishCoreText(dish),
+      name: name,
+    );
     if (base != null) {
       return RuleMatch(
         isNonKeto: true,
@@ -555,6 +712,7 @@ abstract final class ClassificationRules {
 
     final occurrences = _unguardedModifierOccurrences(
       TextNormaliser.dishRulesText(dish),
+      name: name,
     );
     final sentences = _sentencesAfterSuppression(occurrences);
 
@@ -565,8 +723,10 @@ abstract final class ClassificationRules {
     // steered around the same way even when the joined option text reads
     // as guarded ("בחרו סוג בצק" + "קלאסי" + "כרובית").
     final optionBase =
-        _firstUnguardedBaseMatch(TextNormaliser.dishOptionRulesText(dish))
-            ?.label ??
+        _firstUnguardedBaseMatch(
+          TextNormaliser.dishOptionRulesText(dish),
+          name: name,
+        )?.label ??
         _doughChoices(dish).firstOrNull?.label;
     if (optionBase != null) {
       final template = TextNormaliser.containsHebrew(optionBase)
@@ -587,7 +747,9 @@ abstract final class ClassificationRules {
   /// The dough [dish] is built on, when one of its option groups is a
   /// choice of dough: the group's **name** holds an unguarded dough word
   /// ([doughBasesEn], [doughBasesHe]) — "בחרו סוג בצק - MIX", "בצק -
-  /// אישית", "Choose your dough". Null for every other dish.
+  /// אישית", "Choose your dough" — or a pasta or noodle word beside a
+  /// choice word ([choiceBasesEn], [choiceGroupWordsEn]; issue #473) —
+  /// "בחרו סוג פסטה". Null for every other dish.
   ///
   /// This is how a pizzeria's menu on Wolt says "pizza" when the name is
   /// a topping mix and the description lists toppings: fourteen dishes on
@@ -616,14 +778,7 @@ abstract final class ClassificationRules {
   /// applies, not the carb-only red (issue #191). The name is never
   /// consulted: [carbOnlyBase] already established it names only a carb.
   static bool describesFilling(Dish dish) {
-    final parts = <String>[TextNormaliser.normalise(dish.description)];
-    for (final option in dish.options) {
-      for (final value in option.values) {
-        if (TextNormaliser.isRemovalOptionValue(value)) continue;
-        parts.add(TextNormaliser.normalise(value));
-      }
-    }
-    final text = parts.where((part) => part.isNotEmpty).join(' ');
+    final text = _fillingText(dish);
     if (text.isEmpty) return false;
     return mentionsPlant(text) ||
         mentionsDairy(text) ||
@@ -631,6 +786,41 @@ abstract final class ClassificationRules {
           (_fillingProteinEn, _noGuards),
           (_fillingProteinHe, _noGuards),
         ]);
+  }
+
+  /// Whether [dish]'s filling text names a protein — the one filling that
+  /// turns a starch named alone into a dish that comes with it (issue
+  /// #276): "Rice bowl" with chicken is a D-V3 yellow, "Rice" with herbs
+  /// is rice.
+  static bool _describesProtein(Dish dish) {
+    final text = _fillingText(dish);
+    if (text.isEmpty) return false;
+    return _anyUnguardedMatch(text, [
+      (_fillingProteinEn, _noGuards),
+      (_fillingProteinHe, _noGuards),
+    ]);
+  }
+
+  /// [dish]'s description and non-removal option values outside upsell
+  /// groups (issue #475), normalised and joined, with every topping
+  /// replaced by a space: a topping named
+  /// again ("tossed in truffle oil and parmesan") is not a filling (issue
+  /// #273). What [describesFilling] and [_describesProtein] read.
+  static String _fillingText(Dish dish) {
+    final parts = <String>[TextNormaliser.normalise(dish.description)];
+    for (final option in dish.options) {
+      if (TextNormaliser.isAddOnOptionGroup(option.name)) continue;
+      for (final value in option.values) {
+        if (TextNormaliser.isRemovalOptionValue(value)) continue;
+        parts.add(TextNormaliser.normalise(value));
+      }
+    }
+    var text = parts.where((part) => part.isNotEmpty).join(' ');
+    if (text.isEmpty) return text;
+    for (final topping in _toppings) {
+      text = text.replaceAll(topping.pattern, ' ');
+    }
+    return text;
   }
 
   /// The carb-modifier trigger a dish [name] consists of, when the name
@@ -649,7 +839,7 @@ abstract final class ClassificationRules {
   static String? carbOnlyBase(String name) {
     final haystack = TextNormaliser.normalise(name);
     if (haystack.isEmpty) return null;
-    final occurrences = _unguardedModifierOccurrences(haystack);
+    final occurrences = _unguardedModifierOccurrences(haystack, name: haystack);
     if (occurrences.isEmpty) return null;
     // Only a starch or a bread can be the whole dish; a sauce, a dressing
     // or a root vegetable in the name means this rule does not apply, and

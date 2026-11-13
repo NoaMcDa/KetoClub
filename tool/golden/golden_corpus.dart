@@ -331,6 +331,132 @@ const List<String> ruleTexts = <String>[
   'אורז כרובית',
   'כרובית אורז',
   'כרובית גדול שמן עסיסי אורז',
+  // Issue #273: false reds — juice as seasoning, crispy, the name-wide
+  // substitute guard, pasta's guard, מחלבה, at night, cooked-in drinks,
+  // corn-fed and rice vinegar — and the cases that must stay as they were.
+  'Grilled salmon, olive oil, lemon juice',
+  'Green salad with orange juice dressing',
+  'Fresh orange juice',
+  'דג עם מיץ לימון',
+  'סלט ירוק ברוטב מיץ תפוזים',
+  'סלמון עם עור קריספי',
+  'בייקון קריספי',
+  'עוף בציפוי קריספי',
+  "קריספי צ'יקן בלחמנייה רכה",
+  'Crispy chicken burger',
+  'Crispy chicken skin',
+  "המבורגר עם צ'יפס פרמזן",
+  "סלט עם פרמזן צ'יפס",
+  "עוף עם צ'יפס קישואים",
+  'Pizza with cauliflower crust',
+  'פיצה על בסיס כרובית',
+  'Keto margherita, thin pizza',
+  'Chicken with rice and roasted cauliflower',
+  'Zucchini pasta',
+  'Shirataki pasta',
+  'Pasta with zucchini',
+  'פסטת קישואים',
+  'פסטת פומודורו',
+  'גבינה מחלבה',
+  'גבינות מהחלבה של הכפר',
+  'פרפה חלבה',
+  'גלידת וניל וחלבה',
+  'מרק חם שמוגש בלילה',
+  'דג בבלילה',
+  'Beer-braised short rib',
+  'Short rib braised in stout',
+  'צלע בקר מבושלת בבירה',
+  'Port wine reduction',
+  'Glass of port wine',
+  'חזה ברווז ברוטב יין פורט',
+  'Corn-fed chicken',
+  'Baby corn stir fry',
+  'עוף מוזן תירס',
+  'Cucumber salad with rice vinegar dressing',
+  'סלט מלפפונים ברוטב חומץ אורז',
+  // Issue #274: false greens — plurals, compounds, construct forms and
+  // the new vocabulary.
+  'Steamed dumplings',
+  'New York cheesecake',
+  'Vanilla cupcakes',
+  'Fish tacos',
+  'Cheese blintzes',
+  'Cauliflower pizzas',
+  'Zucchini noodles',
+  'Pizzas',
+  'Grilled tartare',
+  'עוגת שוקולד',
+  "עוגיית שוקולד צ'יפס",
+  'שווארמה בפיתות',
+  'עוף בטורטיות',
+  'Lentil soup',
+  'מרק עדשים',
+  'Turkey with cranberry sauce',
+  'הודו עם רוטב חמוציות',
+  'Eggs with hash browns',
+  'Steak with onion rings',
+  'Butter chicken with naan',
+  'Lamb on flatbread',
+  'Loaded nachos',
+  'Salmon sushi',
+  'Salmon sashimi',
+  'Sushi-grade tuna tartare',
+  'טונה באיכות סושי',
+  'Crème brûlée',
+  'Korean fried chicken',
+  'Pan-fried chicken breast',
+  'French toast',
+  "פרנץ' טוסט",
+  "Fish 'n' Chips",
+  "פיש נ' צ'יפס",
+  // Issue #469: desserts and sweets, and chocolate's guards.
+  'טבלת שוקולד חלב וקרמל מלוח',
+  'בר שוקולד דובאי',
+  'וולקנו שוקולד חם',
+  'שוקולד מריר 85%',
+  'שוקולד ללא סוכר',
+  'סטייק ברוטב שוקולד',
+  'Steak with chocolate sauce',
+  'Dark chocolate bar',
+  'Hot chocolate',
+  "פאדג' שוקולד",
+  'מארז סוכריות גומי',
+  'מארז טראפלס',
+  'ספיישל פחזניות טופי מיסו',
+  'בוואריה שנות ה80',
+  'קדאיף חלבי',
+  'פנקוטה וניל, מוס מנגו',
+  'מוס כבד עוף',
+  'Chicken liver mousse',
+  'Chocolate mousse',
+  'מארז גביעים',
+  'ביסקיט תרד',
+  'זיווה גבינות',
+  'מלוואח במילוי שוקולד',
+  'חלת בצל',
+  "בן אנד ג'ריס פיינט וניל",
+  'Panna cotta',
+  'Profiteroles',
+  'Gummy candy',
+  'Chocolate truffles',
+  'Truffle fries',
+  'Pralines',
+  // Issue #470: sushi rolls are rice; sashimi and naruto rolls are not.
+  'מאקי סלמון',
+  'טמאקי סלמון אבוקדו',
+  'קליפורניה רול',
+  'אינסייד אאוט טונה',
+  'גרין רול ללא גלוטן',
+  'רול קינמון',
+  'ספרינג רול ירקות',
+  'נארוטו רול סלמון',
+  'רול סלמון ללא אורז',
+  'סשימי סלמון',
+  'Salmon temaki',
+  'Spicy tuna sushi roll',
+  'Naruto sushi roll',
+  'Vegetable spring rolls',
+  'Lobster roll',
 ];
 
 /// Hand-written `ClassificationRules.carbOnlyBase` inputs, lifted from
@@ -682,6 +808,134 @@ final List<Dish> ruleDishes = <Dish>[
       ),
     ],
   ),
+  // Issue #273: the name-wide substitute guard reads the name, never the
+  // description.
+  ruleDish('Pizza with cauliflower crust', description: 'Tomato, basil'),
+  ruleDish('Keto margherita', description: 'Thin pizza, basil'),
+  ruleDish('מרגריטה קטו', description: 'פיצה דקה, בזיליקום'),
+  ruleDish('Margherita', description: 'Classic pizza. Cauliflower crust'),
+  ruleDish('מרגריטה', description: 'פיצה קלאסית. בסיס כרובית לפי בקשה'),
+  ruleDish(
+    'Keto bowl',
+    options: const <DishOption>[
+      DishOption(name: 'Base', values: <String>['Rice', 'Greens']),
+    ],
+  ),
+  // Issue #273: toppings leave fries the whole dish; a real filling
+  // still makes a bread a carrier.
+  ruleDish(
+    "צ'יפס פרמז'ן כמהין",
+    description: "קריספי צ'יפס מוקפץ בשמן כמהין פלפל שחור ופרמז'ן",
+  ),
+  ruleDish(
+    'Truffle parmesan fries',
+    description: 'Crispy fries, truffle oil and parmesan',
+  ),
+  ruleDish('Pita', description: 'Grilled chicken, garlic, parmesan'),
+  ruleDish('פיתה', description: 'פלפל קלוי ושום'),
+  // Issue #274: carb-only names of the new sides and breads.
+  ruleDish('Hash browns'),
+  ruleDish('Onion rings'),
+  ruleDish('Naan'),
+  ruleDish('פיתות'),
+  ruleDish('טורטיות'),
+  ruleDish('עוגת שוקולד'),
+  // Issue #473: a pasta listed by its sauce, with the pasta only in a
+  // required choice; a rescued choice is a yellow; a side choice is not
+  // a choice of base.
+  ruleDish(
+    'רוזה',
+    description: 'עגבניות ושמנת',
+    options: const <DishOption>[
+      DishOption(name: 'בחרו סוג פסטה', values: <String>['פנה']),
+    ],
+  ),
+  ruleDish(
+    'בולונז',
+    description: 'בקר טחון שבושל ביין אדום וירקות שורש, רוטב עגבניות',
+    options: const <DishOption>[
+      DishOption(
+        name: 'בחר סוג פסטה',
+        values: <String>['רדיאטורי', 'בומבטי', 'בומבטי סלק'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'Bolognese',
+    options: const <DishOption>[
+      DishOption(name: 'Choose your pasta', values: <String>['Penne']),
+    ],
+  ),
+  ruleDish(
+    'Bolognese',
+    options: const <DishOption>[
+      DishOption(
+        name: 'Choose your noodles',
+        values: <String>['Egg noodles', 'Zucchini noodles'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'רוזה',
+    options: const <DishOption>[
+      DishOption(name: 'בחרו סוג פסטה', values: <String>['פנה', 'קישואים']),
+    ],
+  ),
+  ruleDish(
+    'שניצל',
+    options: const <DishOption>[
+      DishOption(name: 'תוספת לבחירה', values: <String>['פסטה', 'סלט']),
+    ],
+  ),
+  ruleDish(
+    'Steak',
+    options: const <DishOption>[
+      DishOption(name: 'Add pasta', values: <String>['Penne']),
+    ],
+  ),
+  // Issue #276: a starch named alone is the dish, whatever the
+  // description says; a bread with a filling and a starch with a
+  // protein stay yellow.
+  ruleDish('Rice', description: 'Basmati rice with herbs'),
+  ruleDish('פירה', description: 'פירה עם חמאה ושמנת'),
+  ruleDish('Garlic bread'),
+  ruleDish('Garlic bread', description: 'Baguette with butter and garlic'),
+  ruleDish('Rice bowl', description: 'Grilled chicken, vegetables'),
+  ruleDish('Steak with rice'),
+  ruleDish('לאפה', description: 'שווארמה, חומוס וסלט'),
+  ruleDish('פיתה', description: 'שמן זית וזעתר'),
+  // Issue #475: an upsell or paid-extras group is not what the dish
+  // comes with; a required choice of side still is.
+  ruleDish(
+    'שמנת קשיו',
+    options: const <DishOption>[
+      DishOption(
+        name: 'תוספות בתשלום',
+        values: <String>['קוקוט ויניגרט פסיפלורה', 'קוקוט רוטב סובה'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'משפחתית עבה',
+    options: const <DishOption>[
+      DishOption(name: 'תרצו להוסיף שתייה?', values: <String>['קוקה קולה']),
+    ],
+  ),
+  ruleDish(
+    'Tuna melt',
+    options: const <DishOption>[
+      DishOption(
+        name: 'A small discount',
+        values: <String>['Arnold Palmer | half iced tea half lemonade'],
+      ),
+    ],
+  ),
+  ruleDish(
+    'סטייק',
+    options: const <DishOption>[
+      DishOption(name: 'בחרו תוספת', values: <String>["צ'יפס", 'סלט']),
+    ],
+  ),
 ];
 
 // ---------------------------------------------------------------------------
@@ -910,11 +1164,90 @@ final Menu goldenMixedMenu = Menu(
   ],
 );
 
+/// A menu of drinks under beer, juice and soft-drink headings (issue
+/// #474), cutlery, candles and cards under food headings (issue #472),
+/// and a dish with an upsell group (issue #475).
+final Menu goldenDrinksMenu = Menu(
+  venueRef: const VenueRef(source: MenuSource.wolt, platformId: 'drinks'),
+  currency: 'ILS',
+  fetchedAt: goldenNow,
+  categories: <MenuCategory>[
+    MenuCategory(
+      id: 'd-beer',
+      name: 'בירות ויין',
+      dishes: <Dish>[
+        menuDish('d1', 'היינקן בקבוק 330 מ"ל'),
+        menuDish('d2', 'פאולנר'),
+        menuDish('d3', 'הרצל- שש אחוז כפרה'),
+        menuDish('d4', 'יין אדום יבש'),
+        menuDish('d5', 'בירה זירו'),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-juice',
+      name: 'מיצים טבעיים',
+      dishes: <Dish>[
+        menuDish('d6', 'תפוז'),
+        menuDish('d7', 'לימון נענע'),
+        menuDish('d8', 'מים מינרלים'),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-soft',
+      name: 'שתייה קלה',
+      dishes: <Dish>[
+        menuDish('d9', 'פיוז טי אפרסק'),
+        menuDish('d10', 'טרופית'),
+        menuDish('d11', 'לימונדת הבית'),
+        menuDish('d12', 'מים בטעם ענבים'),
+        menuDish('d13', 'Diet coke'),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-en',
+      name: 'Beers',
+      dishes: <Dish>[
+        menuDish('d14', 'Blue Moon'),
+        menuDish('d15', 'Hazy IPA'),
+        menuDish('d16', 'Whisky'),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-mains',
+      name: 'עיקריות',
+      dishes: <Dish>[
+        menuDish('d17', 'סטייק אנטריקוט'),
+        menuDish('d18', 'סכו"ם חד"פ', price: 0),
+        menuDish('d19', 'נר מספר 5'),
+        menuDish('d20', 'כרטיס ברכה'),
+        menuDish('d21', 'Cutlery'),
+        menuDish('d22', 'קציצות בטעם של ברכה'),
+        menuDish(
+          'd23',
+          'שמנת קשיו',
+          options: const <DishOption>[
+            DishOption(
+              name: 'תוספות בתשלום',
+              values: <String>['קוקוט רוטב סובה', 'מנת לחם (4 פרוסות)'],
+            ),
+          ],
+        ),
+      ],
+    ),
+    MenuCategory(
+      id: 'd-notice',
+      name: '\u{1F497} לתשומת לבכם \u{1F497}',
+      dishes: <Dish>[menuDish('d24', 'הערה חשובה! נשים בהיריון', price: 0)],
+    ),
+  ],
+);
+
 /// The hand-built menus, by name.
 final Map<String, Menu> goldenHandBuiltMenus = <String, Menu>{
   'english': goldenEnglishMenu,
   'hebrew': goldenHebrewMenu,
   'mixed': goldenMixedMenu,
+  'drinks': goldenDrinksMenu,
 };
 
 // ---------------------------------------------------------------------------
@@ -924,6 +1257,12 @@ final Map<String, Menu> goldenHandBuiltMenus = <String, Menu>{
 /// Category headings for `categoryKindOf`, lifted from
 /// `dish_kind_test.dart` and extended.
 const List<String> dishKindHeadings = <String>[
+  'הודעות חשובות \u{1F49A}',
+  '\u{1F497} לתשומת לבכם \u{1F497}',
+  'מספר סועדים',
+  'נרות יום הולדת',
+  'ברכה להזמנה \u{1F48C}',
+  'Notices',
   '\u202Bלקוחות יקרים',
   'ספיישל סמאשבורגר \u{1F31F}',
   '\u202Bהדילים של המוסד  \u{1F354} +  \u{1F35F} + \u{1F964}',
@@ -1007,6 +1346,20 @@ const List<String> dishKindNames = <String>[
   'בקפה',
   'Goldstar',
   'Tiramisu',
+  // Issue #472: non-edible lines named as such, and food that only
+  // sounds like one.
+  'סכו"ם חד"פ \u{1F374}',
+  'סכו״ם | צ׳ופסטיקס',
+  'מזלג חד"פ',
+  "סט צ'ופסטיקס ומפית",
+  'נר מספר 5',
+  'נר HAPPY BIRTHDAY',
+  'כרטיס ברכה Nola',
+  'Cutlery',
+  'Birthday candles',
+  'Candlelight dinner for two',
+  'קציצות בטעם של ברכה',
+  'פיוז טי אפרסק',
 ];
 
 /// Notice-like dish names read at a price of zero and of forty.
@@ -1017,6 +1370,9 @@ const List<String> dishKindNoticeNames = <String>[
   'חשוב',
   'Allergen information: ask your waiter',
   'מידע לאלרגנים! \u{1F499}',
+  'הערה חשובה! נשים בהיריון',
+  'Notices',
+  'אלרגנים',
 ];
 
 // ---------------------------------------------------------------------------

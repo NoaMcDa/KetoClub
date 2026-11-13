@@ -62,6 +62,7 @@ Future<void> _pump(
             ? const Text('screen:$_detailRoute')
             : AppShell(
                 currentIndex: _indexFor(settings.name),
+                pageTitle: settings.name == '/drinks' ? 'Drinks guide' : null,
                 child: Text('screen:${settings.name}'),
               ),
       ),
@@ -530,6 +531,23 @@ void main() {
 
       // Assert
       expect(find.text('screen:/saved'), findsOneWidget);
+      expect(_navigator(tester).canPop(), isFalse);
+    });
+
+    testWidgets('the Explore tab on a page Explore opened goes back to the '
+        'Explore root (issue #288)', (tester) async {
+      // Arrange
+      await _pump(tester);
+      _navigator(tester).pushNamed('/drinks');
+      await tester.pumpAndSettle();
+      expect(find.text('screen:/drinks'), findsOneWidget);
+
+      // Act
+      await tester.tap(find.text(_en.navExplore));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('screen:/'), findsOneWidget);
       expect(_navigator(tester).canPop(), isFalse);
     });
 

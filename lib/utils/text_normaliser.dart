@@ -275,11 +275,14 @@ abstract final class TextNormaliser {
 
   /// The option half of [dishRulesText] on its own: every option group's
   /// name and each non-removal value, normalised and joined (issue #192).
+  /// An upsell or paid-extras group ([isAddOnOptionGroup], issue #475) is
+  /// left out whole: the diner ordered none of it.
   /// Matched separately so a non-keto base found only here can be told
   /// apart from one in the dish's own text.
   static String dishOptionRulesText(Dish dish) {
     final parts = <String>[];
     for (final option in dish.options) {
+      if (isAddOnOptionGroup(option.name)) continue;
       parts.add(normalise(option.name));
       for (final value in option.values) {
         if (isRemovalOptionValue(value)) continue;
@@ -287,6 +290,25 @@ abstract final class TextNormaliser {
       }
     }
     return parts.where((part) => part.isNotEmpty).join(' ');
+  }
+
+  /// Whether an option group named [rawName] is an upsell or paid extras
+  /// (issue #475): its normalised name holds one of
+  /// [optionAddOnGroupWordsEn]/[optionAddOnGroupWordsHe] as whole words —
+  /// "תוספות בתשלום", "תרצו להוסיף שתייה?", "Add a drink", "A small
+  /// discount". A required choice ("בחרו תוספת", "Choice of side") is not
+  /// one.
+  static bool isAddOnOptionGroup(String rawName) {
+    final normalised = normalise(rawName);
+    if (normalised.isEmpty) return false;
+    final padded = ' $normalised ';
+    for (final word in <String>[
+      ...optionAddOnGroupWordsEn,
+      ...optionAddOnGroupWordsHe,
+    ]) {
+      if (padded.contains(' ${normalise(word)} ')) return true;
+    }
+    return false;
   }
 
   /// Whether the option value [raw] is a removal — its first normalised

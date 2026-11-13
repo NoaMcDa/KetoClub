@@ -8,7 +8,8 @@ source text** exactly as Dart builds it (pinned by the vocabulary golden's
 ``*_pattern`` function that compiles that same source with Python ``re``
 flags that reproduce the Dart semantics:
 
-* **Latin** — ``\\b<trigger>\\b``, case-insensitive, non-unicode. Dart's
+* **Latin** — ``\\b<trigger>\\b`` (``\\b<trigger>(?:e?s)?\\b`` with
+  ``allow_plural``), case-insensitive, non-unicode. Dart's
   ``\\b`` is ASCII-only, so the Python pattern uses ``re.ASCII``: a Hebrew
   letter, ``ß``, ``ı`` or an astral letter beside a trigger counts as a
   boundary, and ``_`` does not. Every normalised Latin trigger in the
@@ -47,9 +48,18 @@ def dart_regexp_escape(text: str) -> str:
     return "".join("\\" + char if char in _DART_ESCAPED else char for char in text)
 
 
-def latin_trigger_source(normalised_trigger: str) -> str:
-    """The Dart source of ``latinTriggerPattern(normalised_trigger)``."""
-    return f"\\b{dart_regexp_escape(normalised_trigger)}\\b"
+_LATIN_PLURAL: Final = "(?:e?s)?"
+"""``latinTriggerPattern``'s ``allowPlural`` suffix: a regular ``s``/``es``."""
+
+
+def latin_trigger_source(normalised_trigger: str, *, allow_plural: bool = False) -> str:
+    """The Dart source of ``latinTriggerPattern(normalised_trigger, ...)``.
+
+    ``allow_plural`` accepts a regular English plural after the trigger
+    (issue #274); only the keto engine's non-keto bases turn it on.
+    """
+    plural = _LATIN_PLURAL if allow_plural else ""
+    return f"\\b{dart_regexp_escape(normalised_trigger)}{plural}\\b"
 
 
 def hebrew_trigger_source(
@@ -69,10 +79,13 @@ def hebrew_trigger_source(
 
 
 @cache
-def latin_trigger_pattern(normalised_trigger: str) -> re.Pattern[str]:
+def latin_trigger_pattern(
+    normalised_trigger: str, *, allow_plural: bool = False
+) -> re.Pattern[str]:
     """``latinTriggerPattern``: an ASCII word-boundary, ignore-case match."""
     return re.compile(
-        latin_trigger_source(normalised_trigger), re.ASCII | re.IGNORECASE
+        latin_trigger_source(normalised_trigger, allow_plural=allow_plural),
+        re.ASCII | re.IGNORECASE,
     )
 
 

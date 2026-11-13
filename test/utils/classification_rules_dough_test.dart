@@ -186,9 +186,11 @@ void main() {
       expect(result.instructions, isEmpty);
     });
 
-    test('dough offered as an add-on under another heading stays the '
-        'issue #192 yellow', () {
-      // Arrange: only the group's name can make it a choice of dough.
+    test('dough offered as an upsell is neither a choice of dough nor an '
+        'instruction (issue #475)', () {
+      // Arrange: only the group's name can make it a choice of dough, and
+      // "would you like something extra?" is an upsell the diner never
+      // ordered.
       final salad = _dish(
         name: 'סלט יווני',
         options: const <DishOption>[
@@ -200,7 +202,7 @@ void main() {
       // Assert
       expect(ClassificationRules.doughChoiceBase(salad), isNull);
       expect(result.isNonKeto, isFalse);
-      expect(result.instructions, equals([_skipHe('בצק')]));
+      expect(result.instructions, isEmpty);
     });
 
     test('an English "Choose your dough" group is red, and a cauliflower '
