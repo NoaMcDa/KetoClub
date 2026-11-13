@@ -689,6 +689,23 @@ void main() {
         expect(search.byNameCalls, hasLength(1));
       });
 
+      test('nearbyVenues stays the nearby list while a name search shows '
+          'others, which name the header place (issue #288)', () async {
+        // Arrange
+        search
+          ..queueFound([_venue('near')])
+          ..queueFound([_venue('named')]);
+        await controller.locate(language: 'en');
+
+        // Act
+        controller.search('named', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Assert
+        expect(controller.results.single.name, 'named');
+        expect(controller.nearbyVenues.single.name, 'near');
+      });
+
       test('clearing with no nearby list goes back to nothing asked', () async {
         // Arrange
         search.queueFound([_venue('named')]);
@@ -886,6 +903,38 @@ void main() {
 
     group('card numbers (D13)', () {
       final venue = _venue('vitrina');
+
+      test('refreshNumbers picks up a menu analysed since the list '
+          'arrived (issue #288)', () async {
+        // Arrange
+        search.queueFound([venue]);
+        await controller.locate(language: 'en');
+        expect(controller.cardNumbers(venue), isNull);
+        repository.seedCache(_analysed(venue.ref, green: 9, yellow: 5, red: 2));
+
+        // Act
+        await controller.refreshNumbers();
+
+        // Assert
+        expect(controller.cardNumbers(venue)?.green, 9);
+      });
+
+      test('refreshNumbers drops the numbers of a cleared cache '
+          '(issue #288)', () async {
+        // Arrange
+        repository.seedCache(_analysed(venue.ref, green: 9, yellow: 5, red: 2));
+        search.queueFound([venue]);
+        await controller.locate(language: 'en');
+        expect(controller.cardNumbers(venue), isNotNull);
+        await repository.clearCache();
+
+        // Act
+        await controller.refreshNumbers();
+
+        // Assert
+        expect(controller.cardNumbers(venue), isNull);
+        expect(controller.hasAnyNumbers, isFalse);
+      });
 
       test('come from a cached MenuAnalysed', () async {
         // Arrange

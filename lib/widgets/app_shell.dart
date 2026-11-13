@@ -143,7 +143,9 @@ class AppShell extends StatelessWidget {
   /// the source itself can still push Settings over the menu so that Back
   /// from Settings returns to it.
   void _selectTab(BuildContext context, int index) {
-    if (index == currentIndex) return;
+    // A page that names itself (the drinks guide) is a tab's second level:
+    // its own tab goes back to the tab's root (issue #288).
+    if (index == currentIndex && pageTitle == null) return;
     Navigator.of(context).pushNamedAndRemoveUntil(_routes[index], (_) => false);
   }
 
