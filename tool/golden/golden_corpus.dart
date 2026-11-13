@@ -171,6 +171,7 @@ const List<String> ruleTexts = <String>[
   'Ask about the price first',
   'Beef Burger בלחמנייה',
   'Beef burger on a brioche bun',
+  'המבורגר BBQ עם hash browns',
   'Beer',
   'Beetroot salad with feta',
   'Blueberry muffin',
@@ -1150,6 +1151,9 @@ final Menu goldenMixedMenu = Menu(
             DishOption(name: 'תוספות', values: <String>['פרמזן', 'צ׳יפס']),
           ],
         ),
+        // Issue #279: an English trigger in a Hebrew dish gives the
+        // Hebrew counterpart's sentence.
+        menuDish('x17', 'המבורגר BBQ', description: 'עם hash browns'),
       ],
     ),
     MenuCategory(

@@ -6971,7 +6971,7 @@
           {
             "dishId": "x6",
             "hiddenCarbs": [],
-            "modification": "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
             "name": "Beef Burger בלחמנייה",
             "netCarbsEstimate": null,
             "verdict": "modifiable",
@@ -7050,6 +7050,15 @@
             "why": "Built on pasta, which cannot be made keto."
           },
           {
+            "dishId": "x17",
+            "hiddenCarbs": [],
+            "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר.\nאפשר בבקשה להחליף את האש בראון בסלט ירוק או בביצה נוספת?",
+            "name": "המבורגר BBQ",
+            "netCarbsEstimate": null,
+            "verdict": "modifiable",
+            "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+          },
+          {
             "dishId": "x13",
             "hiddenCarbs": [],
             "modification": null,
@@ -7092,8 +7101,8 @@
         "green": 3,
         "hiddenCarbYellow": 0,
         "red": 6,
-        "score": 3.6,
-        "yellow": 2
+        "score": 3.8,
+        "yellow": 3
       },
       "menu": {
         "categories": [
@@ -7242,6 +7251,15 @@
                     ]
                   }
                 ],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "עם hash browns",
+                "id": "x17",
+                "imageUrl": null,
+                "name": "המבורגר BBQ",
+                "options": [],
                 "page": null,
                 "price": 40.0
               }

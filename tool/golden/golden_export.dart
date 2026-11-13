@@ -305,6 +305,8 @@ Map<String, Object?> _vocabulary() {
   return <String, Object?>{
     'carbModifiersEn': _pairs(carbModifiersEn),
     'carbModifiersHe': _pairs(carbModifiersHe),
+    'carbModifierCounterpartsEn': carbModifierCounterpartsEn,
+    'carbModifierCounterpartsHe': carbModifierCounterpartsHe,
     'nonKetoDrinkBasesEn': nonKetoDrinkBasesEn,
     'nonKetoDrinkBasesHe': nonKetoDrinkBasesHe,
     'doughBasesEn': doughBasesEn,

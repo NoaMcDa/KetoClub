@@ -890,4 +890,131 @@ void main() {
       expect(result.instructions, contains(carbModifiersHe['לחמנייה']));
     });
   });
+
+  group('ClassificationRules — the script is in the dish language '
+      '(issue #279)', () {
+    final hebrewLetter = RegExp('[֐-׿]');
+
+    Dish dish({
+      required String name,
+      String description = '',
+      List<DishOption> options = const [],
+    }) => Dish(
+      id: 'd',
+      name: name,
+      description: description,
+      price: 10,
+      options: options,
+    );
+
+    test('every English trigger has a Hebrew counterpart trigger', () {
+      for (final key in carbModifiersEn.keys) {
+        // Act
+        final counterpart = carbModifierCounterpartsEn[key];
+        // Assert
+        expect(counterpart, isNotNull, reason: key);
+        expect(carbModifiersHe, contains(counterpart), reason: key);
+      }
+      expect(carbModifierCounterpartsEn.keys.toSet(), carbModifiersEn.keys);
+    });
+
+    test('every Hebrew trigger has an English counterpart trigger', () {
+      for (final key in carbModifiersHe.keys) {
+        // Act
+        final counterpart = carbModifierCounterpartsHe[key];
+        // Assert
+        expect(counterpart, isNotNull, reason: key);
+        expect(carbModifiersEn, contains(counterpart), reason: key);
+      }
+      expect(carbModifierCounterpartsHe.keys.toSet(), carbModifiersHe.keys);
+    });
+
+    for (final entry in carbModifierCounterpartsEn.entries) {
+      test('"${entry.key}" in Hebrew text asks in Hebrew', () {
+        // Act
+        final result = ClassificationRules.match(_heText(entry.key));
+        // Assert
+        expect(result.instructions, contains(carbModifiersHe[entry.value]));
+        for (final sentence in result.instructions) {
+          expect(sentence, contains(hebrewLetter));
+        }
+      });
+    }
+
+    for (final entry in carbModifierCounterpartsHe.entries) {
+      test('"${entry.key}" in an English dish asks in English', () {
+        // Arrange: the Hebrew word is an option of an English dish.
+        final steak = dish(
+          name: 'Steak',
+          options: [
+            DishOption(name: 'Sides', values: [entry.key]),
+          ],
+        );
+        // Act
+        final result = ClassificationRules.matchDish(steak);
+        // Assert
+        expect(result.instructions, contains(carbModifiersEn[entry.value]));
+        for (final sentence in result.instructions) {
+          expect(sentence, isNot(contains(hebrewLetter)));
+        }
+      });
+    }
+
+    test('"המבורגר BBQ" gets only Hebrew sentences', () {
+      // Act
+      final result = ClassificationRules.matchDish(dish(name: 'המבורגר BBQ'));
+      // Assert
+      expect(result.instructions, [
+        carbModifiersHe['המבורגר'],
+        carbModifiersHe['ברביקיו'],
+      ]);
+    });
+
+    test('an option base is asked about in the dish language', () {
+      // Arrange: a Hebrew dish whose option names an English base.
+      final salad = dish(
+        name: 'סלט עוף',
+        options: const [
+          DishOption(name: 'תוספת', values: ['pasta']),
+        ],
+      );
+      // Act
+      final result = ClassificationRules.matchDish(salad);
+      // Assert
+      expect(
+        result.instructions.first,
+        optionBaseModificationHe.replaceAll('{base}', 'pasta'),
+      );
+    });
+
+    test('isHebrewDish reads the name and description before options', () {
+      // Act + Assert
+      expect(
+        ClassificationRules.isHebrewDish(
+          dish(
+            name: 'Pasta',
+            options: const [
+              DishOption(name: 'תוספות', values: ['פרמזן']),
+            ],
+          ),
+        ),
+        isFalse,
+      );
+      expect(
+        ClassificationRules.isHebrewDish(
+          dish(
+            name: '',
+            options: const [
+              DishOption(name: 'תוספות', values: ['פרמזן']),
+            ],
+          ),
+        ),
+        isTrue,
+      );
+      expect(
+        ClassificationRules.isHebrewDish(dish(name: 'המבורגר BBQ')),
+        isTrue,
+      );
+    });
+  });
 }

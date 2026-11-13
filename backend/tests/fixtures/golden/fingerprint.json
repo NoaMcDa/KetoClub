@@ -4423,7 +4423,7 @@
     ]
   },
   {
-    "hex": "d38bfb68",
+    "hex": "26f73592",
     "menu": {
       "categories": [
         {
@@ -4573,6 +4573,15 @@
               ],
               "page": null,
               "price": 40.0
+            },
+            {
+              "description": "עם hash browns",
+              "id": "x17",
+              "imageUrl": null,
+              "name": "המבורגר BBQ",
+              "options": [],
+              "page": null,
+              "price": 40.0
             }
           ],
           "id": "m-mains",
@@ -4636,6 +4645,7 @@
       "𝐁𝐞𝐞𝐟 steak",
       "קרואסונ חמאה listed twice",
       "pasta bolognese תוספות פרמזנ ציפס",
+      "המבורגר bbq עמ hash browns",
       "goldstar",
       "diet coke",
       "cheeseburger"
