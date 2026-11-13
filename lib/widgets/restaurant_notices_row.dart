@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/focus_ring.dart';
 
 /// The menu screen's one quiet place for the restaurant's own notices
@@ -86,7 +87,9 @@ class RestaurantNoticesRow extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4, bottom: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [for (final notice in notices) _notice(theme, notice)],
+              children: [
+                for (final notice in notices) _notice(context, theme, notice),
+              ],
             ),
           ),
       ],
@@ -94,7 +97,8 @@ class RestaurantNoticesRow extends StatelessWidget {
   }
 
   /// One notice: its name, then its description when it has one.
-  Widget _notice(ThemeData theme, Dish notice) {
+  Widget _notice(BuildContext context, ThemeData theme, Dish notice) {
+    final ambient = Directionality.of(context);
     final name = notice.name.trim();
     final description = notice.description.trim();
     return Padding(
@@ -102,10 +106,16 @@ class RestaurantNoticesRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (name.isNotEmpty) Text(name, style: theme.textTheme.bodyMedium),
+          if (name.isNotEmpty)
+            Text(
+              name,
+              textDirection: contentDirection(name, ambient),
+              style: theme.textTheme.bodyMedium,
+            ),
           if (description.isNotEmpty)
             Text(
               description,
+              textDirection: contentDirection(description, ambient),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

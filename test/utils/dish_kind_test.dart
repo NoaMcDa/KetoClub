@@ -325,4 +325,27 @@ void main() {
       expect(dishKindsOf(menu), {'cola': DishKind.drink});
     });
   });
+
+  group('listedDishCount (issue #460)', () {
+    test('leaves a notice line out and counts everything else', () {
+      // Arrange
+      final menu = Menu(
+        venueRef: const VenueRef(source: MenuSource.wolt, platformId: 'v'),
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: [
+          MenuCategory(
+            id: 'n',
+            name: 'Dear customers',
+            dishes: [_dish('Allergen note', price: 0)],
+          ),
+          MenuCategory(id: 'm', name: 'Mains', dishes: [_dish('Steak')]),
+        ],
+      );
+
+      // Act & Assert
+      expect(menu.allDishes.length, 2);
+      expect(listedDishCount(menu), 1);
+    });
+  });
 }

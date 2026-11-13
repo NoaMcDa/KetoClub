@@ -350,6 +350,12 @@ abstract class AppLocalizations {
   /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.'**
   String get settingsConsentBody;
 
+  /// No description provided for @consentDisclosureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Tap Turn off to keep every menu on this device.'**
+  String get consentDisclosureBody;
+
   /// No description provided for @settingsConsentAccept.
   ///
   /// In en, this message translates to:
@@ -374,11 +380,23 @@ abstract class AppLocalizations {
   /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.'**
   String get settingsConsentBodyDirect;
 
+  /// No description provided for @consentDisclosureBodyDirect.
+  ///
+  /// In en, this message translates to:
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Tap Turn off to keep every menu on this device.'**
+  String get consentDisclosureBodyDirect;
+
   /// No description provided for @settingsConsentBodyDirectViaBackend.
   ///
   /// In en, this message translates to:
   /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent from this device to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Your own API key is used only if the server cannot be reached. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.'**
   String get settingsConsentBodyDirectViaBackend;
+
+  /// No description provided for @consentDisclosureBodyDirectViaBackend.
+  ///
+  /// In en, this message translates to:
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent from this device to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Your own API key is used only if the server cannot be reached. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Tap Turn off to keep every menu on this device.'**
+  String get consentDisclosureBodyDirectViaBackend;
 
   /// No description provided for @settingsKeySection.
   ///
@@ -1009,6 +1027,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Undo'**
   String get savedUndo;
+
+  /// No description provided for @savedOpenedJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened just now'**
+  String get savedOpenedJustNow;
 
   /// No description provided for @savedOpenedAgo.
   ///

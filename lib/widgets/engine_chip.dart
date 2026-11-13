@@ -80,17 +80,22 @@ class EngineChip extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 6),
-            for (final part in labelParts)
-              Text(
-                part,
-                style: TextStyle(color: color, fontWeight: FontWeight.w600),
-              ),
-          ],
+        // Scales down when a narrow phone or a large text size leaves less
+        // room than the label needs, rather than overflowing (#462).
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 6),
+              for (final part in labelParts)
+                Text(
+                  part,
+                  style: TextStyle(color: color, fontWeight: FontWeight.w600),
+                ),
+            ],
+          ),
         ),
       ),
     );
