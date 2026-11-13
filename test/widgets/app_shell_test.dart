@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -540,7 +538,7 @@ void main() {
         'Explore root (issue #288)', (tester) async {
       // Arrange
       await _pump(tester);
-      unawaited(_navigator(tester).pushNamed('/drinks'));
+      _navigator(tester).pushNamed('/drinks');
       await tester.pumpAndSettle();
       expect(find.text('screen:/drinks'), findsOneWidget);
 
