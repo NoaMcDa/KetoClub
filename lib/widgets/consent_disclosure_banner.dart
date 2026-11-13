@@ -100,10 +100,10 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
   }
 
   String _message(AppLocalizations l10n) {
-    if (!widget.directToGoogle) return l10n.settingsConsentBody;
+    if (!widget.directToGoogle) return l10n.consentDisclosureBody;
     return widget.backendConfigured
-        ? l10n.settingsConsentBodyDirectViaBackend
-        : l10n.settingsConsentBodyDirect;
+        ? l10n.consentDisclosureBodyDirectViaBackend
+        : l10n.consentDisclosureBodyDirect;
   }
 
   @override

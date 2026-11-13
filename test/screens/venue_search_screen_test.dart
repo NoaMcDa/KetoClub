@@ -220,10 +220,10 @@ void main() {
 
       // Assert
       expect(
-        find.text(l10n.settingsConsentBodyDirectViaBackend),
+        find.text(l10n.consentDisclosureBodyDirectViaBackend),
         findsOneWidget,
       );
-      expect(find.text(l10n.settingsConsentBodyDirect), findsNothing);
+      expect(find.text(l10n.consentDisclosureBodyDirect), findsNothing);
     });
 
     for (final entry in {

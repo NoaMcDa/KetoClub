@@ -302,6 +302,54 @@ void main() {
       expect(result.single.ref, equals(woltRef));
     });
 
+    test('entries leave a notice line out of dishCount (issue #460)', () async {
+      // Arrange
+      final cache = _buildCache();
+      await cache.write(
+        CachedMenu(
+          menu: Menu(
+            venueRef: woltRef,
+            currency: 'ILS',
+            fetchedAt: DateTime.utc(2026),
+            categories: const <MenuCategory>[
+              MenuCategory(
+                id: 'n',
+                name: 'Dear customers',
+                dishes: <Dish>[
+                  Dish(
+                    id: 'note',
+                    name: 'Allergen information',
+                    description: '',
+                    price: 0,
+                    options: <DishOption>[],
+                  ),
+                ],
+              ),
+              MenuCategory(
+                id: 'mains',
+                name: 'Mains',
+                dishes: <Dish>[
+                  Dish(
+                    id: 'steak',
+                    name: 'Steak',
+                    description: '',
+                    price: 80,
+                    options: <DishOption>[],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+
+      // Act
+      final entry = (await cache.entries()).single;
+
+      // Assert
+      expect(entry.dishCount, 1);
+    });
+
     test('entries count food only: a drink is listed in dishCount but never '
         'in the score (D21)', () async {
       // Arrange: a steak (green) and a cola (green) under a drinks heading.

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/utils/text_normaliser.dart';
+import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/focus_ring.dart';
 
 /// The horizontal row of category chips above the dish list (issue #51):
@@ -39,6 +41,7 @@ class CategoryChips extends StatelessWidget {
   Widget build(BuildContext context) {
     if (categories.isEmpty) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
+    final ambient = Directionality.of(context);
     // A scrollable Row rather than a horizontal ListView: a menu has a
     // handful of categories, so building every chip up front costs
     // nothing, and it keeps the loaded menu's one ListView the only one
@@ -52,7 +55,7 @@ class CategoryChips extends StatelessWidget {
           child: FocusRing(
             borderRadius: BorderRadius.circular(8),
             child: ActionChip(
-              label: Text(category),
+              label: _label(category, ambient),
               onPressed: () => onSelected(category),
             ),
           ),
@@ -73,5 +76,12 @@ class CategoryChips extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // A chip sizes itself to its label, so the label is stripped of the
+  // bidi controls Wolt prefixes (#484) and laid out in its own direction.
+  static Widget _label(String category, TextDirection ambient) {
+    final text = TextNormaliser.stripBidiControls(category);
+    return Text(text, textDirection: contentDirection(text, ambient));
   }
 }

@@ -139,6 +139,16 @@ DishKind dishKindOf({required String category, required Dish dish}) {
   return DishKind.food;
 }
 
+/// How many dishes [menu] lists that a diner can order: every dish except a
+/// notice line (issue #445). Computed, never stored (D21), and the one rule
+/// the menu screen, the Recent tab and the cache summary all count by.
+int listedDishCount(Menu menu) {
+  final kinds = dishKindsOf(menu);
+  return menu.allDishes
+      .where((dish) => kinds[dish.id] != DishKind.notice)
+      .length;
+}
+
 /// The kind of every dish on [menu], by dish id, computed once per menu.
 /// A dish id listed under two categories takes the first one's heading,
 /// as `Menu.categoryNameOf` does.

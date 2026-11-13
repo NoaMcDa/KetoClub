@@ -23,12 +23,14 @@ import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
+import 'package:ketoclub/utils/text_normaliser.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/app_notice.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/carb_budget_field.dart';
 import 'package:ketoclub/widgets/category_chips.dart';
+import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
@@ -290,13 +292,11 @@ class _MenuScreenState extends State<MenuScreen> {
     // Any green or yellow dish, drinks included: the counts are food only
     // (D21), but a card of safe drinks is still worth sharing.
     final analysis = controller.analysis;
+    final shareMenu = controller.menu;
     final canShare =
         analysis is MenuAnalysed &&
-        analysis.dishes.any(
-          (dish) =>
-              dish.verdict == DishVerdict.orderAsIs ||
-              dish.verdict == DishVerdict.modifiable,
-        );
+        shareMenu != null &&
+        MenuShareText.hasContent(shareMenu, analysis);
     return Scaffold(
       appBar: AppBar(
         // The venue name, once the body header has scrolled under the bar
@@ -360,7 +360,7 @@ class _MenuScreenState extends State<MenuScreen> {
         builder: (context, constraints) {
           final twoPane =
               constraints.maxWidth >= menuTwoPaneMinWidth &&
-              (controller.menu?.allDishes.isNotEmpty ?? false);
+              controller.totalDishCount > 0;
           _syncTwoPane(twoPane);
           return ContentWidth(
             maxWidth: twoPane ? menuTwoPaneMaxWidth : contentMaxWidth,
@@ -569,7 +569,7 @@ class _MenuScreenState extends State<MenuScreen> {
     final header = _header(context, l10n, controller);
     final sourceLine = _sourceLine(context, l10n, controller);
 
-    if (menu.allDishes.isEmpty) {
+    if (controller.totalDishCount == 0) {
       return _refreshable(
         controller,
         ListView(
@@ -581,6 +581,15 @@ class _MenuScreenState extends State<MenuScreen> {
             ?sourceLine,
             const SizedBox(height: 12),
             ...banners,
+            if (controller.restaurantNotices.isNotEmpty)
+              RestaurantNoticesRow(
+                notices: controller.restaurantNotices,
+                expanded: _restaurantNoticesExpanded,
+                onToggle: () => setState(
+                  () =>
+                      _restaurantNoticesExpanded = !_restaurantNoticesExpanded,
+                ),
+              ),
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(top: 24),
@@ -1103,9 +1112,11 @@ class _MenuScreenState extends State<MenuScreen> {
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 6),
-                Text(
-                  _legendExpanded ? l10n.legendHide : l10n.legendToggle,
-                  style: theme.textTheme.labelMedium,
+                Flexible(
+                  child: Text(
+                    _legendExpanded ? l10n.legendHide : l10n.legendToggle,
+                    style: theme.textTheme.labelMedium,
+                  ),
                 ),
               ],
             ),
@@ -1359,7 +1370,17 @@ class _MenuScreenState extends State<MenuScreen> {
       padding: const EdgeInsets.only(top: 4, bottom: 8),
       child: KeyedSubtree(
         key: _categoryKeyFor(category),
-        child: Text(category, style: Theme.of(context).textTheme.titleSmall),
+        child: SizedBox(
+          width: double.infinity,
+          child: Text(
+            TextNormaliser.stripBidiControls(category),
+            textDirection: contentDirection(
+              category,
+              Directionality.of(context),
+            ),
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+        ),
       ),
     );
   }
