@@ -495,8 +495,8 @@ AppDependencies buildDependencies() {
   // platform on a phone, through the raw proxy routes in a browser with a
   // backend (D11). With a backend they are the fallbacks (D25).
   final directAdapters = <PlatformMenuAdapter>[
-    WoltMenuAdapter(client: client, proxyBase: proxyBase),
-    TenBisAdapter(client: client, proxyBase: proxyBase),
+    WoltMenuAdapter(client: client, clock: clock, proxyBase: proxyBase),
+    TenBisAdapter(client: client, clock: clock, proxyBase: proxyBase),
     // Any other restaurant URL (D19). A PDF menu is read by the vision
     // path under the options the menu screen would build, so the
     // analysis it caches is the one the screen reuses.

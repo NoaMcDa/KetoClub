@@ -1339,7 +1339,12 @@ void wireBackendBuild(
   Future<ClassificationOptions> readOptions() async =>
       ClassificationOptions.fromSettings(await fakes.settingsStore.read());
   final direct = <PlatformMenuAdapter>[
-    WoltMenuAdapter(client: client, proxyBase: proxyBase, runsInBrowser: false),
+    WoltMenuAdapter(
+      clock: fakes.clock,
+      client: client,
+      proxyBase: proxyBase,
+      runsInBrowser: false,
+    ),
   ];
   final cache = FlowMemoryMenuCache();
   fakes

@@ -13,6 +13,7 @@ import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../../../fakes/fake_install_id_store.dart';
+import '../../../fakes/fake_transport_exceptions.dart';
 import '../venue_search_service_contract.dart';
 
 /// The position every search here is made from (Rabin Square, Tel Aviv).
@@ -394,6 +395,13 @@ void main() {
     test('maps a ClientException to offline', () async {
       await _expectBoth(
         _direct(_throwing(http.ClientException('Connection failed'))),
+        const VenueSearchFailed(VenueSearchFailureReason.offline),
+      );
+    });
+
+    test('maps a TLS handshake failure (#278) to offline', () async {
+      await _expectBoth(
+        _direct(_throwing(const FakeHandshakeException())),
         const VenueSearchFailed(VenueSearchFailureReason.offline),
       );
     });

@@ -198,14 +198,17 @@ final class WoltVenueSearchService implements VenueSearchService {
     final http.Response response;
     try {
       response = await request().timeout(_timeout);
-    } on http.ClientException {
+    } on TimeoutException {
+      return const VenueSearchFailed(VenueSearchFailureReason.timeout);
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278). `services/` may not import dart:io to name them.
       return VenueSearchFailed(
         proxyBase != null
             ? VenueSearchFailureReason.backendUnreachable
             : VenueSearchFailureReason.offline,
       );
-    } on TimeoutException {
-      return const VenueSearchFailed(VenueSearchFailureReason.timeout);
     }
 
     final statusCode = response.statusCode;

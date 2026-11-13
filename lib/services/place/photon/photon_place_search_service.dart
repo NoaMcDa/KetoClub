@@ -104,10 +104,13 @@ final class PhotonPlaceSearchService implements PlaceSearchService {
             },
           )
           .timeout(timeout);
-    } on http.ClientException {
-      return const PlaceSearchFailed(PlaceSearchFailureReason.offline);
     } on TimeoutException {
       return const PlaceSearchFailed(PlaceSearchFailureReason.timeout);
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278). `services/` may not import dart:io to name them.
+      return const PlaceSearchFailed(PlaceSearchFailureReason.offline);
     }
 
     final status = response.statusCode;

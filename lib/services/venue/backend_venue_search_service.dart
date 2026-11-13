@@ -139,10 +139,13 @@ final class BackendVenueSearchService implements VenueSearchService {
     final http.Response response;
     try {
       response = await request().timeout(timeout);
-    } on http.ClientException {
-      return _notConfigured;
     } on TimeoutException {
       return const VenueSearchFailed(VenueSearchFailureReason.timeout);
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278). `services/` may not import dart:io to name them.
+      return _notConfigured;
     }
 
     final status = response.statusCode;

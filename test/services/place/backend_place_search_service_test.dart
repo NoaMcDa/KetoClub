@@ -12,6 +12,7 @@ import 'package:ketoclub/services/place/place_search_service.dart';
 
 import '../../fakes/fake_install_id_store.dart';
 import '../../fakes/fake_place_search_service.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 
 final Uri _base = Uri.parse('http://localhost:8000');
 
@@ -218,6 +219,24 @@ void main() {
       // Arrange
       final service = _service(
         MockClient((_) async => throw http.ClientException('refused')),
+        baseUrl: _base,
+      );
+
+      // Act
+      final result = await service.search('herzl', language: 'en');
+
+      // Assert
+      expect(
+        result,
+        const PlaceSearchFailed(PlaceSearchFailureReason.backendUnreachable),
+      );
+    });
+
+    test('a TLS handshake failure (#278) is backend '
+        'unreachable', () async {
+      // Arrange
+      final service = _service(
+        MockClient((_) async => throw const FakeHandshakeException()),
         baseUrl: _base,
       );
 

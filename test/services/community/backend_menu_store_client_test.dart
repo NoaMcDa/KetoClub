@@ -12,6 +12,7 @@ import 'package:ketoclub/services/community/menu_store_client.dart';
 
 import '../../fakes/fake_app_logger.dart';
 import '../../fakes/fake_install_id_store.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 
 /// The backend base every test uses unless it is exercising the URL
 /// composition itself.
@@ -479,6 +480,28 @@ void main() {
       final client = _build(
         MockClient((request) async {
           throw http.ClientException('Connection refused', request.url);
+        }),
+      );
+
+      // Act
+      final result = await client.upload(_upload());
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuStoreFailed(
+            reason: MenuStoreFailureReason.backendUnreachable,
+          ),
+        ),
+      );
+    });
+
+    test('a TLS handshake failure (#278) is backendUnreachable', () async {
+      // Arrange
+      final client = _build(
+        MockClient((request) async {
+          throw const FakeHandshakeException();
         }),
       );
 

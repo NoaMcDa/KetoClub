@@ -11,6 +11,7 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../../fakes/fake_install_id_store.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 import '../../fakes/fake_venue_search_service.dart';
 import 'venue_search_service_contract.dart';
 
@@ -415,6 +416,13 @@ void main() {
     test('a ClientException is backendUnreachable', () async {
       await expectBoth(
         _service(_throwing(http.ClientException('down'))),
+        const VenueSearchFailed(VenueSearchFailureReason.backendUnreachable),
+      );
+    });
+
+    test('a TLS handshake failure (#278) is backendUnreachable', () async {
+      await expectBoth(
+        _service(_throwing(const FakeHandshakeException())),
         const VenueSearchFailed(VenueSearchFailureReason.backendUnreachable),
       );
     });

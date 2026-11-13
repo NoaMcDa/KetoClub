@@ -15,6 +15,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../../../fakes/fake_install_id_store.dart';
+import '../../../fakes/fake_transport_exceptions.dart';
 import '../platform_menu_adapter_contract.dart';
 
 /// The backend every adapter under test talks to.
@@ -570,6 +571,19 @@ void main() {
       );
     });
 
+    test('a TLS handshake failure (#278) is backendUnreachable', () async {
+      final adapter = _adapter(
+        client: MockClient((_) async => throw const FakeHandshakeException()),
+      );
+
+      expect(
+        await adapter.fetch(_woltRef),
+        const MenuFetchFailed(
+          reason: MenuFetchFailureReason.backendUnreachable,
+        ),
+      );
+    });
+
     test('a timeout is backendUnreachable', () async {
       final never = Completer<http.Response>();
       final adapter = _adapter(
@@ -598,6 +612,23 @@ void main() {
         ),
       );
     });
+
+    test(
+      'a website TLS handshake failure (#278) is backendUnreachable',
+      () async {
+        final adapter = _adapter(
+          client: MockClient((_) async => throw const FakeHandshakeException()),
+          source: MenuSource.website,
+        );
+
+        expect(
+          await adapter.fetch(_websiteRef),
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.backendUnreachable,
+          ),
+        );
+      },
+    );
   });
 
   group('venue route errors', () {

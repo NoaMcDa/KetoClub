@@ -9,6 +9,7 @@ import 'package:ketoclub/services/menu/website/backend_website_fetcher.dart';
 import 'package:ketoclub/services/menu/website/website_fetcher.dart';
 
 import '../../../fakes/fake_install_id_store.dart';
+import '../../../fakes/fake_transport_exceptions.dart';
 
 final Uri _page = Uri.parse('https://cafe.example/menu');
 
@@ -106,6 +107,16 @@ void main() {
     test('an unreachable backend is backendUnreachable', () async {
       final result = await _fetch(
         MockClient((_) async => throw http.ClientException('refused')),
+      );
+      expect(
+        (result as WebsiteFetchFailed).reason,
+        MenuFetchFailureReason.backendUnreachable,
+      );
+    });
+
+    test('a TLS handshake failure is backendUnreachable (#278)', () async {
+      final result = await _fetch(
+        MockClient((_) async => throw const FakeHandshakeException()),
       );
       expect(
         (result as WebsiteFetchFailed).reason,

@@ -8,6 +8,8 @@ import 'package:http/testing.dart';
 import 'package:ketoclub/services/place/photon/photon_place_search_service.dart';
 import 'package:ketoclub/services/place/place_search_service.dart';
 
+import '../../../fakes/fake_transport_exceptions.dart';
+
 /// The recorded Hebrew reply (see `test/fixtures/README.md`), as bytes.
 List<int> _herzlReply() =>
     File('test/fixtures/photon/photon_herzl_tel_aviv_default.json')
@@ -191,6 +193,19 @@ void main() {
       // Arrange
       final service = _service(
         MockClient((_) async => throw http.ClientException('no route')),
+      );
+
+      // Act
+      final result = await service.search('herzl', language: 'en');
+
+      // Assert
+      expect(result, const PlaceSearchFailed(PlaceSearchFailureReason.offline));
+    });
+
+    test('a TLS handshake failure is offline (#278)', () async {
+      // Arrange
+      final service = _service(
+        MockClient((_) async => throw const FakeHandshakeException()),
       );
 
       // Act

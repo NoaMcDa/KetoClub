@@ -7,6 +7,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/tenbis/tenbis_menu_mapper.dart';
+import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// Fetches menus from 10bis's `NextApi/GetRestaurantMenu` endpoint, the
@@ -52,15 +53,21 @@ final class TenBisAdapter implements PlatformMenuAdapter {
   /// the menu on the client's behalf (`backend_plan.md` §3.3, §4.1,
   /// issue #122), which is how the web build works around 10bis's
   /// missing CORS headers.
+  ///
+  /// [clock] stamps each fetched menu's `fetchedAt` (issue #284).
   new({
     required http.Client client,
+    required Clock clock,
     this.proxyBase,
     this.runsInBrowser = kIsWeb,
   })
-    // The field is private and the parameter is not, so `this._client` is
-    // not available; see the constructor doc above.
+    // The fields are private and the parameters are not, so `this._client`
+    // is not available; see the constructor doc above.
     // ignore: prefer_initializing_formals
-    : _client = client;
+    : _client = client,
+       // Same reason: a private field, a public parameter name.
+       // ignore: prefer_initializing_formals
+       _clock = clock;
 
   /// How long [fetch] waits for a response before giving up. Mirrors
   /// `WoltMenuAdapter`'s own timeout: a slower answer than this is
@@ -70,6 +77,8 @@ final class TenBisAdapter implements PlatformMenuAdapter {
   static const Duration _timeout = Duration(seconds: 15);
 
   final http.Client _client;
+
+  final Clock _clock;
 
   /// Whether requests go out through a browser. A browser forbids a page
   /// from setting `User-Agent`, so the header is omitted there, and it
@@ -114,7 +123,12 @@ final class TenBisAdapter implements PlatformMenuAdapter {
             },
           )
           .timeout(_timeout);
-    } on http.ClientException {
+    } on TimeoutException {
+      return const MenuFetchFailed(reason: MenuFetchFailureReason.offline);
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278). `services/` may not import dart:io to name them.
       if (proxyBase != null) {
         // KetoClub's own backend could not be reached at all — distinct
         // from 10bis being unreachable, which the backend reports as a
@@ -132,8 +146,6 @@ final class TenBisAdapter implements PlatformMenuAdapter {
             ? MenuFetchFailureReason.blockedByBrowser
             : MenuFetchFailureReason.offline,
       );
-    } on TimeoutException {
-      return const MenuFetchFailed(reason: MenuFetchFailureReason.offline);
     }
 
     final statusCode = response.statusCode;
@@ -171,11 +183,7 @@ final class TenBisAdapter implements PlatformMenuAdapter {
       );
     }
 
-    return TenBisMenuMapper.toMenu(
-      decoded,
-      ref: ref,
-      fetchedAt: DateTime.now(),
-    );
+    return TenBisMenuMapper.toMenu(decoded, ref: ref, fetchedAt: _clock.now());
   }
 
   /// The query 10bis's menu endpoint is asked with for [restaurantId]:

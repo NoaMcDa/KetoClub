@@ -119,6 +119,7 @@ void _wirePhoneBuild(
         readOptions: () async => const ClassificationOptions(),
         direct: [
           WoltMenuAdapter(
+            clock: fakes.clock,
             client: network.client,
             proxyBase: menuProxyBase(
               runsInBrowser: false,

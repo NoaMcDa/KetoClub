@@ -12,7 +12,12 @@ import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/wolt_headers.dart';
 
+import '../../../fakes/fake_clock.dart';
+import '../../../fakes/fake_transport_exceptions.dart';
 import '../platform_menu_adapter_contract.dart';
+
+/// The clock every adapter here stamps its menus with (issue #284).
+final FakeClock _clock = FakeClock(DateTime.utc(2026, 11, 13, 9, 30));
 
 /// The ref used everywhere a working fetch is exercised.
 const VenueRef _refItHandles = VenueRef(
@@ -48,6 +53,7 @@ final RegExp _uuid4 = RegExp(
 /// menu, regardless of the request — enough for the shared contract
 /// suite, which asserts shape and provenance only.
 WoltMenuAdapter _buildContractAdapter() => WoltMenuAdapter(
+  clock: _clock,
   client: MockClient((request) async => http.Response(_emptyMenuBody, 200)),
 );
 
@@ -64,6 +70,7 @@ void main() {
       // Arrange
       Uri? capturedUri;
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           capturedUri = request.url;
           return http.Response(_emptyMenuBody, 200);
@@ -88,8 +95,12 @@ void main() {
       const odd = VenueRef(source: MenuSource.wolt, platformId: 'a/b?c');
 
       // Act
-      await WoltMenuAdapter(client: MockClient(answer)).fetch(odd);
       await WoltMenuAdapter(
+        clock: _clock,
+        client: MockClient(answer),
+      ).fetch(odd);
+      await WoltMenuAdapter(
+        clock: _clock,
         client: MockClient(answer),
         proxyBase: Uri.parse('http://localhost:8000'),
       ).fetch(odd);
@@ -109,6 +120,7 @@ void main() {
       // Arrange
       Map<String, String>? capturedHeaders;
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           capturedHeaders = request.headers;
           return http.Response(_emptyMenuBody, 200);
@@ -129,6 +141,7 @@ void main() {
       // Arrange
       Map<String, String>? capturedHeaders;
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           capturedHeaders = request.headers;
           return http.Response(_emptyMenuBody, 200);
@@ -160,11 +173,13 @@ void main() {
         return http.Response(_emptyMenuBody, 200);
       });
       final first = WoltMenuAdapter(
+        clock: _clock,
         client: recordingClient(),
         random: Random(1),
         runsInBrowser: false,
       );
       final second = WoltMenuAdapter(
+        clock: _clock,
         client: recordingClient(),
         random: Random(2),
         runsInBrowser: false,
@@ -185,6 +200,7 @@ void main() {
       // Arrange: what Wolt's retired menu endpoint answers every anonymous
       // caller with (issues #22, #168).
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async => http.Response('', 200)),
       );
 
@@ -203,6 +219,7 @@ void main() {
     test('fetch maps a 404 status to notFound with the status code', () async {
       // Arrange
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           return http.Response('not found', 404);
         }),
@@ -227,6 +244,7 @@ void main() {
         'status code', () async {
       // Arrange
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           return http.Response('server error', 503);
         }),
@@ -251,6 +269,7 @@ void main() {
         'code', () async {
       // Arrange
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           return http.Response('<html>not json</html>', 200);
         }),
@@ -273,6 +292,7 @@ void main() {
       () async {
         // Arrange
         final adapter = WoltMenuAdapter(
+          clock: _clock,
           client: MockClient((request) async {
             return http.Response(
               jsonEncode(<String, Object?>{'resultCode': 0}),
@@ -299,6 +319,7 @@ void main() {
     test('fetch maps a ClientException to offline outside a browser', () async {
       // Arrange
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           throw http.ClientException('Connection failed', request.url);
         }),
@@ -322,6 +343,7 @@ void main() {
         // dead network (architecture.md §13), so the adapter must tell them
         // apart by where it runs, never by the exception.
         final adapter = WoltMenuAdapter(
+          clock: _clock,
           client: MockClient((request) async {
             throw http.ClientException('Failed to fetch', request.url);
           }),
@@ -343,11 +365,62 @@ void main() {
       },
     );
 
+    test('fetch stamps the menu with the injected clock (#284)', () async {
+      // Arrange
+      final adapter = WoltMenuAdapter(
+        clock: _clock,
+        client: MockClient(
+          (request) async => http.Response(_emptyMenuBody, 200),
+        ),
+        runsInBrowser: false,
+      );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect((result as MenuFetched).menu.fetchedAt, _clock.now());
+    });
+
+    for (final (label, error) in <(String, Exception)>[
+      ('a TLS handshake failure', const FakeHandshakeException()),
+      ('a socket closed mid-body', const FakeSocketException()),
+    ]) {
+      test('fetch maps $label to a failure, never a throw (#278)', () async {
+        // Arrange: IOClient lets these through unwrapped.
+        WoltMenuAdapter adapter({Uri? proxyBase}) => WoltMenuAdapter(
+          clock: _clock,
+          client: MockClient((request) async => throw error),
+          proxyBase: proxyBase,
+          runsInBrowser: false,
+        );
+
+        // Act
+        final direct = await adapter().fetch(_refItHandles);
+        final proxied = await adapter(
+          proxyBase: Uri.parse('http://localhost:8000'),
+        ).fetch(_refItHandles);
+
+        // Assert
+        expect(
+          direct,
+          const MenuFetchFailed(reason: MenuFetchFailureReason.offline),
+        );
+        expect(
+          proxied,
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.backendUnreachable,
+          ),
+        );
+      });
+    }
+
     test('fetch omits the User-Agent header in a browser', () async {
       // Arrange: a page may not set User-Agent; a browser drops it with a
       // console warning, so the adapter does not send it there.
       Map<String, String>? capturedHeaders;
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           capturedHeaders = request.headers;
           return http.Response(_emptyMenuBody, 200);
@@ -368,6 +441,7 @@ void main() {
     test('fetch maps a TimeoutException to offline', () async {
       // Arrange
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           throw TimeoutException('Timed out');
         }),
@@ -396,6 +470,7 @@ void main() {
     runPlatformMenuAdapterContract(
       'WoltMenuAdapter (proxy)',
       () => WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           return http.Response(_emptyMenuBody, 200);
         }),
@@ -410,6 +485,7 @@ void main() {
       // Arrange
       Uri? capturedUri;
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           capturedUri = request.url;
           return http.Response(_emptyMenuBody, 200);
@@ -429,6 +505,7 @@ void main() {
       // Arrange
       Uri? capturedUri;
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           capturedUri = request.url;
           return http.Response(_emptyMenuBody, 200);
@@ -447,6 +524,7 @@ void main() {
       // Arrange
       Map<String, String>? capturedHeaders;
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           capturedHeaders = request.headers;
           return http.Response(_emptyMenuBody, 200);
@@ -469,6 +547,7 @@ void main() {
     test('fetch maps an empty proxied 200 body to platformChanged', () async {
       // Arrange
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async => http.Response('', 200)),
         proxyBase: Uri.parse('http://localhost:8000'),
       );
@@ -490,6 +569,7 @@ void main() {
       () async {
         // Arrange
         final adapter = WoltMenuAdapter(
+          clock: _clock,
           client: MockClient((request) async {
             throw http.ClientException('Failed to fetch', request.url);
           }),
@@ -518,6 +598,7 @@ void main() {
       () async {
         // Arrange
         final adapter = WoltMenuAdapter(
+          clock: _clock,
           client: MockClient((request) async {
             throw http.ClientException('Connection failed', request.url);
           }),
@@ -544,6 +625,7 @@ void main() {
       // Arrange: the backend's own "Wolt unreachable" status
       // (`backend_plan.md` §3.3).
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           return http.Response('{"reason":"offline"}', 502);
         }),
@@ -564,6 +646,7 @@ void main() {
       // Arrange: the backend's own "Wolt timed out" status
       // (`backend_plan.md` §3.3).
       final adapter = WoltMenuAdapter(
+        clock: _clock,
         client: MockClient((request) async {
           return http.Response('{"reason":"timeout"}', 504);
         }),

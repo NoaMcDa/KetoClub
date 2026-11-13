@@ -290,7 +290,10 @@ final class BackendMenuStoreClient implements MenuStoreClient {
           .timeout(timeout);
     } on TimeoutException {
       return _fail(MenuStoreFailureReason.timeout);
-    } on http.ClientException {
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278). `services/` may not import dart:io to name them.
       return _fail(MenuStoreFailureReason.backendUnreachable);
     }
 

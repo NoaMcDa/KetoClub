@@ -8,6 +8,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_menu_mapper.dart';
+import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/utils/wolt_headers.dart';
 
 /// Fetches menus from Wolt's consumer-assortment endpoint, the one
@@ -57,8 +58,12 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
   /// [random] is the source of the per-instance web client id and
   /// defaults to [Random.secure]; nothing is drawn from it until the
   /// first direct request, so the constructor performs no work at all.
+  ///
+  /// [clock] stamps each fetched menu's `fetchedAt` (issue #284), so the
+  /// cache's age and a test's expectations read the same time source.
   new({
     required http.Client client,
+    required Clock clock,
     this.proxyBase,
     this.runsInBrowser = kIsWeb,
     Random? random,
@@ -67,6 +72,9 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
     // is not available; see the constructor doc above.
     // ignore: prefer_initializing_formals
     : _client = client,
+       // Same reason as above: a private field, a public parameter name.
+       // ignore: prefer_initializing_formals
+       _clock = clock,
        // Same reason as above: a private field, a public parameter name.
        // ignore: prefer_initializing_formals
        _random = random;
@@ -78,6 +86,8 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
   static const Duration _timeout = Duration(seconds: 15);
 
   final http.Client _client;
+
+  final Clock _clock;
 
   final Random? _random;
 
@@ -137,7 +147,12 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
     http.Response response;
     try {
       response = await _client.get(uri, headers: headers).timeout(_timeout);
-    } on http.ClientException {
+    } on TimeoutException {
+      return const MenuFetchFailed(reason: MenuFetchFailureReason.offline);
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278). `services/` may not import dart:io to name them.
       if (proxyBase != null) {
         // KetoClub's own backend could not be reached at all — distinct
         // from Wolt being unreachable, which the backend reports as a
@@ -155,8 +170,6 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
             ? MenuFetchFailureReason.blockedByBrowser
             : MenuFetchFailureReason.offline,
       );
-    } on TimeoutException {
-      return const MenuFetchFailed(reason: MenuFetchFailureReason.offline);
     }
 
     final statusCode = response.statusCode;
@@ -196,7 +209,7 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
       );
     }
 
-    return WoltMenuMapper.toMenu(decoded, ref: ref, fetchedAt: DateTime.now());
+    return WoltMenuMapper.toMenu(decoded, ref: ref, fetchedAt: _clock.now());
   }
 
   /// The proxied request URL for [platformId] under [base]
