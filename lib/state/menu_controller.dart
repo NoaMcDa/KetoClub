@@ -176,9 +176,45 @@ final class MenuController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
+    // Retires whatever load is in flight: its results land on nothing.
+    _generation++;
     _carbBudget.removeListener(_onBudgetChange);
     super.dispose();
   }
+
+  /// Whether [dispose] has run (issue #287). A load still in flight when
+  /// the screen goes away finishes into nothing: [notifyListeners] is
+  /// skipped, and [open], [refresh] and [reanalyse] stop at their next
+  /// step ([_isCurrent]).
+  bool _disposed = false;
+
+  /// Bumped by every [open], [refresh] and [reanalyse], and by [dispose]
+  /// (issue #287). Each load keeps the value it started with and applies
+  /// what it fetched or classified only while that is still the current
+  /// one ([_isCurrent]), so a load superseded by a later one, or outlived
+  /// by its screen, can neither overwrite the newer result, write the
+  /// last venue, record a visit, upload, nor put [phase] back to idle
+  /// while the newer one is still running.
+  int _generation = 0;
+
+  /// Whether the load that started as [generation] is still the one this
+  /// controller shows: no later load has started and it is not disposed.
+  bool _isCurrent(int generation) => !_disposed && generation == _generation;
+
+  /// Notifies listeners unless this controller is disposed (issue #287):
+  /// an await that resumes after the screen went away, a load or a note
+  /// written as it closed, must not reach a dead listener list.
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
+  }
+
+  /// Whether the user named the open menu with [renameVisit] (issue
+  /// #457): from then on [historyName] and [historyCity] are the menu's,
+  /// and the opener's [VenueOpenHint] no longer outranks them.
+  bool _renamed = false;
 
   /// Called when the budget changes; re-filters the visible rows by
   /// notifying listeners. Never re-classifies.
@@ -294,12 +330,20 @@ final class MenuController extends ChangeNotifier {
   ///
   /// Read at the start of [open], before the menu is fetched, so a header
   /// can show it while the menu loads; refreshed once [open] has recorded
-  /// the visit. Null before [open] and for a venue never named.
+  /// the visit. The opener's [VenueOpenHint] name outranks the stored one
+  /// (issue #457) until [renameVisit] replaces both. Null before [open]
+  /// and for a venue never named.
   String? get historyName => _historyName;
 
   /// The city the visit history remembers for the open venue (issue #307),
   /// read and refreshed exactly as [historyName]; null when none is known.
   String? get historyCity => _historyCity;
+
+  /// Whether [open] has been called (issue #457). Until then a screen
+  /// names the venue from its opener's hint; from then on [historyName]
+  /// and [historyCity] already carry that hint, which outranks the visit
+  /// history until the user renames the menu ([renameVisit]).
+  bool get isOpened => _ref != null;
 
   /// Completes when the most recent menu upload [open] started has
   /// finished (issue #312); already complete when none has been started.
@@ -541,11 +585,17 @@ final class MenuController extends ChangeNotifier {
           .toList();
     } else {
       final analysedById = _analysedById();
+      // By identity: [unclassifiedRows] holds this menu's own instances,
+      // one per name it placed, so a twin of the same name stays listed.
+      final unclassified = Set<Dish>.identity()
+        ..addAll(unclassifiedRows.map((row) => row.dish));
       rows = <DishRow>[];
       for (final category in currentMenu.categories) {
         for (final dish in category.dishes) {
           if (_isNotice(dish)) continue;
           final verdict = analysedById[dish.id];
+          // Listed once, in the unclassified section (issue #286).
+          if (verdict == null && unclassified.contains(dish)) continue;
           if (!_matchesFilter(verdict)) continue;
           if (!_matchesQuery(dish, normalisedQuery)) continue;
           if (!_matchesBudget(verdict)) continue;
@@ -747,23 +797,47 @@ final class MenuController extends ChangeNotifier {
     bool forceRefresh = false,
     VenueOpenHint? hint,
   }) async {
+    final generation = ++_generation;
+    // A name the user gave this menu here outranks the opener's (#457).
+    final openHint = _renamed ? null : hint;
     _ref = ref;
     _phase = LoadPhase.fetching;
     _pageFilter = null;
+    // A retry starts from a clean slate (issue #287): the last failure's
+    // copy gives way to the loading state at once.
+    _fetchFailure = null;
+    _fetchStatusCode = null;
+    if (openHint != null) {
+      _historyName = openHint.name ?? _historyName;
+      _historyCity = openHint.city ?? _historyCity;
+    }
     notifyListeners();
 
     _openRef = ref;
     final appSettings = await _settings.read();
+    if (!_isCurrent(generation)) return;
     _filter = appSettings.lastFilter ?? appSettings.filter;
     _dishNotes = await _notes.readAll(ref);
     final previous = await _history.read(ref);
-    if (previous?.name != _historyName || previous?.city != _historyCity) {
-      _historyName = previous?.name;
-      _historyCity = previous?.city;
+    if (!_isCurrent(generation)) return;
+    // The opener's hint outranks what the history remembers (#312), and
+    // both live here, so a rename (#457) can replace them on screen.
+    final knownName = _renamed
+        ? _historyName
+        : openHint?.name ?? previous?.name;
+    final knownCity = _renamed
+        ? _historyCity
+        : openHint?.city ?? previous?.city;
+    if (knownName != _historyName || knownCity != _historyCity) {
+      _historyName = knownName;
+      _historyCity = knownCity;
       notifyListeners();
     }
 
     final fetchResult = await _repository.load(ref, forceRefresh: forceRefresh);
+    // Superseded or disposed while fetching (issue #287): nothing below
+    // runs, so neither the last venue nor a visit is written for it.
+    if (!_isCurrent(generation)) return;
     switch (fetchResult) {
       case MenuFetched(
         menu: final fetchedMenu,
@@ -778,7 +852,9 @@ final class MenuController extends ChangeNotifier {
         _fetchStatusCode = null;
         // A successful open is remembered so the Explore screen can offer
         // to resume it (issue #55); a failed one is not.
-        await _settings.write(appSettings.copyWith(lastVenue: ref));
+        // Onto the latest stored settings, not the ones read before the
+        // fetch, so a change made during a slow load survives (#287).
+        await _settings.update((latest) => latest.copyWith(lastVenue: ref));
 
         final options = _optionsFrom(appSettings);
         // An analysis that came with the fetch is this open's answer,
@@ -792,19 +868,21 @@ final class MenuController extends ChangeNotifier {
               fetchedMenu,
               options,
             );
+        if (!_isCurrent(generation)) return;
         if (reusable != null) {
           _analysis = reusable;
         } else {
           await _classify(ref, fetchedMenu, options);
         }
+        if (!_isCurrent(generation)) return;
         await _recordVisit(
           ref,
           fetchedMenu,
-          hint: hint,
+          hint: openHint,
           previous: previous,
           classified: reusable == null,
-          consentGiven: appSettings.estimationConsentGiven,
           analysedByFetch: fetchedAnalysis != null,
+          generation: generation,
         );
       case MenuFetchFailed(:final reason, :final statusCode):
         _menu = null;
@@ -815,6 +893,7 @@ final class MenuController extends ChangeNotifier {
         _fetchStatusCode = statusCode;
     }
 
+    if (!_isCurrent(generation)) return;
     _phase = LoadPhase.idle;
     notifyListeners();
   }
@@ -825,16 +904,20 @@ final class MenuController extends ChangeNotifier {
   ///
   /// [previous] is the entry read before the fetch, [classified] whether
   /// this open ran the classifier rather than reusing a cached analysis,
-  /// [consentGiven] the user's AI-analysis consent, and [analysedByFetch]
-  /// whether the fetch itself carried an analysis (D25).
+  /// [analysedByFetch] whether the fetch itself carried an analysis (D25),
+  /// and [generation] the load this visit belongs to.
+  ///
+  /// The upload asks for the consent stored **now**, read just before it
+  /// starts (issue #456): an analysis can take half a minute, and consent
+  /// withdrawn in Settings meanwhile means nothing is uploaded.
   Future<void> _recordVisit(
     VenueRef ref,
     Menu menu, {
     required VenueOpenHint? hint,
     required VisitEntry? previous,
     required bool classified,
-    required bool consentGiven,
     required bool analysedByFetch,
+    required int generation,
   }) async {
     final analysis = _analysis;
     final counts = analysis is MenuAnalysed
@@ -856,7 +939,9 @@ final class MenuController extends ChangeNotifier {
     _historyName = name ?? previous?.name;
     _historyCity = city ?? previous?.city;
 
-    if (!consentGiven || !_menuStore.isConfigured) return;
+    if (!_menuStore.isConfigured) return;
+    final consentGiven = (await _settings.read()).estimationConsentGiven;
+    if (!consentGiven || !_isCurrent(generation)) return;
     // Only a language-model analysis is news: a rules result is never
     // reused, so counting it would upload on every open.
     final llm = analysis is MenuAnalysed && analysis.engine is LlmEngine
@@ -915,6 +1000,7 @@ final class MenuController extends ChangeNotifier {
     await _history.rename(ref, name: cleanName, city: cleanCity);
     _historyName = cleanName;
     _historyCity = cleanCity;
+    _renamed = true;
     notifyListeners();
 
     final menu = _menu;
@@ -967,7 +1053,8 @@ final class MenuController extends ChangeNotifier {
   /// [open] uses, below.
   Future<void> refresh() async {
     final currentRef = _ref;
-    if (currentRef == null) return;
+    if (currentRef == null || isLoading) return;
+    final generation = ++_generation;
     final previousMenu = _menu;
     final previousAnalysis = _analysis;
 
@@ -975,6 +1062,7 @@ final class MenuController extends ChangeNotifier {
     notifyListeners();
 
     final fetchResult = await _repository.load(currentRef, forceRefresh: true);
+    if (!_isCurrent(generation)) return;
     switch (fetchResult) {
       case MenuFetched(
         menu: final fetchedMenu,
@@ -992,6 +1080,7 @@ final class MenuController extends ChangeNotifier {
         _fetchFailure = null;
         _fetchStatusCode = null;
         final options = _optionsFrom(await _settings.read());
+        if (!_isCurrent(generation)) return;
         if (unchanged &&
             previousAnalysis is MenuAnalysed &&
             options.matches(previousAnalysis.options)) {
@@ -1017,6 +1106,7 @@ final class MenuController extends ChangeNotifier {
         _isFromCache = true;
     }
 
+    if (!_isCurrent(generation)) return;
     _phase = LoadPhase.idle;
     notifyListeners();
   }
@@ -1043,17 +1133,25 @@ final class MenuController extends ChangeNotifier {
     _phase = LoadPhase.classifying;
     notifyListeners();
 
+    final generation = _generation;
     var returned = false;
     try {
       final analysis = await _classifier.classify(menu, options: options);
+      // Superseded or disposed while the engine ran (issue #287): apply
+      // nothing, and leave [phase] to the load that superseded this one.
+      if (!_isCurrent(generation)) {
+        returned = true;
+        return;
+      }
       _analysis = analysis;
       if (analysis is MenuAnalysed) {
         await _repository.saveAnalysis(ref, analysis);
       }
       returned = true;
     } finally {
-      // Only a throw from below reaches here unreturned (issue #278).
-      if (!returned) {
+      // Only a throw from below reaches here unreturned (issue #278); a
+      // superseded load still never touches the newer load's [phase].
+      if (!returned && _isCurrent(generation)) {
         _phase = LoadPhase.idle;
         notifyListeners();
       }
@@ -1086,11 +1184,13 @@ final class MenuController extends ChangeNotifier {
   ///
   /// A no-op when [open] has not yet produced a [menu]. Persists a
   /// successful [MenuAnalysed] through the repository exactly as [open]
-  /// does, so the next [open] can reuse it.
+  /// does, so the next [open] can reuse it. A no-op while a load is
+  /// running ([isLoading], issue #287), as [refresh] is.
   Future<void> reanalyse() async {
     final currentMenu = _menu;
     final currentRef = _ref;
-    if (currentMenu == null || currentRef == null) return;
+    if (currentMenu == null || currentRef == null || isLoading) return;
+    final generation = ++_generation;
 
     // Loading from the first synchronous moment, like open(); the
     // listeners hear about it once _classify notifies. Classified through
@@ -1098,8 +1198,10 @@ final class MenuController extends ChangeNotifier {
     // while the retry runs (issue #65).
     _phase = LoadPhase.classifying;
     final options = _optionsFrom(await _settings.read());
+    if (!_isCurrent(generation)) return;
     await _classify(currentRef, currentMenu, options);
 
+    if (!_isCurrent(generation)) return;
     _phase = LoadPhase.idle;
     notifyListeners();
   }
@@ -1108,14 +1210,19 @@ final class MenuController extends ChangeNotifier {
   /// net-carb limit (issue #57), and the dietary constraints the three
   /// "Your keto rules" toggles switch on (issue #56), in the fixed order
   /// [ClassificationOptions.dietaryConstraintsFor] gives them.
-  ClassificationOptions _optionsFrom(AppSettings settings) =>
-      ClassificationOptions.fromSettings(
-        settings,
-        // The engine that picks up these options reports itself here, so
-        // [phase] can name it (issue #65). An observer only: it takes no
-        // part in [ClassificationOptions.matches] or equality.
-        onEngineStarted: _onEngineStarted,
-      );
+  ClassificationOptions _optionsFrom(AppSettings settings) {
+    final generation = _generation;
+    return ClassificationOptions.fromSettings(
+      settings,
+      // The engine that picks up these options reports itself here, so
+      // [phase] can name it (issue #65). An observer only: it takes no
+      // part in [ClassificationOptions.matches] or equality. Heard only
+      // while the load these options were built for is current (#287).
+      onEngineStarted: (engine) {
+        if (_isCurrent(generation)) _onEngineStarted(engine);
+      },
+    );
+  }
 
   /// [analysis], the one that arrived with the fetch of [menu], when
   /// [_reusableAnalysis] would reuse it had it been cached — except that
@@ -1237,8 +1344,7 @@ final class MenuController extends ChangeNotifier {
   Future<void> setFilter(MenuFilter filter) async {
     _filter = filter;
     notifyListeners();
-    final appSettings = await _settings.read();
-    await _settings.write(appSettings.copyWith(lastFilter: filter));
+    await _settings.update((latest) => latest.copyWith(lastFilter: filter));
   }
 
   /// Changes [query] and notifies listeners (issue #51). Does not refetch

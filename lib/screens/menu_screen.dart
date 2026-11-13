@@ -65,6 +65,12 @@ const double menuTwoPaneMinWidth = 1080;
 /// [menuTwoPaneMinWidth] and above.
 const double menuTwoPaneMaxWidth = 1200;
 
+/// How old a cached copy must be before the menu screen says it is
+/// "Showing the menu saved on …" (issue #486). Younger copies are what any
+/// fetch would show, and the source line already gives their age; a
+/// failed refresh shows the line whatever the age.
+const Duration cachedNoticeMinAge = Duration(hours: 1);
+
 /// The brand name shown for [ref]'s source inside failure copy (architecture.md
 /// §10), e.g. "Wolt" in "Venue not found on Wolt. Check the link."
 ///
@@ -253,9 +259,10 @@ class _MenuScreenState extends State<MenuScreen> {
   static const double _sidePaneWidth = 380;
 
   /// The stable [GlobalKey] for each category header currently or
-  /// previously shown, keyed by category name — see [_categoryKeyFor]
-  /// (issue #51).
-  final Map<String, GlobalKey> _categoryKeys = <String, GlobalKey>{};
+  /// previously shown, keyed by category name and which header of that
+  /// name it is — see [_categoryKeyFor] (issues #51, #286).
+  final Map<(String, int), GlobalKey> _categoryKeys =
+      <(String, int), GlobalKey>{};
 
   @override
   void dispose() {
@@ -513,13 +520,19 @@ class _MenuScreenState extends State<MenuScreen> {
             const SizedBox(height: 16),
             FetchFailureAction(
               reason: failure,
-              onRetry: () => _retry(
-                () => controller.open(
-                  widget.ref,
-                  forceRefresh: true,
-                  hint: widget.hint,
-                ),
-              ),
+              // The open clears the failure at once, so this view gives
+              // way to the loading skeleton; the guard covers a second tap
+              // landing before that frame (issue #287).
+              onRetry: () {
+                if (controller.isLoading) return;
+                _retry(
+                  () => controller.open(
+                    widget.ref,
+                    forceRefresh: true,
+                    hint: widget.hint,
+                  ),
+                );
+              },
               onBackToSearch: () => _backToSearch(context),
             ),
           ],
@@ -599,7 +612,10 @@ class _MenuScreenState extends State<MenuScreen> {
                     Text(l10n.menuEmpty, textAlign: TextAlign.center),
                     const SizedBox(height: 12),
                     OutlinedButton(
-                      onPressed: () => _retry(controller.refresh),
+                      // Disabled while a load runs (issue #287).
+                      onPressed: controller.isLoading
+                          ? null
+                          : () => _retry(controller.refresh),
                       child: Text(l10n.actionRefreshMenu),
                     ),
                   ],
@@ -659,7 +675,14 @@ class _MenuScreenState extends State<MenuScreen> {
         children: [
           if (analysed)
             Text(
-              _showingLabel(l10n, controller),
+              _showingLabel(
+                l10n,
+                controller,
+                // What the list shows (issue #286): the rows the filter,
+                // the search, the budget and the page leave, and the
+                // unclassified section's cards below them.
+                visible: rows.length + controller.unclassifiedRows.length,
+              ),
               style: Theme.of(context).textTheme.labelMedium,
             )
           else
@@ -769,7 +792,12 @@ class _MenuScreenState extends State<MenuScreen> {
     MenuController controller, {
     required bool analysed,
   }) {
-    final hasBudget = context.watch<CarbBudgetController>().hasBudget;
+    // The budget counts only while its field is shown (issue #286): a
+    // rules-engine menu hides it, and a hidden control is no filter the
+    // user can see or undo here.
+    final hasBudget =
+        context.watch<CarbBudgetController>().hasBudget &&
+        controller.isBudgetAvailable;
     final activeCount =
         (controller.query.trim().isEmpty ? 0 : 1) + (hasBudget ? 1 : 0);
     return MenuFiltersRow(
@@ -782,7 +810,14 @@ class _MenuScreenState extends State<MenuScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MenuSearchField(onChanged: controller.setQuery),
+          // The text is the controller's (issue #286), so a field rebuilt
+          // from scratch — scrolled out of the lazy list and back, or
+          // moved between the one- and two-pane layouts — shows the query
+          // that is still filtering.
+          MenuSearchField(
+            query: controller.query,
+            onChanged: controller.setQuery,
+          ),
           const SizedBox(height: 8),
           CarbBudgetField(isBudgetAvailable: controller.isBudgetAvailable),
           if (analysed) ...[
@@ -838,9 +873,10 @@ class _MenuScreenState extends State<MenuScreen> {
       MenuSource.website => _platformName(widget.ref, l10n),
       _ => widget.ref.platformId,
     };
+    // Once open has run the controller holds the hint's name (#457), so
+    // a rename made here replaces it, clearing included.
     return controller.venueName ??
-        widget.hint?.name ??
-        controller.historyName ??
+        (controller.isOpened ? controller.historyName : widget.hint?.name) ??
         fallback;
   }
 
@@ -970,7 +1006,9 @@ class _MenuScreenState extends State<MenuScreen> {
     final age = _ageLabel(fetchedAt, DateTime.now(), l10n);
     // The venue's city, when the opener or the visit history knows it
     // (issue #312): "Wolt · Tel Aviv · 4 min ago".
-    final city = widget.hint?.city ?? controller.historyCity;
+    final city = controller.isOpened
+        ? controller.historyCity
+        : widget.hint?.city;
     final source = city == null
         ? _sourceName(l10n)
         : l10n.sourceWithCity(_sourceName(l10n), city);
@@ -998,7 +1036,11 @@ class _MenuScreenState extends State<MenuScreen> {
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             visualDensity: VisualDensity.compact,
-            onPressed: () => _retry(controller.refresh),
+            // Disabled while a load runs (issue #287): a second refresh
+            // would start a second classification.
+            onPressed: controller.isLoading
+                ? null
+                : () => _retry(controller.refresh),
           ),
         ?_openOnPlatformAction(l10n),
       ],
@@ -1043,7 +1085,9 @@ class _MenuScreenState extends State<MenuScreen> {
   /// next to the control it undoes.
   Widget _noVisibleRows(AppLocalizations l10n, MenuController controller) {
     final canClearFilter = controller.filter != MenuFilter.all;
-    final hasBudget = context.read<CarbBudgetController>().hasBudget;
+    final hasBudget =
+        context.read<CarbBudgetController>().hasBudget &&
+        controller.isBudgetAvailable;
     return Center(
       child: Padding(
         padding: const EdgeInsets.only(top: 12),
@@ -1071,14 +1115,21 @@ class _MenuScreenState extends State<MenuScreen> {
   /// `.design/Main.dc.html`'s `showing` map. An exhaustive switch with no
   /// `default`: adding a [MenuFilter] value without updating this
   /// function is a compile error (architecture.md §10).
-  String _showingLabel(AppLocalizations l10n, MenuController controller) =>
-      switch (controller.filter) {
-        MenuFilter.greenOnly => l10n.menuShowingGreen,
-        MenuFilter.yellowOnly => l10n.menuShowingYellow,
-        MenuFilter.redOnly => l10n.menuShowingRed,
-        MenuFilter.greenAndYellow => l10n.menuShowingGreenAndYellow,
-        MenuFilter.all => l10n.menuShowingAll(controller.totalDishCount),
-      };
+  ///
+  /// [visible] is how many dish cards the list shows (issue #286), not
+  /// how many the menu has: a search or a budget that hides dishes lowers
+  /// it.
+  String _showingLabel(
+    AppLocalizations l10n,
+    MenuController controller, {
+    required int visible,
+  }) => switch (controller.filter) {
+    MenuFilter.greenOnly => l10n.menuShowingGreen,
+    MenuFilter.yellowOnly => l10n.menuShowingYellow,
+    MenuFilter.redOnly => l10n.menuShowingRed,
+    MenuFilter.greenAndYellow => l10n.menuShowingGreenAndYellow,
+    MenuFilter.all => l10n.menuShowingAll(visible),
+  };
 
   /// The verdict legend (issue #17): a toggle, and — once expanded — the
   /// same three verdict definitions the system prompt sends
@@ -1189,6 +1240,20 @@ class _MenuScreenState extends State<MenuScreen> {
   /// one hiding the other. Each line is an [AppNotice.info] (issue #260):
   /// they explain, they ask for nothing, so each is one muted line with
   /// an icon.
+  /// Whether the "Showing the menu saved on …" line tells the user
+  /// something about the copy fetched at [cachedAt] (issue #486): a fresh
+  /// fetch failed ([MenuController.staleReason]), or the copy is at least
+  /// [cachedNoticeMinAge] old. Never for a pasted or scanned menu, which
+  /// has no live copy to be stale against, and never for one fetched
+  /// minutes ago (the source line already says "2 minutes ago").
+  bool _tellsCachedCopy(MenuController controller, DateTime cachedAt) {
+    if (!controller.isFromCache || widget.ref.source == MenuSource.scan) {
+      return false;
+    }
+    if (controller.staleReason != null) return true;
+    return DateTime.now().difference(cachedAt) >= cachedNoticeMinAge;
+  }
+
   List<Widget> _banners(
     BuildContext context,
     AppLocalizations l10n,
@@ -1208,7 +1273,7 @@ class _MenuScreenState extends State<MenuScreen> {
       );
     }
     final cachedAt = controller.cachedAt;
-    if (controller.isFromCache && cachedAt != null) {
+    if (cachedAt != null && _tellsCachedCopy(controller, cachedAt)) {
       final localeTag = Localizations.localeOf(context).toLanguageTag();
       final formatted = DateFormat.yMMMd(localeTag)
           .add_Hm()
@@ -1300,6 +1365,11 @@ class _MenuScreenState extends State<MenuScreen> {
     String? lastCategory;
     int? lastPage;
     var first = true;
+    // How many headers of each name are already in the list (issue #286):
+    // a menu can repeat a heading ("Mains" twice), so each header gets a
+    // key of its own.
+    final headed = <String, int>{};
+    final keyed = <String, int>{};
     for (final row in rows) {
       if (paging != null) {
         final page = row.dish.page;
@@ -1309,11 +1379,17 @@ class _MenuScreenState extends State<MenuScreen> {
         }
       } else if (row.category != lastCategory) {
         lastCategory = row.category;
-        widgets.add(_categoryHeader(context, row.category));
+        final occurrence = headed.update(
+          row.category,
+          (n) => n + 1,
+          ifAbsent: () => 0,
+        );
+        widgets.add(_categoryHeader(context, row.category, occurrence));
       }
       first = false;
       widgets.add(
         Padding(
+          key: _dishRowKey(row, keyed),
           padding: const EdgeInsets.only(bottom: 12),
           child: DishCard(
             row: row,
@@ -1365,11 +1441,17 @@ class _MenuScreenState extends State<MenuScreen> {
   /// a fresh one, so it stays stable across rebuilds as the filter or the
   /// search narrows and widens what is visible — [_scrollToCategory] needs
   /// the same key to keep pointing at the same element.
-  Widget _categoryHeader(BuildContext context, String category) {
+  ///
+  /// [occurrence] counts earlier headers of the same name (issue #286).
+  Widget _categoryHeader(
+    BuildContext context,
+    String category,
+    int occurrence,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(top: 4, bottom: 8),
       child: KeyedSubtree(
-        key: _categoryKeyFor(category),
+        key: _categoryKeyFor(category, occurrence),
         child: SizedBox(
           width: double.infinity,
           child: Text(
@@ -1386,9 +1468,23 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   /// The stable [GlobalKey] for [category]'s header, created once and
-  /// reused from [_categoryKeys] on every later call (issue #51).
-  GlobalKey _categoryKeyFor(String category) =>
-      _categoryKeys.putIfAbsent(category, GlobalKey.new);
+  /// reused from [_categoryKeys] on every later call (issue #51). Keyed
+  /// by [occurrence] too, the [occurrence]th header of that name (0 for
+  /// the first), so a repeated heading never puts one [GlobalKey] on two
+  /// headers (issue #286); a chip jumps to the first.
+  GlobalKey _categoryKeyFor(String category, [int occurrence = 0]) =>
+      _categoryKeys.putIfAbsent((category, occurrence), GlobalKey.new);
+
+  /// The key of [row]'s card in the list (issues #286, #490): its dish id,
+  /// so a card's own state — an open waiter script, a photo already
+  /// drawn — stays with its dish when a filter or a search moves it, and
+  /// [seen] counts that id's earlier cards, so a dish listed twice keeps
+  /// two keys.
+  Key _dishRowKey(DishRow row, Map<String, int> seen) {
+    final id = row.dish.id;
+    final occurrence = seen.update(id, (n) => n + 1, ifAbsent: () => 0);
+    return ValueKey<(String, int)>((id, occurrence));
+  }
 
   /// Scrolls the loaded-menu list so [category]'s header is on screen
   /// (issue #51's chip jump).
@@ -1442,6 +1538,7 @@ class _MenuScreenState extends State<MenuScreen> {
     String localeTag,
   ) {
     final rows = controller.unclassifiedRows;
+    final keyed = <String, int>{};
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: Column(
@@ -1463,6 +1560,7 @@ class _MenuScreenState extends State<MenuScreen> {
           const SizedBox(height: 4),
           for (final row in rows)
             Padding(
+              key: _dishRowKey(row, keyed),
               padding: const EdgeInsets.only(bottom: 12),
               child: DishCard(
                 row: row,

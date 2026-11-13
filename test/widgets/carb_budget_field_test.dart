@@ -143,5 +143,25 @@ void main() {
         expect(find.byType(TextField), findsOneWidget);
       });
     });
+
+    testWidgets('follows the budget when it is set or cleared elsewhere '
+        '(issue #286)', (tester) async {
+      // Arrange
+      final budget = CarbBudgetController()..setBudget(20);
+      await _pump(tester, isBudgetAvailable: true, carbBudget: budget);
+      String shown() =>
+          tester.widget<TextField>(find.byType(TextField)).controller!.text;
+      expect(shown(), '20');
+
+      // Act & Assert: cleared, as the menu's "Clear filter" does.
+      budget.clear();
+      await tester.pump();
+      expect(shown(), '');
+
+      // Act & Assert: set again from elsewhere.
+      budget.setBudget(12);
+      await tester.pump();
+      expect(shown(), '12');
+    });
   });
 }
