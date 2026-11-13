@@ -41,6 +41,7 @@ CHAT_FAILURE_REASONS: Final[tuple[str, ...]] = (
     "timeout",
     "rateLimited",
     "badResponse",
+    "unavailable",
 )
 
 # Read 110 s: the Dart client's own 120 s timeout is the outer bound, so the
@@ -363,6 +364,13 @@ def _read(response: httpx.Response, settings: Settings) -> ChatResponse:
         raise BackendError(503, "notConfigured")
     if status == 429:
         raise BackendError(429, "rateLimited")
+    if status == 504:
+        # Google gave up waiting on the model: the app's "too slow".
+        raise BackendError(504, "timeout")
+    if status in (500, 502, 503):
+        # Google is busy or down ("the model is overloaded"): not an
+        # unusable answer, and trying again in a minute usually works (#485).
+        raise BackendError(503, "unavailable")
     if status != 200:
         raise BackendError(502, "badResponse")
 

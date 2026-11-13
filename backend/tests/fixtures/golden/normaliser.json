@@ -309,11 +309,13 @@
     "containsHebrew": true,
     "in": "א׀ב ג׃ ד׆ה וׇ",
     "isRemovalOptionValue": false,
-    "normalised": "אב ג דה ו",
+    "normalised": "א ב ג ד ה ו",
     "words": [
-      "אב",
+      "א",
+      "ב",
       "ג",
-      "דה",
+      "ד",
+      "ה",
       "ו"
     ],
     "wordsMin3": []
@@ -322,12 +324,14 @@
     "containsHebrew": true,
     "in": "חרדל־דבש",
     "isRemovalOptionValue": false,
-    "normalised": "חרדלדבש",
+    "normalised": "חרדל דבש",
     "words": [
-      "חרדלדבש"
+      "חרדל",
+      "דבש"
     ],
     "wordsMin3": [
-      "חרדלדבש"
+      "חרדל",
+      "דבש"
     ]
   },
   {
@@ -408,13 +412,12 @@
     "containsHebrew": true,
     "in": "צ‘יפס",
     "isRemovalOptionValue": false,
-    "normalised": "צ יפס",
+    "normalised": "ציפס",
     "words": [
-      "צ",
-      "יפס"
+      "ציפס"
     ],
     "wordsMin3": [
-      "יפס"
+      "ציפס"
     ]
   },
   {
@@ -457,13 +460,12 @@
     "containsHebrew": true,
     "in": "תפו“א",
     "isRemovalOptionValue": false,
-    "normalised": "תפו א",
+    "normalised": "תפוא",
     "words": [
-      "תפו",
-      "א"
+      "תפוא"
     ],
     "wordsMin3": [
-      "תפו"
+      "תפוא"
     ]
   },
   {
@@ -939,10 +941,9 @@
     "containsHebrew": true,
     "in": "א‘ב",
     "isRemovalOptionValue": false,
-    "normalised": "א ב",
+    "normalised": "אב",
     "words": [
-      "א",
-      "ב"
+      "אב"
     ],
     "wordsMin3": []
   },
@@ -950,10 +951,9 @@
     "containsHebrew": true,
     "in": "א“ב",
     "isRemovalOptionValue": false,
-    "normalised": "א ב",
+    "normalised": "אב",
     "words": [
-      "א",
-      "ב"
+      "אב"
     ],
     "wordsMin3": []
   },
@@ -961,10 +961,9 @@
     "containsHebrew": true,
     "in": "א´ב",
     "isRemovalOptionValue": false,
-    "normalised": "א ב",
+    "normalised": "אב",
     "words": [
-      "א",
-      "ב"
+      "אב"
     ],
     "wordsMin3": []
   },
@@ -972,10 +971,19 @@
     "containsHebrew": true,
     "in": "א′ב",
     "isRemovalOptionValue": false,
-    "normalised": "א ב",
+    "normalised": "אב",
     "words": [
-      "א",
-      "ב"
+      "אב"
+    ],
+    "wordsMin3": []
+  },
+  {
+    "containsHebrew": true,
+    "in": "א″ב",
+    "isRemovalOptionValue": false,
+    "normalised": "אב",
+    "words": [
+      "אב"
     ],
     "wordsMin3": []
   },
@@ -6169,13 +6177,14 @@
     "containsHebrew": true,
     "in": "אפשר בבקשה בלי רוטב חרדל־דבש? אפשר שמן זית ולימון בצד במקום.",
     "isRemovalOptionValue": false,
-    "normalised": "אפשר בבקשה בלי רוטב חרדלדבש אפשר שמנ זית ולימונ בצד במקומ",
+    "normalised": "אפשר בבקשה בלי רוטב חרדל דבש אפשר שמנ זית ולימונ בצד במקומ",
     "words": [
       "אפשר",
       "בבקשה",
       "בלי",
       "רוטב",
-      "חרדלדבש",
+      "חרדל",
+      "דבש",
       "אפשר",
       "שמנ",
       "זית",
@@ -6188,7 +6197,8 @@
       "בבקשה",
       "בלי",
       "רוטב",
-      "חרדלדבש",
+      "חרדל",
+      "דבש",
       "אפשר",
       "שמנ",
       "זית",

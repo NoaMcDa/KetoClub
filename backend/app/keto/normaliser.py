@@ -7,11 +7,12 @@ same order, with the Dart quirks the golden corpus pins
 
 1. Strip the bidi controls LRM, RLM, LRE, RLE, PDF, LRO, RLO, LRI, RLI, FSI,
    PDI.
-2. Strip U+0591–U+05C7 (Hebrew points and teamim). The range also holds the
-   maqaf U+05BE, paseq U+05C0, sof pasuq U+05C3 and nun hafukha U+05C6, so
-   these are **deleted**, not spaced: ``חרדל־דבש`` becomes ``חרדלדבש``.
-3. Delete the quote marks ``׳ ״ ' " ` ’ ” ʼ`` (only these: ``‘ “ ´ ′`` fall
-   to step 6 and become spaces).
+2. Strip the Hebrew points and teamim: U+0591–U+05BD, U+05BF, U+05C1–U+05C2,
+   U+05C4–U+05C5 and U+05C7. The block's punctuation in between (the maqaf
+   U+05BE, paseq U+05C0, sof pasuq U+05C3, nun hafukha U+05C6) is left for
+   step 6, so ``חרדל־דבש`` becomes ``חרדל דבש`` as a hyphen would (#275).
+3. Delete the quote marks ``׳ ״ ' " ` ‘ ’ “ ” ʼ ´ ′ ″`` (#275 added the
+   left curly quotes, the acute accent and the primes).
 4. Fold Latin-1 Supplement diacritics with a hand-written table (no NFD:
    ``Ÿ``, ``ẞ`` and combining marks are left alone).
 5. Lowercase one character at a time, the Dart way
@@ -48,9 +49,24 @@ _BIDI_CONTROLS: Final = frozenset(
     )
 )
 
-_QUOTE_MARKS: Final = frozenset("׳״'\"`’”ʼ")
-"""Geresh, gershayim, ASCII quote, double quote and backtick, the right
-single and double smart quotes, and the modifier apostrophe."""
+_QUOTE_MARKS: Final = frozenset(
+    "\u05f3\u05f4'\"`\u2018\u2019\u201c\u201d\u02bc\u00b4\u2032\u2033"
+)
+"""Geresh, gershayim, ASCII quote, double quote and backtick, the four curly
+quotes, the modifier apostrophe, the acute accent and the two primes (#275).
+"""
+
+_HEBREW_MARKS: Final = (
+    *range(0x0591, 0x05BE),
+    0x05BF,
+    0x05C1,
+    0x05C2,
+    0x05C4,
+    0x05C5,
+    0x05C7,
+)
+"""Dart ``_hebrewPointsAndTeamim``: the marks of U+0591–U+05C7 without the
+block's punctuation (maqaf, paseq, sof pasuq, nun hafukha; #275)."""
 
 _NON_LETTER_OR_NUMBER_RUN: Final = regex.compile(r"[^\p{L}\p{N}]+")
 
@@ -130,7 +146,7 @@ _HEBREW_FINALS_FOLD: Final[dict[str, str]] = {
 
 _STEP_1_TO_4: Final[dict[int, str | None]] = {
     **{ord(char): None for char in _BIDI_CONTROLS},
-    **{code: None for code in range(0x0591, 0x05C8)},
+    **{code: None for code in _HEBREW_MARKS},
     **{ord(char): None for char in _QUOTE_MARKS},
     **{ord(char): folded for char, folded in _DIACRITIC_FOLD.items()},
 }

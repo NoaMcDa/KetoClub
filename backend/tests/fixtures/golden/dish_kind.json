@@ -4257,6 +4257,7 @@
         "x13": "drink",
         "x14": "drink",
         "x15": "food",
+        "x16": "food",
         "x2": "food",
         "x3": "drink",
         "x4": "drink",
@@ -4396,6 +4397,23 @@
                 "imageUrl": null,
                 "name": "קרואסון חמאה",
                 "options": [],
+                "page": null,
+                "price": 40.0
+              },
+              {
+                "description": "",
+                "id": "x16",
+                "imageUrl": null,
+                "name": "Pasta Bolognese",
+                "options": [
+                  {
+                    "name": "תוספות",
+                    "values": [
+                      "פרמזן",
+                      "צ׳יפס"
+                    ]
+                  }
+                ],
                 "page": null,
                 "price": 40.0
               }

@@ -51,17 +51,32 @@ abstract final class MenuResponseParser {
   /// 2. `dishes` missing or not a list is also
   ///    [MenuAnalysisFailureReason.badResponse]; naming more than
   ///    [maxAnalysedDishes] dishes is too.
-  /// 3. Each element must be traceable to a dish in [source] — by `id`,
-  ///    or by a shared normalised word of [minOverlapWordLength]+
-  ///    letters with a source dish's name — or it is an invention and
-  ///    never receives a verdict (constraint 6).
+  /// 3. Each element must be traceable to a dish in [source] or it is an
+  ///    invention and never receives a verdict (constraint 6). A matching
+  ///    `id` always wins; only an element whose `id` is missing or names
+  ///    no source dish falls back to its `name`, which must normalise
+  ///    exactly to a source dish's name or share at least
+  ///    [nameOverlapNumerator]/[nameOverlapDenominator] of its content
+  ///    words ([minOverlapWordLength]+ letters, not in [nameStopWords])
+  ///    with exactly one best source dish (see [_findSourceDish]). Each
+  ///    source dish is judged at most once: a later element resolving to
+  ///    a dish an earlier one already resolved to is dropped, so a dish
+  ///    is never in [MenuAnalysed.dishes] twice or in both lists.
   /// 4. Its `verdict` must be one of [DishVerdict]'s names and its `why`
   ///    non-empty, or the dish is demoted to
   ///    [MenuAnalysed.unclassified].
   /// 5. A [DishVerdict.modifiable] verdict with a null, blank, or
   ///    over-[maxModificationLength] `modification` is demoted the same
-  ///    way (constraint 7); any other verdict keeps its verdict and
-  ///    drops the field regardless of what the model sent.
+  ///    way (constraint 7), even when it carries `hidden_carbs` (issue
+  ///    #277); any other verdict keeps its verdict and drops the field
+  ///    regardless of what the model sent.
+  ///
+  ///    5a. A [DishVerdict.orderAsIs] verdict carrying a well-formed
+  ///    hidden-carb flag is a wrong green (issue #213) and becomes a
+  ///    [DishVerdict.modifiable]: its instruction is the model's usable
+  ///    `modification`, else the first flag's waiter question, which is
+  ///    a complete instruction here because the flag is the dish's only
+  ///    reason to be yellow.
   /// 6. `why` is truncated at [maxWhyLength], never rejected for length
   ///    alone.
   ///
@@ -75,6 +90,13 @@ abstract final class MenuResponseParser {
   /// (constraint 7). An estimate at or under the limit, or no estimate at
   /// all, leaves the verdict alone: the limit is "N g or less", and the
   /// parser never invents a figure the model did not send.
+  ///
+  /// The estimate is stored only when it is a finite number of zero or
+  /// more (issue #478): `jsonDecode` reads `1e400` as infinity, which no
+  /// card can round and no cache can encode, and a negative count of
+  /// carbs is no count at all. Either is stored as no estimate. The
+  /// post-rule still reads the raw figure, so an infinite estimate on a
+  /// green is over any limit.
   ///
   /// Finally:
   ///
@@ -100,7 +122,7 @@ abstract final class MenuResponseParser {
     if (rawDishes is! List<Object?>) return _badResponse();
     if (rawDishes.length > maxAnalysedDishes) return _badResponse();
 
-    final placedSourceIds = <String>{};
+    final resolvedSourceIds = <String>{};
     final dishes = <AnalysedDish>[];
     final unclassified = <String>[];
 
@@ -109,16 +131,16 @@ abstract final class MenuResponseParser {
         rawDish,
         source: source,
         netCarbLimitGrams: netCarbLimitGrams,
-        placedSourceIds: placedSourceIds,
+        resolvedSourceIds: resolvedSourceIds,
         dishes: dishes,
         unclassified: unclassified,
       );
     }
 
     // Rule 7: a source dish no reply element matched at all — by id or
-    // by name overlap — was skipped by the model, not merely demoted.
+    // by name — was skipped by the model, not merely demoted.
     for (final dish in source.allDishes) {
-      if (!placedSourceIds.contains(dish.id)) unclassified.add(dish.name);
+      if (!resolvedSourceIds.contains(dish.id)) unclassified.add(dish.name);
     }
 
     if (dishes.isEmpty && unclassified.isEmpty) {
@@ -312,12 +334,17 @@ abstract final class MenuResponseParser {
       const MenuAnalysisFailed(reason: MenuAnalysisFailureReason.badResponse);
 
   /// Processes one element of the reply's `dishes` array: places it onto
-  /// [dishes], demotes it onto [unclassified], or — for an element with
-  /// no source name to show at all — drops it silently. Any source dish
-  /// it resolves to (by id or by name overlap) is recorded in
-  /// [placedSourceIds], whether the element is ultimately placed or
+  /// [dishes], demotes it onto [unclassified], or drops it silently. Any
+  /// source dish it resolves to (by id or by name) is recorded in
+  /// [resolvedSourceIds], whether the element is ultimately placed or
   /// demoted, so rule 7 does not also report that source dish as
   /// skipped.
+  ///
+  /// An element resolving to a source dish already in
+  /// [resolvedSourceIds] is a duplicate and is dropped without being
+  /// counted anywhere (issue #277): the first element naming a dish is
+  /// the one judged, so a dish never carries two conflicting verdicts and
+  /// is never both placed and unclassified.
   ///
   /// A non-map element, or one with neither a string `id` nor a string
   /// `name`, carries nothing this parser can trust or display and is
@@ -328,7 +355,7 @@ abstract final class MenuResponseParser {
     Object? rawDish, {
     required Menu source,
     required int netCarbLimitGrams,
-    required Set<String> placedSourceIds,
+    required Set<String> resolvedSourceIds,
     required List<AnalysedDish> dishes,
     required List<String> unclassified,
   }) {
@@ -348,7 +375,8 @@ abstract final class MenuResponseParser {
       if (modelName.isNotEmpty) unclassified.add(modelName);
       return;
     }
-    placedSourceIds.add(matched.id);
+    // A second element for a dish already judged: drop it (issue #277).
+    if (!resolvedSourceIds.add(matched.id)) return;
     _judge(
       rawDish,
       matched,
@@ -400,12 +428,18 @@ abstract final class MenuResponseParser {
         modification.length <= maxModificationLength;
 
     final rawNetCarbs = rawDish['net_carbs_estimate'];
-    final netCarbsEstimate = rawNetCarbs is num ? rawNetCarbs.toDouble() : null;
+    final carbFigure = rawNetCarbs is num ? rawNetCarbs.toDouble() : null;
+    // Stored only when finite and not negative (issue #478); the
+    // post-rule below reads the raw figure, so infinity is still over.
+    final netCarbsEstimate =
+        carbFigure != null && carbFigure.isFinite && carbFigure >= 0
+        ? carbFigure
+        : null;
 
     var finalVerdict = verdict;
     if (verdict == DishVerdict.orderAsIs &&
-        netCarbsEstimate != null &&
-        netCarbsEstimate > netCarbLimitGrams) {
+        carbFigure != null &&
+        carbFigure > netCarbLimitGrams) {
       // Issue #57's post-rule: the model's own figure is over the limit
       // the prompt gave it, so this cannot stay green. With an
       // instruction it becomes the yellow that instruction describes;
@@ -414,27 +448,31 @@ abstract final class MenuResponseParser {
       finalVerdict = DishVerdict.modifiable;
     }
 
-    // Issue #213 rule 5a: a green with a valid hidden-carb flag is a
-    // wrong green (architecture.md §3 constraint 5). Parse flags first;
-    // a red drops them (red has no modification), a pre-existing yellow
-    // is left alone (it already has an instruction).
+    // §9.4 rule 5a (issue #213): a green with a valid hidden-carb flag
+    // is a wrong green (architecture.md §3 constraint 5). Parse flags
+    // first; a red drops them (red has no modification).
     final hiddenCarbs = verdict == DishVerdict.nonKeto
         ? const <HiddenCarb>[]
         : _parseHiddenCarbs(rawDish['hidden_carbs']);
 
-    if (finalVerdict == DishVerdict.orderAsIs && hiddenCarbs.isNotEmpty) {
-      // Demote green → yellow. The instruction is the model's own
-      // modification if usable; otherwise the first flag's waiter
-      // question (guaranteed non-empty by _parseHiddenCarbs).
-      finalVerdict = DishVerdict.modifiable;
-    }
+    // Rule 5a applies only to a dish that is still green: the flag is
+    // then its only reason to be yellow, so the flag's own waiter
+    // question is a complete instruction for it. A yellow the model sent
+    // (or #57 produced) is yellow for a reason the flag need not cover —
+    // a side of fries, a carb count — so rule 5 holds for it as written
+    // and a missing instruction demotes it (issue #277).
+    final hiddenCarbYellow =
+        finalVerdict == DishVerdict.orderAsIs && hiddenCarbs.isNotEmpty;
+    if (hiddenCarbYellow) finalVerdict = DishVerdict.modifiable;
 
     String? finalModification;
     if (finalVerdict == DishVerdict.modifiable) {
       if (hasUsableModification) {
         finalModification = modification;
-      } else if (hiddenCarbs.isNotEmpty) {
-        // The only instruction we have is from the hidden-carb flag.
+      } else if (hiddenCarbYellow) {
+        // The flag is the only reason this dish is yellow, and its
+        // question (non-empty, guaranteed by _parseHiddenCarbs) is what
+        // the waiter needs to be asked.
         finalModification = hiddenCarbs.first.waiterQuestion;
       } else {
         // Constraint 7: a yellow without an instruction does not exist.
@@ -501,37 +539,78 @@ abstract final class MenuResponseParser {
   }
 
   /// Finds the dish in [source] a reply element with this [id] and
-  /// [name] refers to (architecture.md §9.4 rule 3): first by an exact
-  /// [Dish.id] match, then by a shared normalised word of
-  /// [minOverlapWordLength]+ letters between [name] and a source dish's
-  /// [Dish.name]. Both sides go through [TextNormaliser] — never a
-  /// bespoke comparison. Returns null when neither matches: an
-  /// invention.
+  /// [name] refers to (architecture.md §9.4 rule 3, issue #277). Returns
+  /// null when nothing matches: an invention.
+  ///
+  /// 1. A non-empty [id] equal to a source [Dish.id] always wins, whatever
+  ///    [name] says: the model was given the ids, and a name can be
+  ///    paraphrased into another dish's.
+  /// 2. Only when [id] is missing or names no source dish is [name] read.
+  ///    A source dish whose name normalises ([TextNormaliser.normalise])
+  ///    exactly to [name]'s is the match — the first such in menu order.
+  /// 3. Otherwise the dish whose content words overlap [name]'s most,
+  ///    when that overlap is high: the content words of a name are its
+  ///    normalised words of [minOverlapWordLength]+ letters that are not
+  ///    in [nameStopWords], and the overlap is the shared words over all
+  ///    words of the two sets (Jaccard), which must be at least
+  ///    [nameOverlapNumerator]/[nameOverlapDenominator]. Two dishes tied
+  ///    for the best overlap are ambiguous, and an ambiguous name matches
+  ///    neither. Counted in whole numbers, so the Python twin cannot
+  ///    round differently.
+  ///
+  /// Every source dish is a candidate, including one an earlier element
+  /// already resolved to: the caller then drops the element as a
+  /// duplicate, rather than this method re-routing it to a lookalike that
+  /// is still free.
   static Dish? _findSourceDish(
     Menu source, {
     required String id,
     required String name,
   }) {
+    final all = source.allDishes;
     if (id.isNotEmpty) {
-      for (final dish in source.allDishes) {
+      for (final dish in all) {
         if (dish.id == id) return dish;
       }
     }
-    if (name.isEmpty) return null;
-    final nameWords = TextNormaliser.words(
-      name,
-      minLength: minOverlapWordLength,
-    ).toSet();
-    if (nameWords.isEmpty) return null;
-    for (final dish in source.allDishes) {
-      final dishWords = TextNormaliser.words(
-        dish.name,
-        minLength: minOverlapWordLength,
-      );
-      if (dishWords.any(nameWords.contains)) return dish;
+    final normalisedName = TextNormaliser.normalise(name);
+    if (normalisedName.isEmpty) return null;
+    for (final dish in all) {
+      if (TextNormaliser.normalise(dish.name) == normalisedName) return dish;
     }
-    return null;
+    final nameWords = _contentWords(name);
+    if (nameWords.isEmpty) return null;
+    Dish? best;
+    var bestShared = 0;
+    var bestUnion = 1;
+    var tied = false;
+    for (final dish in all) {
+      final dishWords = _contentWords(dish.name);
+      final shared = dishWords.where(nameWords.contains).length;
+      if (shared == 0) continue;
+      final union = nameWords.length + dishWords.length - shared;
+      if (shared * nameOverlapDenominator < union * nameOverlapNumerator) {
+        continue;
+      }
+      final compare = shared * bestUnion - bestShared * union;
+      if (best == null || compare > 0) {
+        best = dish;
+        bestShared = shared;
+        bestUnion = union;
+        tied = false;
+      } else if (compare == 0) {
+        tied = true;
+      }
+    }
+    return tied ? null : best;
   }
+
+  /// The content words of [name]: its distinct normalised words of
+  /// [minOverlapWordLength]+ letters that are not in [nameStopWords].
+  static Set<String> _contentWords(String name) => TextNormaliser.words(
+    name,
+    minLength: minOverlapWordLength,
+  ).where((word) => !nameStopWords.contains(word)).toSet();
 
   /// [text], cut to at most [maxLength] characters (architecture.md §9.4
   /// rule 6 — truncated, never rejected for length alone). The cut never

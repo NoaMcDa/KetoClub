@@ -86,6 +86,7 @@ String analysisFailureMessage(
     detail == null || detail.trim().isEmpty
         ? l10n.analysisBadResponseNoDetail
         : l10n.analysisBadResponse(detail),
+  MenuAnalysisFailureReason.unavailable => l10n.analysisUnavailable,
   MenuAnalysisFailureReason.noDishesFound => l10n.analysisNoDishesFound,
   MenuAnalysisFailureReason.backendUnreachable =>
     l10n.analysisBackendUnreachable,
@@ -114,6 +115,7 @@ String menuQuestionFailureMessage(
   MenuAnalysisFailureReason.timeout => l10n.menuQuestionFailedTimeout,
   MenuAnalysisFailureReason.rateLimited => l10n.menuQuestionFailedRateLimited,
   MenuAnalysisFailureReason.badResponse => l10n.menuQuestionFailedBadResponse,
+  MenuAnalysisFailureReason.unavailable => l10n.menuQuestionFailedUnavailable,
   MenuAnalysisFailureReason.noDishesFound => l10n.menuQuestionFailedBadResponse,
   MenuAnalysisFailureReason.backendUnreachable =>
     l10n.menuQuestionFailedBackendUnreachable,

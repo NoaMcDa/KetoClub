@@ -210,6 +210,54 @@ void main() {
       expect(analysed.why, redWhyEn.replaceAll('{base}', 'pizza'));
     });
 
+    test('classify reads a maqaf compound as two words (issue #275)', () async {
+      // Arrange: U+05BE between פסטה and בולונז, as Wolt menus print it.
+      final maqaf = String.fromCharCode(0x05BE);
+      final menu = _menuOf([_dishNamed('d1', 'פסטה$maqafבולונז')]);
+
+      // Act
+      final result = await _classify(menu);
+
+      // Assert: the pasta base is found, as it is with a hyphen.
+      expect(result.dishes.single.verdict, DishVerdict.nonKeto);
+    });
+
+    test('classify reads a curly-quote geresh in צ׳יפס (issue #275)', () async {
+      // Arrange: a left single curly quote (U+2018) stands in for the
+      // geresh.
+      final menu = _menuOf([_dishNamed('d1', 'סטייק אנטריקוט עם צ${'‘'}יפס')]);
+
+      // Act
+      final result = await _classify(menu);
+
+      // Assert: the chips side is found, so the steak needs a change.
+      expect(result.dishes.single.verdict, DishVerdict.modifiable);
+    });
+
+    test('classify writes an English dish with Hebrew option labels in '
+        'English (issue #279)', () async {
+      // Arrange
+      final menu = _menuOf([
+        const Dish(
+          id: 'd1',
+          name: 'Pasta Bolognese',
+          description: '',
+          price: 50,
+          options: [
+            DishOption(name: 'תוספות', values: ['פרמזן']),
+          ],
+        ),
+      ]);
+
+      // Act
+      final result = await _classify(menu);
+
+      // Assert
+      final dish = result.dishes.single;
+      expect(dish.verdict, DishVerdict.nonKeto);
+      expect(dish.why, redWhyEn.replaceAll('{base}', 'pasta'));
+    });
+
     test('classify given a plain grilled protein returns orderAsIs', () async {
       // Arrange
       const dish = Dish(

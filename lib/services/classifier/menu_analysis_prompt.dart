@@ -20,6 +20,13 @@ import 'package:ketoclub/utils/constants.dart';
 /// definitions and keto rules already in [promptKetoRulesTemplate]: the
 /// modification/schema/format requirements that are this prompt's own
 /// contribution rather than shared vocabulary.
+/// A line break of any kind, or the `|` that separates a dish line's
+/// fields, with the spaces and tabs around it: what [MenuAnalysisPrompt]
+/// turns into one space inside a field (issue #279).
+final RegExp _lineBreakOrBar = RegExp(
+  r'[ \t]*[\r\n\u000B\u000C\u0085\u2028\u2029|]+[ \t]*',
+);
+
 const String _outputRules = '''
 Every "modifiable" dish must carry a non-empty "modification" naming the exact component to remove and the exact substitute to ask for. A dish with no compliant path is "nonKeto" and must not carry a "modification".
 Respond with JSON matching the supplied schema and nothing else: no markdown fence, no heading, no commentary before or after the JSON object.''';
@@ -149,7 +156,10 @@ abstract final class MenuAnalysisPrompt {
     return lines.join('\n');
   }
 
-  /// One `userPrompt` line for [dish], under [categoryName].
+  /// One `userPrompt` line for [dish], under [categoryName]. Every field
+  /// is [_oneLine]: a description holding a newline (the real Wolt fixture
+  /// holds 31) or a `|` would otherwise read as a second, id-less dish line
+  /// or as an extra field (issue #279).
   static String _dishLine(Dish dish, String categoryName) {
     final options = dish.options.map(_optionText).join('; ');
     return <String>[
@@ -158,12 +168,16 @@ abstract final class MenuAnalysisPrompt {
       dish.name,
       dish.description,
       options,
-    ].join(' | ');
+    ].map(_oneLine).join(' | ');
   }
 
   /// Flattens one [DishOption] to `label: value, value, ...`.
   static String _optionText(DishOption option) =>
       '${option.name}: ${option.values.join(', ')}';
+
+  /// [text] with every run of line breaks and `|`, and the spaces and
+  /// tabs around it, replaced by one space (issue #279).
+  static String _oneLine(String text) => text.replaceAll(_lineBreakOrBar, ' ');
 
   /// The strict JSON schema for the reply (architecture.md §9.2).
   ///

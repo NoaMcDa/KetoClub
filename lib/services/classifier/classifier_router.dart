@@ -131,6 +131,7 @@ final class RoutingMenuClassifier implements MenuClassifier {
       case MenuAnalysisFailureReason.timeout:
       case MenuAnalysisFailureReason.rateLimited:
       case MenuAnalysisFailureReason.badResponse:
+      case MenuAnalysisFailureReason.unavailable:
       case MenuAnalysisFailureReason.backendUnreachable:
       case MenuAnalysisFailureReason.consentWithheld:
       case MenuAnalysisFailureReason.apiKeyMissing:

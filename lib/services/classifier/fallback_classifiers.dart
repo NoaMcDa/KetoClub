@@ -29,6 +29,9 @@ bool _shouldFallBack(MenuAnalysisFailureReason reason) {
       return true;
     case MenuAnalysisFailureReason.offline:
     case MenuAnalysisFailureReason.badResponse:
+    // The backend answered: the model provider is busy (#485), and the
+    // device would ask the same provider.
+    case MenuAnalysisFailureReason.unavailable:
     case MenuAnalysisFailureReason.noDishesFound:
     case MenuAnalysisFailureReason.consentWithheld:
     case MenuAnalysisFailureReason.apiKeyMissing:

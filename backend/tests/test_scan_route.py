@@ -292,7 +292,8 @@ def test_no_server_key_is_503_with_no_call_and_no_bucket_spent(
     ("upstream", "status", "reason"),
     [
         (httpx.Response(429), 429, "rateLimited"),
-        (httpx.Response(500), 502, "badResponse"),
+        (httpx.Response(500), 503, "unavailable"),
+        (httpx.Response(404), 502, "badResponse"),
         (httpx.Response(401), 503, "notConfigured"),
         (
             httpx.Response(
@@ -326,6 +327,7 @@ def test_no_server_key_is_503_with_no_call_and_no_bucket_spent(
     ids=[
         "upstream_429",
         "upstream_500",
+        "upstream_404",
         "upstream_401",
         "max_tokens",
         "not_json",

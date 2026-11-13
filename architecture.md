@@ -1630,15 +1630,48 @@ tests free of a real clock.)* In order:
 1. Strip a markdown fence if present. `jsonDecode` inside `try`; any throw →
    `badResponse`.
 2. Root not a map, or `dishes` missing or not a list → `badResponse`.
-3. Per element: `id` must match a dish in `source` **or** `name` must share at least
-   one word of ≥ 3 letters with a source dish name after `text_normaliser` on both
-   sides. Otherwise the element is an invention and its name goes to `unclassified`
-   (constraint 6).
+3. Per element: an `id` that matches a dish in `source` **always wins**, whatever
+   `name` says. Only when `id` is missing or matches no source dish is `name` read,
+   and it must either normalise (`text_normaliser`) exactly to a source dish's name
+   (the first such in menu order), or overlap one source dish's name highly: the
+   *content words* of a name are its normalised words of ≥ 3 letters not in
+   `nameStopWords` ("with", "and", "ללא", …), and the shared content words must be
+   at least `nameOverlapNumerator`/`nameOverlapDenominator` (3/5) of all the
+   content words the two names hold (Jaccard), with one dish strictly best — a tie
+   is ambiguous and matches neither. Otherwise the element is an invention and its
+   name goes to `unclassified` (constraint 6). **Each source dish is judged at most
+   once:** the first element resolving to it (by id or name) is the one judged,
+   placed or demoted, and every later element resolving to the same dish is
+   dropped — never re-routed to a lookalike that is still free — so a dish is
+   never in `dishes` twice or in both `dishes` and `unclassified`. *(Issue #277:
+   the previous rule — any one shared word of ≥ 3 letters, first source dish wins —
+   gave "Grilled Chicken" with an unknown id to "Chicken Schnitzel", attached an
+   invented "Chef special with fries" to the first dish saying "with", and let two
+   elements give one dish two conflicting verdicts. A strict fallback costs only
+   a dish shown as unclassified; a loose one costs a wrong green. The model is
+   given every id, so the name path is a safety net, not the normal route. The
+   stop-words and the threshold are exported to the golden vocabulary, so the
+   Python twin reads the same values.)*
 4. `verdict` matched by string, never by ordinal; `why` non-empty. Either failing →
    `unclassified`.
 5. `verdict == modifiable` with a null, blank, or over-length `modification` →
-   `unclassified` (constraint 7). A green or red carrying a `modification` keeps the
-   verdict and drops the field.
+   `unclassified` (constraint 7), **even when it carries `hidden_carbs`** (issue
+   #277). A green or red carrying a `modification` keeps the verdict and drops the
+   field. The same holds for a green that issue #57's post-rule turns yellow (its
+   own `net_carbs_estimate` is over the limit): no usable `modification`, no yellow.
+   A `net_carbs_estimate` that is not finite (`1e400` decodes as infinity) or is
+   negative is stored as no estimate (#478); the post-rule still reads the raw
+   figure, so an infinite estimate on a green is over any limit.
+
+   5a. *(Issue #213, written down by #277.)* A green carrying at least one
+   well-formed `hidden_carbs` flag is a wrong green (constraint 5) and becomes
+   `modifiable`. Its instruction is the model's usable `modification`, or else the
+   first flag's `waiter_question`. Only here may a waiter question stand in for an
+   instruction, because only here is the flag the dish's whole reason to be
+   yellow: the question asks the one thing that decides it. A yellow the model sent
+   is yellow for a reason the flag need not cover (a side of fries, a carb count),
+   so a question about a glaze would let the fries through as if handled — which is
+   why rule 5 holds for it as written. A red drops its flags.
 6. Caps: more than `maxAnalysedDishes` (1000; a sanity bound against a
    runaway reply, not a menu size — raised from 150, which real Israeli Wolt
    venues exceed, #188) dishes → `badResponse`; `why` truncated at 300
@@ -1724,11 +1757,12 @@ languages. Collapsing reasons is a bug.
 | `Analysis.consentWithheld` | router, consent toggle off (client-only, §11) | rules result + "Allow AI analysis in Settings to analyse this menu. Showing rule-based results." | settings |
 | `Analysis.apiKeyMissing` | phones only: `GeminiChatClient` found no key saved, so nothing was sent (D17) | rules result + "Add your Gemini API key in Settings to analyse this menu. Showing rule-based results." | settings |
 | `Analysis.apiKeyRejected` | phones only: Google answered 401, 403, or a 400 naming an invalid key (D17) | rules result + "Gemini rejected your API key. Check it in Settings. Showing rule-based results." | settings |
-| `Analysis.offline` | router / client, no route: a phone's `ClientException` calling Google, or on web the backend's own 502 (Gemini unreachable) | rules result + "Offline. Showing rule-based results." | retry |
-| `Analysis.timeout` | client, > 120 s, or the backend's 504 (Gemini did not answer within its own budget) | rules result + "The AI model was too slow. Showing rule-based results." | retry |
+| `Analysis.offline` | router / client, no route: any exception sending to or reading from Google on a phone — a `ClientException`, a TLS handshake failure or a socket closed mid-body, caught as `Exception` since `services/` cannot name `dart:io` types (#278) — or on web the backend's own 502 (Gemini unreachable) | rules result + "Offline. Showing rule-based results." | retry |
+| `Analysis.timeout` | client, > 120 s for the whole call (on a phone the schema retry, which also drops `thinkingConfig`, shares that one deadline, #278), Google's own 504 to a phone, or the backend's 504 (Gemini did not answer within its own budget) | rules result + "The AI model was too slow. Showing rule-based results." | retry |
 | `Analysis.rateLimited` | client, 429 — on a phone, the user's own key's Gemini quota; on web, Gemini's limit or the backend's per-install limiter | rules result + "Daily AI limit reached." | wait |
-| `Analysis.backendUnreachable` | client, `ClientException` posting to `/v1/chat` (D11's "the call is the probe": nothing pre-checks the backend) | rules result + "KetoClub's server could not be reached. Showing rule-based results." | retry |
+| `Analysis.backendUnreachable` | client, any exception posting to `/v1/chat`, `/v1/classify` or `/v1/scan` or reading the reply (a `ClientException`, a TLS or mid-body socket error, #278) (D11's "the call is the probe": nothing pre-checks the backend); and from `/v1/classify` or `/v1/scan`, a 400, 404 or 413, or an error body naming no wire reason — a backend without the route or refusing the request did not answer it, so the fallback chain tries the device (#471) | rules result + "KetoClub's server could not be reached. Showing rule-based results." | retry |
 | `Analysis.badResponse` | client (4xx/5xx other), parser, or an unusable Gemini reply (non-`STOP` finish, no candidates, unparseable body) | rules result + "AI analysis failed ({detail}). Showing rule-based results." | retry / report |
+| `Analysis.unavailable` | client: Google answered 500, 502 or 503 ("the model is overloaded") — on a phone directly, on the server as `503 {"reason": "unavailable"}` from `/v1/chat` and `/v1/scan`, or a `rules(unavailable)` analysis from `/v1/classify` and `/v1/venue-menus` (#485). An answer from the backend, so no fallback chain passes it on | rules result + "The AI service is busy right now. Showing rule-based results. Try again in a minute." | retry |
 | `Analysis.noDishesFound` | parser | "The AI could not identify any dishes on this menu." | try rules |
 
 **What D25 changes in this table.** No reason is added; where a reason can now

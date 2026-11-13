@@ -39,6 +39,7 @@ import '../fakes/fake_menu_store_client.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_platform_menu_adapter.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_transport_exceptions.dart';
 import '../fakes/fake_visit_history_store.dart';
 
 /// The venue every test opens, unless a test builds its own.
@@ -1267,6 +1268,26 @@ void main() {
     });
 
     group('reanalyse (issue #68)', () {
+      test('a classifier that throws still ends the classifying phase, so '
+          'the menu is never stuck on the progress row (issue #278)', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        final gate = Completer<void>();
+        classifier.gate = gate.future;
+        final pending = controller.reanalyse();
+        await pumpEventQueue();
+        expect(controller.phase.isClassifying, isTrue);
+
+        // Act
+        gate.completeError(const FakeHandshakeException());
+
+        // Assert
+        await expectLater(pending, throwsA(isA<FakeHandshakeException>()));
+        expect(controller.phase, LoadPhase.idle);
+        expect(controller.isLoading, isFalse);
+      });
+
       test('reanalyse before any open is a no-op: no repository call, no '
           'classifier call, and no notification', () async {
         // Arrange
@@ -2610,6 +2631,27 @@ void main() {
       },
     );
 
+    test('askQuestion with the consent withdrawn since the analysis sends '
+        'nothing and fails as consentWithheld (issue #279)', () async {
+      // Arrange
+      await openWithLlmAnalysis();
+      answerer.enqueueAnswer('Never sent.');
+      await settings.write(
+        (await settings.read()).copyWith(estimationConsentGiven: false),
+      );
+
+      // Act
+      await controller.askQuestion('Which dish should I order?');
+
+      // Assert
+      expect(answerer.calls, isEmpty);
+      expect(controller.questionState, QuestionState.failed);
+      expect(
+        controller.questionFailure,
+        MenuAnalysisFailureReason.consentWithheld,
+      );
+    });
+
     test('askQuestion sets questionAnswer on success', () async {
       await openWithLlmAnalysis();
       answerer.enqueueAnswer('Steak is great.', dishIds: ['steak']);
@@ -3507,34 +3549,27 @@ void main() {
       expect(store.uploads, isEmpty);
     });
 
-    test(
-      'a rules analysis that arrived with the fetch is classified again '
-      'here, and a model analysis made here is uploaded (issue #331)',
-      () async {
-        // Arrange: the server's model failed, so it answered with rules.
-        final menu = _menuOf([steak]);
-        stubArrived(
-          menu,
-          arrivedAnalysis(
-            menu,
-            engine: const RulesEngine(
-              reason: MenuAnalysisFailureReason.rateLimited,
-            ),
-          ),
-        );
-        classifier.derivedEngine = const LlmEngine(model: 'device-model');
+    test('a rules analysis that arrived with the fetch is shown at once, '
+        'with no second model request and no upload (issue #483)', () async {
+      // Arrange: the server's model timed out, so it answered with rules.
+      final menu = _menuOf([steak]);
+      final analysis = arrivedAnalysis(
+        menu,
+        engine: const RulesEngine(reason: MenuAnalysisFailureReason.timeout),
+      );
+      stubArrived(menu, analysis);
 
-        // Act
-        final controller = await openOnce();
+      // Act
+      final controller = await openOnce();
 
-        // Assert
-        expect(classifier.calls, hasLength(1));
-        expect(store.uploads.single.analysis, controller.analysis);
-      },
-    );
+      // Assert
+      expect(controller.analysis, analysis);
+      expect(classifier.calls, isEmpty);
+      expect(store.uploads, isEmpty);
+    });
 
-    test('a rules analysis that arrived with the fetch and a rules result '
-        'here upload nothing: the backend has the menu (issue #331)', () async {
+    test('Retry on an arrived rules analysis still re-analyses '
+        '(issue #483)', () async {
       // Arrange
       final menu = _menuOf([steak]);
       stubArrived(
@@ -3546,14 +3581,28 @@ void main() {
           ),
         ),
       );
+      final controller = await openOnce();
 
       // Act
-      await openOnce();
+      await controller.reanalyse();
 
-      // Assert: the fake classifier's default result is a rules one.
+      // Assert
       expect(classifier.calls, hasLength(1));
-      expect(store.uploads, isEmpty);
     });
+
+    test(
+      'a fetch with no analysis still classifies once (issue #483)',
+      () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+
+        // Act
+        await openOnce();
+
+        // Assert
+        expect(classifier.calls, hasLength(1));
+      },
+    );
 
     test('a refresh whose refetch carried a reusable analysis shows it '
         'without classifying again (issue #331)', () async {
@@ -3573,8 +3622,8 @@ void main() {
       expect(classifier.calls, hasLength(callsBefore));
     });
 
-    test('a refresh whose refetch carried a rules analysis classifies again '
-        '(issue #331)', () async {
+    test('a refresh whose refetch carried a rules analysis shows it '
+        'without classifying again (issue #483)', () async {
       // Arrange
       repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
       final controller = await openOnce();
@@ -3592,7 +3641,8 @@ void main() {
       await controller.refresh();
 
       // Assert
-      expect(classifier.calls, hasLength(callsBefore + 1));
+      expect(classifier.calls, hasLength(callsBefore));
+      expect((controller.analysis! as MenuAnalysed).engine, isA<RulesEngine>());
     });
 
     test('lastUpload completes only once the upload has finished', () async {

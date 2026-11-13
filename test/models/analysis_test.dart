@@ -78,6 +78,24 @@ void main() {
       'netCarbsEstimate': null,
     };
 
+    test('tryFrom reads an infinite or negative netCarbsEstimate as no '
+        'estimate (issue #478)', () {
+      for (final figure in <num>[double.infinity, -12, -0.5]) {
+        // Arrange
+        final json = <String, Object?>{
+          ...modifiableJson,
+          'netCarbsEstimate': figure,
+        };
+
+        // Act
+        final result = AnalysedDish.tryFrom(json);
+
+        // Assert: the dish is kept, its figure is not.
+        expect(result, isNotNull, reason: '$figure');
+        expect(result!.netCarbsEstimate, isNull, reason: '$figure');
+      }
+    });
+
     test('tryFrom returns an AnalysedDish for a modifiable verdict', () {
       // Arrange & Act
       final result = AnalysedDish.tryFrom(modifiableJson);

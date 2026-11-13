@@ -121,6 +121,7 @@ FailureReason = Literal[
     "consentWithheld",
     "apiKeyMissing",
     "apiKeyRejected",
+    "unavailable",
 ]
 """The Dart ``MenuAnalysisFailureReason`` names: a ``RulesEngine.reason``."""
 

@@ -81,6 +81,33 @@ void main() {
       },
     );
 
+    test('write drops an entry JSON cannot carry instead of throwing '
+        '(issue #478)', () async {
+      // Arrange: an estimate built directly, past the parser's guard.
+      final cache = _buildCache();
+      final entry = CachedMenu(
+        menu: _menuFor(woltRef),
+        analysis: MenuAnalysed(
+          dishes: const <AnalysedDish>[
+            AnalysedDish(
+              dishId: 'd1',
+              name: 'Steak',
+              verdict: DishVerdict.nonKeto,
+              why: 'Breaded',
+              netCarbsEstimate: double.infinity,
+            ),
+          ],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test/model'),
+          analysedAt: DateTime.utc(2026),
+        ),
+      );
+
+      // Act, Assert
+      await expectLater(cache.write(entry), completes);
+      expect(await cache.read(woltRef), isNull);
+    });
+
     test('read on a corrupt entry returns a miss', () async {
       // Arrange
       final box = await _openTestBox();

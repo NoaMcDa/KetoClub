@@ -336,6 +336,34 @@ void main() {
         );
       });
 
+      test('userPrompt keeps each dish on one line: newlines and | inside '
+          'a field become one space (issue #279)', () {
+        // Arrange
+        const dish = Dish(
+          id: 'dish-1',
+          name: 'Steak | Fries',
+          description: 'Ribeye 300g\n\nServed with:\r\n  fries',
+          price: 45,
+          options: [
+            DishOption(name: 'Side\nchoice', values: ['Salad|Fries']),
+          ],
+        );
+        final menu = _menuOf([
+          ('Mains\u2028Grill', [dish]),
+        ]);
+
+        // Act
+        final prompt = MenuAnalysisPrompt.userPrompt(menu);
+
+        // Assert
+        expect(prompt.split('\n'), hasLength(1));
+        expect(
+          prompt,
+          'dish-1 | Mains Grill | Steak Fries | '
+          'Ribeye 300g Served with: fries | Side choice: Salad Fries',
+        );
+      });
+
       test('userPrompt given a menu with no dishes returns an empty '
           'string', () {
         // Arrange

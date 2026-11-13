@@ -15,6 +15,7 @@ import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../../fakes/fake_install_id_store.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 import 'menu_classifier_contract.dart';
 
 /// The backend base every test uses unless it is exercising the URL
@@ -394,7 +395,9 @@ void main() {
       ('timeout', 504, MenuAnalysisFailureReason.timeout),
       ('rateLimited', 429, MenuAnalysisFailureReason.rateLimited),
       ('badResponse', 502, MenuAnalysisFailureReason.badResponse),
-      ('badResponse', 400, MenuAnalysisFailureReason.badResponse),
+      // A 400 is a refused request whatever it names (issue #471).
+      ('badResponse', 400, MenuAnalysisFailureReason.backendUnreachable),
+      ('unavailable', 503, MenuAnalysisFailureReason.unavailable),
       ('noDishesFound', 422, MenuAnalysisFailureReason.noDishesFound),
     ];
     for (final (name, status, reason) in named) {
@@ -430,10 +433,13 @@ void main() {
       ),
       'a non-string reason': ('{"reason": 7, "status_code": 500}', 500),
       'a non-JSON body': ('<html>Bad gateway</html>', 502),
+      'a missing route (404 detail)': ('{"detail": "Not Found"}', 404),
+      'a 404 naming a wire reason': (_errorBody('badResponse', 404), 404),
     };
     for (final MapEntry(key: label, value: (body, status))
         in untrusted.entries) {
-      test('$label is badResponse', () async {
+      test('$label is backendUnreachable, so the device engine runs '
+          '(issue #471)', () async {
         // Arrange
         final classifier = _answering(body, status);
 
@@ -445,7 +451,7 @@ void main() {
           result,
           equals(
             const MenuAnalysisFailed(
-              reason: MenuAnalysisFailureReason.badResponse,
+              reason: MenuAnalysisFailureReason.backendUnreachable,
             ),
           ),
         );
@@ -475,6 +481,31 @@ void main() {
   });
 
   group('BackendMenuClassifier transport failures', () {
+    for (final error in <Exception>[
+      const FakeHandshakeException(),
+      const FakeSocketException(),
+      const FormatException('half a body'),
+    ]) {
+      test('a $error from the transport is backendUnreachable, never a '
+          'throw (issue #278)', () async {
+        // Arrange
+        final classifier = _build(MockClient((request) async => throw error));
+
+        // Act
+        final result = await classifier.classify(_menu);
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const MenuAnalysisFailed(
+              reason: MenuAnalysisFailureReason.backendUnreachable,
+            ),
+          ),
+        );
+      });
+    }
+
     test('a ClientException is backendUnreachable, never offline', () async {
       // Arrange
       final classifier = _build(
@@ -572,13 +603,14 @@ void main() {
       for (final reason in MenuAnalysisFailureReason.values) {
         final mapped = backendFailureReasonFrom(<String, Object?>{
           'reason': reason.name,
-        });
+        }, statusCode: 502);
         final wire = <MenuAnalysisFailureReason>{
           MenuAnalysisFailureReason.notConfigured,
           MenuAnalysisFailureReason.offline,
           MenuAnalysisFailureReason.timeout,
           MenuAnalysisFailureReason.rateLimited,
           MenuAnalysisFailureReason.badResponse,
+          MenuAnalysisFailureReason.unavailable,
           MenuAnalysisFailureReason.noDishesFound,
         };
         expect(
@@ -586,15 +618,24 @@ void main() {
           equals(
             wire.contains(reason)
                 ? reason
-                : MenuAnalysisFailureReason.badResponse,
+                : MenuAnalysisFailureReason.backendUnreachable,
           ),
           reason: reason.name,
         );
       }
       expect(
-        backendFailureReasonFrom(null),
-        equals(MenuAnalysisFailureReason.badResponse),
+        backendFailureReasonFrom(null, statusCode: 502),
+        equals(MenuAnalysisFailureReason.backendUnreachable),
       );
+      for (final status in <int>[400, 404, 413]) {
+        expect(
+          backendFailureReasonFrom(<String, Object?>{
+            'reason': 'rateLimited',
+          }, statusCode: status),
+          equals(MenuAnalysisFailureReason.backendUnreachable),
+          reason: '$status',
+        );
+      }
     });
 
     test('decodeBackendBody reads JSON and answers null for anything '

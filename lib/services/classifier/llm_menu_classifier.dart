@@ -38,6 +38,8 @@ MenuAnalysisFailureReason menuFailureReasonFor(ChatFailureReason reason) {
       return MenuAnalysisFailureReason.rateLimited;
     case ChatFailureReason.badResponse:
       return MenuAnalysisFailureReason.badResponse;
+    case ChatFailureReason.unavailable:
+      return MenuAnalysisFailureReason.unavailable;
     case ChatFailureReason.backendUnreachable:
       return MenuAnalysisFailureReason.backendUnreachable;
     case ChatFailureReason.apiKeyMissing:

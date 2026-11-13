@@ -10,6 +10,7 @@ import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 
 import '../../fakes/fake_install_id_store.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 import 'llm_chat_client_contract.dart';
 
 /// The backend base every test uses unless it is exercising the URL
@@ -522,6 +523,7 @@ void main() {
       ('timeout', 504, ChatFailureReason.timeout),
       ('rateLimited', 429, ChatFailureReason.rateLimited),
       ('badResponse', 502, ChatFailureReason.badResponse),
+      ('unavailable', 503, ChatFailureReason.unavailable),
     ];
 
     for (final (name, status, expected) in wireCases) {
@@ -721,6 +723,34 @@ void main() {
   });
 
   group('BackendChatClient transport failures', () {
+    for (final error in <Exception>[
+      const FakeHandshakeException(),
+      const FakeSocketException(),
+      const FormatException('half a body'),
+    ]) {
+      test(
+        'a $error is backendUnreachable, never a throw (issue #278)',
+        () async {
+          // Arrange
+          final client = _build(MockClient((_) async => throw error));
+
+          // Act
+          final result = await client.complete(
+            systemPrompt: 's',
+            userPrompt: 'u',
+          );
+
+          // Assert
+          expect(
+            result,
+            equals(
+              const ChatFailed(reason: ChatFailureReason.backendUnreachable),
+            ),
+          );
+        },
+      );
+    }
+
     test('a ClientException is backendUnreachable, never offline', () async {
       // Arrange
       final client = _build(

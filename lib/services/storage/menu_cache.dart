@@ -502,7 +502,15 @@ final class HiveMenuCache implements MenuCache {
       return;
     }
     final key = storageKeyFor(entry.menu.venueRef);
-    final value = jsonEncode(entry.toJson());
+    final String value;
+    try {
+      value = jsonEncode(entry.toJson());
+      // An entry JSON cannot carry (a non-finite number, issue #478) is
+      // dropped like a broken box's write: never a throw.
+      // ignore: avoid_catching_errors
+    } on JsonUnsupportedObjectError {
+      return;
+    }
     try {
       await box.put(key, value);
       // Drop the write; a broken box degrades instead of throwing.

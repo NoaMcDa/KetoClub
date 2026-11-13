@@ -175,8 +175,8 @@ def test_a_failed_completion_is_never_cached(
     first = _post(chat_client)
     second = _post(chat_client)
 
-    assert first.status_code == 502
-    assert first.json() == {"reason": "badResponse", "status_code": 502}
+    assert first.status_code == 503
+    assert first.json() == {"reason": "unavailable", "status_code": 503}
     assert second.status_code == 200
     assert second.headers["X-KetoClub-Cache"] == "miss"
     assert route.call_count == 2

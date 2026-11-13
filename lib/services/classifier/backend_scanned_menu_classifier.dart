@@ -25,11 +25,15 @@ import 'package:ketoclub/utils/constants.dart';
 /// analysis.
 ///
 /// **One request for the whole scan** (D6), no retries, and no
-/// pre-check: the call is the probe. A socket or DNS failure is
+/// pre-check: the call is the probe. Any exception sending or reading —
+/// a socket or DNS failure, a TLS handshake failure, a socket closed
+/// mid-body (issue #278) — is
 /// [MenuAnalysisFailureReason.backendUnreachable]; exceeding [timeout] is
-/// [MenuAnalysisFailureReason.timeout]; an error body is mapped by its
-/// `reason` name exactly as `BackendMenuClassifier` maps one
-/// ([backendFailureReasonFrom]). There is no rules fallback on the server
+/// [MenuAnalysisFailureReason.timeout]; an error response is mapped
+/// exactly as `BackendMenuClassifier` maps one
+/// ([backendFailureReasonFrom]), so a backend without `/v1/scan` (404),
+/// or one refusing the request (400, 413), lets the device read the
+/// pages instead (issue #471). There is no rules fallback on the server
 /// or here (D15): the rule engine needs text a photograph does not have.
 ///
 /// **Pages leave the device only here.** Each page is sent as
@@ -120,7 +124,10 @@ final class BackendScannedMenuClassifier implements ScannedMenuClassifier {
           .timeout(timeout);
     } on TimeoutException {
       return const ScannedMenuFailed(reason: MenuAnalysisFailureReason.timeout);
-    } on http.ClientException {
+    } on Exception {
+      // http.ClientException, and what IOClient lets through unwrapped: a
+      // TLS HandshakeException, a SocketException while the body is read
+      // (issue #278).
       return const ScannedMenuFailed(
         reason: MenuAnalysisFailureReason.backendUnreachable,
       );
@@ -133,7 +140,9 @@ final class BackendScannedMenuClassifier implements ScannedMenuClassifier {
     final statusCode = response.statusCode;
     final decoded = decodeBackendBody(response);
     if (statusCode < 200 || statusCode >= 300) {
-      return ScannedMenuFailed(reason: backendFailureReasonFrom(decoded));
+      return ScannedMenuFailed(
+        reason: backendFailureReasonFrom(decoded, statusCode: statusCode),
+      );
     }
     return _readFrom(decoded) ??
         const ScannedMenuFailed(reason: MenuAnalysisFailureReason.badResponse);

@@ -87,6 +87,22 @@ void main() {
         // Assert: collapsing reasons is a bug (architecture.md §10).
         expect(messages.toSet(), hasLength(messages.length));
       });
+
+      test('says a busy provider is busy, not an unusable answer, in '
+          '${locale.languageCode} (issue #485)', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final busy = analysisFailureMessage(
+          MenuAnalysisFailureReason.unavailable,
+          l10n,
+        );
+
+        // Assert
+        expect(busy, l10n.analysisUnavailable);
+        expect(busy, isNot(l10n.analysisBadResponseNoDetail));
+      });
     }
   });
 

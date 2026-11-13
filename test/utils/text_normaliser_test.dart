@@ -104,6 +104,54 @@ void main() {
       expect(result, equals('תפוחי אדמה'));
     });
 
+    test('normalise turns a Hebrew maqaf into one space, as a hyphen '
+        '(issue #275)', () {
+      // Arrange: the maqaf is U+05BE, inside the points block step 2
+      // strips; built from its code point so the source shows which.
+      final maqaf = String.fromCharCode(0x05BE);
+      // Act
+      final result = TextNormaliser.normalise('תפוחי$maqafאדמה');
+      // Assert: the two-word potato trigger is visible again.
+      expect(result, equals('תפוחי אדמה'));
+      expect(result, equals(TextNormaliser.normalise('תפוחי-אדמה')));
+    });
+
+    test('normalise spaces the other Hebrew punctuation in the points '
+        'block: paseq, sof pasuq, nun hafukha (issue #275)', () {
+      // Arrange
+      final raw = String.fromCharCodes(const <int>[
+        0x05D0, 0x05C0, 0x05D1, // paseq
+        0x05D2, 0x05C3, 0x05D3, // sof pasuq
+        0x05D4, 0x05C6, 0x05D5, // nun hafukha
+      ]);
+      // Act
+      final result = TextNormaliser.normalise(raw);
+      // Assert
+      expect(result, equals('א בג דה ו'));
+    });
+
+    test('normalise deletes every geresh stand-in inside צ׳יפס '
+        '(issue #275)', () {
+      // Arrange: the left and right curly quotes, the acute accent, the
+      // primes and the double-quote forms, between צ and יפס.
+      const marks = <int>[
+        0x05F3, 0x0027, 0x2018, 0x2019, 0x02BC, 0x00B4, 0x2032, //
+        0x0022, 0x05F4, 0x201C, 0x201D, 0x2033, 0x0060,
+      ];
+      for (final mark in marks) {
+        // Act
+        final result = TextNormaliser.normalise(
+          'צ${String.fromCharCode(mark)}יפס',
+        );
+        // Assert
+        expect(
+          result,
+          equals('ציפס'),
+          reason: 'U+${mark.toRadixString(16).toUpperCase()}',
+        );
+      }
+    });
+
     test('normalise collapses a run of punctuation into one space '
         '(step 6)', () {
       // Act

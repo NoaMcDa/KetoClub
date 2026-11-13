@@ -170,6 +170,7 @@
     "placeholders": { "detail": { "type": "String" } }
   },
   "analysisBadResponseNoDetail": "The AI model gave an unusable answer. Showing rule-based results.",
+  "analysisUnavailable": "The AI service is busy right now. Showing rule-based results. Try again in a minute.",
   "analysisNoDishesFound": "The AI could not identify any dishes on this menu.",
   "analysisBackendUnreachable": "KetoClub's server could not be reached. Showing rule-based results.",
   "analysisConsentWithheld": "Allow AI analysis in Settings to analyse this menu. Showing rule-based results.",
@@ -575,6 +576,7 @@
   "scanScreenFailureTimeout": "The AI model was too slow. Your pages are kept; try again.",
   "scanScreenFailureRateLimited": "The daily AI limit is used up. Your pages are kept; try again later.",
   "scanScreenFailureBadResponse": "The AI model gave an unusable answer. Your pages are kept; try again.",
+  "scanScreenFailureUnavailable": "The AI service is busy right now. Your pages are kept; try again in a minute.",
   "scanScreenFailureNoDishesFound": "No dishes could be read from these pages. Check that the photos are sharp and well lit, or paste the text instead.",
   "scanScreenFailureBackendUnreachable": "KetoClub's server could not be reached. Your pages are kept; try again.",
   "scanScreenFailureConsentWithheld": "Scanning sends the pages to Google's Gemini API to be read. Allow AI analysis in Settings to scan a menu.",
@@ -652,6 +654,7 @@
   "menuQuestionFailedTimeout": "The AI model was too slow. Try asking again.",
   "menuQuestionFailedRateLimited": "The daily AI limit is used up. Try again later.",
   "menuQuestionFailedBadResponse": "The AI gave an unusable answer. Try asking in a different way.",
+  "menuQuestionFailedUnavailable": "The AI service is busy right now. Try asking again in a minute.",
   "menuQuestionFailedBackendUnreachable": "KetoClub's server could not be reached. Try asking again.",
   "menuQuestionFailedConsentWithheld": "Allow AI analysis in Settings to ask questions about a menu.",
   "menuQuestionFailedApiKeyMissing": "Add your Gemini API key in Settings to ask questions about a menu.",

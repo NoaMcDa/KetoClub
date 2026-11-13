@@ -249,7 +249,8 @@ def test_a_crafted_fingerprint_collision_never_shares_an_analysis(
 @pytest.mark.parametrize(
     ("upstream", "reason"),
     [
-        (httpx.Response(503, json={"error": {"status": "UNAVAILABLE"}}), "badResponse"),
+        (httpx.Response(503, json={"error": {"status": "UNAVAILABLE"}}), "unavailable"),
+        (httpx.Response(504), "timeout"),
         (httpx.Response(429), "rateLimited"),
         (httpx.Response(403), "notConfigured"),
         (httpx.ConnectError("no route"), "offline"),

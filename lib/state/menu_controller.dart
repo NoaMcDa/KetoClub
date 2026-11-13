@@ -857,11 +857,17 @@ final class MenuController extends ChangeNotifier {
         await _settings.update((latest) => latest.copyWith(lastVenue: ref));
 
         final options = _optionsFrom(appSettings);
-        final reusable = _reusableAnalysis(
-          await _repository.cached(ref),
-          fetchedMenu,
-          options,
-        );
+        // An analysis that came with the fetch is this open's answer,
+        // whatever engine made it: a server-side rules(reason) is shown at
+        // once with its reason and Retry, never asked of Gemini a second
+        // time (issue #483, D25). Only without one is the cache consulted.
+        final reusable =
+            _arrivedReusable(fetchedAnalysis, fetchedMenu, options) ??
+            _reusableAnalysis(
+              await _repository.cached(ref),
+              fetchedMenu,
+              options,
+            );
         if (!_isCurrent(generation)) return;
         if (reusable != null) {
           _analysis = reusable;
@@ -1113,6 +1119,11 @@ final class MenuController extends ChangeNotifier {
   /// unjudged under a progress row while the engine runs, rather than
   /// the previous analysis — which may describe other dish text — or
   /// nothing at all.
+  ///
+  /// The classifier never throws by contract, but should anything below
+  /// it break that, [phase] is put back to [LoadPhase.idle] on the way
+  /// out, so the screen is never left on the progress row forever (issue
+  /// #278). On a normal return the caller ends the phase, as before.
   Future<void> _classify(
     VenueRef ref,
     Menu menu,
@@ -1123,12 +1134,27 @@ final class MenuController extends ChangeNotifier {
     notifyListeners();
 
     final generation = _generation;
-    final analysis = await _classifier.classify(menu, options: options);
-    // Superseded or disposed while the engine ran (issue #287).
-    if (!_isCurrent(generation)) return;
-    _analysis = analysis;
-    if (analysis is MenuAnalysed) {
-      await _repository.saveAnalysis(ref, analysis);
+    var returned = false;
+    try {
+      final analysis = await _classifier.classify(menu, options: options);
+      // Superseded or disposed while the engine ran (issue #287): apply
+      // nothing, and leave [phase] to the load that superseded this one.
+      if (!_isCurrent(generation)) {
+        returned = true;
+        return;
+      }
+      _analysis = analysis;
+      if (analysis is MenuAnalysed) {
+        await _repository.saveAnalysis(ref, analysis);
+      }
+      returned = true;
+    } finally {
+      // Only a throw from below reaches here unreturned (issue #278); a
+      // superseded load still never touches the newer load's [phase].
+      if (!returned && _isCurrent(generation)) {
+        _phase = LoadPhase.idle;
+        notifyListeners();
+      }
     }
   }
 
@@ -1199,7 +1225,10 @@ final class MenuController extends ChangeNotifier {
   }
 
   /// [analysis], the one that arrived with the fetch of [menu], when
-  /// [_reusableAnalysis] would reuse it had it been cached; else null.
+  /// [_reusableAnalysis] would reuse it had it been cached — except that
+  /// its engine does not matter: a rules result the server stamped with
+  /// its reason is an answer too, and classifying again would ask the
+  /// model a second time for the same menu (issue #483). Else null.
   static MenuAnalysed? _arrivedReusable(
     MenuAnalysed? analysis,
     Menu menu,
@@ -1210,20 +1239,25 @@ final class MenuController extends ChangeNotifier {
           CachedMenu(menu: menu, analysis: analysis),
           menu,
           options,
+          anyEngine: true,
         );
 
   /// [cached]'s analysis when [open] may show it for [fetched] under
   /// [options] instead of classifying again, or null when it must
   /// classify. See [open] for the three conditions.
+  ///
+  /// [anyEngine] lifts the "made by the model" condition, for an analysis
+  /// that arrived with this very fetch ([_arrivedReusable]).
   static MenuAnalysed? _reusableAnalysis(
     CachedMenu? cached,
     Menu fetched,
-    ClassificationOptions options,
-  ) {
+    ClassificationOptions options, {
+    bool anyEngine = false,
+  }) {
     if (cached == null) return null;
     final analysis = cached.analysis;
     if (analysis is! MenuAnalysed) return null;
-    if (analysis.engine is! LlmEngine) return null;
+    if (!anyEngine && analysis.engine is! LlmEngine) return null;
     if (!options.estimationConsentGiven) return null;
     if (TextNormaliser.menuFingerprint(cached.menu) !=
         TextNormaliser.menuFingerprint(fetched)) {
@@ -1243,7 +1277,10 @@ final class MenuController extends ChangeNotifier {
   ///
   /// Guards: no-ops when [_answerer] is null, when [analysis] is not a
   /// [MenuAnalysed] with an [LlmEngine], when [question] is blank after
-  /// trimming, or when a question is already in flight. The question is
+  /// trimming, or when a question is already in flight. With the
+  /// AI-analysis consent withdrawn since the menu was analysed, nothing is
+  /// sent and the ask fails as [MenuAnalysisFailureReason.consentWithheld]
+  /// (issue #279). The question is
   /// never persisted, never logged, and never stored in the Hive cache or
   /// [SettingsStore] (architecture.md D8; issue #214).
   ///
@@ -1265,6 +1302,16 @@ final class MenuController extends ChangeNotifier {
     _questionAnswer = null;
     _questionFailure = null;
     notifyListeners();
+
+    // Consent is read at every ask, not taken from when the menu was
+    // analysed: withdrawn in Settings since, nothing is sent (issue #279).
+    final settings = await _settings.read();
+    if (!settings.estimationConsentGiven) {
+      _questionState = QuestionState.failed;
+      _questionFailure = MenuAnalysisFailureReason.consentWithheld;
+      notifyListeners();
+      return;
+    }
 
     // The question is in the user prompt only, never logged or persisted.
     final result = await answerer.ask(menu, analysis, trimmed);

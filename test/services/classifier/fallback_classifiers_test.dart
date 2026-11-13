@@ -357,6 +357,29 @@ void main() {
       expect(result, isA<MenuAnalysed>());
       expect(fallback.calls, hasLength(1));
     });
+
+    test('a backend without /v1/classify (404) falls to the device engine '
+        '(issue #471)', () async {
+      // Arrange
+      final fallback = FakeMenuClassifier();
+      final chain = FallbackMenuClassifier(
+        primary: BackendMenuClassifier(
+          client: MockClient(
+            (request) async => http.Response('{"detail":"Not Found"}', 404),
+          ),
+          baseUrl: Uri.parse('https://api.ketoclub.test'),
+          installIdStore: FakeInstallIdStore(),
+        ),
+        fallback: fallback,
+      );
+
+      // Act
+      final result = await chain.classify(_menu, options: _options);
+
+      // Assert
+      expect(result, isA<MenuAnalysed>());
+      expect(fallback.calls, hasLength(1));
+    });
   });
 
   group('FallbackScannedMenuClassifier', () {
@@ -467,6 +490,29 @@ void main() {
       final fallback = FakeScannedMenuClassifier();
       final chain = FallbackScannedMenuClassifier(
         primary: _unreachableScan(),
+        fallback: fallback,
+      );
+
+      // Act
+      final result = await chain.classify(_scan, options: _options);
+
+      // Assert
+      expect(result, isA<ScannedMenuRead>());
+      expect(fallback.calls, hasLength(1));
+    });
+
+    test('a backend without /v1/scan (404) falls to the device engine '
+        '(issue #471)', () async {
+      // Arrange
+      final fallback = FakeScannedMenuClassifier();
+      final chain = FallbackScannedMenuClassifier(
+        primary: BackendScannedMenuClassifier(
+          client: MockClient(
+            (request) async => http.Response('{"detail":"Not Found"}', 404),
+          ),
+          baseUrl: Uri.parse('https://api.ketoclub.test'),
+          installIdStore: FakeInstallIdStore(),
+        ),
         fallback: fallback,
       );
 

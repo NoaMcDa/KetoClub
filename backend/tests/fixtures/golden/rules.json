@@ -9059,18 +9059,23 @@
     {
       "match": {
         "baseLabel": null,
-        "instructions": [],
+        "instructions": [
+          "אפשר בבקשה להחליף את תפוחי האדמה בסלט ירוק או בירקות מאודים?"
+        ],
         "isNonKeto": false,
-        "kind": "green"
+        "kind": "yellow"
       },
       "text": "תפוחי־אדמה"
     },
     {
       "match": {
         "baseLabel": null,
-        "instructions": [],
+        "instructions": [
+          "אפשר בבקשה בלי רוטב חרדל־דבש? אפשר שמן זית ולימון בצד במקום.",
+          "אפשר בבקשה להכין את המנה בלי דבש?"
+        ],
         "isNonKeto": false,
-        "kind": "green"
+        "kind": "yellow"
       },
       "text": "חרדל־דבש"
     },

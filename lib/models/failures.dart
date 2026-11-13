@@ -150,4 +150,11 @@ enum MenuAnalysisFailureReason {
   /// rejected your API key. Check it in Settings. Showing rule-based
   /// results."
   apiKeyRejected,
+
+  /// The model provider was busy or down: Google answered 500, 502 or
+  /// 503, directly or through KetoClub's server (issue #485). Not a
+  /// defect in the reply, so it is not [badResponse]. The router falls
+  /// back to the rules engine; the user sees "The AI service is busy
+  /// right now. Showing rule-based results. Try again in a minute."
+  unavailable,
 }
