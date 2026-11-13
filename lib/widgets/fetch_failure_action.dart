@@ -76,7 +76,8 @@ class FetchFailureAction extends StatelessWidget {
       MenuFetchFailureReason.menuNotFound ||
       MenuFetchFailureReason.disallowedByRobots ||
       MenuFetchFailureReason.jsOnlyPage ||
-      MenuFetchFailureReason.websiteTooLarge => FilledButton(
+      MenuFetchFailureReason.websiteTooLarge ||
+      MenuFetchFailureReason.notARestaurant => FilledButton(
         onPressed: onBackToSearch,
         child: Text(l10n.actionBackToSearch),
       ),

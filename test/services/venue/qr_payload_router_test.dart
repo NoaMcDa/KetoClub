@@ -153,6 +153,9 @@ void main() {
         '://',
         '\u0000',
         'https://cafe.co.il/%zz',
+        // A percent escape that is not UTF-8 (issue #477).
+        'https://wolt.com/he/isr/tel-aviv/restaurant/%E0%A4',
+        'https://www.10bis.co.il/next/restaurants/menu/delivery/%D7%A/1',
         'א' * 500,
       ]) {
         expect(

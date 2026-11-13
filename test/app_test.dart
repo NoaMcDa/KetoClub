@@ -527,6 +527,16 @@ void main() {
       expect(venueRefFromPath('/venue/wolt/'), isNull);
       expect(venueRefFromPath('/venue/nosuch/slug'), isNull);
     });
+
+    test('is null, never a throw, for a percent escape that is not UTF-8 '
+        '(issue #461)', () {
+      // Act and assert
+      expect(venueRefFromPath('/venue/wolt/%E0%A4'), isNull);
+      expect(
+        venueRefFromPath('/venue/website/https%3A%2F%2Fcafe.co.il%2F%D7'),
+        isNull,
+      );
+    });
   });
 
   group('generateRoute', () {

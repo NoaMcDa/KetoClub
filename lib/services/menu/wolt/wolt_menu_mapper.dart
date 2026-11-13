@@ -68,6 +68,13 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 ///   carry the venue's name. The Discovery screen already knows it when
 ///   the user arrived from a venue card.
 ///
+/// **A shop is not a menu (issue #476).** A `loading_strategy` of
+/// `partial` is how Wolt answers for a supermarket, pet shop or other
+/// store: `items` is empty and the products load per category, which
+/// KetoClub never asks for. [toMenu] answers
+/// [MenuFetchFailureReason.notARestaurant] for it ([isShopAssortment]),
+/// never an empty menu that reads as a fault.
+///
 /// Anything else — a missing or wrong-typed `categories`/`items`, or a
 /// present-but-malformed entry inside `categories[]`, `items[]`,
 /// `options[]` or an item's `options` — is treated as a shape this mapper
@@ -77,6 +84,12 @@ abstract final class WoltMenuMapper {
   /// The currency every Wolt Israel venue prices in; see the class doc
   /// comment for why it is not read from the payload.
   static const String defaultCurrency = 'ILS';
+
+  /// Whether [json] is a shop's assortment rather than a restaurant's menu
+  /// (issue #476): its `loading_strategy` is `partial`. Every restaurant
+  /// recorded answered `full`. Never throws.
+  static bool isShopAssortment(Map<String, Object?> json) =>
+      json['loading_strategy'] == 'partial';
 
   /// Normalises [json] into a [Menu] for [ref], stamped [fetchedAt].
   ///
@@ -88,6 +101,11 @@ abstract final class WoltMenuMapper {
     required VenueRef ref,
     required DateTime fetchedAt,
   }) {
+    if (isShopAssortment(json)) {
+      return const MenuFetchFailed(
+        reason: MenuFetchFailureReason.notARestaurant,
+      );
+    }
     final menu = _tryBuildMenu(json, ref: ref, fetchedAt: fetchedAt);
     if (menu == null) {
       return const MenuFetchFailed(

@@ -20,6 +20,7 @@ void main() {
         'websiteTooLarge',
         'websiteRateLimited',
         'websitePdfUnread',
+        'notARestaurant',
       ];
 
       // Act

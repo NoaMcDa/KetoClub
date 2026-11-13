@@ -13283,7 +13283,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13297,7 +13298,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13495,7 +13497,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13640,7 +13643,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13663,7 +13667,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13676,7 +13681,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13688,7 +13694,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13702,7 +13709,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13724,7 +13732,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13748,7 +13757,8 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13786,7 +13796,86 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
+  },
+  {
+    "fetchedAt": "2026-01-01T00:00:00.000Z",
+    "menu": null,
+    "name": "synthetic_shop_partial",
+    "raw": {
+      "categories": [
+        {
+          "id": "c1",
+          "item_ids": [],
+          "name": "Category c1"
+        }
+      ],
+      "items": [],
+      "loading_strategy": "partial"
+    },
+    "ref": {
+      "platformId": "hamosad",
+      "source": "wolt"
+    },
+    "shop": true
+  },
+  {
+    "fetchedAt": "2026-01-01T00:00:00.000Z",
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "Description of i1",
+              "id": "i1",
+              "imageUrl": null,
+              "name": "Dish i1",
+              "options": [],
+              "page": null,
+              "price": 30.0
+            }
+          ],
+          "id": "c1",
+          "name": "Category c1"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "hamosad",
+        "source": "wolt"
+      }
+    },
+    "name": "synthetic_full_strategy",
+    "raw": {
+      "categories": [
+        {
+          "id": "c1",
+          "item_ids": [
+            "i1"
+          ],
+          "name": "Category c1"
+        }
+      ],
+      "items": [
+        {
+          "description": "Description of i1",
+          "id": "i1",
+          "images": [],
+          "name": "Dish i1",
+          "options": [],
+          "price": 3000
+        }
+      ],
+      "loading_strategy": "full"
+    },
+    "ref": {
+      "platformId": "hamosad",
+      "source": "wolt"
+    },
+    "shop": false
   },
   {
     "fetchedAt": "2026-01-01T00:00:00.000Z",
@@ -13807,6 +13896,7 @@
     "ref": {
       "platformId": "hamosad",
       "source": "wolt"
-    }
+    },
+    "shop": false
   }
 ]

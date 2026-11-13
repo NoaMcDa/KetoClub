@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 
 from app.config import Settings
 from app.main import create_app
+from app.routers.discovery import DEFAULT_SEARCH_LAT, DEFAULT_SEARCH_LON
 
 _INSTALL_ID = "0123456789abcdef0123456789abcdef"
 
@@ -133,9 +134,10 @@ def test_search_forwards_the_query_as_a_venue_search(
     assert _INSTALL_ID not in str(wolt_discovery.calls.last.request.headers)
 
 
-def test_search_without_position_sends_no_coordinates(
+def test_search_without_position_searches_around_the_default_centre(
     client: TestClient, wolt_discovery: respx.MockRouter
 ) -> None:
+    # Wolt answers an empty page to a search with no lat/lon (#466).
     wolt_discovery.post(_UPSTREAM_SEARCH).mock(
         return_value=httpx.Response(200, json=_MAPPABLE[0]["raw"])
     )
@@ -144,7 +146,12 @@ def test_search_without_position_sends_no_coordinates(
 
     assert response.status_code == 200
     sent = json.loads(wolt_discovery.calls.last.request.content)
-    assert sent == {"q": "vitrina", "target": "venues"}
+    assert sent == {
+        "q": "vitrina",
+        "target": "venues",
+        "lat": DEFAULT_SEARCH_LAT,
+        "lon": DEFAULT_SEARCH_LON,
+    }
 
 
 def test_nearby_sends_lat_and_lon(

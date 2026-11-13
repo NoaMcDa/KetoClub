@@ -349,6 +349,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String fetchFailedNotARestaurant(String platform) {
+    return '$platform lists this place as a shop, not a restaurant, so there is no menu for KetoClub to read.';
+  }
+
+  @override
   String fetchFailedPlatformChanged(String platform, String statusCode) {
     return '$platform changed its menu format (HTTP $statusCode), so KetoClub could not read it. Please report this.';
   }
@@ -643,6 +648,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryLookingAround => 'Looking around';
 
   @override
+  String discoveryNameSearchAround(String place) {
+    return 'Searching around $place. Choose a location to search somewhere else.';
+  }
+
+  @override
   String get discoveryAroundYou => 'Your location';
 
   @override
@@ -687,6 +697,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get locationPickerNoMatch =>
       'No city matches that. Try another spelling.';
+
+  @override
+  String get locationPickerNoCityTryStreets =>
+      'No city by that name. Search the streets instead:';
 
   @override
   String locationPickerStreetSearch(String query) {

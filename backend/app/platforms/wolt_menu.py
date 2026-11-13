@@ -24,10 +24,20 @@ DEFAULT_CURRENCY = "ILS"
 """The currency of every Wolt Israel venue; the payload carries none."""
 
 
+def is_shop_assortment(raw: object) -> bool:
+    """Whether ``raw`` is a shop's assortment, not a restaurant's menu
+    (#476): ``loading_strategy`` is ``partial`` (Dart
+    ``WoltMenuMapper.isShopAssortment``)."""
+    return isinstance(raw, dict) and raw.get("loading_strategy") == "partial"
+
+
 def map_wolt_menu(raw: object, *, ref: VenueRef, fetched_at: str) -> Menu | None:
     """``raw`` as a ``Menu`` for ``ref`` stamped ``fetched_at`` (the Dart
     ``toIso8601String`` text), or ``None`` when it is not a payload this
-    mapper knows."""
+    mapper knows, or is a shop's (``is_shop_assortment``, which the caller
+    tells apart)."""
+    if is_shop_assortment(raw):
+        return None
     try:
         return _try_build_menu(raw, ref, fetched_at)
     except (ValidationError, OverflowError):

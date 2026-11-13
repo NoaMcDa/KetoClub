@@ -686,6 +686,12 @@ abstract class AppLocalizations {
   /// **'No venue found on {platform}. Check the link.'**
   String fetchFailedNotFound(String platform);
 
+  /// A Wolt venue that is a supermarket, pet shop or other store (issue #476).
+  ///
+  /// In en, this message translates to:
+  /// **'{platform} lists this place as a shop, not a restaurant, so there is no menu for KetoClub to read.'**
+  String fetchFailedNotARestaurant(String platform);
+
   /// No description provided for @fetchFailedPlatformChanged.
   ///
   /// In en, this message translates to:
@@ -1100,6 +1106,12 @@ abstract class AppLocalizations {
   /// **'Looking around'**
   String get discoveryLookingAround;
 
+  /// Above the results of a search by name made with no location (issue #466): the city the search was made around.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching around {place}. Choose a location to search somewhere else.'**
+  String discoveryNameSearchAround(String place);
+
   /// No description provided for @discoveryAroundYou.
   ///
   /// In en, this message translates to:
@@ -1183,6 +1195,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No city matches that. Try another spelling.'**
   String get locationPickerNoMatch;
+
+  /// In the location picker, when no bundled city matches and the street search action is offered right below (issue #489).
+  ///
+  /// In en, this message translates to:
+  /// **'No city by that name. Search the streets instead:'**
+  String get locationPickerNoCityTryStreets;
 
   /// No description provided for @locationPickerStreetSearch.
   ///
