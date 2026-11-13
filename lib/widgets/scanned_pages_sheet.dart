@@ -40,7 +40,7 @@ class ScannedPagesSheet extends StatelessWidget {
     final theme = Theme.of(context);
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 8, 12, 20),
+        padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 12, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
