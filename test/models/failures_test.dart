@@ -19,6 +19,7 @@ void main() {
         'websiteUnreachable',
         'websiteTooLarge',
         'websiteRateLimited',
+        'backendRateLimited',
         'websitePdfUnread',
         'notARestaurant',
       ];
