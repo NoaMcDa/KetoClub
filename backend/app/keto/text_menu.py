@@ -248,7 +248,8 @@ CURRENCY_SOURCE: Final = (
 """``priceCurrencySource``, verbatim (it holds no ``\\s``, ``\\d`` or ``$``)."""
 
 PRICE_SUFFIX_SOURCE: Final = (
-    rf"(?:^|{WS}+|{WS}*[-–—:.…|]+{WS}*)(?:(?:מחיר|price){WS}*:?{WS}*)?(?:\({WS}*)?"
+    rf"(?:^|(?<!{WS}){WS}+|(?<!{WS})(?<![-–—:.…|]){WS}*[-–—:.…|]+{WS}*)"
+    rf"(?:(?:מחיר|price){WS}*:?{WS}*)?(?:\({WS}*)?"
     rf"(?:{CURRENCY_SOURCE}{WS}*)?[0-9]+(?:[.,][0-9]{{1,2}})?(?:[.,]-)?"
     rf"(?:{WS}*/{WS}*[0-9]+(?:[.,][0-9]{{1,2}})?)*(?:{WS}*{CURRENCY_SOURCE})?"
     rf"(?:{WS}*\))?{WS}*\Z"
@@ -267,7 +268,8 @@ _PRICE_PREFIX: Final = re.compile(
 )
 """``pastedPricePrefix``."""
 _SIZED_PRICE: Final = re.compile(
-    rf"{WS}+[0-9]{{2,}}(?:[.,][0-9]{{1,2}})?(?:{WS}*{CURRENCY_SOURCE})?(?={WS}*/)",
+    rf"(?<!{WS}){WS}+[0-9]{{2,}}(?:[.,][0-9]{{1,2}})?"
+    rf"(?:{WS}*{CURRENCY_SOURCE})?(?={WS}*/)",
     re.IGNORECASE | re.ASCII,
 )
 """``pastedSizedPrice``."""

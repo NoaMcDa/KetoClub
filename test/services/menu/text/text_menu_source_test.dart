@@ -378,6 +378,20 @@ void main() {
         });
       }
 
+      test('reads a 200 KB run of marks or spaces in linear time', () {
+        for (final run in const ['-', ':', '.', ' ', ' .']) {
+          // Arrange
+          final text = 'Steak 45\nSalad${run * (200000 ~/ run.length)}x';
+          final watch = Stopwatch()..start();
+
+          // Act
+          TextMenuSource.parse(text, now: _now);
+
+          // Assert
+          expect(watch.elapsed, lessThan(const Duration(seconds: 2)));
+        }
+      });
+
       test('keeps a leading weight and a single leading digit', () {
         // Act
         final menu = _parse('300 גרם אנטריקוט 120\n200 g steak\n2 eggs');

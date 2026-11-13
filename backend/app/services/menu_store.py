@@ -95,7 +95,11 @@ def score_of(analysis: dict[str, Any] | None) -> float | None:
     score = analysis.get("score")
     if isinstance(score, bool) or not isinstance(score, int | float):
         return None
-    as_float = float(score)
+    try:
+        as_float = float(score)
+    except OverflowError:
+        # An integer too large for a float (#270): no usable score.
+        return None
     return as_float if math.isfinite(as_float) else None
 
 

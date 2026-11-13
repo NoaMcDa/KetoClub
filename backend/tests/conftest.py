@@ -34,6 +34,13 @@ def client(settings: Settings) -> Iterator[TestClient]:
 
 
 @pytest.fixture(autouse=True)
+def _test_client_host(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Admit ``TestClient``'s ``Host: testserver`` (#271) on every app a test
+    builds, unless the test passes ``ALLOWED_HOSTS`` itself."""
+    monkeypatch.setenv("ALLOWED_HOSTS", "testserver,localhost,127.0.0.1,[::1]")
+
+
+@pytest.fixture(autouse=True)
 def _block_network() -> Iterator[None]:
     """Fail any request that is not mocked by respx in the test itself."""
     with respx.mock(assert_all_called=False):

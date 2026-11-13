@@ -2098,8 +2098,14 @@ const String priceCurrencySource =
 /// text the classifier reads. The token must follow whitespace, a
 /// separator or the start of the line, so a digit inside a word (`B12`)
 /// is left alone. Matched case-insensitively.
+///
+/// A separator starts only where a run of whitespace or marks starts
+/// (the lookbehinds), so a long run is scanned once, not once per
+/// character: the pattern stays linear on a pasted line of 2 MB of
+/// dashes (#268's trap, which `+` on the marks would reopen).
 final RegExp pastedPriceSuffix = RegExp(
-  r'(?:^|\s+|\s*[-–—:.…|]+\s*)(?:(?:מחיר|price)\s*:?\s*)?(?:\(\s*)?'
+  r'(?:^|(?<!\s)\s+|(?<!\s)(?<![-–—:.…|])\s*[-–—:.…|]+\s*)'
+  r'(?:(?:מחיר|price)\s*:?\s*)?(?:\(\s*)?'
   '(?:$priceCurrencySource'
   r'\s*)?\d+(?:[.,]\d{1,2})?(?:[.,]-)?(?:\s*/\s*\d+(?:[.,]\d{1,2})?)*(?:\s*'
   '$priceCurrencySource'
@@ -2129,7 +2135,7 @@ final RegExp pastedPricePrefix = RegExp(
 /// takes the last one (#282). At least two digits, so `4 / 8 slices`
 /// stays.
 final RegExp pastedSizedPrice = RegExp(
-  r'\s+\d{2,}(?:[.,]\d{1,2})?(?:\s*'
+  r'(?<!\s)\s+\d{2,}(?:[.,]\d{1,2})?(?:\s*'
   '$priceCurrencySource'
   r')?(?=\s*/)',
   caseSensitive: false,
