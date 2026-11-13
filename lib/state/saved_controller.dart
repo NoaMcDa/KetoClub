@@ -170,9 +170,14 @@ final class SavedController extends ChangeNotifier {
 
   /// Reads the visit history and the cache, and joins them by [VenueRef]:
   /// one [RecentEntry] per visit, most recently opened first.
-  Future<void> load() async {
-    _isLoading = true;
-    notifyListeners();
+  ///
+  /// With [showLoading] false the list stays on screen while it is re-read,
+  /// for a refresh after a menu was opened over it (#288).
+  Future<void> load({bool showLoading = true}) async {
+    if (showLoading) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     final visits = await _history.entries();
     final saved = await _repository.savedMenus();

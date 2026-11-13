@@ -70,7 +70,11 @@ String _availabilityLabel(
   if (cached == null) {
     return entry.isGone ? l10n.savedScanGone : l10n.savedNotOnDevice;
   }
-  if (cached.pinned) return l10n.savedKept;
+  // A scan or paste has no platform to ask again, so the cache never
+  // expires it and there is no countdown to show (#288).
+  if (cached.pinned || entry.ref.source == MenuSource.scan) {
+    return l10n.savedKept;
+  }
   return cacheExpiryLabel(cached.fetchedAt, now, l10n);
 }
 
@@ -234,19 +238,25 @@ class _SavedScreenState extends State<SavedScreen> {
           // it again (issue #313).
           onTap: entry.isGone
               ? null
-              : () => Navigator.pushNamed(
-                  context,
-                  venueRoutePath(entry.ref),
-                  // Issue #169: pass the venue's name (and, since #313,
-                  // its city) through the route in a VenueOpenHint (issue
-                  // #307), so the menu header shows the venue's real name
-                  // rather than the raw slug — cached or not
-                  // (`_generateRoute` in app.dart reads it). Null-safe: an
-                  // entry with no name falls back to the slug, unchanged.
-                  arguments: VenueOpenHint(
-                    name: entry.venueName,
-                    city: entry.city,
-                  ),
+              : () => unawaited(
+                  Navigator.pushNamed<Object?>(
+                    context,
+                    venueRoutePath(entry.ref),
+                    // Issue #169: pass the venue's name (and, since #313,
+                    // its city) through the route in a VenueOpenHint (issue
+                    // #307), so the menu header shows the venue's real name
+                    // rather than the raw slug — cached or not
+                    // (`_generateRoute` in app.dart reads it). Null-safe: an
+                    // entry with no name falls back to the slug, unchanged.
+                    arguments: VenueOpenHint(
+                      name: entry.venueName,
+                      city: entry.city,
+                    ),
+                  ).then((_) {
+                    // The menu opened over this list may have been refreshed
+                    // or re-analysed: re-read the scores and expiries (#288).
+                    if (mounted) unawaited(controller.load(showLoading: false));
+                  }),
                 ),
           onRemove: () => _removeWithUndo(context, controller, entry),
           // Only a scanned menu is the user's to name (issue #315).
@@ -369,9 +379,9 @@ class _SavedEntryTile extends StatelessWidget {
     final theme = Theme.of(context);
     final now = DateTime.now();
     final title = _entryTitle(entry, l10n);
-    final opened = l10n.savedOpenedAgo(
-      _ageLabel(entry.visit.lastOpenedAt, now, l10n),
-    );
+    final opened = now.difference(entry.visit.lastOpenedAt).inMinutes < 1
+        ? l10n.savedOpenedJustNow
+        : l10n.savedOpenedAgo(_ageLabel(entry.visit.lastOpenedAt, now, l10n));
     final availability = _availabilityLabel(entry, now, l10n);
     final score = entry.score;
     final dishCount = entry.dishCount;
@@ -415,15 +425,19 @@ class _SavedEntryTile extends StatelessWidget {
           child: ListTile(
             enabled: onTap != null,
             onTap: onTap,
-            title: Row(
-              children: [
-                Expanded(child: Text(title)),
-                if (score != null) ...[
-                  const SizedBox(width: 10),
-                  KetoScoreBadge(score: score, inline: true),
-                ],
-              ],
-            ),
+            // A Wrap, not a Row: at a large text size the badge drops under
+            // the title instead of overflowing beside it (#462).
+            title: score == null
+                ? Text(title)
+                : Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    runSpacing: 4,
+                    children: [
+                      Text(title),
+                      KetoScoreBadge(score: score, inline: true),
+                    ],
+                  ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -453,7 +467,7 @@ class _SavedEntryTile extends StatelessWidget {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (entry.isCached)
+                if (entry.isCached && entry.ref.source != MenuSource.scan)
                   Semantics(
                     label: entry.isPinned
                         ? l10n.savedUnkeepSemanticLabel(title)

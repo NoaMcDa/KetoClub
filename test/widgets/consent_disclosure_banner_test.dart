@@ -50,7 +50,7 @@ void main() {
 
       // Assert
       expect(find.text(_en.settingsConsentTitle), findsOneWidget);
-      expect(find.text(_en.settingsConsentBody), findsOneWidget);
+      expect(find.text(_en.consentDisclosureBody), findsOneWidget);
       expect(find.text(_en.consentDisclosureOk), findsOneWidget);
       expect(find.text(_en.consentDisclosureTurnOff), findsOneWidget);
     });
@@ -64,8 +64,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // Assert
-        expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
-        expect(find.text(_en.settingsConsentBody), findsNothing);
+        expect(find.text(_en.consentDisclosureBodyDirect), findsOneWidget);
+        expect(find.text(_en.consentDisclosureBody), findsNothing);
       },
     );
 
@@ -79,19 +79,19 @@ void main() {
 
         // Assert
         expect(
-          find.text(_en.settingsConsentBodyDirectViaBackend),
+          find.text(_en.consentDisclosureBodyDirectViaBackend),
           findsOneWidget,
         );
-        expect(find.text(_en.settingsConsentBodyDirect), findsNothing);
+        expect(find.text(_en.consentDisclosureBodyDirect), findsNothing);
 
         // Act: web with a backend.
         await _pump(tester, backendConfigured: true);
         await tester.pumpAndSettle();
 
         // Assert
-        expect(find.text(_en.settingsConsentBody), findsOneWidget);
+        expect(find.text(_en.consentDisclosureBody), findsOneWidget);
         expect(
-          find.text(_en.settingsConsentBodyDirectViaBackend),
+          find.text(_en.consentDisclosureBodyDirectViaBackend),
           findsNothing,
         );
       },

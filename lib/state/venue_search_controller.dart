@@ -486,6 +486,9 @@ final class VenueSearchController extends ChangeNotifier {
       case LocationFound(:final latitude, :final longitude):
         _place = null;
         _street = null;
+        // The nearby list replaces whatever was typed (#288).
+        _input = '';
+        _resolved = null;
         _position = (latitude: latitude, longitude: longitude);
         // Also when no place is chosen in memory: one saved by an earlier
         // launch must not come back after the user asked for their own.
@@ -651,11 +654,15 @@ final class VenueSearchController extends ChangeNotifier {
     _lastVenue = lastVenue;
     final known = lastVenue == null ? null : await _knownFor(lastVenue);
     _lastVenueHint = known;
+    // A pasted menu's id is a content hash: with no name it stays null so
+    // the screen says "Pasted menu" (#288).
     _lastVenueName = lastVenue == null
         ? null
         : known?.name ??
               VenueRefResolver.websiteHost(lastVenue) ??
-              lastVenue.platformId;
+              (lastVenue.source == MenuSource.scan
+                  ? null
+                  : lastVenue.platformId);
     final restored = _restoreChoice(settings);
     _notify();
     if (restored == null || language == null) return;

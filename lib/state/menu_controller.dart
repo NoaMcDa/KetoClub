@@ -467,7 +467,7 @@ final class MenuController extends ChangeNotifier {
   int get totalDishCount {
     final currentMenu = _menu;
     if (currentMenu == null) return 0;
-    return currentMenu.allDishes.where((dish) => !_isNotice(dish)).length;
+    return listedDishCount(currentMenu);
   }
 
   /// The net-carb limit in grams [analysis] was produced under (issue #57),
@@ -923,7 +923,7 @@ final class MenuController extends ChangeNotifier {
       ref,
       name: name,
       city: city,
-      dishCount: menu.allDishes.length,
+      dishCount: listedDishCount(menu),
       score: counts?.score,
       greenCount: counts?.green,
       yellowCount: counts?.yellow,

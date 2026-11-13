@@ -4221,6 +4221,64 @@ void main() {
       expect(find.text(noticeName), findsNothing);
     });
 
+    testWidgets('a menu of only a notice says the menu has no dishes and '
+        'still offers the notice (issue #460)', (tester) async {
+      // Arrange
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: <MenuCategory>[menuWithNotice().categories.first],
+      );
+
+      // Act
+      await _pump(tester, controllerOver(menu));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.menuEmpty), findsOneWidget);
+      expect(find.text(_en.menuNoResults), findsNothing);
+      expect(find.byType(RestaurantNoticesRow), findsOneWidget);
+    });
+
+    testWidgets('the category heading and the notice read right to left in '
+        'the English UI (issue #463)', (tester) async {
+      // Arrange
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: const <MenuCategory>[
+          MenuCategory(
+            id: 'c1',
+            name: 'מבצעים:',
+            dishes: [
+              Dish(
+                id: 'd',
+                name: 'סטייק',
+                description: '',
+                price: 40,
+                options: <DishOption>[],
+              ),
+            ],
+          ),
+        ],
+      );
+
+      // Act
+      await _pump(tester, controllerOver(menu));
+      await tester.pumpAndSettle();
+
+      // Assert: the heading, not the chip beside it.
+      final heading = find.text('מבצעים:');
+      final texts = tester.widgetList<Text>(heading).toList();
+      expect(texts.map((t) => t.textDirection), contains(ui.TextDirection.rtl));
+      expect(
+        texts.every((t) => t.textDirection == ui.TextDirection.rtl),
+        isTrue,
+      );
+    });
+
     testWidgets('a menu with no notice has no notices row', (tester) async {
       // Act
       await _pump(tester, controllerOver(_menuOf([_dish('Steak')])));
