@@ -7,7 +7,8 @@ website_adapter.dart``) does, with every fetch going through
 ``app.services.website_fetch.fetch_document`` (public hosts only, robots.txt,
 the AI opt-out headers, size caps, the install and per-site budgets: the
 ``/v1/website/fetch`` rules) and every reading through the port of the Dart
-reader (``app.website.adapter``):
+reader (``app.website.adapter``), in a worker thread under
+``WEBSITE_PARSE_BUDGET_SECONDS`` (#268):
 
 1. The pasted page is fetched. A PDF goes to the vision path
    (``app.services.scan.scan``) as one ``application/pdf`` page.
@@ -69,7 +70,11 @@ from app.services.auth import reject_authorization
 from app.services.classify import ClassifyContext, classify, dart_now, scrubbed
 from app.services.install_id import require_install_id
 from app.services.scan import Scanned, scan
-from app.services.website_fetch import WebsiteDocument, fetch_document
+from app.services.website_fetch import (
+    WebsiteDocument,
+    fetch_document,
+    run_off_loop,
+)
 from app.website.adapter import (
     DISALLOWED_BY_ROBOTS,
     Failed,
@@ -158,8 +163,10 @@ async def _follow(context: _Context, url: DartUri) -> Located | Scanned:
     document = await context.fetch(url.remove_fragment().to_string())
     if document.kind == "pdf":
         return await context.read_pdf(document)
-    linked = read_linked_page(
-        document.page or "", _final_url(document), now=context.now_text
+    page_url = _final_url(document)
+    linked = await run_off_loop(
+        context.request,
+        lambda: read_linked_page(document.page or "", page_url, now=context.now_text),
     )
     if isinstance(linked, Failed):
         raise _reading_error(linked)
@@ -170,7 +177,11 @@ async def _read(context: _Context, document: WebsiteDocument) -> Located | Scann
     """``WebsiteMenuAdapter.fetch`` once the pasted page is in hand."""
     if document.kind == "pdf":
         return await context.read_pdf(document)
-    reading = read_page(document.page or "", _final_url(document), now=context.now_text)
+    page_url = _final_url(document)
+    reading = await run_off_loop(
+        context.request,
+        lambda: read_page(document.page or "", page_url, now=context.now_text),
+    )
     if isinstance(reading, Failed):
         raise _reading_error(reading)
     if isinstance(reading, Located):

@@ -650,9 +650,10 @@ def test_images_follow_the_prompt_as_inline_data_parts_in_order(
     )
 
 
-def test_the_schema_retry_resends_the_images(
+def test_a_400_with_images_is_never_resent_without_the_schema(
     chat_client: TestClient, gemini: respx.MockRouter
 ) -> None:
+    # #272: the retry would upload every page to Google a second time.
     route = gemini.post(_URL).mock(
         side_effect=[
             httpx.Response(400, json=_GENERIC_400_BODY),
@@ -662,11 +663,63 @@ def test_the_schema_retry_resends_the_images(
 
     response = _post(chat_client, body=_image_body(("image/png", _PNG_B64)))
 
-    assert response.status_code == 200
-    assert route.call_count == 2
-    retried = _sent_body(route.calls.last)
-    assert "responseSchema" not in _generation_config(route.calls.last)
-    assert retried["contents"] == _sent_body(route.calls[0])["contents"]
+    assert response.status_code == 502
+    assert response.json() == _error(502, "badResponse")
+    assert route.call_count == 1
+
+
+def test_concurrent_identical_misses_share_one_gemini_call(
+    gemini: respx.MockRouter,
+) -> None:
+    # #272: single flight. The first request holds the key while Gemini
+    # answers; the others wait, then find its answer in the cache.
+    import asyncio
+
+    from app.config import Settings
+    from app.main import create_app
+
+    calls = 0
+
+    async def slow_reply(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        await asyncio.sleep(0.2)
+        return httpx.Response(200, json=_reply())
+
+    gemini.post(_URL).mock(side_effect=slow_reply)
+    app = create_app(
+        settings=Settings(
+            DATABASE_URL="sqlite:///:memory:",
+            GEMINI_API_KEY="test-key",
+            RATE_LIMIT_PER_MINUTE=100,
+            RATE_LIMIT_PER_DAY=1000,
+        )
+    )
+
+    async def run() -> list[str]:
+        transport = httpx.ASGITransport(app=app)
+        async with (
+            app.router.lifespan_context(app),
+            httpx.AsyncClient(transport=transport, base_url="http://testserver") as c,
+        ):
+            replies = await asyncio.gather(
+                *(
+                    c.post(
+                        "/v1/chat",
+                        json=_request_body(),
+                        headers={"X-KetoClub-Install-Id": _INSTALL_ID},
+                    )
+                    for _ in range(4)
+                )
+            )
+        assert all(reply.status_code == 200 for reply in replies)
+        assert len(app.state.chat_flights) == 0
+        return sorted(reply.headers["X-KetoClub-Cache"] for reply in replies)
+
+    caches = asyncio.run(run())
+
+    assert calls == 1
+    assert caches == ["hit", "hit", "hit", "miss"]
 
 
 def test_a_request_with_images_bypasses_the_completion_cache(

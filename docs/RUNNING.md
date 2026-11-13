@@ -118,8 +118,10 @@ D17 and D25).
 # web, backend on the same machine
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
 
-# a phone: the backend must listen beyond localhost and the phone must reach it
-cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
+# a phone: the backend must listen beyond localhost, answer to its LAN address
+# (ALLOWED_HOSTS, #271; add 10.0.2.2 for the Android emulator) and the phone
+# must reach it
+cd backend && ALLOWED_HOSTS='localhost,127.0.0.1,[::1],<lan-ip>'   uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 flutter run -d <device-id> --dart-define=KETOCLUB_BACKEND_URL=http://<lan-ip>:8000
 ```
 

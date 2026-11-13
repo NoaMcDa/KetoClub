@@ -180,6 +180,72 @@ def test_a_hit_for_the_same_text_under_other_ids_is_a_miss(
     assert ids == {"other-dish-steak", "other-dish-salad"}
 
 
+def _collision_menu(description: str) -> dict[str, Any]:
+    return {
+        "venueRef": {"source": "wolt", "platformId": "trattoria"},
+        "currency": "ILS",
+        "fetchedAt": "2026-11-12T10:00:00.000Z",
+        "categories": [
+            {
+                "id": "mains",
+                "name": "Mains",
+                "dishes": [
+                    {
+                        "id": "d1",
+                        "name": "Pasta Carbonara",
+                        "description": description,
+                        "price": 58,
+                        "options": [],
+                    },
+                    {
+                        "id": "d2",
+                        "name": "Entrecote",
+                        "description": "300g steak with fries",
+                        "price": 96,
+                        "options": [],
+                    },
+                ],
+            }
+        ],
+    }
+
+
+def test_a_crafted_fingerprint_collision_never_shares_an_analysis(
+    gemini: respx.MockRouter,
+) -> None:
+    # #464: the 32-bit fingerprint can be matched on purpose. This pair,
+    # found in seconds, shares it; the second menu is a real venue's.
+    from app.keto.fingerprint import fingerprint_hex
+
+    attacker = _collision_menu(
+        "Zucchini ribbons, cream, bacon, parmesan. No pasta 1ujqac0"
+    )
+    victim = _collision_menu("Spaghetti, cream, bacon, parmesan")
+    assert fingerprint_hex(Menu.model_validate(attacker)) == fingerprint_hex(
+        Menu.model_validate(victim)
+    )
+    route = gemini.post(GEMINI_URL)
+    route.respond(
+        200, json=gemini_answer(all_green_reply(Menu.model_validate(attacker)))
+    )
+    with client(settings()) as test_client:
+        planted = _post(
+            test_client,
+            _body(attacker),
+            **{"X-KetoClub-Install-Id": "a" * 32},
+        )
+        assert planted.headers["X-KetoClub-Cache"] == "miss"
+
+        response = _post(
+            test_client,
+            _body(victim),
+            **{"X-KetoClub-Install-Id": "b" * 32},
+        )
+
+    assert response.headers["X-KetoClub-Cache"] == "miss"
+    assert route.call_count == 2
+
+
 @pytest.mark.parametrize(
     ("upstream", "reason"),
     [
