@@ -9,8 +9,10 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/tenbis/tenbis_menu_mapper.dart';
 import 'package:ketoclub/utils/constants.dart';
 
-/// Fetches menus from 10bis's `Restaurants/{id}/Menu` endpoint
-/// (architecture.md §6.1, §8, issue #46).
+/// Fetches menus from 10bis's `NextApi/GetRestaurantMenu` endpoint, the
+/// one 10bis's own web app reads (architecture.md §6.1, §8, issues #46,
+/// #468). The older `api/v1.0/Restaurants/{id}/Menu` answers 404 for
+/// every id.
 ///
 /// This class mirrors `wolt_adapter.dart`'s `WoltMenuAdapter` on purpose:
 /// an HTTP GET plus the failure mapping architecture.md §8 and §10
@@ -94,7 +96,8 @@ final class TenBisAdapter implements PlatformMenuAdapter {
         ? _proxyUri(proxyBase, ref.platformId)
         : Uri.https(
             'www.10bis.co.il',
-            '/api/v1.0/Restaurants/${ref.platformId}/Menu',
+            '/NextApi/GetRestaurantMenu',
+            menuQuery(ref.platformId),
           );
 
     http.Response response;
@@ -175,17 +178,26 @@ final class TenBisAdapter implements PlatformMenuAdapter {
     );
   }
 
+  /// The query 10bis's menu endpoint is asked with for [restaurantId]:
+  /// the parameters its own web app sends, in Hebrew (the menu's own
+  /// language, which the waiter script is written in, §12) and for
+  /// delivery. The backend's proxy sends the same (#468).
+  static Map<String, String> menuQuery(String restaurantId) => <String, String>{
+    'culture': 'he-IL',
+    'uiCulture': 'he',
+    'restaurantId': restaurantId,
+    'deliveryMethod': 'delivery',
+  };
+
   /// The proxied request URL for [platformId] under [base]
-  /// (`backend_plan.md` §3.3, issue #122): `{base}/v1/proxy/tenbis/
-  /// api/v1.0/Restaurants/{platformId}/Menu`, whether or not [base]
-  /// itself ends with a trailing slash.
+  /// (`backend_plan.md` §3.3, issues #122, #468): `{base}/v1/proxy/
+  /// tenbis/restaurants/{platformId}/menu`, whether or not [base] itself
+  /// ends with a trailing slash. The backend builds 10bis's own query.
   static Uri _proxyUri(Uri base, String platformId) {
     final rendered = base.toString();
     final trimmed = rendered.endsWith('/')
         ? rendered.substring(0, rendered.length - 1)
         : rendered;
-    return Uri.parse(
-      '$trimmed/v1/proxy/tenbis/api/v1.0/Restaurants/$platformId/Menu',
-    );
+    return Uri.parse('$trimmed/v1/proxy/tenbis/restaurants/$platformId/menu');
   }
 }

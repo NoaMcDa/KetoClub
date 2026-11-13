@@ -1,6 +1,6 @@
 // The schema-drift check issue #22 asks for and issue #44 repeats for
 // 10bis: a test that fails loudly the moment a real 10bis
-// `Restaurants/{id}/Menu` payload stops carrying a field
+// `NextApi/GetRestaurantMenu` payload stops carrying a field
 // `TenBisMenuMapper` reads, rather than the mapper quietly starting to
 // treat every fixture as `platformChanged` (or, worse, silently
 // dropping a field no test happens to exercise).
@@ -22,7 +22,7 @@ import 'package:flutter_test/flutter_test.dart';
 const String _fixturesDir = 'test/fixtures';
 
 /// `tenbis_*_menu.json` fixtures that are real (or real-shaped)
-/// `Restaurants/{id}/Menu` payloads, excluding
+/// `NextApi/GetRestaurantMenu` payloads, excluding
 /// `tenbis_malformed_menu.json`, which is deliberately shaped wrong to
 /// exercise the `platformChanged` path and would fail every assertion
 /// below by design.
@@ -59,125 +59,59 @@ String _driftMessage(String fixtureName, String field) =>
 /// each read site requires. See `tenbis_menu_mapper.dart`'s class doc
 /// comment for the authoritative list this mirrors.
 void _assertTenBisMenuShape(Map<String, Object?> json, String fixtureName) {
-  final rawCategories = json['categoriesList'];
-  expect(
-    rawCategories,
-    isA<List<Object?>>(),
-    reason: _driftMessage(fixtureName, 'categoriesList'),
-  );
+  void expectField(Object? value, Matcher matcher, String field) =>
+      expect(value, matcher, reason: _driftMessage(fixtureName, field));
+
+  expectField(json['Success'], isTrue, 'Success');
+  final data = json['Data'];
+  expectField(data, isA<Map<String, Object?>>(), 'Data');
+  final rawCategories = (data! as Map<String, Object?>)['categoriesList'];
+  expectField(rawCategories, isA<List<Object?>>(), 'Data.categoriesList');
   for (final rawCategory in rawCategories! as List<Object?>) {
-    expect(
-      rawCategory,
-      isA<Map<String, Object?>>(),
-      reason: _driftMessage(fixtureName, 'categoriesList[]'),
-    );
+    expectField(rawCategory, isA<Map<String, Object?>>(), 'categoriesList[]');
     final category = rawCategory! as Map<String, Object?>;
-    expect(
-      category['categoryName'],
-      isA<String>(),
-      reason: _driftMessage(fixtureName, 'categoriesList[].categoryName'),
-    );
-
+    expectField(category['categoryID'], isA<num>(), 'categoryID');
+    expectField(category['categoryName'], isA<String>(), 'categoryName');
     final rawDishes = category['dishList'];
-    expect(
-      rawDishes,
-      isA<List<Object?>>(),
-      reason: _driftMessage(fixtureName, 'categoriesList[].dishList'),
-    );
+    expectField(rawDishes, isA<List<Object?>>(), 'dishList');
     for (final rawDish in rawDishes! as List<Object?>) {
-      expect(
-        rawDish,
-        isA<Map<String, Object?>>(),
-        reason: _driftMessage(fixtureName, 'dishList[]'),
-      );
+      expectField(rawDish, isA<Map<String, Object?>>(), 'dishList[]');
       final dish = rawDish! as Map<String, Object?>;
-      final rawId = dish['dishId'];
-      expect(
-        rawId is String || rawId is num,
-        isTrue,
-        reason: _driftMessage(fixtureName, 'dishList[].dishId'),
-      );
-      expect(
-        dish['dishName'],
+      expectField(dish['dishId'], isA<num>(), 'dishList[].dishId');
+      expectField(dish['dishName'], isA<String>(), 'dishList[].dishName');
+      expectField(dish['dishPrice'], isA<num>(), 'dishList[].dishPrice');
+      expectField(
+        dish['dishDescription'],
         isA<String>(),
-        reason: _driftMessage(fixtureName, 'dishList[].dishName'),
+        'dishList[].dishDescription',
       );
-      expect(
-        dish['price'],
-        isA<num>(),
-        reason: _driftMessage(fixtureName, 'dishList[].price'),
+      expectField(
+        dish['dishImageUrl'],
+        isA<String>(),
+        'dishList[].dishImageUrl',
       );
-      final description = dish['dishDescription'];
-      if (description != null) {
-        expect(
-          description,
+      final rawChoices = dish['choices'];
+      expectField(rawChoices, isA<List<Object?>>(), 'dishList[].choices');
+      for (final rawChoice in rawChoices! as List<Object?>) {
+        expectField(rawChoice, isA<Map<String, Object?>>(), 'choices[]');
+        final choice = rawChoice! as Map<String, Object?>;
+        expectField(
+          choice['textBeforeChoosing'],
           isA<String>(),
-          reason: _driftMessage(fixtureName, 'dishList[].dishDescription'),
+          'choices[].textBeforeChoosing',
         );
-      }
-
-      final rawOptions = dish['dishOptionsList'];
-      if (rawOptions != null) {
-        expect(
-          rawOptions,
-          isA<List<Object?>>(),
-          reason: _driftMessage(fixtureName, 'dishList[].dishOptionsList'),
-        );
-        for (final rawOption in rawOptions as List<Object?>) {
-          expect(
-            rawOption,
-            isA<Map<String, Object?>>(),
-            reason: _driftMessage(fixtureName, 'dishOptionsList[]'),
-          );
-          final option = rawOption! as Map<String, Object?>;
-          expect(
-            option['name'],
+        final rawSubs = choice['subs'];
+        expectField(rawSubs, isA<List<Object?>>(), 'choices[].subs');
+        for (final rawSub in rawSubs! as List<Object?>) {
+          expectField(rawSub, isA<Map<String, Object?>>(), 'subs[]');
+          expectField(
+            (rawSub! as Map<String, Object?>)['name'],
             isA<String>(),
-            reason: _driftMessage(fixtureName, 'dishOptionsList[].name'),
+            'subs[].name',
           );
-          final rawValues = option['values'];
-          expect(
-            rawValues,
-            isA<List<Object?>>(),
-            reason: _driftMessage(fixtureName, 'dishOptionsList[].values'),
-          );
-          for (final rawValue in rawValues! as List<Object?>) {
-            expect(
-              rawValue,
-              isA<Map<String, Object?>>(),
-              reason: _driftMessage(fixtureName, 'dishOptionsList[].values[]'),
-            );
-            final value = rawValue! as Map<String, Object?>;
-            expect(
-              value['name'],
-              isA<String>(),
-              reason: _driftMessage(
-                fixtureName,
-                'dishOptionsList[].values[].name',
-              ),
-            );
-          }
         }
       }
-
-      final image = dish['dishImageUrl'];
-      if (image != null) {
-        expect(
-          image,
-          isA<String>(),
-          reason: _driftMessage(fixtureName, 'dishList[].dishImageUrl'),
-        );
-      }
     }
-  }
-
-  final restaurantName = json['restaurantName'];
-  if (restaurantName != null) {
-    expect(
-      restaurantName,
-      isA<String>(),
-      reason: _driftMessage(fixtureName, 'restaurantName'),
-    );
   }
 }
 

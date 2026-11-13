@@ -1387,7 +1387,7 @@ fields and are not modelled until then.
 | Service | Endpoint | Auth | Priority | Notes |
 |---|---|---|---|---|
 | **Wolt** | `GET https://consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/{slug}/assortment` | none; the web-client header set (`platform: Web`, `app-language`, client version, a per-process `x-wolt-web-clientid`) | Phase 1, ported in #168 | Cleanest schema; prices in agorot; no currency (`ILS` assumed). iOS/Android call this directly; the web build calls it through the backend proxy below when configured (D11). Replaced `restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data`, which answers every anonymous caller with an empty `200` |
-| **10bis** | `GET https://www.10bis.co.il/api/v1.0/Restaurants/{restaurantId}/Menu` | none | Phase 1–2 | `categoriesList → dishList`; decimal prices |
+| **10bis** | `GET https://www.10bis.co.il/NextApi/GetRestaurantMenu?culture=he-IL&uiCulture=he&restaurantId={restaurantId}&deliveryMethod=delivery` (#468; `api/v1.0/Restaurants/{id}/Menu` answers 404 for every id) | none | Phase 1–2 | `{Success, Data: {categoriesList → dishList → choices → subs}}`; `dishPrice` in shekels; an unknown id is a 200 with `Success: false` or a null `categoriesList` (→ `notFound`) |
 | **Tabit** | `GET https://tgp-api.tabit.cloud/menu/v2/{siteId}` (alt: `online.tabit.cloud/api/v1/ordering/menu?siteId=`) | session / anonymous token from the QR landing | Phase 2+ | Dine-in venues absent from delivery apps |
 | **Ontopo** | `POST https://ontopo.com/api/loginAnonymously` → `GET https://ontopo.com/api/venue/{venueId}` | anonymous bearer | Phase 4 | Returns PDF/image links, needs the OCR path |
 | **KetoClub backend — Wolt proxy** | `GET {KETOCLUB_BACKEND_URL}/v1/proxy/wolt/venues/slug/{slug}/assortment` | none | Phase 3 (D11), path moved in #168 | Allow-listed passthrough only — Wolt's status, body and `Content-Type` unchanged, 1 h server cache of non-empty `2xx` bodies; used only by the web build with a backend configured |
@@ -3563,7 +3563,9 @@ and what is still owed (fixture recordings, a phone run).
    `unsupportedSource`. Built against a synthetic fixture
    (`tenbis_synthetic_menu.json`, issue #44) — the live capture this step
    once said was required turned out not to block the code, only the
-   pre-release confidence in it.
+   pre-release confidence in it. #468 found that endpoint retired and moved
+   the adapter, proxy and mapper to `NextApi/GetRestaurantMenu`, against a
+   real recording (`tenbis_19156_menu.json`).
 9. ✅ **Location and nearby search** (#37/#151 `LocationService`, #123/#149
    the Wolt venue-search proxy, #39/#150 `WoltVenueSearchService`, #40/#154
    the Discovery screen, #147 D13). §17.2's "no Wolt venue-search endpoint is
