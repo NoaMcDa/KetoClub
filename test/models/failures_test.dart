@@ -44,6 +44,7 @@ void main() {
         'consentWithheld',
         'apiKeyMissing',
         'apiKeyRejected',
+        'unavailable',
       ];
 
       // Act
