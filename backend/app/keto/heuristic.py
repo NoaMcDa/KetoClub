@@ -27,6 +27,7 @@ Pure: the caller supplies ``analysed_at`` (Dart's ``Clock.now()``, written
 by ``DateTime.toIso8601String``), so nothing here reads the clock.
 """
 
+from app.keto.dish_kind import heading_drink_base
 from app.keto.models import (
     AnalysedDish,
     AnalysisOptionsSnapshot,
@@ -37,6 +38,7 @@ from app.keto.models import (
 )
 from app.keto.normaliser import contains_hebrew, dish_core_text, dish_rules_text
 from app.keto.rules import (
+    RuleMatch,
     match_dish,
     mentions_dairy,
     mentions_plant,
@@ -54,7 +56,11 @@ def classify_heuristic(
     ran under; ``analysed_at`` is the ISO-8601 timestamp to stamp.
     """
     return MenuAnalysed(
-        dishes=[_analyse(dish, options_snapshot) for dish in menu.all_dishes()],
+        dishes=[
+            _analyse(dish, options_snapshot, category=category.name)
+            for category in menu.categories
+            for dish in category.dishes
+        ],
         unclassified=[],
         engine=RulesEngine(reason="notConfigured"),
         analysed_at=analysed_at,
@@ -62,7 +68,9 @@ def classify_heuristic(
     )
 
 
-def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
+def _analyse(
+    dish: Dish, options: AnalysisOptionsSnapshot, *, category: str
+) -> AnalysedDish:
     templates = vocabulary().templates
     text = dish_rules_text(dish)
     # Dart ``_analyse``: the dish's own name and description decide the
@@ -70,6 +78,12 @@ def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
     core = dish_core_text(dish)
     is_hebrew = contains_hebrew(core if core else text)
     found = match_dish(dish)
+    # A brand or a fruit under a beer or juice heading is that drink
+    # (issue #474).
+    if not found.is_non_keto:
+        drink_base = heading_drink_base(category=category, dish=dish)
+        if drink_base is not None:
+            found = RuleMatch(is_non_keto=True, base_label=drink_base)
 
     if found.is_non_keto:
         template = templates.red_why_he if is_hebrew else templates.red_why_en

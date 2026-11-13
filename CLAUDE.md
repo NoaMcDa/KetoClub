@@ -459,6 +459,11 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   byte-equal). The analysis cache's key has no prompt text in it, so a change
   that should retire stored analyses needs a `schemaVersion` bump (weigh D22's
   cost) or waits out the 7-day TTL.
+- **Every English non-keto base matches its regular plural (`s`/`es`,
+  #274), and a drink takes its heading's base (D30).** Never add a plural
+  entry (a test pins it); the singular's guard and label cover it. The
+  heuristic classifier needs the dish's category heading, so classify
+  through the menu, not a bare dish list.
 - **Python parity (D25): `re.ASCII` for Latin `\b`, the `regex` module for
   `\p{}`, UTF-16 code units for the 300-char caps and the fingerprint, Dart's
   `trim` not Python's `strip`.** Also Dart's one-to-one lowercasing (no final

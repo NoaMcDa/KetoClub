@@ -104,14 +104,15 @@ def test_a_group_offering_a_cauliflower_dough_is_yellow_not_red(
     assert found.instructions == (_skip("בצק"),)
 
 
-def test_dough_offered_as_an_add_on_under_another_heading_stays_yellow() -> None:
+def test_dough_offered_as_an_upsell_adds_nothing() -> None:
+    # "Would you like something extra?" is an upsell (issue #475).
     salad = _dish(
         "סלט יווני",
         options=[DishOption(name="תרצו משהו נוסף?", values=["מקלות בצק"])],
     )
 
     assert dough_choice_base(salad) is None
-    assert match_dish(salad).kind == "yellow"
+    assert match_dish(salad).kind == "green"
 
 
 @pytest.mark.parametrize(
