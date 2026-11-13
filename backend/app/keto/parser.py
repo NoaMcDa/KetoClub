@@ -271,9 +271,7 @@ def _judge(
             # count: both are stored as no estimate (#478).
             net_carbs_estimate=(
                 net_carbs
-                if net_carbs is not None
-                and math.isfinite(net_carbs)
-                and net_carbs >= 0
+                if net_carbs is not None and math.isfinite(net_carbs) and net_carbs >= 0
                 else None
             ),
             hidden_carbs=[] if final_verdict == "nonKeto" else hidden_carbs,
