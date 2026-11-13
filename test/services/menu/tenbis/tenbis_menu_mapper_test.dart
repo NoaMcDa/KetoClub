@@ -9,733 +9,361 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/tenbis/tenbis_menu_mapper.dart';
 
 /// The ref every mapper test asks for.
-const VenueRef _ref = VenueRef(source: MenuSource.tenbis, platformId: '9001');
+const VenueRef _ref = VenueRef(source: MenuSource.tenbis, platformId: '19156');
 
 /// The fixed timestamp every mapper test stamps a menu with.
 final DateTime _fetchedAt = DateTime.utc(2026);
 
-/// Loads and decodes a fixture from `test/fixtures/` by file name.
-Map<String, Object?> _loadFixture(String fileName) {
-  final text = File('test/fixtures/$fileName').readAsStringSync();
-  final decoded = jsonDecode(text);
-  return decoded as Map<String, Object?>;
-}
+/// The recorded, trimmed 10bis payload (see `test/fixtures/README.md`).
+Map<String, Object?> _recording() =>
+    jsonDecode(File('test/fixtures/tenbis_19156_menu.json').readAsStringSync())
+        as Map<String, Object?>;
 
-/// The synthetic, hand-built 10bis fixture (see `test/fixtures/README.md`).
-Map<String, Object?> _validFixture() =>
-    _loadFixture('tenbis_synthetic_menu.json');
+/// A dish in the live shape, with [extra] merged over it.
+Map<String, Object?> _dish(
+  Object? id, [
+  Map<String, Object?> extra = const <String, Object?>{},
+]) => <String, Object?>{
+  'dishId': id,
+  'dishName': 'Dish $id',
+  'dishDescription': 'Description of $id',
+  'dishPrice': 42,
+  'dishImageUrl': '',
+  'choices': <Object?>[],
+  ...extra,
+};
 
-/// Asserts that mapping [json] yields a bare `platformChanged` failure.
-void _expectPlatformChanged(Map<String, Object?> json) {
-  final result = TenBisMenuMapper.toMenu(
-    json,
-    ref: _ref,
-    fetchedAt: _fetchedAt,
-  );
-  expect(
-    result,
-    equals(
-      const MenuFetchFailed(reason: MenuFetchFailureReason.platformChanged),
-    ),
-  );
+/// A category in the live shape holding [dishes], with [extra] merged
+/// over it.
+Map<String, Object?> _category(
+  List<Object?> dishes, [
+  Map<String, Object?> extra = const <String, Object?>{},
+]) => <String, Object?>{
+  'categoryID': 1,
+  'categoryName': 'Mains',
+  'dishList': dishes,
+  ...extra,
+};
+
+/// The live envelope around [categories].
+Map<String, Object?> _envelope(Object? categories) => <String, Object?>{
+  'Errors': null,
+  'Success': true,
+  'Data': <String, Object?>{'resId': 19156, 'categoriesList': categories},
+  'ShoppingCartGuid': '00000000-0000-0000-0000-000000000000',
+};
+
+MenuFetchResult _map(Map<String, Object?> json) =>
+    TenBisMenuMapper.toMenu(json, ref: _ref, fetchedAt: _fetchedAt);
+
+Menu _mapped(Map<String, Object?> json) => (_map(json) as MenuFetched).menu;
+
+/// Asserts that mapping [json] yields a bare [reason] failure.
+void _expectFailure(Map<String, Object?> json, MenuFetchFailureReason reason) {
+  expect(_map(json), equals(MenuFetchFailed(reason: reason)));
 }
 
 void main() {
-  group('TenBisMenuMapper', () {
-    test('toMenu ignores the leading _synthetic key', () {
+  group('TenBisMenuMapper on the recorded payload', () {
+    test('maps every category and dish of the recording', () {
       // Arrange
-      final json = _validFixture();
+      final json = _recording();
 
       // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      );
+      final menu = _mapped(json);
 
       // Assert
-      expect(result, isA<MenuFetched>());
-      expect(json.keys.first, equals('_synthetic'));
+      expect(menu.venueRef, equals(_ref));
+      expect(menu.fetchedAt, equals(_fetchedAt));
+      expect(menu.currency, equals('ILS'));
+      expect(menu.venueName, isNull);
+      expect(menu.categories, hasLength(19));
+      expect(menu.allDishes, hasLength(38));
     });
 
-    test('toMenu returns a menu whose venueRef equals the requested ref', () {
+    test('pins the first dish: id, Hebrew name, price, photo, choices', () {
       // Arrange
-      final json = _validFixture();
+      final json = _recording();
 
       // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
+      final first = _mapped(json).categories.first;
+      final dish = first.dishes.first;
 
       // Assert
-      expect(result.menu.venueRef, equals(_ref));
-    });
-
-    test('toMenu stamps the menu with the given fetchedAt', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      expect(result.menu.fetchedAt, equals(_fetchedAt));
-    });
-
-    test('toMenu defaults currency to ILS when the payload names none', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      expect(result.menu.currency, equals('ILS'));
-    });
-
-    test('toMenu reads an explicit top-level currency when present', () {
-      // Arrange
-      final json = <String, Object?>{..._validFixture(), 'currency': 'USD'};
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      expect(result.menu.currency, equals('USD'));
-    });
-
-    test('toMenu reads venueName from a top-level restaurantName', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      expect(result.menu.venueName, equals('Vitrina Tel Aviv'));
-    });
-
-    test('toMenu produces every category in menu order', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
+      expect(first.id, equals('cat_987906'));
+      expect(first.name, equals('כריכים '));
+      expect(dish.id, equals('22610556'));
+      expect(dish.name, equals('פיקולי גאודה'));
       expect(
-        result.menu.categories.map((category) => category.name),
-        equals(<String>['Steaks', "Chef's Specials", 'סלטים', 'Coming Soon']),
+        dish.description,
+        equals('לחמנית חלה, חסה, עגבניה, גבינת גאודה וחמאה.'),
       );
-    });
-
-    test('toMenu derives a stable slugified id from categoryName', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      expect(result.menu.categories.first.id, equals('cat_steaks'));
-    });
-
-    test('toMenu falls back to a hash-derived slug when categoryName leaves '
-        'nothing after stripping', () {
-      // Arrange
-      final json = <String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{'categoryName': '!!!', 'dishList': <Object?>[]},
-        ],
-      };
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      final id = result.menu.categories.single.id;
-      expect(id, startsWith('cat_'));
-      expect(id, isNot(equals('cat_')));
-    });
-
-    test('toMenu leaves venueName null when restaurantName is absent', () {
-      // Arrange
-      final json = <String, Object?>{'categoriesList': <Object?>[]};
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      expect(result.menu.venueName, isNull);
-    });
-
-    test('toMenu treats an empty dishList as a valid, empty category', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      final comingSoon = result.menu.categories.firstWhere(
-        (category) => category.name == 'Coming Soon',
-      );
-      expect(comingSoon.dishes, isEmpty);
-    });
-
-    test('toMenu accepts a numeric dishId, converted to a String', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      expect(result.menu.allDishes.map((dish) => dish.id), contains('1001'));
-    });
-
-    test('toMenu reads a decimal price with no unit conversion', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      final entrecote = result.menu.allDishes.firstWhere(
-        (dish) => dish.id == '1001',
-      );
-      expect(entrecote.price, equals(142.0));
-    });
-
-    test('toMenu keeps a zero price as 0.0', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      final bread = result.menu.allDishes.firstWhere(
-        (dish) => dish.id == '1003',
-      );
-      expect(bread.price, equals(0.0));
-    });
-
-    test('toMenu pins the entrecôte image URL from the fixture', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      final entrecote = result.menu.allDishes.firstWhere(
-        (dish) => dish.id == '1001',
-      );
+      expect(dish.price, equals(29.0));
+      expect(dish.imageUrl, startsWith('https://'));
       expect(
-        entrecote.imageUrl,
-        equals('https://example.invalid/entrecote.jpg'),
-      );
-    });
-
-    test('toMenu defaults an absent dishImageUrl to null', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      final bread = result.menu.allDishes.firstWhere(
-        (dish) => dish.id == '1003',
-      );
-      expect(bread.imageUrl, isNull);
-    });
-
-    test('toMenu defaults a missing dishDescription to the empty string', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      final babyGem = result.menu.allDishes.firstWhere(
-        (dish) => dish.id == '1005',
-      );
-      expect(babyGem.description, equals(''));
-    });
-
-    test('toMenu flattens a dishOptionsList entry into name and values', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      final entrecote = result.menu.allDishes.firstWhere(
-        (dish) => dish.id == '1001',
-      );
-      expect(
-        entrecote.options,
-        equals(<DishOption>[
-          const DishOption(
-            name: 'Choice of Side',
-            values: <String>['Potato Purée', 'Green Salad'],
-          ),
+        dish.options.map((option) => option.name),
+        equals(<String>[
+          'לחם ללא גלוטן - כריכים',
+          'שתייה לבחירה',
+          'קינוח לבחירה',
+          'תוספת סלט?',
         ]),
       );
+      expect(dish.options.first.values, equals(<String>['לחמנייה ללא גלוטן']));
+      expect(dish.options[1].values, hasLength(6));
     });
 
-    test('toMenu leaves a dish with no dishOptionsList empty', () {
+    test('reads an empty dishImageUrl as no photo', () {
       // Arrange
-      final json = _validFixture();
+      final json = _recording();
 
       // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
+      final dish = _mapped(json).allDishes
+          .firstWhere((dish) => dish.id == '22610575');
 
       // Assert
-      final bread = result.menu.allDishes.firstWhere(
-        (dish) => dish.id == '1003',
-      );
-      expect(bread.options, isEmpty);
+      expect(dish.imageUrl, isNull);
     });
 
-    test('toMenu drops a duplicate dish id from every category after the '
-        'first', () {
+    test('reads an empty choices list as no options', () {
       // Arrange
-      final json = _validFixture();
+      final json = _recording();
 
       // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
+      final dish = _mapped(json).allDishes
+          .firstWhere((dish) => dish.id == '22610744');
 
       // Assert
-      final steaks = result.menu.categories[0];
-      final specials = result.menu.categories[1];
-      expect(steaks.dishes.map((dish) => dish.id), contains('1002-shared'));
+      expect(dish.name, equals('פיצה'));
+      expect(dish.options, isEmpty);
+    });
+  });
+
+  group('TenBisMenuMapper not found', () {
+    test('maps Success false with Errors to notFound', () {
+      // Arrange: 10bis's live answer to a malformed id.
+      final json = <String, Object?>{
+        'Errors': <Object?>[
+          <String, Object?>{
+            'ErrorCode': 'InvalidParameters',
+            'ErrorDesc': 'restaurantId',
+          },
+        ],
+        'Success': false,
+        'Data': null,
+      };
+
+      // Act & Assert
+      _expectFailure(json, MenuFetchFailureReason.notFound);
+    });
+
+    test('maps a null categoriesList to notFound', () {
+      // Arrange: 10bis's live answer to an id no restaurant has.
+      final json = _envelope(null);
+
+      // Act & Assert
+      _expectFailure(json, MenuFetchFailureReason.notFound);
+      expect(TenBisMenuMapper.isNotFound(json), isTrue);
+    });
+
+    test('does not call a well-formed menu not found', () {
+      expect(TenBisMenuMapper.isNotFound(_recording()), isFalse);
+    });
+  });
+
+  group('TenBisMenuMapper rules', () {
+    test('treats an empty categoriesList as a valid empty menu', () {
+      expect(_mapped(_envelope(<Object?>[])).categories, isEmpty);
+    });
+
+    test('treats an empty dishList as a valid empty category', () {
       expect(
-        specials.dishes.map((dish) => dish.id),
-        isNot(contains('1002-shared')),
+        _mapped(_envelope(<Object?>[_category(<Object?>[])]))
+            .categories
+            .single
+            .dishes,
+        isEmpty,
       );
+    });
+
+    test('falls back to a name slug when categoryID is absent', () {
+      // Arrange
+      final json = _envelope(<Object?>[
+        <String, Object?>{
+          'categoryName': 'Hot Drinks! שתייה',
+          'dishList': <Object?>[],
+        },
+      ]);
+
+      // Act & Assert
       expect(
-        result.menu.allDishes.where((dish) => dish.id == '1002-shared'),
-        hasLength(1),
+        _mapped(json).categories.single.id,
+        equals('cat_hot-drinks-שתייה'),
       );
-      // The dedupe drops only the repeated id; the specials category's
-      // own "Bread Basket" dish is unaffected.
-      expect(specials.dishes.map((dish) => dish.id), contains('1003'));
     });
 
-    test('toMenu preserves Hebrew category and dish names', () {
+    test('falls back to a hash slug when the name leaves nothing', () {
       // Arrange
-      final json = _validFixture();
+      final json = _envelope(<Object?>[
+        <String, Object?>{'categoryName': '!!!', 'dishList': <Object?>[]},
+      ]);
 
       // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
+      final id = _mapped(json).categories.single.id;
 
       // Assert
-      final salads = result.menu.categories.firstWhere(
-        (category) => category.name == 'סלטים',
-      );
-      expect(salads.name, equals('סלטים'));
-      final hebrewSalad = result.menu.allDishes.firstWhere(
-        (dish) => dish.id == '1004',
-      );
-      expect(hebrewSalad.name, equals('סלט ירקות'));
+      expect(id, startsWith('cat_'));
+      expect(id.length, greaterThan('cat_'.length));
     });
 
-    test('toMenu treats an empty categoriesList as a valid empty menu', () {
+    test('accepts a string dishId and a decimal price as-is', () {
       // Arrange
-      final json = <String, Object?>{'categoriesList': <Object?>[]};
+      final json = _envelope(<Object?>[
+        _category(<Object?>[
+          _dish('a-1', <String, Object?>{'dishPrice': 12.5}),
+        ]),
+      ]);
 
       // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      );
+      final dish = _mapped(json).allDishes.single;
 
       // Assert
-      expect(result, isA<MenuFetched>());
-      expect((result as MenuFetched).menu.categories, isEmpty);
+      expect(dish.id, equals('a-1'));
+      expect(dish.price, equals(12.5));
     });
 
-    test('toMenu returns platformChanged when categoriesList is missing', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{});
+    test('defaults a missing dishDescription and choices', () {
+      // Arrange
+      final dish = _dish(1)
+        ..remove('dishDescription')
+        ..remove('choices');
+
+      // Act
+      final mapped = _mapped(
+        _envelope(<Object?>[
+          _category(<Object?>[dish]),
+        ]),
+      ).allDishes.single;
+
+      // Assert
+      expect(mapped.description, isEmpty);
+      expect(mapped.options, isEmpty);
     });
 
-    test(
-      'toMenu returns platformChanged when categoriesList is not a list',
-      () {
-        // Arrange & Act & Assert
-        _expectPlatformChanged(<String, Object?>{
-          'categoriesList': 'not a list',
-        });
+    test('drops a duplicate dish id from every category after the first', () {
+      // Arrange
+      final json = _envelope(<Object?>[
+        _category(<Object?>[_dish(7)]),
+        _category(
+          <Object?>[_dish(7), _dish(8)],
+          <String, Object?>{'categoryID': 2},
+        ),
+      ]);
+
+      // Act
+      final menu = _mapped(json);
+
+      // Assert
+      expect(menu.categories[0].dishes.map((dish) => dish.id), ['7']);
+      expect(menu.categories[1].dishes.map((dish) => dish.id), ['8']);
+    });
+  });
+
+  group('TenBisMenuMapper platformChanged', () {
+    final cases = <String, Map<String, Object?>>{
+      'the pre-#468 shape with no Data': <String, Object?>{
+        'categoriesList': <Object?>[],
       },
-    );
-
-    test('toMenu returns platformChanged when a category is not a map', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>['not a map'],
-      });
-    });
-
-    test('toMenu returns platformChanged when a category has no name', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{'dishList': <Object?>[]},
-        ],
-      });
-    });
-
-    test('toMenu returns platformChanged when a category name is empty', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{'categoryName': '', 'dishList': <Object?>[]},
-        ],
-      });
-    });
-
-    test("toMenu returns platformChanged when a category's dishList is not a "
-        'list', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{'categoryName': 'Mains', 'dishList': 'not a list'},
-        ],
-      });
-    });
-
-    test('toMenu returns platformChanged when a dish is not a map', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>['not a map'],
-          },
-        ],
-      });
-    });
-
-    test('toMenu returns platformChanged when a dish has no dishId', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{'dishName': 'No Id', 'price': 10},
-            ],
-          },
-        ],
-      });
-    });
-
-    test('toMenu returns platformChanged when a dishId is empty', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{
-                'dishId': '',
-                'dishName': 'Empty Id',
-                'price': 10,
-              },
-            ],
-          },
-        ],
-      });
-    });
-
-    test('toMenu returns platformChanged when a dish has no dishName', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{'dishId': '1', 'price': 10},
-            ],
-          },
-        ],
-      });
-    });
-
-    test('toMenu returns platformChanged when a dishDescription is not a '
-        'string', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{
-                'dishId': '1',
-                'dishName': 'Odd',
-                'dishDescription': 42,
-                'price': 10,
-              },
-            ],
-          },
-        ],
-      });
-    });
-
-    test('toMenu returns platformChanged when a dish has a negative price', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{
-                'dishId': '1',
-                'dishName': 'Broken',
-                'price': -10,
-              },
-            ],
-          },
-        ],
-      });
-    });
-
-    test('toMenu returns platformChanged when a dish has no price', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{'dishId': '1', 'dishName': 'No Price'},
-            ],
-          },
-        ],
-      });
-    });
-
-    test("toMenu returns platformChanged when a dish's dishOptionsList is not "
-        'a list', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{
-                'dishId': '1',
-                'dishName': 'Odd',
-                'price': 10,
-                'dishOptionsList': 'not a list',
-              },
-            ],
-          },
-        ],
-      });
-    });
-
-    test(
-      'toMenu returns platformChanged when an option group is not a map',
-      () {
-        // Arrange & Act & Assert
-        _expectPlatformChanged(<String, Object?>{
-          'categoriesList': <Object?>[
-            <String, Object?>{
-              'categoryName': 'Mains',
-              'dishList': <Object?>[
-                <String, Object?>{
-                  'dishId': '1',
-                  'dishName': 'Odd',
-                  'price': 10,
-                  'dishOptionsList': <Object?>['not a map'],
-                },
-              ],
-            },
-          ],
-        });
+      'Data that is not an object': <String, Object?>{'Data': 'x'},
+      'Data with no categoriesList': <String, Object?>{
+        'Data': <String, Object?>{'resId': 1},
       },
-    );
-
-    test('toMenu returns platformChanged when an option group has no name', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
+      'a categoriesList that is not a list': _envelope('x'),
+      'a category that is not a map': _envelope(<Object?>['x']),
+      'a category with an empty name': _envelope(<Object?>[
+        _category(<Object?>[], <String, Object?>{'categoryName': ''}),
+      ]),
+      'a dishList that is not a list': _envelope(<Object?>[
+        _category(<Object?>[], <String, Object?>{'dishList': 'x'}),
+      ]),
+      'a dish that is not a map': _envelope(<Object?>[
+        _category(<Object?>['x']),
+      ]),
+      'an empty dishId': _envelope(<Object?>[
+        _category(<Object?>[_dish('')]),
+      ]),
+      'a dish with no dishName': _envelope(<Object?>[
+        _category(<Object?>[
+          _dish(1, <String, Object?>{'dishName': null}),
+        ]),
+      ]),
+      'a description that is not a string': _envelope(<Object?>[
+        _category(<Object?>[
+          _dish(1, <String, Object?>{'dishDescription': 3}),
+        ]),
+      ]),
+      'a negative dishPrice': _envelope(<Object?>[
+        _category(<Object?>[
+          _dish(1, <String, Object?>{'dishPrice': -1}),
+        ]),
+      ]),
+      'the old price key in place of dishPrice': _envelope(<Object?>[
+        _category(<Object?>[
+          _dish(1, <String, Object?>{'dishPrice': null, 'price': 5}),
+        ]),
+      ]),
+      'choices that are not a list': _envelope(<Object?>[
+        _category(<Object?>[
+          _dish(1, <String, Object?>{'choices': 'x'}),
+        ]),
+      ]),
+      'a choice with no textBeforeChoosing': _envelope(<Object?>[
+        _category(<Object?>[
+          _dish(1, <String, Object?>{
+            'choices': <Object?>[
+              <String, Object?>{'subs': <Object?>[]},
+            ],
+          }),
+        ]),
+      ]),
+      'a choice whose subs is not a list': _envelope(<Object?>[
+        _category(<Object?>[
+          _dish(1, <String, Object?>{
+            'choices': <Object?>[
+              <String, Object?>{'textBeforeChoosing': 'Side', 'subs': 'x'},
+            ],
+          }),
+        ]),
+      ]),
+      'a sub with no name': _envelope(<Object?>[
+        _category(<Object?>[
+          _dish(1, <String, Object?>{
+            'choices': <Object?>[
               <String, Object?>{
-                'dishId': '1',
-                'dishName': 'Odd',
-                'price': 10,
-                'dishOptionsList': <Object?>[
-                  <String, Object?>{'values': <Object?>[]},
+                'textBeforeChoosing': 'Side',
+                'subs': <Object?>[
+                  <String, Object?>{'price': 0},
                 ],
               },
             ],
-          },
-        ],
+          }),
+        ]),
+      ]),
+    };
+    for (final MapEntry(key: name, value: json) in cases.entries) {
+      test('returns platformChanged for $name', () {
+        _expectFailure(json, MenuFetchFailureReason.platformChanged);
       });
-    });
+    }
 
-    test("toMenu returns platformChanged when an option group's values is not "
-        'a list', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{
-                'dishId': '1',
-                'dishName': 'Odd',
-                'price': 10,
-                'dishOptionsList': <Object?>[
-                  <String, Object?>{'name': 'Choice', 'values': 'not a list'},
-                ],
-              },
-            ],
-          },
-        ],
-      });
-    });
+    test('reads the malformed fixture as platformChanged', () {
+      // Arrange
+      final json = jsonDecode(
+        File('test/fixtures/tenbis_malformed_menu.json').readAsStringSync(),
+      ) as Map<String, Object?>;
 
-    test(
-      'toMenu returns platformChanged when an option value is not a map',
-      () {
-        // Arrange & Act & Assert
-        _expectPlatformChanged(<String, Object?>{
-          'categoriesList': <Object?>[
-            <String, Object?>{
-              'categoryName': 'Mains',
-              'dishList': <Object?>[
-                <String, Object?>{
-                  'dishId': '1',
-                  'dishName': 'Odd',
-                  'price': 10,
-                  'dishOptionsList': <Object?>[
-                    <String, Object?>{
-                      'name': 'Choice',
-                      'values': <Object?>['not a map'],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        });
-      },
-    );
-
-    test('toMenu returns platformChanged when an option value has no name', () {
-      // Arrange & Act & Assert
-      _expectPlatformChanged(<String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{
-                'dishId': '1',
-                'dishName': 'Odd',
-                'price': 10,
-                'dishOptionsList': <Object?>[
-                  <String, Object?>{
-                    'name': 'Choice',
-                    'values': <Object?>[
-                      <String, Object?>{'unknown': 'x'},
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      });
+      // Act & Assert
+      _expectFailure(json, MenuFetchFailureReason.platformChanged);
     });
   });
 }

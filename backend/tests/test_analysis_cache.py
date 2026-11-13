@@ -60,6 +60,51 @@ def _key(menu: Menu, **overrides: object) -> str:
     return analysis_cache.cache_key(menu, **fields)  # type: ignore[arg-type]
 
 
+def test_the_key_reads_every_text_the_classifier_reads() -> None:
+    # #464: the key is a digest of the dish text, not the 32-bit fingerprint.
+    menu = _menu()
+    base = _key(menu)
+
+    def edited(change: str) -> Menu:
+        data = menu.model_dump(by_alias=True)
+        category = data["categories"][0]
+        dish = category["dishes"][0]
+        if change == "description":
+            dish["description"] = dish["description"] + " zucchini instead"
+        elif change == "option":
+            dish["options"] = [{"name": "Side", "values": ["Fries"]}]
+        elif change == "category":
+            category["name"] = category["name"] + " B"
+        elif change == "name":
+            dish["name"] = dish["name"] + " B"
+        elif change == "id":
+            dish["id"] = dish["id"] + "-b"
+        elif change == "price":
+            dish["price"] = dish["price"] + 1
+        return Menu.model_validate(data)
+
+    for change in ("description", "option", "category", "name", "id"):
+        assert _key(edited(change)) != base, change
+    assert _key(edited("price")) == base
+
+
+def test_the_key_does_not_rest_on_the_fingerprint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Were the key built on the fingerprint, a collision would merge these.
+    from app.keto import fingerprint
+
+    monkeypatch.setattr(fingerprint, "fingerprint_hex", lambda _menu: "8175a786")
+    monkeypatch.setattr(
+        analysis_cache, "fingerprint_hex", lambda _menu: "8175a786", raising=False
+    )
+    menu = _menu()
+    data = menu.model_dump(by_alias=True)
+    data["categories"][0]["dishes"][0]["description"] = "crafted text 1ujqac0"
+
+    assert _key(Menu.model_validate(data)) != _key(menu)
+
+
 def test_the_table_exists_with_no_install_id_column(engine: Engine) -> None:
     columns = {c["name"] for c in inspect(engine).get_columns("analysis_cache")}
     assert columns == {"key", "analysis_json", "created_at"}

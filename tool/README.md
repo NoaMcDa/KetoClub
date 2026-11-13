@@ -50,7 +50,7 @@ It cannot be run with `dart run`: everything it times imports
   ```
   One test prints the same table with the two checked-in fixtures
   (`test/fixtures/wolt_hamosad_menu.json`,
-  `tenbis_synthetic_menu.json`) added as extra decode + map rows. These are
+  `tenbis_19156_menu.json`) added as extra decode + map rows. These are
   unoptimised JIT timings on a desktop CPU. The test asserts no duration,
   so CI never fails on a slow runner.
 

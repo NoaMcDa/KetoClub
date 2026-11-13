@@ -15,21 +15,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
+# Printed through the ``ketoclub`` parent's handler (``app.logs``, #467); the
+# fields are in the message as well as on the record, since that handler's
+# format has no per-field placeholders.
 logger = logging.getLogger("ketoclub.request")
-logger.setLevel(logging.INFO)
-if not logger.handlers:
-    # Attached directly to this logger rather than relying on root logging
-    # configuration: uvicorn configures its own loggers, so a request line
-    # would otherwise silently vanish unless something else happens to set
-    # up the root logger first.
-    _handler = logging.StreamHandler()
-    _handler.setFormatter(
-        logging.Formatter(
-            "%(asctime)s request_id=%(request_id)s method=%(method)s "
-            "route=%(route)s status=%(status)s latency_ms=%(latency_ms)s"
-        )
-    )
-    logger.addHandler(_handler)
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
@@ -47,7 +36,12 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
         response.headers["X-Request-Id"] = request_id
         logger.info(
-            "request",
+            "request request_id=%s method=%s route=%s status=%s latency_ms=%s",
+            request_id,
+            request.method,
+            request.url.path,
+            response.status_code,
+            latency_ms,
             extra={
                 "request_id": request_id,
                 "route": request.url.path,

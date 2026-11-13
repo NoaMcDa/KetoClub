@@ -1003,14 +1003,17 @@ an install id alongside its content (§11, `backend_plan.md` §3.5). *(D25 adds 
 third, below.)*
 
 **Server-side, the analysis cache (D25).** `analysis_cache` holds one complete
-**language-model** analysis per `sha256(menu fingerprint | GEMINI_MODEL |
+**language-model** analysis per `sha256(menu digest | GEMINI_MODEL |
 schemaVersion | netCarbLimitGrams | dietaryConstraints)`, for
 `ANALYSIS_CACHE_TTL_SECONDS` (default 7 days, against the chat cache's 24 h:
 a menu's dish text rarely changes, and a changed one is a different
-fingerprint). Only an `llm` analysis is ever written — a rules fallback never
+digest). Only an `llm` analysis is ever written — a rules fallback never
 is, so a Gemini outage cannot pin rules verdicts for a week — and a scan, whose
-input is images, never touches it. The fingerprint is the 32-bit dish-text hash
-a scan is addressed by, so a hit is re-checked before it is served: the same
+input is images, never touches it. The menu digest is a sha256 of everything
+the classifier reads (category names; dish ids, names, descriptions and
+options), not the 32-bit fingerprint a scan is addressed by (#464): FNV-1a can
+be run backwards, so a crafted menu could otherwise take a real venue's key and
+plant its verdicts there. A hit is still re-checked before it is served: the same
 engine, schema version and options, and every verdict naming a dish id and name
 the menu holds. Two venues with the same dishes under different ids (a chain on
 two platforms) therefore miss rather than get verdicts for ids they lack. A
@@ -1350,7 +1353,7 @@ fields and are not modelled until then.
 | Service | Endpoint | Auth | Priority | Notes |
 |---|---|---|---|---|
 | **Wolt** | `GET https://consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/{slug}/assortment` | none; the web-client header set (`platform: Web`, `app-language`, client version, a per-process `x-wolt-web-clientid`) | Phase 1, ported in #168 | Cleanest schema; prices in agorot; no currency (`ILS` assumed). iOS/Android call this directly; the web build calls it through the backend proxy below when configured (D11). Replaced `restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data`, which answers every anonymous caller with an empty `200` |
-| **10bis** | `GET https://www.10bis.co.il/api/v1.0/Restaurants/{restaurantId}/Menu` | none | Phase 1–2 | `categoriesList → dishList`; decimal prices |
+| **10bis** | `GET https://www.10bis.co.il/NextApi/GetRestaurantMenu?culture=he-IL&uiCulture=he&restaurantId={restaurantId}&deliveryMethod=delivery` (#468; `api/v1.0/Restaurants/{id}/Menu` answers 404 for every id) | none | Phase 1–2 | `{Success, Data: {categoriesList → dishList → choices → subs}}`; `dishPrice` in shekels; an unknown id is a 200 with `Success: false` or a null `categoriesList` (→ `notFound`) |
 | **Tabit** | `GET https://tgp-api.tabit.cloud/menu/v2/{siteId}` (alt: `online.tabit.cloud/api/v1/ordering/menu?siteId=`) | session / anonymous token from the QR landing | Phase 2+ | Dine-in venues absent from delivery apps |
 | **Ontopo** | `POST https://ontopo.com/api/loginAnonymously` → `GET https://ontopo.com/api/venue/{venueId}` | anonymous bearer | Phase 4 | Returns PDF/image links, needs the OCR path |
 | **KetoClub backend — Wolt proxy** | `GET {KETOCLUB_BACKEND_URL}/v1/proxy/wolt/venues/slug/{slug}/assortment` | none | Phase 3 (D11), path moved in #168 | Allow-listed passthrough only — Wolt's status, body and `Content-Type` unchanged, 1 h server cache of non-empty `2xx` bodies; used only by the web build with a backend configured |
@@ -3523,7 +3526,9 @@ and what is still owed (fixture recordings, a phone run).
    `unsupportedSource`. Built against a synthetic fixture
    (`tenbis_synthetic_menu.json`, issue #44) — the live capture this step
    once said was required turned out not to block the code, only the
-   pre-release confidence in it.
+   pre-release confidence in it. #468 found that endpoint retired and moved
+   the adapter, proxy and mapper to `NextApi/GetRestaurantMenu`, against a
+   real recording (`tenbis_19156_menu.json`).
 9. ✅ **Location and nearby search** (#37/#151 `LocationService`, #123/#149
    the Wolt venue-search proxy, #39/#150 `WoltVenueSearchService`, #40/#154
    the Discovery screen, #147 D13). §17.2's "no Wolt venue-search endpoint is
