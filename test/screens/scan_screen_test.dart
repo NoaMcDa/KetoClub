@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
@@ -425,6 +426,36 @@ void main() {
       );
       expect(sheet.initialPage, 1);
       expect(sheet.scan.pages, [_jpeg(1), _jpeg(2)]);
+    });
+
+    testWidgets('a screen reader can open a page preview: the thumbnail '
+        'node carries the tap (issue #285)', (tester) async {
+      // Arrange
+      final semantics = tester.ensureSemantics();
+      picker.queuePickImages([_jpeg(1), _jpeg(2)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+      final preview = find.semantics.byLabel(_en.scanScreenPreviewPage(2));
+      expect(
+        preview.evaluate().single.getSemanticsData().hasAction(
+          SemanticsAction.tap,
+        ),
+        isTrue,
+      );
+
+      // Act: a screen reader's double-tap.
+      tester.semantics.tap(preview);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        tester
+            .widget<ScannedPagesSheet>(find.byType(ScannedPagesSheet))
+            .initialPage,
+        1,
+      );
+      semantics.dispose();
     });
 
     testWidgets('the remove button drops that page', (tester) async {

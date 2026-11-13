@@ -1184,6 +1184,12 @@ instead of leaving the app; Back from Explore leaves it (issue #262). `Scan`
 and `SavedScreen` are stateless placeholders with localized copy explaining what
 is missing, not stubs left silently blank; `MenuScreen` (reached from a search
 result, not a tab) and `WaiterCardSheet` (a modal) sit outside the shell.
+At 840px and wider the shell shows a `NavigationRail` instead of the bar
+(#223); both build the same tree around the tab's screen — a `Scaffold`
+whose body is a `Row` ending in the screen's keyed `Expanded` — so a window
+crossing 840px (an iPad rotating, a browser resized) keeps the route's
+controller and the screen's state: the Scan tab's pages and pasted text,
+Settings mid-edit (issue #287).
 
 **Content is capped at 680px on a wide window** *(issue #221, Phase 8)*. Every
 screen was drawn on a 390px artboard, and on a desktop browser a full-width
@@ -1230,6 +1236,37 @@ and the Waiter Card work as they do on a phone. The header never scrolls under
 the app bar there, so the bar shows no venue name (issue #237 applies below
 1080px only). Below 1080px, and for the loading, failed-fetch and empty-menu
 states at any width, the screen is the single capped column above, unchanged.
+The search text lives in `MenuController.query` rather than the field, so
+the field rebuilt in the other pane, or after a long scroll out of the lazy
+list, still shows the query that filters (issue #286).
+
+**What the list shows** *(issue #286)*. An unclassified dish is listed once,
+in the unclassified section, under every filter: `visibleRows` leaves out the
+dishes `unclassifiedRows` lists, where "All" once listed them twice. The
+"Showing N dishes" label counts the cards on screen (the visible rows and the
+unclassified section's), so a search, the carb budget or a page filter lowers
+it. The Filters row counts the carb budget as active only while its field is
+shown (an AI result). Each category header's `GlobalKey` is keyed by name and
+by which header of that name it is, since a pasted menu can repeat a heading;
+each dish card is keyed by its dish id, and each `PhotoTile` image by its URL,
+so an open waiter script and a drawn photo stay with their dish when a filter
+moves it (#490: the web's HTML-element image fallback otherwise kept the old
+picture). A load superseded by a later one, or outlived by its screen,
+applies nothing (`MenuController`'s generation token, issue #287), and
+refresh is disabled while a load runs.
+
+**"Showing the menu saved on …"** *(issue #486)* appears only when it tells
+the user something: a fresh fetch failed (`staleReason`), or the cached copy
+is at least `cachedNoticeMinAge` (1 hour) old. Never for a pasted or scanned
+menu, which has no live copy to be stale against; the source line ("Wolt ·
+2 minutes ago") already gives a young copy's age.
+
+**Settings are written read-modify-write** *(issue #287)*.
+`SettingsStore.update` applies a change to the latest stored settings, one
+update at a time in call order; every caller that changes some fields
+(Settings, the disclosure banner, the menu's last venue and filter, the
+Discovery place) uses it, so a snapshot read earlier can never revert a field
+written since — consent above all.
 
 Visual rules: a verdict is always icon **and** colour, never colour alone
 (accessibility). Unclassified dishes are listed under their own neutral heading.
@@ -1366,7 +1403,7 @@ fields and are not modelled until then.
 | **KetoClub backend — scan** (D25) | `POST {KETOCLUB_BACKEND_URL}/v1/scan` `{pages: [{mimeType, data}], options}` | as above | D25 (#334, #328) | Pages read and classified in one Gemini request: `{menu, analysis}`, every dish with its `page`. No rules fallback; every scan spends the bucket; pages are forwarded and dropped |
 | **KetoClub backend — website menu** (D25) | `POST {KETOCLUB_BACKEND_URL}/v1/website-menu` `{url, options}` | as above, plus the website install and per-site buckets | D25 (#334, #327) | A restaurant's site fetched, read and analysed server-side: `{menu, analysis \| null}`, ref `website/<url>`; the `/v1/website/fetch` reasons, plus 404 `menuNotFound`. A linked PDF goes through the scan path. Upserts `stored_menus` |
 | **KetoClub backend — venue search** (D25) | `GET {KETOCLUB_BACKEND_URL}/v1/venues/nearby?lat&lon&lang`; `POST …/v1/venues/search` `{query, lang, lat?, lon?}` | `X-KetoClub-Install-Id` (discovery bucket) | D25 (#335, #329) | `{venues: [Venue]}` in Wolt's order, mapped server-side. 429, 502 `platformChanged`/`offline`, 504 |
-| **KetoClub backend — menu store** (D24) | `POST {KETOCLUB_BACKEND_URL}/v1/menus` `{source, platform_id, venue_name, city, menu, analysis}`; `GET …/v1/menus/{source}/{platform_id}` | `X-KetoClub-Install-Id` on the POST, for the rate limiter only (the `/v1/chat` bucket); none on the GET | Phase 3 (#310, #312) | Upserts one opened menu keyed by venue: 201 new, 200 refreshed. Called on **every** platform built with a backend URL, phones included, and only with the AI-analysis consent; the analysis travels without its `options`. The app does not call the GET |
+| **KetoClub backend — menu store** (D24) | `POST {KETOCLUB_BACKEND_URL}/v1/menus` `{source, platform_id, venue_name, city, menu, analysis}`; `GET …/v1/menus/{source}/{platform_id}` | `X-KetoClub-Install-Id` on the POST, for the rate limiter only (the `/v1/chat` bucket); none on the GET | Phase 3 (#310, #312) | Upserts one opened menu keyed by venue: 201 new, 200 refreshed. Called on **every** platform built with a backend URL, phones included, and only with the AI-analysis consent, read from storage just before the upload starts (#456: consent withdrawn during a slow analysis means no upload); the analysis travels without its `options`. The app does not call the GET |
 
 All restaurant endpoints are undocumented internal APIs discovered by network
 inspection (`menu_api_research`). Each adapter therefore:
@@ -2719,7 +2756,10 @@ decisions:
    city live in the history, never on the `Menu`, so the cache, the
    fingerprint and the ref are untouched. Renaming from the menu screen
    uploads the menu again under the new name and city when the user consents
-   (D24); renaming from Recent writes the history only.
+   (D24); renaming from Recent writes the history only. The controller holds
+   the opener's hint (a Recent row's name and city) as the menu's name and
+   city from `open` on, and a rename replaces both, clearing included, in the
+   header, the source line and the tab title at once (issue #457).
 6. **Settings' Clear clears the history (#314).** "Recent menus → Clear"
    empties the cache and the history together, so the tab it is labelled
    after is empty afterwards.

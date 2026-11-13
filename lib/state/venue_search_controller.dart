@@ -737,8 +737,11 @@ final class VenueSearchController extends ChangeNotifier {
         settings.discoveryStreet == street) {
       return;
     }
-    await _settings.write(
-      settings.copyWith(discoveryPlaceId: placeId, discoveryStreet: street),
+    // Onto the latest stored settings (issue #287), so nothing written
+    // between the read above and this write is reverted.
+    await _settings.update(
+      (latest) =>
+          latest.copyWith(discoveryPlaceId: placeId, discoveryStreet: street),
     );
   }
 

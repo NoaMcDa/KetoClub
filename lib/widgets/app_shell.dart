@@ -166,23 +166,35 @@ class AppShell extends StatelessWidget {
   /// The shell's scaffold: a [NavigationRail] beside [child] when the
   /// shell is at least [railBreakpoint] wide, a bottom [NavigationBar]
   /// under it otherwise.
+  ///
+  /// Both layouts build the same tree around [child] — a [Scaffold] whose
+  /// body is a [Row] ending in [child]'s keyed [Expanded] — and differ
+  /// only in the rail before it and the bar below (issue #287). A
+  /// different tree on each side of [railBreakpoint] would rebuild
+  /// [child] from scratch whenever the window crossed it (an iPad
+  /// rotating, a browser resized), and with it the route's own
+  /// controller: the Scan tab's photographed pages and pasted text, a
+  /// half-typed key in Settings.
   Widget _scaffold(BuildContext context, AppLocalizations l10n) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth >= railBreakpoint) {
-          return Scaffold(
-            body: Row(
-              children: [
-                _rail(context, l10n),
-                Expanded(child: child),
-              ],
-            ),
-          );
-        }
-        return Scaffold(body: child, bottomNavigationBar: _bar(context, l10n));
+        final wide = constraints.maxWidth >= railBreakpoint;
+        return Scaffold(
+          body: Row(
+            children: [
+              if (wide) _rail(context, l10n),
+              Expanded(key: _bodyKey, child: child),
+            ],
+          ),
+          bottomNavigationBar: wide ? null : _bar(context, l10n),
+        );
       },
     );
   }
+
+  /// Keys [child]'s slot in [_scaffold]'s [Row], so it keeps its element,
+  /// and so its state, whether or not the rail is inserted before it.
+  static const Key _bodyKey = ValueKey<String>('appShellBody');
 
   /// The bottom bar shown below [railBreakpoint].
   Widget _bar(BuildContext context, AppLocalizations l10n) {
