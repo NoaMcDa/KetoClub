@@ -38,7 +38,10 @@ _WOLT_URL = (
     "https://consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/"
     "hamosad/assortment"
 )
-_TENBIS_URL = "https://www.10bis.co.il/api/v1.0/Restaurants/9001/Menu"
+_TENBIS_URL = (
+    "https://www.10bis.co.il/NextApi/GetRestaurantMenu"
+    "?culture=he-IL&uiCulture=he&restaurantId=9001&deliveryMethod=delivery"
+)
 _WOLT_PATH = "/v1/venue-menus/wolt/hamosad"
 _TENBIS_PATH = "/v1/venue-menus/tenbis/9001"
 
@@ -59,7 +62,7 @@ def _wolt(name: str = "synthetic_options_and_labels") -> dict[str, Any]:
     return golden_entry("wolt_menu.json", name)
 
 
-def _tenbis(name: str = "tenbis_synthetic_menu.json") -> dict[str, Any]:
+def _tenbis(name: str = "tenbis_19156_menu.json") -> dict[str, Any]:
     return golden_entry("tenbis_menu.json", name)
 
 
@@ -320,6 +323,20 @@ def test_a_tenbis_mapper_refusal_is_platform_changed(
     response = _get(app_client, _TENBIS_PATH)
     assert response.status_code == 502
     assert response.json()["reason"] == "platformChanged"
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["synthetic_not_found_success_false", "synthetic_not_found_null_categories"],
+)
+def test_a_tenbis_200_naming_no_restaurant_is_not_found(
+    app_client: TestClient, upstream: respx.MockRouter, name: str
+) -> None:
+    """10bis answers an unknown or malformed id with a 200 (#468)."""
+    upstream.get(_TENBIS_URL).respond(200, json=_tenbis(name)["raw"])
+    response = _get(app_client, _TENBIS_PATH)
+    assert response.status_code == 404
+    assert response.json() == {"reason": "notFound", "status_code": 404}
 
 
 @pytest.mark.parametrize(

@@ -24,7 +24,7 @@ Routes shipped so far:
 |---|---|---|---|---|
 | `GET /v1/health` | #94 | no | no | `{status, version, llm_configured}` |
 | `GET /v1/proxy/wolt/venues/slug/{slug}/assortment` | #95, #168 | no | no | The Wolt menu proxy for the web build, see below |
-| `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | no | no | The 10bis menu proxy for the web build, see below |
+| `GET /v1/proxy/tenbis/restaurants/{restaurantId}/menu` | #122, #468 | no | no | The 10bis menu proxy for the web build, see below |
 | `POST /v1/chat` | #100 | **yes** | **yes** (`RATE_LIMIT_*`) | Hosted classification for the web build: forwards one completion to Gemini `generateContent` with the server's key |
 | `GET /v1/proxy/wolt/pages/restaurants` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | Nearby-venue search for the web build, see below |
 | `POST /v1/proxy/wolt/pages/search` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | By-name venue search for the web build, see below |
@@ -267,8 +267,9 @@ curl -sS localhost:8000/v1/proxy/wolt/venues/slug/hamosad/assortment \
 
 ## The 10bis menu proxy
 
-`GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` forwards to
-`{TENBIS_BASE_URL}/api/v1.0/Restaurants/{restaurantId}/Menu` and returns
+`GET /v1/proxy/tenbis/restaurants/{restaurantId}/menu` forwards to
+`{TENBIS_BASE_URL}/NextApi/GetRestaurantMenu?culture=he-IL&uiCulture=he&restaurantId={restaurantId}&deliveryMethod=delivery`
+(#468; the older `api/v1.0/Restaurants/{id}/Menu` answers 404 for every id) and returns
 10bis's status, body and `Content-Type` unchanged, 404 included — shaped
 like the Wolt proxy above (issue #122). The upstream host always
 comes from `TENBIS_BASE_URL` in config, never from the request.
@@ -291,7 +292,7 @@ that can reach `www.10bis.co.il` (the sandbox this backend was built in
 cannot):
 
 ```bash
-curl -sS localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu \
+curl -sS localhost:8000/v1/proxy/tenbis/restaurants/{restaurantId}/menu \
   -o test/fixtures/tenbis_{id}_menu.json
 ```
 

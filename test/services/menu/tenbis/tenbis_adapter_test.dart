@@ -24,16 +24,18 @@ const VenueRef _refItRejects = VenueRef(
   platformId: 'some-wolt-slug',
 );
 
-/// A minimal, valid, empty 10bis payload.
+/// A minimal, valid, empty 10bis payload, in the live envelope (#468).
 final String _emptyMenuBody = jsonEncode(<String, Object?>{
-  'restaurantName': 'Vitrina Tel Aviv',
-  'categoriesList': <Object?>[],
+  'Errors': null,
+  'Success': true,
+  'Data': <String, Object?>{'resId': 654321, 'categoriesList': <Object?>[]},
 });
 
-/// The expected direct request URL for [_refItHandles].
-final Uri _expectedUri = Uri.https(
-  'www.10bis.co.il',
-  '/api/v1.0/Restaurants/654321/Menu',
+/// The expected direct request URL for [_refItHandles]: the endpoint
+/// 10bis's own web app reads, with the query it sends (#468).
+final Uri _expectedUri = Uri.parse(
+  'https://www.10bis.co.il/NextApi/GetRestaurantMenu'
+  '?culture=he-IL&uiCulture=he&restaurantId=654321&deliveryMethod=delivery',
 );
 
 /// Builds an adapter whose client always answers with a valid, empty
@@ -52,7 +54,7 @@ void main() {
   );
 
   group('TenBisAdapter', () {
-    test('fetch sends the exact Restaurants/{id}/Menu URL', () async {
+    test('fetch sends the exact GetRestaurantMenu URL', () async {
       // Arrange
       Uri? capturedUri;
       final adapter = TenBisAdapter(
@@ -183,6 +185,34 @@ void main() {
       },
     );
 
+    test('fetch maps a 200 body naming no restaurant to notFound', () async {
+      // Arrange: 10bis's live answer to an id no restaurant has (#468).
+      final adapter = TenBisAdapter(
+        client: MockClient((request) async {
+          return http.Response(
+            jsonEncode(<String, Object?>{
+              'Errors': null,
+              'Success': true,
+              'Data': <String, Object?>{
+                'resId': 654321,
+                'categoriesList': null,
+              },
+            }),
+            200,
+          );
+        }),
+      );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        result,
+        equals(const MenuFetchFailed(reason: MenuFetchFailureReason.notFound)),
+      );
+    });
+
     test('fetch maps a ClientException to offline outside a browser', () async {
       // Arrange
       final adapter = TenBisAdapter(
@@ -276,8 +306,7 @@ void main() {
 
     /// The proxy request URL a base with no trailing slash should produce.
     final expectedProxyUri = Uri.parse(
-      'http://localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/'
-      '654321/Menu',
+      'http://localhost:8000/v1/proxy/tenbis/restaurants/654321/menu',
     );
 
     runPlatformMenuAdapterContract(
