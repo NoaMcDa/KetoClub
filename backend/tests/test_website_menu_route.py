@@ -157,7 +157,8 @@ def _assert_round_trips(body: dict[str, Any]) -> None:
             "HTTP://cafe-noir.example:80/menu/?a=1#top",
             "http://cafe-noir.example/menu?a=1",
         ),
-        ("https://cafe-noir.example:8443/x/", None),  // placeholder
+        # A port the fetcher refuses has no ref, as in the app (#283).
+        ("https://cafe-noir.example:8443/x/", None),
         (
             "https://cafe-noir.example/תפריט/",
             "https://cafe-noir.example/%D7%AA%D7%A4%D7%A8%D7%99%D7%98",
