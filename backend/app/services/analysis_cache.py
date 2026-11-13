@@ -23,29 +23,63 @@ from sqlalchemy import Engine
 from sqlalchemy.orm import Session
 
 from app.db import get_session
-from app.keto.fingerprint import fingerprint_hex
 from app.keto.models import AnalysisOptionsSnapshot, Menu, MenuAnalysed, to_json
 from app.models import AnalysisCache
+
+
+def menu_digest(menu: Menu) -> str:
+    """The sha256 hex digest of everything the classifier reads in ``menu``.
+
+    Each category's name, and each dish's id, name, description and option
+    groups, in menu order, as compact JSON: exactly what
+    ``prompt.user_prompt`` sends, in a form no field's own punctuation can
+    make two menus read alike. Prices, images and the venue are not read by
+    the classifier and are left out, so the same dishes on two platforms
+    still share an analysis.
+
+    Not the menu's 32-bit ``fingerprint`` (#464): FNV-1a can be run
+    backwards, so a crafted menu with another venue's dish ids and names
+    and its own descriptions could be given that venue's fingerprint in
+    seconds, and its analysis would then be served for the real menu. The
+    fingerprint still addresses a scan (D23); it no longer keys a reuse.
+    """
+    material = [
+        [
+            category.name,
+            [
+                [
+                    dish.id,
+                    dish.name,
+                    dish.description,
+                    [[option.name, list(option.values)] for option in dish.options],
+                ]
+                for dish in category.dishes
+            ],
+        ]
+        for category in menu.categories
+    ]
+    canonical = json.dumps(material, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def cache_key(
     menu: Menu, *, model: str, schema_version: int, options: AnalysisOptionsSnapshot
 ) -> str:
-    """The sha256 hex digest of ``fingerprint|model|schemaVersion|
+    """The sha256 hex digest of ``menuDigest|model|schemaVersion|
     netCarbLimitGrams|constraints``.
 
-    ``fingerprint`` is the menu's dish-text fingerprint
-    (``app.keto.fingerprint``, the one a scan is addressed by), so the same
-    dishes are one key whichever platform or venue they came from.
-    ``constraints`` is the list as compact JSON, in the order given, so no
-    fragment's own punctuation can make two lists read alike.
+    ``menuDigest`` is :func:`menu_digest`, so the same dishes are one key
+    whichever platform or venue they came from, and different dish text is
+    a different key. ``constraints`` is the list as compact JSON, in the
+    order given, so no fragment's own punctuation can make two lists read
+    alike.
     """
     constraints = json.dumps(
         list(options.dietary_constraints), ensure_ascii=False, separators=(",", ":")
     )
     material = "|".join(
         [
-            fingerprint_hex(menu),
+            menu_digest(menu),
             model,
             str(schema_version),
             str(options.net_carb_limit_grams),

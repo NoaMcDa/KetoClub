@@ -253,13 +253,17 @@ async def fetch_discovery(
                 json=call.json_body,
                 timeout=WOLT_TIMEOUT,
             )
-    except httpx.ConnectError:
-        return DiscoveryFailure(reason="offline", status_code=502)
     except httpx.TimeoutException:
         return DiscoveryFailure(reason="timeout", status_code=504)
+    except httpx.TransportError:
+        # A reset mid-read or a malformed reply too, not only a refused
+        # connection (#270).
+        return DiscoveryFailure(reason="offline", status_code=502)
 
     content_type = upstream.headers.get("content-type", "application/json")
-    if 200 <= upstream.status_code < 300:
+    # An empty 2xx body is never cached (#272), as the menu proxy does not
+    # cache one: it would pin an empty venue list for the whole TTL.
+    if 200 <= upstream.status_code < 300 and upstream.content:
         await run_in_threadpool(
             write_cached_menu,
             engine,

@@ -85,10 +85,12 @@ async def fetch_menu_body(
     fetched_at = now.replace(microsecond=now.microsecond // 1000 * 1000)
     try:
         upstream = await http_client.get(url, headers=headers, timeout=timeout)
-    except httpx.ConnectError:
-        raise UpstreamUnreachable("offline", 502) from None
     except httpx.TimeoutException:
         raise UpstreamUnreachable("timeout", 504) from None
+    except httpx.TransportError:
+        # Any other transport failure (a refused connection, a reset mid-read,
+        # a malformed reply) is the website route's 502 offline (#270).
+        raise UpstreamUnreachable("offline", 502) from None
 
     content_type = upstream.headers.get("content-type", "application/json")
     if 200 <= upstream.status_code < 300 and upstream.content:
