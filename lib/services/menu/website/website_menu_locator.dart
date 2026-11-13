@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/services/menu/website/json_ld_menu_mapper.dart';
 import 'package:ketoclub/services/menu/website/website_html.dart';
+import 'package:ketoclub/utils/constants.dart';
 
 /// Where [WebsiteMenuLocator.locate] found a page's menu (D19).
 @immutable
@@ -47,10 +48,12 @@ final class NoMenuLink extends MenuLocation {
 /// 1. JSON-LD `Menu` / `MenuSection` / `MenuItem` markup with named items.
 /// 2. A link to the menu: the JSON-LD `hasMenu` URL first, then the page's
 ///    own links whose address or text says "menu" or "תפריט", or that end
-///    in `.pdf`. A menu-named PDF comes first, then a menu-named page, then
-///    any PDF, each group in page order. A page link must stay on the same
-///    site (`www.` aside); a PDF may live elsewhere (menus are often on a
-///    file host). A link back to the page itself is skipped.
+///    in `.pdf`. A menu-named PDF comes first, then a page whose own
+///    address names the menu (`/menu/food`, `/dairy_menu/`), then a page
+///    only its link text names (an events page linked as "תפריט בהתאמה",
+///    #480), then any PDF, each group in page order. A page link must stay
+///    on the same site (`www.` aside); a PDF may live elsewhere (menus are
+///    often on a file host). A link back to the page itself is skipped.
 /// 3. Nothing: the caller reads the page itself with [menuText].
 abstract final class WebsiteMenuLocator {
   /// Where [html], fetched from [pageUrl], keeps its menu.
@@ -69,9 +72,10 @@ abstract final class WebsiteMenuLocator {
     for (final link in WebsiteHtml.links(html, pageUrl)) {
       if (_samePage(link.uri, pageUrl)) continue;
       final isPdf = link.uri.path.toLowerCase().endsWith('.pdf');
-      final named = _namesMenu(link);
+      final addressNamed = _addressNamesMenu(link);
+      final named = addressNamed || _textNamesMenu(link);
       if (!isPdf && !(named && _sameSite(link.uri, pageUrl))) continue;
-      final score = named && isPdf ? 3 : (named ? 2 : 1);
+      final score = isPdf ? (named ? 4 : 1) : (addressNamed ? 3 : 2);
       if (score > bestScore) {
         best = MenuLinkFound(link.uri);
         bestScore = score;
@@ -87,13 +91,50 @@ abstract final class WebsiteMenuLocator {
   /// menu: a homepage with one "from 45" line is not one.
   static const int minPricedLines = 3;
 
+  /// A line that is only a price: an optional `מחיר:`/`price:` label, an
+  /// optional currency, the number, an optional currency (one source with
+  /// a paste's, [priceCurrencySource]: `₪`, `ש"ח`, `שקלים`, `shkalim`).
   static final RegExp _priceOnly = RegExp(
-    r'^(?:₪\s*)?\d{1,4}(?:[.,]\d{1,2})?\s*(?:₪|NIS|ILS|ש["״]ח)?$',
+    r'^(?:(?:מחיר|price)\s*:?\s*)?(?:'
+    '$priceCurrencySource'
+    r'\s*)?\d{1,4}(?:[.,]\d{1,2})?\s*(?:'
+    '$priceCurrencySource'
+    r')?$',
     caseSensitive: false,
   );
   static final RegExp _trailingPrice = RegExp(
-    r'(?:\s+|\s*[-–—:.…|]+\s*)(?:₪\s*)?\d{1,4}(?:[.,]\d{1,2})?'
-    r'(?:\s*(?:₪|NIS|ILS|ש["״]ח))?\s*$',
+    r'(?:\s+|\s*[-–—:.…|]+\s*)(?:(?:מחיר|price)\s*:?\s*)?(?:'
+    '$priceCurrencySource'
+    r'\s*)?\d{1,4}(?:[.,]\d{1,2})?(?:\s*'
+    '$priceCurrencySource'
+    r')?\s*$',
+    caseSensitive: false,
+  );
+
+  /// A dietary tag on a line of its own (`מנה צמחונית`, `ללא גלוטן`,
+  /// `vegan`, `GF`): dropped before a page is read, so it never shifts a
+  /// dish's name into a header (#480).
+  static final RegExp _dietaryTag = RegExp(
+    r'^\(?(?:(?:מנה\s+)?(?:צמחונית|צמחוני|טבעונית|טבעוני|חריפה|חריף'
+    r'|(?:ללא|נטול(?:ת)?)\s+גלוטן)|vegan|vegetarian|veggie|spicy|v|vg|gf|df'
+    r'|gluten[\s-]free|dairy[\s-]free)\)?$',
+    caseSensitive: false,
+  );
+
+  /// A street address with a number, which ends in a number like a priced
+  /// dish does (`Tel Aviv, Dizengoff 99`, `רחוב הרצל 12`, #283): a street
+  /// word, or a city before a comma.
+  static final RegExp _address = RegExp(
+    r'(?:^|[\s,(])(?:רחוב|רח[\x27׳"]|שד[\x27׳"]|שדרות|דרך|כיכר|סמטת)\s'
+    r'|\b(?:st|street|ave|avenue|road|rd|blvd|boulevard)\b'
+    r'|^(?:tel[\s-]aviv(?:[\s-]yafo)?|jerusalem|haifa|herzliya|ramat[\s-]gan'
+    r'|givatayim|holon|bat[\s-]yam|petah[\s-]tikva|ra\x27?anana|kfar[\s-]saba'
+    r'|netanya|rishon[\s-]le[\s-]?zion|rehovot|ashdod|ashkelon'
+    r'|be\x27?er[\s-]sheva|eilat|modi\x27?in|hod[\s-]hasharon'
+    r'|ramat[\s-]hasharon|תל[\s-]אביב(?:[\s-]יפו)?|ירושלים|חיפה|הרצליה'
+    r'|רמת[\s-]גן|גבעתיים|חולון|בת[\s-]ים|פתח[\s-]תקו?וה|רעננה|כפר[\s-]סבא'
+    r'|נתניה|ראשון[\s-]לציון|רחובות|אשדוד|אשקלון|באר[\s-]שבע|אילת|מודיעין'
+    r'|הוד[\s-]השרון|רמת[\s-]השרון)\s*,',
     caseSensitive: false,
   );
   static final RegExp _letter = RegExp(r'\p{L}', unicode: true);
@@ -120,7 +161,10 @@ abstract final class WebsiteMenuLocator {
   /// page's footer. The prices themselves are dropped, as a paste's are
   /// (D18).
   static String? menuText(String html) {
-    final lines = WebsiteHtml.lines(html);
+    final lines = <String>[
+      for (final line in WebsiteHtml.lines(html))
+        if (!_dietaryTag.hasMatch(line)) line,
+    ];
     var priceOnly = 0;
     var inline = 0;
     for (final line in lines) {
@@ -131,10 +175,86 @@ abstract final class WebsiteMenuLocator {
       }
     }
     if (priceOnly + inline < minPricedLines) return null;
-    final out = priceOnly >= inline
-        ? _fromSeparatePrices(lines)
-        : _fromInlinePrices(lines);
+    final out = priceOnly < inline
+        ? _fromInlinePrices(lines)
+        : _priceFollowsName(lines)
+        ? _fromNameThenPrice(lines)
+        : _fromSeparatePrices(lines);
     return out.isEmpty ? null : out.join('\n');
+  }
+
+  /// The runs of lines between price-only lines: one more run than there
+  /// are prices, the first before the first price, the last after the
+  /// last.
+  static List<List<String>> _runsBetweenPrices(List<String> lines) {
+    final runs = <List<String>>[<String>[]];
+    for (final line in lines) {
+      if (_priceOnly.hasMatch(line)) {
+        runs.add(<String>[]);
+      } else {
+        runs.last.add(line);
+      }
+    }
+    return runs;
+  }
+
+  /// Whether the page sets each price straight under the dish's name, with
+  /// the description after it (`name / 67 / description`, #480), rather
+  /// than after the description: the line after a price is longer than
+  /// the line before it for most prices.
+  static bool _priceFollowsName(List<String> lines) {
+    final runs = _runsBetweenPrices(lines);
+    var after = 0;
+    var before = 0;
+    for (var i = 0; i + 1 < runs.length; i++) {
+      if (runs[i].isEmpty || runs[i + 1].isEmpty) continue;
+      final wordsBefore = runs[i].last.split(_whitespace).length;
+      final wordsAfter = runs[i + 1].first.split(_whitespace).length;
+      if (wordsAfter > wordsBefore) {
+        after += 1;
+      } else if (wordsAfter < wordsBefore) {
+        before += 1;
+      }
+    }
+    return after > before;
+  }
+
+  /// A page read as `name / price / description`: each price closes the
+  /// line before it as a dish name; the first line after it is that
+  /// dish's description; a short line between that and the next name is
+  /// a section header, and any longer one joins the description. Nothing
+  /// after the last dish's description is read.
+  static List<String> _fromNameThenPrice(List<String> lines) {
+    final out = <String>[];
+    final runs = _runsBetweenPrices(lines);
+    String? name;
+    for (var i = 0; i < runs.length; i++) {
+      final run = runs[i];
+      final isLast = i == runs.length - 1;
+      final description = <String>[];
+      var rest = run;
+      if (name != null && run.isNotEmpty) {
+        description.add(run.first);
+        rest = run.sublist(1);
+      }
+      String? next;
+      String? header;
+      if (!isLast && rest.isNotEmpty) {
+        next = rest.last;
+        final between = rest.sublist(0, rest.length - 1);
+        if (between.isNotEmpty && _looksLikeHeader(between.last)) {
+          header = between.last;
+          description.addAll(between.sublist(0, between.length - 1));
+        } else {
+          description.addAll(between);
+        }
+      }
+      final current = name;
+      if (current != null) _emitDish(out, current, description);
+      if (header != null) _emitHeader(out, header);
+      name = next;
+    }
+    return out;
   }
 
   static List<String> _fromSeparatePrices(List<String> lines) {
@@ -205,12 +325,14 @@ abstract final class WebsiteMenuLocator {
 
   /// The dish name in [line] when it ends in a price, else null. The name
   /// must hold a letter and must not itself end in a digit or a dash, so
-  /// "Sunday–Thursday 12–23" and "Tel 03-5551234" are not dishes.
+  /// "Sunday–Thursday 12–23" and "Tel 03-5551234" are not dishes, and must
+  /// not read as a street address ("Tel Aviv, Dizengoff 99").
   static String? _inlineDishName(String line) {
     final match = _trailingPrice.firstMatch(line);
     if (match == null) return null;
     final rest = line.substring(0, match.start).trim();
     if (!_letter.hasMatch(rest) || _endsInDigit.hasMatch(rest)) return null;
+    if (_address.hasMatch(rest)) return null;
     return rest;
   }
 
@@ -239,12 +361,14 @@ abstract final class WebsiteMenuLocator {
   static String _clean(String line) =>
       line.replaceFirst(_bullet, '').replaceAll(_whitespace, ' ').trim();
 
-  static bool _namesMenu(PageLink link) {
+  static bool _addressNamesMenu(PageLink link) {
     final address = _decodePath(link.uri.path).toLowerCase();
+    return menuWords.any(address.contains);
+  }
+
+  static bool _textNamesMenu(PageLink link) {
     final text = link.text.toLowerCase();
-    return menuWords.any(
-      (word) => address.contains(word) || text.contains(word),
-    );
+    return menuWords.any(text.contains);
   }
 
   /// [path] percent-decoded as UTF-8, else byte by byte as `windows-1255`

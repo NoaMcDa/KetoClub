@@ -77,6 +77,33 @@ void main() {
       expect(capturedUri, equals(_expectedUri));
     });
 
+    test('fetch escapes a slash or question mark in the slug (#283)', () async {
+      // Arrange
+      final captured = <String>[];
+      Future<http.Response> answer(http.Request request) async {
+        captured.add(request.url.toString());
+        return http.Response(_emptyMenuBody, 200);
+      }
+
+      const odd = VenueRef(source: MenuSource.wolt, platformId: 'a/b?c');
+
+      // Act
+      await WoltMenuAdapter(client: MockClient(answer)).fetch(odd);
+      await WoltMenuAdapter(
+        client: MockClient(answer),
+        proxyBase: Uri.parse('http://localhost:8000'),
+      ).fetch(odd);
+
+      // Assert
+      const direct =
+          'https://consumer-api.wolt.com/consumer-api/consumer-assortment/v1/'
+          'venues/slug/a%2Fb%3Fc/assortment';
+      const proxied =
+          'http://localhost:8000/v1/proxy/wolt/venues/slug/a%2Fb%3Fc/'
+          'assortment';
+      expect(captured, [direct, proxied]);
+    });
+
     test('fetch sends the browser User-Agent and Accept headers outside a '
         'browser', () async {
       // Arrange

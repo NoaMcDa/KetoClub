@@ -111,11 +111,18 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
   };
 
   /// The scan route's reasons the website route answers with a 502 when a
-  /// linked PDF could not be read (`offline` is absent: it is the site
-  /// fetch's own reason too, and reads as the site not answering).
-  static const Set<String> _pdfReasons = <String>{
+  /// linked PDF was read and gave nothing usable: the device would only
+  /// hear the same answer.
+  static const Set<String> _pdfUnreadReasons = <String>{'badResponse'};
+
+  /// The scan route's reasons the website route answers with a 502 when
+  /// the server could not run the PDF's vision read at all — no key, an
+  /// empty analysis bucket, a timeout — which a scan's fallback chain
+  /// treats as the backend not answering (#465; `offline` is absent: it
+  /// is the site fetch's own reason too, and reads as the site not
+  /// answering).
+  static const Set<String> _pdfNotRunReasons = <String>{
     'notConfigured',
-    'badResponse',
     'timeout',
     'rateLimited',
   };
@@ -240,9 +247,12 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
   /// website route whose error body named [reason] (null when none).
   ///
   /// `menuNotFound` keeps its name and `noDishesFound` is
-  /// [MenuFetchFailureReason.websitePdfUnread]; a 502 naming one of the
-  /// scan route's reasons is the linked PDF going unread, also
-  /// [MenuFetchFailureReason.websitePdfUnread]; every website fetch route
+  /// [MenuFetchFailureReason.websitePdfUnread]; a 502 `badResponse` is the
+  /// linked PDF read with nothing usable, also
+  /// [MenuFetchFailureReason.websitePdfUnread]; a 502 `notConfigured`,
+  /// `timeout` or `rateLimited` is the server unable to run the read, so
+  /// [MenuFetchFailureReason.backendUnreachable] and the device tries its
+  /// own key (#465, as a scan's chain does); every website fetch route
   /// reason reads as [BackendWebsiteFetcher.reasonFor] reads it (so a 429
   /// `rateLimited` is [MenuFetchFailureReason.websiteRateLimited]).
   /// Anything else — a refused header (400 `badResponse`), a validation
@@ -255,8 +265,11 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
     if (reason == null) return MenuFetchFailureReason.backendUnreachable;
     if (reason == 'menuNotFound') return MenuFetchFailureReason.menuNotFound;
     if (reason == 'noDishesFound' ||
-        (statusCode == 502 && _pdfReasons.contains(reason))) {
+        (statusCode == 502 && _pdfUnreadReasons.contains(reason))) {
       return MenuFetchFailureReason.websitePdfUnread;
+    }
+    if (statusCode == 502 && _pdfNotRunReasons.contains(reason)) {
+      return MenuFetchFailureReason.backendUnreachable;
     }
     if (_websiteFetchReasons.contains(reason)) {
       return BackendWebsiteFetcher.reasonFor(reason);

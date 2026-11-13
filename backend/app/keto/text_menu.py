@@ -5,18 +5,26 @@ classifier input, so a pasted menu needs no engine of its own; it only needs
 to become dishes. The rules, in the order they apply to each line (the Dart
 ``TextMenuSource`` docs are the reference):
 
+Each line is first cleaned:
+
 * Lines are trimmed (Dart ``trim``) and blank ones dropped, though a blank
   line is remembered, because it can end a section header.
-* A trailing price (``45``, ``45 ₪``, ``₪45``, ``45.90 NIS``) is stripped,
-  and a line that was only a price disappears.
-* A line ending in ``:`` is a section header.
-* A line starting with ``-``, ``(`` or a lowercase letter straight after a
-  dish is that dish's description continued (a wrapped line).
-* A short line (at most ``pastedHeaderMaxWords`` words, no digits) that
-  stands alone, with a blank line before it (or the start of the text) and a
-  blank line and then more text after it, is a section header too; this rule
-  is off when no two non-blank lines are adjacent.
-* Every other line is a dish: ``price 0``, no options, id ``p1..pN``.
+* A WhatsApp sender prefix (``[12/11/2026, 14:02] Dana: ``) is removed (#479).
+* A line wrapped in ``*…*`` or ``_…_`` loses the markers and is emphasised;
+  ``*…*`` inside a line loses its markers.
+* A leading bullet is removed and remembered: a dash, a number (``1.``,
+  ``2)``) or any run of symbols (#282).
+* A price is stripped: a trailing one, a leading one and a size's one; a line
+  that was only a price disappears, and a line that lost a price is priced.
+
+Then each line is a section header (ends in ``:``, or emphasised and
+unpriced); a wrapped line of the dish above (``(``; a dash unless that dish
+was bulleted; a lowercase start unless that dish's name has one); in a priced
+paste, an unpriced unbulleted line after a priced dish is its description (a short
+all-capitals Latin line is a header) and an unpriced short line before a
+priced one is a header; a short line standing alone between blank lines is a
+header (off when no two non-blank lines are adjacent); and every other line is
+a dish: ``price 0``, no options, id ``p1..pN``.
 
 The Dart regexes are **non-unicode** ones, so this module spells their
 semantics out instead of leaning on Python's defaults: ``\\d`` is ASCII only,
@@ -32,6 +40,7 @@ example the Egyptian Hieroglyphs Extended-A letters) are not letters there.
 
 import re
 from bisect import bisect_right
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Final
 
@@ -230,16 +239,71 @@ _DEFAULT_UNCATEGORISED_NAME: Final = "Pasted menu"
 
 _LINE_BREAK: Final = re.compile(r"\r\n|\r|\n")
 _WHITESPACE: Final = re.compile(f"{WS}+")
-_BULLET_START: Final = re.compile(f"^-+{WS}*")
 _DIGIT: Final = re.compile("[0-9]")
+_MIN_PRICED_LINES: Final = 3
+
+CURRENCY_SOURCE: Final = (
+    "(?:₪|NIS|ILS|ש[\\x22״׳']?ח|שקלים|שקל|shekels?|shkalim|sheqalim)"
+)
+"""``priceCurrencySource``, verbatim (it holds no ``\\s``, ``\\d`` or ``$``)."""
 
 PRICE_SUFFIX_SOURCE: Final = (
-    rf"(?:^|{WS}+|{WS}*[-–—:]{WS}*)(?:₪{WS}*)?[0-9]+(?:[.,][0-9]{{1,2}})?"
-    rf"(?:{WS}*(?:₪|NIS|ILS))?{WS}*\Z"
+    rf"(?:^|(?<!{WS}){WS}+|(?<!{WS})(?<![-–—:.…|]){WS}*[-–—:.…|]+{WS}*)"
+    rf"(?:(?:מחיר|price){WS}*:?{WS}*)?(?:\({WS}*)?"
+    rf"(?:{CURRENCY_SOURCE}{WS}*)?[0-9]+(?:[.,][0-9]{{1,2}})?(?:[.,]-)?"
+    rf"(?:{WS}*/{WS}*[0-9]+(?:[.,][0-9]{{1,2}})?)*(?:{WS}*{CURRENCY_SOURCE})?"
+    rf"(?:{WS}*\))?{WS}*\Z"
 )
 """``pastedPriceSuffix`` with Dart's ``\\s``, ``\\d`` and ``$`` spelled out."""
 
 _PRICE_SUFFIX: Final = re.compile(PRICE_SUFFIX_SOURCE, re.IGNORECASE | re.ASCII)
+_PRICE_PREFIX: Final = re.compile(
+    rf"^(?:{CURRENCY_SOURCE}{WS}*[0-9]+(?:[.,][0-9]{{1,2}})?"
+    rf"|[0-9]{{2,}}(?:[.,][0-9]{{1,2}})?(?:{WS}*{CURRENCY_SOURCE})?)"
+    rf"(?:{WS}*[-–—:.…|]+{WS}*|{WS}+)"
+    r'(?!(?:g|gr|grams?|kg|ml|cl|oz|pcs|pieces|ג|גר|גרם|יח|יחידות|מ"ל|ק"ג)'
+    rf"(?:{WS}|[.,)]|\Z))"
+    rf"(?={NOT_WS})",
+    re.IGNORECASE | re.ASCII,
+)
+"""``pastedPricePrefix``."""
+_SIZED_PRICE: Final = re.compile(
+    rf"(?<!{WS}){WS}+[0-9]{{2,}}(?:[.,][0-9]{{1,2}})?"
+    rf"(?:{WS}*{CURRENCY_SOURCE})?(?={WS}*/)",
+    re.IGNORECASE | re.ASCII,
+)
+"""``pastedSizedPrice``."""
+_CHAT_PREFIX: Final = re.compile(
+    rf"^[‎‏]*(?:\[[0-9]{{1,4}}[./-][0-9]{{1,2}}[./-][0-9]{{1,4}},?{WS}+"
+    rf"[0-9]{{1,2}}:[0-9]{{2}}(?::[0-9]{{2}})?(?:{WS}*[AaPp]\.?[Mm]\.?)?\]{WS}*"
+    rf"|[0-9]{{1,4}}[./-][0-9]{{1,2}}[./-][0-9]{{1,4}},?{WS}+[0-9]{{1,2}}:[0-9]{{2}}"
+    rf"(?::[0-9]{{2}})?(?:{WS}*[AaPp]\.?[Mm]\.?)?{WS}+[-–]{WS}+)"
+    rf"[^:\[\]]{{1,60}}?:{WS}*"
+)
+"""``pastedChatPrefix``."""
+_SPACE: Final = re.compile(WS)
+_LATIN_CAPITAL: Final = re.compile("[A-Z]")
+_DASH_BULLET: Final = re.compile(f"^[-–—]+{WS}*")
+_NUMBER_BULLET: Final = re.compile(f"^[0-9]{{1,2}}[.)]{WS}+")
+_EMPHASIS: Final = re.compile(
+    rf"^([*_])([^*_{WS_CLASS}](?:[^*_]*[^*_{WS_CLASS}])?)\1\Z"
+)
+_INNER_BOLD: Final = re.compile(rf"\*([^*{WS_CLASS}](?:[^*]*[^*{WS_CLASS}])?)\*")
+_NOT_BULLETS: Final = "([\"'״׳“”„‘’«₪"
+
+_BULLET_NONE: Final = 0
+_BULLET_DASH: Final = 1
+_BULLET_OTHER: Final = 2
+
+
+@dataclass(frozen=True, slots=True)
+class _Line:
+    """One pasted line after cleaning (Dart ``_Line``)."""
+
+    text: str
+    priced: bool
+    bullet: int
+    emphasised: bool
 
 
 def parse(
@@ -261,6 +325,17 @@ def parse(
     max_dishes = vocabulary().caps.max_analysed_dishes
     lines = [dart_trim(line) for line in _LINE_BREAK.split(scrub_lone_surrogates(text))]
     blank_rule_on = _has_adjacent_lines(lines)
+    read = [_read(line) for line in lines]
+    priced_count = sum(1 for line in read if line is not None and line.priced)
+    unpriced_count = sum(
+        1
+        for line in read
+        if line is not None and not line.priced and not line.text.endswith(":")
+    )
+    priced_paste = (
+        priced_count >= _MIN_PRICED_LINES and priced_count * 2 >= unpriced_count
+    )
+    max_words = vocabulary().pasted.pasted_header_max_words
 
     categories: list[MenuCategory] = []
     category_id = _UNCATEGORISED_ID
@@ -269,6 +344,7 @@ def parse(
     header_count = 0
     dish_count = 0
     can_continue = False
+    dish_line: _Line | None = None
 
     def start_category(name: str) -> None:
         nonlocal category_id, category_name, dishes, header_count, can_continue
@@ -282,38 +358,60 @@ def parse(
         category_name = name
         can_continue = False
 
-    for index, line in enumerate(lines):
-        if not line:
+    def describe(part: str) -> None:
+        last = dishes.pop()
+        dishes.append(
+            Dish(
+                id=last.id,
+                name=last.name,
+                description=part
+                if not last.description
+                else f"{last.description} {part}",
+                price=0.0,
+                options=[],
+            )
+        )
+
+    for index, raw in enumerate(lines):
+        if not raw:
             can_continue = False
             continue
         if dish_count >= max_dishes:
             break
 
-        cleaned = dart_trim(_PRICE_SUFFIX.sub("", line, count=1))
-        if not has_letter_or_digit(cleaned):
+        line = read[index]
+        if line is None:
             continue
+        cleaned = line.text
 
         if cleaned.endswith(":"):
             name = dart_trim(cleaned[:-1])
             if name:
                 start_category(name)
                 continue
-
-        if can_continue and _continues_dish(cleaned):
-            last = dishes.pop()
-            part = _BULLET_START.sub("", cleaned, count=1)
-            dishes.append(
-                Dish(
-                    id=last.id,
-                    name=last.name,
-                    description=part
-                    if not last.description
-                    else f"{last.description} {part}",
-                    price=0.0,
-                    options=[],
-                )
-            )
+        if line.emphasised and not line.priced:
+            start_category(cleaned)
             continue
+
+        above = dish_line
+        if can_continue and above is not None and _continues(line, above):
+            describe(cleaned)
+            continue
+
+        if priced_paste and not line.priced and line.bullet == _BULLET_NONE:
+            short = (
+                not _DIGIT.search(cleaned)
+                and len(_WHITESPACE.split(cleaned)) <= max_words
+            )
+            if can_continue and above is not None and above.priced:
+                if short and _is_capitals_only(cleaned):
+                    start_category(cleaned)
+                else:
+                    describe(cleaned)
+                continue
+            if short and _next_is_priced(read, index):
+                start_category(cleaned)
+                continue
 
         if blank_rule_on and _is_short_header(cleaned, lines, index):
             start_category(cleaned)
@@ -326,6 +424,7 @@ def parse(
             )
         )
         can_continue = True
+        dish_line = line
 
     if dishes:
         categories.append(
@@ -369,6 +468,75 @@ def _is_short_header(cleaned: str, lines: list[str], index: int) -> bool:
     return any(lines[later] for later in range(follower + 1, len(lines)))
 
 
-def _continues_dish(cleaned: str) -> bool:
-    """Whether ``cleaned`` reads as the wrapped tail of the dish above it."""
-    return cleaned.startswith(("-", "(")) or starts_lowercase(cleaned)
+def _read(raw: str) -> _Line | None:
+    """``raw``, a trimmed line, cleaned (Dart ``_read``), or ``None`` when
+    nothing but punctuation is left of it."""
+    text = _CHAT_PREFIX.sub("", raw, count=1)
+    emphasised = False
+    emphasis = _EMPHASIS.search(text)
+    if emphasis is not None:
+        text = emphasis.group(2)
+        emphasised = True
+    text = _INNER_BOLD.sub(lambda match: match.group(1), text)
+    bullet = _BULLET_NONE
+    dash = _DASH_BULLET.match(text)
+    number = _NUMBER_BULLET.match(text) if dash is None else None
+    if dash is not None:
+        text = text[dash.end() :]
+        bullet = _BULLET_DASH
+    elif number is not None:
+        text = text[number.end() :]
+        bullet = _BULLET_OTHER
+    else:
+        start = 0
+        while start < len(text) and _is_bullet_char(text[start]):
+            start += 1
+        if start > 0:
+            text = dart_trim(text[start:])
+            bullet = _BULLET_OTHER
+    without_suffix = dart_trim(_PRICE_SUFFIX.sub("", text, count=1))
+    without_prefix = _PRICE_PREFIX.sub("", without_suffix, count=1)
+    cleaned = dart_trim(_SIZED_PRICE.sub("", without_prefix))
+    if not has_letter_or_digit(cleaned):
+        return None
+    return _Line(
+        text=cleaned,
+        priced=without_suffix != dart_trim(text) or without_prefix != without_suffix,
+        bullet=bullet,
+        emphasised=emphasised,
+    )
+
+
+def _is_bullet_char(char: str) -> bool:
+    """Whether ``char`` is part of a leading bullet."""
+    return (
+        not has_letter_or_digit(char)
+        and _SPACE.fullmatch(char) is None
+        and char not in _NOT_BULLETS
+    )
+
+
+def _continues(line: _Line, above: _Line) -> bool:
+    """Whether ``line`` reads as the wrapped tail of the dish ``above`` made."""
+    if line.bullet == _BULLET_OTHER:
+        return False
+    if line.bullet == _BULLET_DASH:
+        return above.bullet == _BULLET_NONE
+    if line.text.startswith("("):
+        return True
+    return starts_lowercase(line.text) and not starts_lowercase(above.text)
+
+
+def _is_capitals_only(text: str) -> bool:
+    """Whether ``text`` holds a Latin capital and no lowercase letter."""
+    return _LATIN_CAPITAL.search(text) is not None and not any(
+        _is_lowercase(char) for char in text
+    )
+
+
+def _next_is_priced(read: list[_Line | None], index: int) -> bool:
+    """Whether the next line after ``index`` that was read is priced."""
+    for later in read[index + 1 :]:
+        if later is not None:
+            return later.priced
+    return False

@@ -2425,6 +2425,19 @@ fallback when a platform blocks the browser (§6, §13); this builds it.
   also followed by a blank line, and without this it would read as a header. A paste
   where every line is separated by a blank one switches the rule off, since every
   dish would otherwise be a header.
+- **Amended by #282 and #479 (2026-11).** Before the rules above, a line loses a
+  WhatsApp sender prefix, `*bold*`/`_italic_` markers (a wholly emphasised,
+  unpriced line is a header) and a leading bullet (dash, number or symbols). A
+  price may also lead the line (`45 Pasta`, `₪38 Omelette`), sit in parentheses,
+  after dot leaders or `|`, be a `48/56` pair, or carry `ש"ח`/`שקלים`/`shkalim`
+  (`priceCurrencySource`, shared with the website reader). Dashes under a dish
+  that was itself bulleted, and lowercase lines under a lowercase dish, are list
+  items, not descriptions. The price is now a signal: in a paste with at least
+  three priced lines and at least half as many as unpriced ones, an unpriced line
+  under a priced dish is its description (a short all-capitals Latin line is a
+  header), and an unpriced short line before a priced one is a header; a paste
+  without prices reads as before. The Python twin (`app/keto/text_menu.py`) and
+  the `text_menu` goldens move with it.
 - **The reference.** A paste's `VenueRef` is `scan/<hex of
   TextNormaliser.menuFingerprint(menu)>`, eight digits, so the same dishes pasted
   again are the same cache entry (the price does not enter the fingerprint) and
@@ -2500,6 +2513,19 @@ often appear on neither.
   is proof of reversed text. A geresh or gershayim between two letters is part
   of the word (פרמז'ן, תנ"ך), so a loanword's final letter is not read as the
   start of one (issue #442).
+- **Amended by #480 and #283 (2026-11).** A price may carry a currency word or
+  a `מחיר:` label (`priceCurrencySource`, one source with the paste reader);
+  visually hidden text (`sr-only` and kin) and dietary tag lines (`מנה
+  צמחונית`, `vegan`, `GF`) are dropped before lines are read; a page set as
+  `name / price / description` (most prices followed by a longer line than
+  the one before) is read in that order; a line that reads as a street address
+  is never a priced dish. Among menu links, one whose own address names the
+  menu beats one only its text names (an events page linked "תפריט בהתאמה").
+  A page's charset may come from a `<meta>` tag, and the `iso-8859-8` labels
+  all read as Hebrew. The resolver reads a bare domain as `https://`, refuses a
+  port the fetcher would refuse (anything but 80 and 443), reads Wolt
+  `/venue/` links, and refuses `*.app.link` short links rather than fetching
+  them as a website.
 - **Fetching it (crawl hygiene).** Web goes through the backend's new
   `POST /v1/website/fetch` (`{"url"}` in the body, so no URL reaches a request
   log; answers `{kind: html|pdf, content_type, body, final_url}`, a PDF's body in
@@ -3007,6 +3033,12 @@ every platform, and keeps the Dart code as its fallback. Nine decisions:
    questions `FallbackChatClient`. What falls through, and what is reported:
    - Menus: `backendUnreachable` and `offline`. Every other reason is the
      platform's or the site's own answer, which the device would only hear again.
+     A website's PDF the server could not read at all (a 502 `notConfigured`,
+     `timeout` or `rateLimited` from `/v1/website-menu`) reads as
+     `backendUnreachable`, as the same failure falls through on `/v1/scan`; a
+     502 `badResponse` and a 422 `noDishesFound` stay `websitePdfUnread`
+     (#465). When the device then fails with `websitePdfUnread` too, that is
+     reported: it names what to fix.
    - Classifiers and chat: `notConfigured`, `backendUnreachable`, `timeout`,
      `rateLimited`. `offline`, `badResponse`, `noDishesFound`, `consentWithheld`
      and the key reasons are returned as they are.

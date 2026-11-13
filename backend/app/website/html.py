@@ -599,6 +599,14 @@ _INVISIBLE: Final = PairedTags(
     flags=_FLAGS,
     same_name=True,
 )
+_SCREEN_READER_ONLY: Final = re.compile(
+    "(sr-only|scr-reader-only|screen-reader-text|visually-hidden|visuallyhidden)"
+    "([^<>]{0,1000})>[^<]{0,300}",
+    _FLAGS,
+)
+"""``WebsiteHtml._screenReaderOnly``: an element's visually hidden text (#480).
+Linear: every attempt starts at a class-name literal and its quantifiers are
+bounded."""
 _SCRIPTS_ONLY: Final = PairedTags(
     "script|style|noscript|template|svg", space=WS, flags=_FLAGS, same_name=True
 )
@@ -685,14 +693,35 @@ def decode_entities(text: str) -> str:
     return join_surrogates(_ENTITY.sub(replace, text))
 
 
+def _drop_screen_reader_only(text: str) -> str:
+    """``_SCREEN_READER_ONLY.sub``, skipped when no class name it knows is on
+    the page: a substring check is far cheaper than the regex's scan."""
+    lowered = text.lower()
+    if not any(hint in lowered for hint in _SCREEN_READER_HINTS):
+        return text
+    return _SCREEN_READER_ONLY.sub(r"\1\2>", text)
+
+
+_SCREEN_READER_HINTS: Final = (
+    "sr-only",
+    "scr-reader-only",
+    "screen-reader-text",
+    "visually-hidden",
+    "visuallyhidden",
+)
+
+
 def lines(html: str) -> list[str]:
     """The page's visible text as trimmed, non-blank lines in reading order.
 
-    Drops comments, ``<head>``, scripts, styles, templates, SVG, ``<nav>``
-    and ``<footer>``; starts a new line at every block element and joins
-    table cells with a space, so a row reads ``Dish 52`` as one line.
+    Drops comments, ``<head>``, scripts, styles, templates, SVG, ``<nav>``,
+    ``<footer>`` and visually hidden text (``sr-only`` and kin, #480); starts
+    a new line at every block element and joins table cells with a space, so a
+    row reads ``Dish 52`` as one line.
     """
-    without_hidden = _INVISIBLE.sub("\n", sub_comments(" ", html))
+    without_hidden = _drop_screen_reader_only(
+        _INVISIBLE.sub("\n", sub_comments(" ", html))
+    )
     broken = sub_tags(
         _TAG,
         " ",

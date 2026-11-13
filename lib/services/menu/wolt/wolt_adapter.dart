@@ -108,10 +108,20 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
     final proxyBase = this.proxyBase;
     final uri = proxyBase != null
         ? _proxyUri(proxyBase, ref.platformId)
-        : Uri.https(
-            'consumer-api.wolt.com',
-            '/consumer-api/consumer-assortment/v1/venues/slug/'
-                '${ref.platformId}/assortment',
+        : Uri(
+            scheme: 'https',
+            host: 'consumer-api.wolt.com',
+            // Segments, so a slug holding a decoded `/` or `?` (#283) is
+            // escaped rather than read as more path or a query.
+            pathSegments: <String>[
+              'consumer-api',
+              'consumer-assortment',
+              'v1',
+              'venues',
+              'slug',
+              ref.platformId,
+              'assortment',
+            ],
           );
     final headers = proxyBase != null
         // The backend builds Wolt's headers itself (`backend_plan.md`
@@ -199,7 +209,8 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
         ? rendered.substring(0, rendered.length - 1)
         : rendered;
     return Uri.parse(
-      '$trimmed/v1/proxy/wolt/venues/slug/$platformId/assortment',
+      '$trimmed/v1/proxy/wolt/venues/slug/'
+      '${Uri.encodeComponent(platformId)}/assortment',
     );
   }
 }

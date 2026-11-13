@@ -8,6 +8,7 @@ same, once both sides are written as canonical JSON (#326).
 
 import json
 import re
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -120,3 +121,13 @@ def test_dart_upper_first_is_dart_s_one_to_one_code_unit_mapping(
 )  # fmt: skip
 def test_starts_lowercase(text: str, expected: bool) -> None:
     assert starts_lowercase(text) is expected
+
+
+@pytest.mark.parametrize("run", ["-", ":", ".", " ", " ."])
+def test_a_long_run_of_marks_or_spaces_reads_in_linear_time(run: str) -> None:
+    # The price separator takes a run of marks (dot leaders, #282); it may
+    # only start where a run starts, or 200 KB of dashes takes minutes.
+    line = "Steak 45\nSalad" + run * (200_000 // len(run)) + "x"
+    started = time.perf_counter()
+    parse(line, now=_GOLDEN_NOW)
+    assert time.perf_counter() - started < 2.0

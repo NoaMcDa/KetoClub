@@ -489,6 +489,222 @@
   },
   {
     "anyCharacterReversed": null,
+    "baseUrl": "https://www.cafe.example/",
+    "html": "<!doctype html>\n<!-- Trimmed synthetic fixture (issue #480), shaped like a real café chain's\n     homepage seen 2026-11-12: an events \"menu\" linked to the contact page\n     comes before the real menus, whose own addresses name the menu. -->\n<html lang=\"he\" dir=\"rtl\"><head><title>בית קפה</title></head>\n<body>\n<header>\n  <a href=\"/contacts/contact/\">תפריט בהתאמה</a>\n  <a href=\"/dairy_menu/morning/\">תפריט חלבי</a>\n  <a href=\"/meat_menu/morning/\">תפריט בשרי</a>\n</header>\n<p>ברוכים הבאים</p>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "תפריט בהתאמה",
+      "תפריט חלבי",
+      "תפריט בשרי",
+      "ברוכים הבאים"
+    ],
+    "links": [
+      {
+        "text": "תפריט בהתאמה",
+        "uri": "https://www.cafe.example/contacts/contact/"
+      },
+      {
+        "text": "תפריט חלבי",
+        "uri": "https://www.cafe.example/dairy_menu/morning/"
+      },
+      {
+        "text": "תפריט בשרי",
+        "uri": "https://www.cafe.example/meat_menu/morning/"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://www.cafe.example/dairy_menu/morning/"
+    },
+    "menuText": null,
+    "name": "menu_text_link_first.html",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Trimmed synthetic fixture (issue #480), shaped like a real Tel Aviv\n     café's menu page seen 2026-11-12: each dish is name, dietary tags,\n     price (its currency word only for screen readers), then description. -->\n<html lang=\"he\" dir=\"rtl\"><head><title>תפריט אוכל</title></head>\n<body>\n<nav><a href=\"/\">בית</a><a href=\"/menu/food\">אוכל</a></nav>\n<h2>ראשונות</h2>\n<div class=\"menuModuleTextItem\">\n  <div class=\"menuModuleTextItemTitle\">חציל שרוף באש</div>\n  <div class=\"tag\">מנה צמחונית</div>\n  <div class=\"tag\">מנה ללא גלוטן</div>\n  <div class=\"menuModuleTextItemPrice\">48<span class=\"scr-reader-only\">shkalim</span></div>\n  <div class=\"menuModuleTextItemDescription\">טחינה, שמן זית, עגבניות שרי ופלפל חריף</div>\n</div>\n<div class=\"menuModuleTextItem\">\n  <div class=\"menuModuleTextItemTitle\">כרובית וברוקולי פריכים</div>\n  <div class=\"tag\">מנה טבעונית</div>\n  <div class=\"menuModuleTextItemPrice\">52<span class=\"scr-reader-only\">shkalim</span></div>\n  <div class=\"menuModuleTextItemDescription\">רוטב יוגורט, לימון כבוש ועשבי תיבול</div>\n</div>\n<h2>עיקריות</h2>\n<div class=\"menuModuleTextItem\">\n  <div class=\"menuModuleTextItemTitle\">שניצל עוף</div>\n  <div class=\"menuModuleTextItemPrice\">67<span class=\"scr-reader-only\">shkalim</span></div>\n  <div class=\"menuModuleTextItemDescription\">פירורי לחם, תפוחי אדמה מעוכים וסלט ירוק</div>\n</div>\n<div class=\"menuModuleTextItem\">\n  <div class=\"menuModuleTextItemTitle\">סטייק אנטריקוט</div>\n  <div class=\"tag\">ללא גלוטן</div>\n  <div class=\"menuModuleTextItemPrice\">128<span class=\"scr-reader-only\">shkalim</span></div>\n  <div class=\"menuModuleTextItemDescription\">300 גרם, חמאת עשבים, צ׳יפס בצד</div>\n</div>\n<footer><p>דיזנגוף 99, תל אביב</p></footer>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "ראשונות",
+      "חציל שרוף באש",
+      "מנה צמחונית",
+      "מנה ללא גלוטן",
+      "48",
+      "טחינה, שמן זית, עגבניות שרי ופלפל חריף",
+      "כרובית וברוקולי פריכים",
+      "מנה טבעונית",
+      "52",
+      "רוטב יוגורט, לימון כבוש ועשבי תיבול",
+      "עיקריות",
+      "שניצל עוף",
+      "67",
+      "פירורי לחם, תפוחי אדמה מעוכים וסלט ירוק",
+      "סטייק אנטריקוט",
+      "ללא גלוטן",
+      "128",
+      "300 גרם, חמאת עשבים, צ׳יפס בצד"
+    ],
+    "links": [
+      {
+        "text": "בית",
+        "uri": "https://cafe-noir.example/"
+      },
+      {
+        "text": "אוכל",
+        "uri": "https://cafe-noir.example/menu/food"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://cafe-noir.example/menu/food"
+    },
+    "menuText": "ראשונות:\nחציל שרוף באש\n- טחינה, שמן זית, עגבניות שרי ופלפל חריף\nכרובית וברוקולי פריכים\n- רוטב יוגורט, לימון כבוש ועשבי תיבול\nעיקריות:\nשניצל עוף\n- פירורי לחם, תפוחי אדמה מעוכים וסלט ירוק\nסטייק אנטריקוט\n- 300 גרם, חמאת עשבים, צ׳יפס בצד",
+    "name": "name_price_description_menu.html",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "טחינה, שמן זית, עגבניות שרי ופלפל חריף",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "חציל שרוף באש",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "רוטב יוגורט, לימון כבוש ועשבי תיבול",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "כרובית וברוקולי פריכים",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "ראשונות"
+        },
+        {
+          "dishes": [
+            {
+              "description": "פירורי לחם, תפוחי אדמה מעוכים וסלט ירוק",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "שניצל עוף",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "300 גרם, חמאת עשבים, צ׳יפס בצד",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "סטייק אנטריקוט",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-2",
+          "name": "עיקריות"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "7dcdb2f5",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Trimmed synthetic fixture (issue #480), shaped like a real Israeli\n     café chain's breakfast page seen 2026-11-12: name, description, then\n     a \"מחיר: 89 שקלים\" price line. -->\n<html lang=\"he\" dir=\"rtl\"><head><title>ארוחות בוקר</title></head>\n<body>\n<h1>ארוחות בוקר</h1>\n<div class=\"item\"><h3>ארוחת בוקר ישראלית</h3>\n  <p>ארוחת הבוקר מוגשת עם סלסלת לחמים, סלט קצוץ, גבינות וממרחים</p>\n  <p>מחיר: 89 שקלים</p></div>\n<div class=\"item\"><h3>שקשוקה</h3>\n  <p>עגבניות, פלפלים ושתי ביצים, מוגשת עם לחם</p>\n  <p>מחיר: 64 שקלים</p></div>\n<div class=\"item\"><h3>חביתת ירק</h3>\n  <p>שלוש ביצים, עשבי תיבול וסלט ירוק</p>\n  <p>מחיר: 58 ש\"ח</p></div>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "ארוחות בוקר",
+      "ארוחת בוקר ישראלית",
+      "ארוחת הבוקר מוגשת עם סלסלת לחמים, סלט קצוץ, גבינות וממרחים",
+      "מחיר: 89 שקלים",
+      "שקשוקה",
+      "עגבניות, פלפלים ושתי ביצים, מוגשת עם לחם",
+      "מחיר: 64 שקלים",
+      "חביתת ירק",
+      "שלוש ביצים, עשבי תיבול וסלט ירוק",
+      "מחיר: 58 ש\"ח"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "ארוחות בוקר:\nארוחת בוקר ישראלית\n- ארוחת הבוקר מוגשת עם סלסלת לחמים, סלט קצוץ, גבינות וממרחים\nשקשוקה\n- עגבניות, פלפלים ושתי ביצים, מוגשת עם לחם\nחביתת ירק\n- שלוש ביצים, עשבי תיבול וסלט ירוק",
+    "name": "price_label_menu.html",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "ארוחת הבוקר מוגשת עם סלסלת לחמים, סלט קצוץ, גבינות וממרחים",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "ארוחת בוקר ישראלית",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "עגבניות, פלפלים ושתי ביצים, מוגשת עם לחם",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "שקשוקה",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "שלוש ביצים, עשבי תיבול וסלט ירוק",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "חביתת ירק",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "ארוחות בוקר"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "7edeae31",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": null,
     "baseUrl": "https://cafe-noir.example/",
     "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): a homepage with no menu anywhere. -->\n<html lang=\"en\"><head><title>Cafe Noir</title></head>\n<body>\n<nav><a href=\"/\">Home</a> <a href=\"/about\">About</a> <a href=\"/contact\">Contact</a></nav>\n<h1>Cafe Noir</h1>\n<p>A neighbourhood bistro since 1998. Lunch from 45.</p>\n<p>Book a table: call us any day.</p>\n<footer>Rothschild 1, Tel Aviv</footer>\n</body></html>\n",
     "isJavaScriptOnly": false,
@@ -559,6 +775,219 @@
     "name": "pdf_link.html",
     "reservesAi": false,
     "textMenu": null
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<p>Salad 42 shekels</p><p>Soup 30 shkalim</p><p>Steak 98 NIS</p><p>Cola price: 12</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Salad 42 shekels",
+      "Soup 30 shkalim",
+      "Steak 98 NIS",
+      "Cola price: 12"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "Salad\nSoup\nSteak\nCola",
+    "name": "inline_currency_words",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "Cola",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "b57e568c",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<p>Tel Aviv, Dizengoff 99</p><p>Salad 42</p><p>Soup 30</p><p>Steak 98</p><p>Herzl St 12</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Tel Aviv, Dizengoff 99",
+      "Salad 42",
+      "Soup 30",
+      "Steak 98",
+      "Herzl St 12"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "Salad\nSoup\nSteak",
+    "name": "inline_addresses_are_not_dishes",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "c90737d9",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<p>Salad</p><p>Greens</p><p>42<span class=\"sr-only\">NIS</span></p><p>Soup</p><p>Lentils</p><p>30<span class=visually-hidden>shekels</span></p><p>Steak</p><p>Aged</p><p>98</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Salad",
+      "Greens",
+      "42",
+      "Soup",
+      "Lentils",
+      "30",
+      "Steak",
+      "Aged",
+      "98"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "Salad\n- Greens\nSoup\n- Lentils\nSteak\n- Aged",
+    "name": "inline_screen_reader_text",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "Greens",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "Lentils",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "Aged",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "fbd004a1",
+        "source": "scan"
+      }
+    }
   },
   {
     "anyCharacterReversed": null,

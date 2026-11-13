@@ -2671,7 +2671,7 @@
     "pastedHeaderMaxWords": 4,
     "pastedPriceSuffix": {
       "caseSensitive": false,
-      "pattern": "(?:^|\\s+|\\s*[-–—:]\\s*)(?:₪\\s*)?\\d+(?:[.,]\\d{1,2})?(?:\\s*(?:₪|NIS|ILS))?\\s*$",
+      "pattern": "(?:^|(?<!\\s)\\s+|(?<!\\s)(?<![-–—:.…|])\\s*[-–—:.…|]+\\s*)(?:(?:מחיר|price)\\s*:?\\s*)?(?:\\(\\s*)?(?:(?:₪|NIS|ILS|ש[\\x22״׳']?ח|שקלים|שקל|shekels?|shkalim|sheqalim)\\s*)?\\d+(?:[.,]\\d{1,2})?(?:[.,]-)?(?:\\s*/\\s*\\d+(?:[.,]\\d{1,2})?)*(?:\\s*(?:₪|NIS|ILS|ש[\\x22״׳']?ח|שקלים|שקל|shekels?|shkalim|sheqalim))?(?:\\s*\\))?\\s*$",
       "unicode": false
     }
   },
