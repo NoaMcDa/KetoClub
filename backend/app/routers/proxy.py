@@ -67,16 +67,18 @@ async def get_wolt_menu(request: Request, slug: SlugPath) -> Response:
     )
 
 
-@router.get("/proxy/tenbis/api/v1.0/Restaurants/{restaurant_id}/Menu")
+@router.get("/proxy/tenbis/restaurants/{restaurant_id}/menu")
 async def get_tenbis_menu(
     request: Request, restaurant_id: RestaurantIdPath
 ) -> Response:
     """Forward one 10bis menu request, transparently, behind a short cache.
 
     Shaped like ``get_wolt_menu`` (#95): 10bis's status, body and
-    ``Content-Type`` are returned unchanged, 404 included. ``restaurant_id``
-    and a Wolt ``slug`` share ``menu_cache`` but never collide, because the
-    cache key is ``(source, id)``, not ``id`` alone.
+    ``Content-Type`` are returned unchanged, 404 included. The upstream is
+    ``NextApi/GetRestaurantMenu`` (``tenbis_menu_url``, #468), which answers
+    an unknown restaurant with a 200 the Dart mapper reads as ``notFound``.
+    ``restaurant_id`` and a Wolt ``slug`` share ``menu_cache`` but never
+    collide, because the cache key is ``(source, id)``, not ``id`` alone.
     """
     settings = request.app.state.settings
     return await _proxy_menu(

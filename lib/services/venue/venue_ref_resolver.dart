@@ -34,8 +34,8 @@ final RegExp _hyphenatedSlug = RegExp(r'^[a-z0-9][a-z0-9-]*-[a-z0-9-]*$');
 ///   though KetoClub had a menu for the word itself. Requiring a hyphen
 ///   filters that out without needing an explicit platform prefix.
 /// - A `10bis.co.il` restaurant URL. 10bis's own web app puts the
-///   numeric restaurant id (the same id its `Restaurants/{id}/Menu` API
-///   takes — `menu_api_research` §3.2) somewhere in the path after a
+///   numeric restaurant id (the same id its `GetRestaurantMenu` API
+///   takes as `restaurantId`, #468) somewhere in the path after a
 ///   `restaurants` segment, with slug and action segments such as
 ///   `menu`/`delivery` in between (e.g.
 ///   `10bis.co.il/next/restaurants/menu/delivery/123456/some-slug`), so
