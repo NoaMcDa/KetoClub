@@ -285,8 +285,8 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count menus cached · works offline',
-      one: '1 menu cached · works offline',
+      other: '$count menus in your Recent list',
+      one: '1 menu in your Recent list',
     );
     return '$_temp0';
   }

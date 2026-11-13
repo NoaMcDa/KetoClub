@@ -92,8 +92,9 @@ void main() {
       // Act
       final result = await store.read();
 
-      // Assert
-      expect(result, equals(const AppSettings()));
+      // Assert: the defaults, but consent withheld (issue #281): the lost
+      // value may have been a refusal.
+      expect(result, equals(const AppSettings(estimationConsentGiven: false)));
     });
 
     test(
@@ -109,7 +110,32 @@ void main() {
         final result = await store.read();
 
         // Assert
-        expect(result, equals(const AppSettings()));
+        expect(
+          result,
+          equals(const AppSettings(estimationConsentGiven: false)),
+        );
+      },
+    );
+
+    test(
+      'one unreadable field no longer resets the others (issue #281)',
+      () async {
+        // Arrange: a refusal, a language and a theme, with a bad filter.
+        SharedPreferences.setMockInitialValues(<String, Object>{
+          'flutter.ketoclub_settings':
+              '{"languageTag":"he","filter":"bogus",'
+              '"estimationConsentGiven":false,"themeMode":"dark"}',
+        });
+        final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+        // Act
+        final result = await store.read();
+
+        // Assert
+        expect(result.estimationConsentGiven, isFalse);
+        expect(result.languageTag, 'he');
+        expect(result.themeMode, equals(AppThemeMode.dark));
+        expect(result.filter, equals(MenuFilter.all));
       },
     );
 

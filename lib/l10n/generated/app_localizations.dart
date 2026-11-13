@@ -587,7 +587,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsCacheSummary.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, one{1 menu cached · works offline} other{{count} menus cached · works offline}}'**
+  /// **'{count, plural, one{1 menu in your Recent list} other{{count} menus in your Recent list}}'**
   String settingsCacheSummary(num count);
 
   /// No description provided for @settingsClearCache.

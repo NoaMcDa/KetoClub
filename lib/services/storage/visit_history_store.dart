@@ -23,6 +23,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/storage/storage_key.dart';
 
 /// One menu in the visit history: which menu, under what name, when and how
 /// often it was opened, and the numbers the Recent list last showed for it.
@@ -128,8 +129,8 @@ final class VisitEntry {
     'platformId': ref.platformId,
     'name': ?name,
     'city': ?city,
-    'firstOpenedAt': firstOpenedAt.toIso8601String(),
-    'lastOpenedAt': lastOpenedAt.toIso8601String(),
+    'firstOpenedAt': firstOpenedAt.toUtc().toIso8601String(),
+    'lastOpenedAt': lastOpenedAt.toUtc().toIso8601String(),
     'openCount': openCount,
     'dishCount': ?dishCount,
     'score': ?score,
@@ -302,7 +303,27 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
 
   /// Returns the box, opening it via [openBox] on the first call and
   /// reusing that result on every later call.
-  Future<Box<String>> _openedBox() => _box ??= openBox();
+  ///
+  /// A failed open is forgotten so the next call retries it (issue #284),
+  /// and any platform exception reads as the `HiveError` callers expect.
+  Future<Box<String>> _openedBox() => _box ??= _open();
+
+  Future<Box<String>> _open() async {
+    // Yield once, so a synchronous failure cannot reset [_box] before the
+    // caller has stored this future.
+    await null;
+    try {
+      return await openBox();
+      // A failed open is forgotten, then reported as before.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      _box = null;
+      rethrow;
+    } on Exception catch (error) {
+      _box = null;
+      throw HiveError('Could not open the box: $error');
+    }
+  }
 
   /// The box, or null when it cannot be opened.
   Future<Box<String>?> _boxOrNull() async {
@@ -331,7 +352,7 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
   /// Stores [entry] under its ref's cache key; a failed write is dropped.
   Future<void> _put(Box<String> box, VisitEntry entry) async {
     try {
-      await box.put(entry.ref.cacheKey, jsonEncode(entry.toJson()));
+      await box.put(storageKeyFor(entry.ref), jsonEncode(entry.toJson()));
       // Drop the write; a broken box degrades instead of throwing.
       // ignore: avoid_catching_errors
     } on HiveError {
@@ -342,7 +363,7 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
   /// The entry stored in [box] for [ref], or null.
   static VisitEntry? _get(Box<String> box, VenueRef ref) {
     try {
-      return _decode(box.get(ref.cacheKey));
+      return _decode(box.get(storageKeyFor(ref)));
       // A broken box is a miss, never a throw.
       // ignore: avoid_catching_errors
     } on HiveError {
@@ -418,7 +439,7 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
     final box = await _boxOrNull();
     if (box == null) return;
     try {
-      await box.delete(ref.cacheKey);
+      await box.delete(storageKeyFor(ref));
       // An entry that cannot be deleted just stays listed.
       // ignore: avoid_catching_errors
     } on HiveError {

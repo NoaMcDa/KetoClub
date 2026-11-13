@@ -6,6 +6,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/storage/storage_key.dart';
 import 'package:ketoclub/utils/dish_kind.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
@@ -370,7 +371,7 @@ final class HiveMenuCache implements MenuCache {
   Future<Box<String>>? _openedPinBox() {
     final open = openPinBox;
     if (open == null) return null;
-    return _pinBox ??= open();
+    return _pinBox ??= _retryable(open, () => _pinBox = null);
   }
 
   /// The pinned cache keys; empty on a storage failure.
@@ -431,7 +432,35 @@ final class HiveMenuCache implements MenuCache {
 
   /// Returns the box, opening it via [openBox] on the first call and
   /// reusing that result on every later call.
-  Future<Box<String>> _openedBox() => _box ??= openBox();
+  ///
+  /// A failed open is forgotten, so the next call tries again instead of
+  /// replaying the failure for the whole session (issue #284), and any
+  /// exception from the platform (a `FileSystemException` is not a
+  /// `HiveError`) is reported as one `HiveError`, which every caller
+  /// already treats as "no box".
+  Future<Box<String>> _openedBox() =>
+      _box ??= _retryable(openBox, () => _box = null);
+
+  /// [open]'s box, reset through [forget] when it fails.
+  static Future<Box<String>> _retryable(
+    Future<Box<String>> Function() open,
+    void Function() forget,
+  ) async {
+    // Yield once, so the caller has stored this future before a failure
+    // that happens synchronously inside [open] can [forget] it.
+    await null;
+    try {
+      return await open();
+      // A failed open is forgotten, then reported as before.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      forget();
+      rethrow;
+    } on Exception catch (error) {
+      forget();
+      throw HiveError('Could not open the box: $error');
+    }
+  }
 
   @override
   Future<CachedMenu?> read(VenueRef ref) async {
@@ -445,7 +474,7 @@ final class HiveMenuCache implements MenuCache {
     }
     String? raw;
     try {
-      raw = box.get(ref.cacheKey);
+      raw = box.get(storageKeyFor(ref));
       // A broken box is a miss, never a throw (architecture.md §6.4).
       // ignore: avoid_catching_errors
     } on HiveError {
@@ -472,7 +501,7 @@ final class HiveMenuCache implements MenuCache {
     } on HiveError {
       return;
     }
-    final key = entry.menu.venueRef.cacheKey;
+    final key = storageKeyFor(entry.menu.venueRef);
     final value = jsonEncode(entry.toJson());
     try {
       await box.put(key, value);
@@ -515,13 +544,13 @@ final class HiveMenuCache implements MenuCache {
       return;
     }
     try {
-      await box.delete(ref.cacheKey);
+      await box.delete(storageKeyFor(ref));
       // An entry that cannot be deleted just stays stale.
       // ignore: avoid_catching_errors
     } on HiveError {
       // Nothing to do: the delete above never landed.
     }
-    await _setPinKey(ref.cacheKey, pinned: false);
+    await _setPinKey(storageKeyFor(ref), pinned: false);
   }
 
   @override
@@ -530,19 +559,19 @@ final class HiveMenuCache implements MenuCache {
       final Box<String> box;
       try {
         box = await _openedBox();
-        if (!box.containsKey(ref.cacheKey)) return;
+        if (!box.containsKey(storageKeyFor(ref))) return;
         // A broken box cannot hold a pin for a menu it cannot read.
         // ignore: avoid_catching_errors
       } on HiveError {
         return;
       }
     }
-    await _setPinKey(ref.cacheKey, pinned: pinned);
+    await _setPinKey(storageKeyFor(ref), pinned: pinned);
   }
 
   @override
   Future<bool> isPinned(VenueRef ref) async =>
-      (await _pinnedKeys()).contains(ref.cacheKey);
+      (await _pinnedKeys()).contains(storageKeyFor(ref));
 
   @override
   Future<int> size() async {
@@ -599,7 +628,7 @@ final class HiveMenuCache implements MenuCache {
       result.add(
         CachedMenuEntry.summarise(
           cached,
-          pinned: pins.contains(cached.menu.venueRef.cacheKey),
+          pinned: pins.contains(storageKeyFor(cached.menu.venueRef)),
         ),
       );
     }

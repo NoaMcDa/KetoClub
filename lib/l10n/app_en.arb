@@ -109,7 +109,7 @@
   "settingsCarnivoreOnlyHint": "Greens only meat, fish, eggs — vegetables become yellow.",
   "settingsFilter": "Default filter",
   "settingsCacheSection": "Recent menus",
-  "settingsCacheSummary": "{count, plural, one{1 menu cached · works offline} other{{count} menus cached · works offline}}",
+  "settingsCacheSummary": "{count, plural, one{1 menu in your Recent list} other{{count} menus in your Recent list}}",
   "@settingsCacheSummary": {
     "placeholders": { "count": { "type": "num" } }
   },
