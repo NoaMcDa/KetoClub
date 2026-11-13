@@ -1132,6 +1132,114 @@
     ]
   },
   {
+    "name": "synthetic_product_lines",
+    "raw": {
+      "sections": [
+        {
+          "items": [
+            {
+              "venue": {
+                "name": "Venue kept-restaurant",
+                "product_line": "restaurant",
+                "slug": "kept-restaurant"
+              }
+            },
+            {
+              "venue": {
+                "name": "Venue dropped-grocery",
+                "product_line": "grocery",
+                "slug": "dropped-grocery"
+              }
+            },
+            {
+              "venue": {
+                "name": "Venue dropped-pets",
+                "product_line": "pet_supply",
+                "slug": "dropped-pets"
+              }
+            },
+            {
+              "venue": {
+                "name": "Venue dropped-blank",
+                "product_line": "",
+                "slug": "dropped-blank"
+              }
+            },
+            {
+              "venue": {
+                "name": "Venue kept-not-a-string",
+                "product_line": 7,
+                "slug": "kept-not-a-string"
+              }
+            },
+            {
+              "venue": {
+                "name": "Venue kept-none",
+                "slug": "kept-none"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "venues": [
+      {
+        "address": null,
+        "city": null,
+        "cuisineTags": [],
+        "estimateMinutes": null,
+        "imageUrl": null,
+        "isOnline": null,
+        "latitude": null,
+        "longitude": null,
+        "name": "Venue kept-restaurant",
+        "platformRating": null,
+        "ref": {
+          "platformId": "kept-restaurant",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/kept-restaurant"
+      },
+      {
+        "address": null,
+        "city": null,
+        "cuisineTags": [],
+        "estimateMinutes": null,
+        "imageUrl": null,
+        "isOnline": null,
+        "latitude": null,
+        "longitude": null,
+        "name": "Venue kept-not-a-string",
+        "platformRating": null,
+        "ref": {
+          "platformId": "kept-not-a-string",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/kept-not-a-string"
+      },
+      {
+        "address": null,
+        "city": null,
+        "cuisineTags": [],
+        "estimateMinutes": null,
+        "imageUrl": null,
+        "isOnline": null,
+        "latitude": null,
+        "longitude": null,
+        "name": "Venue kept-none",
+        "platformRating": null,
+        "ref": {
+          "platformId": "kept-none",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/kept-none"
+      }
+    ]
+  },
+  {
     "name": "synthetic_no_sections",
     "raw": {
       "sections": "none"

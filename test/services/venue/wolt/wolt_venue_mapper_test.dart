@@ -43,6 +43,36 @@ Venue _bySlug(List<Venue> venues, String slug) =>
     venues.singleWhere((v) => v.ref.platformId == slug);
 
 void main() {
+  group('only restaurants (issue #476)', () {
+    test("drops a venue whose product_line is a shop's", () {
+      // Arrange
+      final page = _page(<Object?>[
+        _item(<String, Object?>{
+          'slug': 'sushi-bar',
+          'name': 'Sushi Bar',
+          'product_line': 'restaurant',
+        }),
+        _item(<String, Object?>{
+          'slug': 'wolt-market-ben-yehuda',
+          'name': 'Wolt Market',
+          'product_line': 'grocery',
+        }),
+        _item(<String, Object?>{
+          'slug': 'pet-shop',
+          'name': 'Pet Shop',
+          'product_line': 'pet_supply',
+        }),
+        _item(<String, Object?>{'slug': 'no-line', 'name': 'No Line'}),
+      ]);
+
+      // Act
+      final venues = WoltVenueMapper.map(page)!;
+
+      // Assert
+      expect(venues.map((v) => v.ref.platformId), ['sushi-bar', 'no-line']);
+    });
+  });
+
   group('WoltVenueMapper over the pages/restaurants fixture', () {
     test('ignores the leading _fixture_note key', () {
       // Arrange

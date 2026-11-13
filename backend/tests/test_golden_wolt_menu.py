@@ -13,7 +13,7 @@ from typing import Any
 import pytest
 
 from app.keto.models import VenueRef, to_json
-from app.platforms.wolt_menu import map_wolt_menu
+from app.platforms.wolt_menu import is_shop_assortment, map_wolt_menu
 
 _GOLDEN = Path(__file__).parent / "fixtures" / "golden" / "wolt_menu.json"
 _ENTRIES: list[dict[str, Any]] = json.loads(_GOLDEN.read_text(encoding="utf-8"))
@@ -38,6 +38,7 @@ def test_wolt_menu_matches_golden(entry: dict[str, Any]) -> None:
     )
     actual = None if menu is None else to_json(menu)
     assert _canonical(actual) == _canonical(entry["menu"])
+    assert is_shop_assortment(entry["raw"]) == entry["shop"]
 
 
 @pytest.mark.parametrize("raw", [None, [], "menu", 7])

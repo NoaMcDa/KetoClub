@@ -45,6 +45,14 @@ router = APIRouter()
 LatQuery = Annotated[float, Query(ge=-90, le=90)]
 LonQuery = Annotated[float, Query(ge=-180, le=180)]
 
+# Where a search by name looks when the client sends no position (#466):
+# Wolt's `pages/search` answers an empty page to a query without
+# `lat`/`lon`, so a position-less search is made around Tel Aviv's centre,
+# the app's `defaultSearchPlace` (`lib/utils/known_places.dart`). Change
+# both together.
+DEFAULT_SEARCH_LAT = 32.0853
+DEFAULT_SEARCH_LON = 34.7818
+
 
 @router.get("/proxy/wolt/pages/restaurants")
 async def search_wolt_nearby(
@@ -149,19 +157,17 @@ def search_call(
 
     ``target`` is fixed to ``"venues"`` here, never taken from a client, so
     no route can be used to proxy a dish search instead. A search without a
-    position (location denied, #37) is its own cache row and is forwarded
-    without ``lat``/``lon`` rather than with nulls.
+    position (location denied, #37) is made around ``DEFAULT_SEARCH_LAT``/
+    ``DEFAULT_SEARCH_LON`` (#466): Wolt finds nothing for a query with no
+    ``lat``/``lon``, so forwarding it bare cached an empty page.
     """
     settings = request.app.state.settings
-    has_position = lat is not None and lon is not None
-    position = f"{lat:.4f},{lon:.4f}" if has_position else "none"
-    json_body: dict[str, object] = {"q": q, "target": "venues"}
-    if has_position:
-        json_body["lat"] = lat
-        json_body["lon"] = lon
+    if lat is None or lon is None:
+        lat, lon = DEFAULT_SEARCH_LAT, DEFAULT_SEARCH_LON
+    json_body: dict[str, object] = {"q": q, "target": "venues", "lat": lat, "lon": lon}
     return DiscoveryCall(
         source=SOURCE_SEARCH,
-        cache_key=f"{q.lower()},{position},{lang}",
+        cache_key=f"{q.lower()},{lat:.4f},{lon:.4f},{lang}",
         method="POST",
         url=wolt_search_url(settings.WOLT_BASE_URL),
         headers=_web_headers(request, lang),

@@ -17,6 +17,12 @@ import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 ///   carousels). So is a venue without a non-empty `slug` and `name`
 ///   string: the slug is how its menu is fetched, the name how it is
 ///   shown, and a venue lacking either is useless on a card.
+/// - **Only restaurants are kept (issue #476).** A venue whose
+///   `product_line` is a string other than `restaurant` — Wolt's
+///   supermarkets, pet shops, pharmacies, gift cards — is skipped: its
+///   assortment is a shop's, loaded per category, never a menu. A venue
+///   with no `product_line` string is kept, as every venue was before
+///   Wolt was seen to send one.
 /// - The first occurrence of a slug wins; a later duplicate — the same
 ///   venue listed in a second section — is dropped.
 /// - `location` is GeoJSON order, `[longitude, latitude]`: index 1 is the
@@ -39,6 +45,10 @@ import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 /// Only a body with no `sections` list at all is not a discovery page;
 /// [map] answers null for it so the caller can report `platformChanged`.
 abstract final class WoltVenueMapper {
+  /// The `product_line` of a Wolt venue that serves a menu; every other
+  /// value is a shop (issue #476).
+  static const String restaurantProductLine = 'restaurant';
+
   /// The venues in [json], in page order and deduplicated by slug, or
   /// null when [json] has no `sections` list. Never throws.
   static List<Venue>? map(Map<String, Object?> json) {
@@ -70,6 +80,10 @@ abstract final class WoltVenueMapper {
     final slug = _nonEmptyString(raw['slug']);
     final name = _nonEmptyString(raw['name']);
     if (slug == null || name == null) return null;
+    final productLine = raw['product_line'];
+    if (productLine is String && productLine != restaurantProductLine) {
+      return null;
+    }
 
     final ref = VenueRef(source: MenuSource.wolt, platformId: slug);
     final position = _readPosition(raw['location']);

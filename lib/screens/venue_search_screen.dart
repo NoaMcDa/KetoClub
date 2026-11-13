@@ -369,6 +369,9 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             labelText: l10n.venueSearchLabel,
             hintText: l10n.venueSearchHint,
             errorText: controller.isInvalid ? l10n.venueSearchInvalid : null,
+            // The hint after the first sentence is the useful half; at
+            // 390px one line cut it off (issue #481).
+            errorMaxLines: 3,
             suffixIcon: controller.isExplicitLink && resolved != null
                 ? IconButton(
                     icon: const Icon(Icons.arrow_forward),
@@ -649,10 +652,17 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     AppLocalizations l10n,
     VenueSearchController controller,
   ) {
+    final around = _nameSearchAround(context, l10n, controller);
     final box = _stateBox(context, l10n, controller);
-    if (box != null) return [SliverToBoxAdapter(child: box)];
+    if (box != null) {
+      return [
+        if (around != null) SliverToBoxAdapter(child: around),
+        SliverToBoxAdapter(child: box),
+      ];
+    }
     final visible = controller.visibleResults;
     return [
+      if (around != null) SliverToBoxAdapter(child: around),
       if (controller.isEstimating || controller.hasVisibleToEstimate)
         SliverToBoxAdapter(
           child: Padding(
@@ -674,6 +684,33 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         ),
       ),
     ];
+  }
+
+  /// Where a search by name with no location was made (issue #466), above
+  /// its results or its "no restaurants" message, with the picker one tap
+  /// away; null when there is a position, or no such search on screen.
+  Widget? _nameSearchAround(
+    BuildContext context,
+    AppLocalizations l10n,
+    VenueSearchController controller,
+  ) {
+    final place = controller.nameSearchPlace;
+    if (place == null ||
+        controller.phase != DiscoveryPhase.idle ||
+        controller.failure != null ||
+        !controller.hasSearched) {
+      return null;
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: _chooseLocation,
+        child: Text(
+          l10n.discoveryNameSearchAround(place.nameFor(_language)),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ),
+    );
   }
 
   /// What stands in place of the list, by precedence: work in flight, a

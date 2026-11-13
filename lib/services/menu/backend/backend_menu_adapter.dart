@@ -227,9 +227,10 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
   /// The [MenuFetchFailureReason] for a non-200 answer from the venue
   /// route whose error body named [reason] (null when it named none).
   ///
-  /// `notFound` (the platform's 404) and `platformChanged` keep their
-  /// names; `offline` and `timeout` (the server could not reach the
-  /// platform) are [MenuFetchFailureReason.offline]. Anything else — a
+  /// `notFound` (the platform's 404), `platformChanged` and
+  /// `notARestaurant` (a Wolt shop, issue #476) keep their names;
+  /// `offline` and `timeout` (the server could not reach the platform) are
+  /// [MenuFetchFailureReason.offline]. Anything else — a
   /// rate limit, a refused header, a validation 422, a route this backend
   /// does not have, an unknown name — means the backend did not serve the
   /// request: [MenuFetchFailureReason.backendUnreachable].
@@ -237,6 +238,7 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
       switch (reason) {
         'notFound' => MenuFetchFailureReason.notFound,
         'platformChanged' => MenuFetchFailureReason.platformChanged,
+        'notARestaurant' => MenuFetchFailureReason.notARestaurant,
         'offline' || 'timeout' => MenuFetchFailureReason.offline,
         _ => MenuFetchFailureReason.backendUnreachable,
       };

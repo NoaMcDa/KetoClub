@@ -417,6 +417,82 @@ void main() {
     });
   });
 
+  group('VenueRefResolver: links as people paste them (issue #477)', () {
+    const hamosad = VenueRef(source: MenuSource.wolt, platformId: 'hamosad');
+    const woltUrl = 'https://wolt.com/en/isr/tel-aviv/restaurant/hamosad';
+
+    for (final input in const [
+      '$woltUrl Check it out',
+      '$woltUrl\nCheck out HaMosad on Wolt!',
+      'Check out HaMosad on Wolt! $woltUrl',
+      '$woltUrl.',
+      '$woltUrl,',
+      '($woltUrl)',
+      '$woltUrl!',
+      '"$woltUrl"',
+      '<$woltUrl>',
+      '\u200F$woltUrl',
+      '\u200E$woltUrl\u200F',
+      '\u200B$woltUrl',
+      'https://wolt.com/en/isr/tel-aviv/restaurant/Hamosad',
+      'wolt.com/en/isr/tel-aviv/restaurant/hamosad.',
+    ]) {
+      test('reads the Wolt slug out of ${input.replaceAll('\n', r'\n')}', () {
+        // Act and assert
+        expect(VenueRefResolver.resolve(input), hamosad);
+        expect(VenueRefResolver.isExplicitLink(input), isTrue);
+      });
+    }
+
+    test('drops the second line after a website link', () {
+      // Act
+      final ref = VenueRefResolver.resolve(
+        'https://mycafe.co.il/menu\nTable 4',
+      );
+
+      // Assert
+      expect(
+        ref,
+        const VenueRef(
+          source: MenuSource.website,
+          platformId: 'https://mycafe.co.il/menu',
+        ),
+      );
+    });
+
+    test('cuts trailing punctuation from a bare slug or id', () {
+      // Act and assert
+      expect(
+        VenueRefResolver.resolve('vitrina-lilinblum.'),
+        const VenueRef(
+          source: MenuSource.wolt,
+          platformId: 'vitrina-lilinblum',
+        ),
+      );
+      expect(
+        VenueRefResolver.resolve('"123456"'),
+        const VenueRef(source: MenuSource.tenbis, platformId: '123456'),
+      );
+    });
+
+    test('a name with spaces and no link stays a name', () {
+      // Act and assert
+      expect(VenueRefResolver.resolve('Cafe Noir.'), isNull);
+      expect(VenueRefResolver.isExplicitLink('Cafe Noir.'), isFalse);
+    });
+
+    for (final input in const [
+      'https://wolt.com/he/isr/tel-aviv/restaurant/%E0%A4',
+      'https://www.10bis.co.il/next/restaurants/menu/delivery/%D7%A/123',
+    ]) {
+      test('is null, never a throw, for a bad percent escape: $input', () {
+        // Act and assert
+        expect(VenueRefResolver.resolve(input), isNull);
+        expect(VenueRefResolver.isExplicitLink(input), isFalse);
+      });
+    }
+  });
+
   group('VenueRefResolver.isExplicitLink', () {
     test('is true for URLs, with or without a scheme, and for digits', () {
       // Act and assert

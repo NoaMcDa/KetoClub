@@ -608,6 +608,11 @@ void main() {
         _errorBody('platformChanged', 502),
         MenuFetchFailureReason.platformChanged,
       ),
+      (
+        422,
+        _errorBody('notARestaurant', 422),
+        MenuFetchFailureReason.notARestaurant,
+      ),
       (502, _errorBody('offline', 502), MenuFetchFailureReason.offline),
       (504, _errorBody('timeout', 504), MenuFetchFailureReason.offline),
       (

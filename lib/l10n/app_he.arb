@@ -133,6 +133,7 @@
     "placeholders": { "platform": { "type": "String" } }
   },
   "fetchFailedNotFound": "לא נמצאה מסעדה ב{platform}. בדקו את הקישור.",
+  "fetchFailedNotARestaurant": "המקום הזה מופיע ב{platform} כחנות ולא כמסעדה, ולכן אין בו תפריט ש-KetoClub יכולה לקרוא.",
   "@fetchFailedNotFound": {
     "placeholders": { "platform": { "type": "String" } }
   },
@@ -269,6 +270,7 @@
   "discoveryEmptyBody": "השתמשו במיקום שלכם או בחרו עיר כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.",
   "discoveryDrinksGuideCard": "מזמינים משקה? מדריך בר וקפה",
   "discoveryLookingAround": "מחפשים סביב",
+  "discoveryNameSearchAround": "מחפשים סביב {place}. בחרו מיקום כדי לחפש במקום אחר.",
   "discoveryAroundYou": "המיקום שלך",
   "discoveryLocationInvite": "הקש כדי להשתמש במיקום שלך",
   "discoveryUseLocation": "השתמש במיקום שלי",
@@ -286,6 +288,7 @@
   "locationPickerUseDevice": "השתמש במיקום הנוכחי שלי",
   "locationPickerSearchLabel": "חיפוש עיר או רחוב",
   "locationPickerNoMatch": "לא נמצאה עיר מתאימה. נסו איות אחר.",
+  "locationPickerNoCityTryStreets": "אין עיר בשם הזה. אפשר לחפש ברחובות:",
   "locationPickerStreetSearch": "חיפוש רחובות עבור \"{query}\"",
   "locationPickerStreetCaptionBackend": "מה שהקלדתם יישלח לשרת של קטוקלאב ול‑Photon, שירות חיפוש של OpenStreetMap.",
   "locationPickerStreetCaptionDirect": "מה שהקלדתם יישלח ל‑Photon, שירות חיפוש של OpenStreetMap.",
