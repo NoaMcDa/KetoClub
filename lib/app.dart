@@ -349,7 +349,9 @@ class _VenueTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = context.select<MenuController, String?>(
-      (c) => c.venueName ?? fallback ?? c.historyName,
+      // The controller holds the opener's name once it opened (#457), so
+      // a rename replaces it here too.
+      (c) => c.venueName ?? (c.isOpened ? c.historyName : fallback),
     );
     return RouteTitle(page: name, child: child);
   }

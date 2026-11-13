@@ -65,6 +65,10 @@ class PhotoTile extends StatelessWidget {
               ? const _PhotoPlaceholder()
               : Image.network(
                   url,
+                  // Keyed by its URL (issue #490): a tile reused for another
+                  // dish must never keep the old picture, which the web's
+                  // HTML-element fallback otherwise holds on to.
+                  key: ValueKey<String>(url),
                   width: width.isFinite ? width : null,
                   height: size.isFinite ? size : null,
                   fit: BoxFit.cover,

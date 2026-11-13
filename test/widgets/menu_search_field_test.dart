@@ -65,5 +65,51 @@ void main() {
       final textField = tester.widget<TextField>(find.byType(TextField));
       expect(textField.controller!.text, '');
     });
+
+    testWidgets('starts from the query it is given, so a field built afresh '
+        'shows the search still filtering (issue #286)', (tester) async {
+      // Arrange & Act
+      await _pump(tester, MenuSearchField(query: 'salmon', onChanged: (_) {}));
+
+      // Assert
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        'salmon',
+      );
+      expect(find.byIcon(Icons.clear), findsOneWidget);
+    });
+
+    testWidgets('follows a query changed from outside, and keeps the cursor '
+        'while the user types (issue #286)', (tester) async {
+      // Arrange: a field whose query mirrors what is typed, as the menu
+      // screen's does through MenuController.setQuery.
+      var query = '';
+      late StateSetter rebuild;
+      await _pump(
+        tester,
+        StatefulBuilder(
+          builder: (context, setState) {
+            rebuild = setState;
+            return MenuSearchField(
+              query: query,
+              onChanged: (text) => setState(() => query = text),
+            );
+          },
+        ),
+      );
+      await tester.enterText(find.byType(TextField), 'sal');
+      await tester.pump();
+      TextEditingController field() =>
+          tester.widget<TextField>(find.byType(TextField)).controller!;
+      expect(field().text, 'sal');
+      expect(field().selection, const TextSelection.collapsed(offset: 3));
+
+      // Act: the query is cleared elsewhere.
+      rebuild(() => query = '');
+      await tester.pump();
+
+      // Assert
+      expect(field().text, '');
+    });
   });
 }
