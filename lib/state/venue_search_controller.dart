@@ -399,6 +399,33 @@ final class VenueSearchController extends ChangeNotifier {
   /// results arrive, never per frame and never through a fetch.
   VenueCardNumbers? cardNumbers(Venue venue) => _numbers[venue.ref];
 
+  /// The venues of the last nearby list (empty before one arrives), which
+  /// the header names the place from: unlike [results] it is never a name
+  /// search's list, whose venues may be across town (issue #288).
+  List<Venue> get nearbyVenues => _nearbyResults ?? const <Venue>[];
+
+  /// Re-reads the card numbers of the list on screen, and of the remembered
+  /// nearby list, from the device cache (issue #288): a menu analysed since
+  /// the list arrived now has numbers, and one cleared in Settings has none.
+  /// Never fetches. A no-op while a search runs, whose own arrival reads
+  /// them, and when nothing changed.
+  Future<void> refreshNumbers() async {
+    if (_disposed || _phase != DiscoveryPhase.idle) return;
+    final generation = _generation;
+    final results = _results;
+    final nearby = _nearbyResults;
+    final numbers = await _readNumbers(results);
+    final nearbyNumbers = identical(nearby, results) || nearby == null
+        ? numbers
+        : await _readNumbers(nearby);
+    if (_isStale(generation) || !identical(results, _results)) return;
+    // The quick score's own results are in the cache too, so what it showed
+    // is kept; only a cleared or newly analysed entry changes.
+    _numbers = numbers;
+    _nearbyNumbers = nearbyNumbers;
+    _notify();
+  }
+
   /// The distance in kilometres from [position] to [venue], or null when
   /// either is unknown.
   double? distanceKmTo(Venue venue) {

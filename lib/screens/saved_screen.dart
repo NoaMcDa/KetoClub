@@ -137,9 +137,22 @@ class SavedScreen extends StatefulWidget {
 }
 
 class _SavedScreenState extends State<SavedScreen> {
+  Timer? _tick;
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
+    // The expiry and "opened ... ago" labels are bucketed to the minute and
+    // read the clock only when built, so rebuild once a minute (issue #288).
+    _tick = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (mounted) setState(() {});
+    });
     // Deferred to after the first frame, so building this screen never
     // itself starts the load — a widget's build method must stay free of
     // side effects. See the class doc for why this must be a
