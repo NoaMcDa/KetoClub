@@ -140,7 +140,7 @@ final class _Inputs {
 
   factory load() {
     final woltRaw = _readJson('test/fixtures/wolt_hamosad_menu.json');
-    final tenBisRaw = _readJson('test/fixtures/tenbis_synthetic_menu.json');
+    final tenBisRaw = _readJson('test/fixtures/tenbis_19156_menu.json');
     return _Inputs(
       woltRaw: woltRaw,
       tenBisRaw: tenBisRaw,
@@ -169,7 +169,7 @@ final class _Inputs {
   /// Every menu the classifier-facing goldens run over, by name.
   Map<String, Menu> get menus => <String, Menu>{
     'wolt_hamosad': wolt,
-    'tenbis_synthetic': tenBis,
+    'tenbis_19156': tenBis,
     ...goldenHandBuiltMenus,
   };
 }
@@ -566,7 +566,7 @@ List<Object?> _normaliser() {
 List<Object?> _fingerprints(_Inputs inputs) {
   final menus = <String, Menu>{
     'wolt_hamosad': inputs.wolt,
-    'tenbis_synthetic': inputs.tenBis,
+    'tenbis_19156': inputs.tenBis,
     for (final (index, text) in <String>[
       'Grilled salmon\nCaesar salad\nPasta carbonara',
       'ראשונות:\nחומוס 32 ₪\nמרק היום\n\nעיקריות:\nסטייק 120',
@@ -1070,7 +1070,7 @@ List<Object?> _woltMenus(_Inputs inputs) {
 
 List<Object?> _tenBisMenus(_Inputs inputs) {
   final payloads = <String, Map<String, Object?>>{
-    'tenbis_synthetic_menu.json': inputs.tenBisRaw,
+    'tenbis_19156_menu.json': inputs.tenBisRaw,
     'tenbis_malformed_menu.json': _readJson(
       'test/fixtures/tenbis_malformed_menu.json',
     ),
@@ -1090,6 +1090,7 @@ List<Object?> _tenBisMenus(_Inputs inputs) {
             fetchedAt: goldenNow,
           ),
         )?.toJson(),
+        'notFound': TenBisMenuMapper.isNotFound(raw),
       },
   ];
 }

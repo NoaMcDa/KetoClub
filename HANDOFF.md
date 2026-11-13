@@ -415,12 +415,12 @@ on GitHub — tooling exists for several of them, it did not close any of them.
    `consumer-api.wolt.com` nor `restaurant-api.wolt.com` is reachable from
    here. `phase2_discovery_research.md` §2.4 has the exact capture steps for
    whoever records them.
-4. **The 10bis fixture is synthetic** (issue #44, tracked separately from
-   #22 and #38). `tenbis_synthetic_menu.json` was hand-built from
-   `menu_api_research` and issue #44's own body text, because
-   `www.10bis.co.il` is also blocked here. `test/fixtures/README.md` has the
-   curl to run once a machine can reach it, and what to check
-   (`TenBisMenuMapper`'s assumed field names) once it does.
+4. **The 10bis fixture is real but trimmed** (#468, closing #44).
+   `tenbis_19156_menu.json` was recorded from `NextApi/GetRestaurantMenu`
+   (10bis retired `api/v1.0/Restaurants/{id}/Menu`; it answers 404 for
+   every id) and keeps 38 of the venue's 247 dishes. No phone or running
+   backend has fetched a live 10bis menu yet. `test/fixtures/README.md`
+   has the curl to re-record.
 5. **No real Gemini request has carried images** (#88, D15). Everything on the
    vision path is proven against fakes: whether `gemini-3.5-flash` accepts
    `image/*` and `application/pdf` parts with the real prompt and schema, how

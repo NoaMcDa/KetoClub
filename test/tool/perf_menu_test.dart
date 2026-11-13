@@ -34,9 +34,9 @@ List<perf.PerfFixture> _fixtures() => <perf.PerfFixture>[
     json: _fixture('wolt_hamosad_menu.json'),
   ),
   perf.PerfFixture(
-    name: 'tenbis_synthetic_menu.json',
+    name: 'tenbis_19156_menu.json',
     format: perf.PerfPayloadFormat.tenbis,
-    json: _fixture('tenbis_synthetic_menu.json'),
+    json: _fixture('tenbis_19156_menu.json'),
   ),
 ];
 
@@ -69,7 +69,7 @@ void main() {
 
       // Assert
       expect(menu.allDishes, hasLength(60));
-      expect(menu.venueName, 'Synthetic Venue');
+      expect(menu.categories.first.id, 'cat_0');
     });
 
     test('a smaller dishCount is honoured by both payloads', () {
@@ -171,7 +171,7 @@ void main() {
         'decode + map (Wolt, synthetic)',
         'decode + map (10bis, synthetic)',
         'decode + map (wolt_hamosad_menu.json)',
-        'decode + map (tenbis_synthetic_menu.json)',
+        'decode + map (tenbis_19156_menu.json)',
         'fingerprint',
         'rules engine',
         'reply parse',

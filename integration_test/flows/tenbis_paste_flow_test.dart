@@ -29,45 +29,55 @@ const String _tenBisUrl =
 /// are stubbed under.
 const VenueRef _ref = VenueRef(source: MenuSource.tenbis, platformId: '654321');
 
-/// A payload shaped like `test/fixtures/tenbis_synthetic_menu.json`
-/// (issue #45), trimmed to the two dishes this test asserts on. Run
-/// through the real [TenBisMenuMapper] below rather than built as a
-/// `Menu` by hand, so this flow exercises the mapper too, not just the
-/// screen.
+/// A payload in the live `NextApi/GetRestaurantMenu` envelope, shaped
+/// like `test/fixtures/tenbis_19156_menu.json` (#468) and trimmed to the
+/// two dishes this test asserts on. Run through the real
+/// [TenBisMenuMapper] below rather than built as a `Menu` by hand, so
+/// this flow exercises the mapper too, not just the screen.
 const Map<String, Object?> _tenBisJson = <String, Object?>{
-  'restaurantName': 'Vitrina Tel Aviv',
-  'categoriesList': <Object?>[
-    <String, Object?>{
-      'categoryName': 'Steaks',
-      'dishList': <Object?>[
-        <String, Object?>{
-          'dishId': 1001,
-          'dishName': 'Entrecôte 300g',
-          'dishDescription': 'Served with butter-infused potato purée',
-          'price': 142.0,
-          'dishOptionsList': <Object?>[
-            <String, Object?>{
-              'name': 'Choice of Side',
-              'values': <Object?>[
-                <String, Object?>{'name': 'Potato Purée'},
-                <String, Object?>{'name': 'Green Salad'},
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    <String, Object?>{
-      'categoryName': "Chef's Specials",
-      'dishList': <Object?>[
-        <String, Object?>{
-          'dishId': '1002-shared',
-          'dishName': 'Grilled Halloumi Salad',
-          'price': 56.0,
-        },
-      ],
-    },
-  ],
+  'Errors': null,
+  'Success': true,
+  'Data': <String, Object?>{
+    'resId': 654321,
+    'categoriesList': <Object?>[
+      <String, Object?>{
+        'categoryID': 1,
+        'categoryName': 'Steaks',
+        'dishList': <Object?>[
+          <String, Object?>{
+            'dishId': 1001,
+            'dishName': 'Entrecôte 300g',
+            'dishDescription': 'Served with butter-infused potato purée',
+            'dishPrice': 142,
+            'dishImageUrl': '',
+            'choices': <Object?>[
+              <String, Object?>{
+                'textBeforeChoosing': 'Choice of Side',
+                'subs': <Object?>[
+                  <String, Object?>{'name': 'Potato Purée', 'price': 0},
+                  <String, Object?>{'name': 'Green Salad', 'price': 0},
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      <String, Object?>{
+        'categoryID': 2,
+        'categoryName': "Chef's Specials",
+        'dishList': <Object?>[
+          <String, Object?>{
+            'dishId': 1002,
+            'dishName': 'Grilled Halloumi Salad',
+            'dishDescription': '',
+            'dishPrice': 56,
+            'dishImageUrl': '',
+            'choices': <Object?>[],
+          },
+        ],
+      },
+    ],
+  },
 };
 
 void main() {
@@ -78,7 +88,7 @@ void main() {
       tester,
     ) async {
       // Setup: the repository answers the pasted link's venue with the
-      // menu TenBisMenuMapper builds from the synthetic fixture's shape.
+      // menu TenBisMenuMapper builds from the recorded fixture's shape.
       final mapped = TenBisMenuMapper.toMenu(
         _tenBisJson,
         ref: _ref,

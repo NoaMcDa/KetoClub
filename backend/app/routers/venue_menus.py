@@ -25,9 +25,10 @@ without its ``options``, keyed by venue, never by install id.
 
 Errors are ``{reason, status_code}`` bodies the client's
 ``BackendMenuAdapter.venueReasonFor`` maps: 404 ``notFound`` (the
-platform's 404), 502 ``platformChanged`` (any other non-2xx, an empty or
-non-JSON body, or a payload the mapper cannot read), 422 ``notARestaurant``
-(a Wolt shop's assortment, #476), 502 ``offline``, 504
+platform's 404, or 10bis's 200 naming no restaurant, #468), 502
+``platformChanged`` (any other non-2xx, an empty or non-JSON body, or a
+payload the mapper cannot read), 422 ``notARestaurant`` (a Wolt shop's
+assortment, #476), 502 ``offline``, 504
 ``timeout``, plus the shared 400 ``badResponse`` for a missing install id
 or an ``Authorization`` header.
 """
@@ -45,7 +46,7 @@ from starlette.concurrency import run_in_threadpool
 
 from app.errors import BackendError
 from app.keto.models import LlmEngine, Menu, MenuAnalysed, VenueRef, to_json
-from app.platforms.tenbis_menu import map_tenbis_menu
+from app.platforms.tenbis_menu import map_tenbis_menu, tenbis_menu_not_found
 from app.platforms.wolt_menu import is_shop_assortment, map_wolt_menu
 from app.schemas import ClassificationOptionsBody, ErrorResponse, VenueMenuResponse
 from app.services import menu_store
@@ -158,6 +159,9 @@ def _mapped(upstream: UpstreamMenu, ref: VenueRef, fetched_at: str) -> Menu:
         raise BackendError(502, "platformChanged") from None
     if ref.source == "wolt" and is_shop_assortment(raw):
         raise BackendError(422, "notARestaurant")
+    if ref.source == "tenbis" and tenbis_menu_not_found(raw):
+        # 10bis answers an unknown or malformed id with a 200 (#468).
+        raise BackendError(404, "notFound")
     mapper = map_wolt_menu if ref.source == "wolt" else map_tenbis_menu
     menu = mapper(raw, ref=ref, fetched_at=fetched_at)
     if menu is None:
