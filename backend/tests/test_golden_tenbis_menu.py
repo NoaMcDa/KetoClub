@@ -14,7 +14,7 @@ import pytest
 
 from app.keto.models import VenueRef, to_json
 from app.platforms._dart import dart_num_to_string
-from app.platforms.tenbis_menu import map_tenbis_menu
+from app.platforms.tenbis_menu import map_tenbis_menu, tenbis_menu_not_found
 
 _GOLDEN = Path(__file__).parent / "fixtures" / "golden" / "tenbis_menu.json"
 _ENTRIES: list[dict[str, Any]] = json.loads(_GOLDEN.read_text(encoding="utf-8"))
@@ -39,6 +39,11 @@ def test_tenbis_menu_matches_golden(entry: dict[str, Any]) -> None:
     )
     actual = None if menu is None else to_json(menu)
     assert _canonical(actual) == _canonical(entry["menu"])
+    assert tenbis_menu_not_found(entry["raw"]) is entry["notFound"]
+
+
+def test_golden_covers_both_not_found_answers() -> None:
+    assert sum(1 for entry in _ENTRIES if entry["notFound"]) == 2
 
 
 @pytest.mark.parametrize("raw", [None, [], "menu", 7])
@@ -69,7 +74,7 @@ def test_dart_number_to_string(number: float, text: str) -> None:
 
 
 def test_letterless_category_name_falls_back_to_a_hash_id() -> None:
-    raw = {"categoriesList": [{"categoryName": "!!!", "dishList": []}]}
+    raw = {"Data": {"categoriesList": [{"categoryName": "!!!", "dishList": []}]}}
     ref = VenueRef(source="tenbis", platform_id="1")
     menu = map_tenbis_menu(raw, ref=ref, fetched_at="2026-01-01T00:00:00.000Z")
     assert menu is not None
@@ -80,7 +85,7 @@ def test_letterless_category_name_falls_back_to_a_hash_id() -> None:
 
 
 def test_dotted_capital_i_lowercases_to_plain_i_in_a_slug() -> None:
-    raw = {"categoriesList": [{"categoryName": "İzmir", "dishList": []}]}
+    raw = {"Data": {"categoriesList": [{"categoryName": "İzmir", "dishList": []}]}}
     ref = VenueRef(source="tenbis", platform_id="1")
     menu = map_tenbis_menu(raw, ref=ref, fetched_at="2026-01-01T00:00:00.000Z")
     assert menu is not None

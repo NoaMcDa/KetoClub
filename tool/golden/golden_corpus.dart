@@ -1709,81 +1709,95 @@ Map<String, Object?> tenBisDish(
   'dishId': id,
   'dishName': 'Dish $id',
   'dishDescription': 'Description of $id',
-  'price': 42.5,
+  'dishPrice': 42.5,
   ...extra,
 };
 
-/// Synthetic 10bis payloads: numeric and string ids, the category slug,
-/// duplicates and failures.
+/// [categories] in the `NextApi/GetRestaurantMenu` envelope (#468).
+Map<String, Object?> tenBisEnvelope(Object? categories) => <String, Object?>{
+  'Errors': null,
+  'Success': true,
+  'Data': <String, Object?>{'resId': 9001, 'categoriesList': categories},
+};
+
+/// Synthetic 10bis payloads: numeric and string ids, category ids and
+/// slugs, duplicates, the two not-found answers and failures.
 Map<String, Map<String, Object?>> tenBisSyntheticPayloads() =>
     <String, Map<String, Object?>>{
-      'synthetic_ids_and_slugs': <String, Object?>{
-        'restaurantName': '',
-        'currency': 'USD',
-        'categoriesList': <Object?>[
+      'synthetic_ids_and_slugs': tenBisEnvelope(<Object?>[
+        <String, Object?>{
+          'categoryName': 'Hot Drinks!',
+          'dishList': <Object?>[
+            tenBisDish(7),
+            tenBisDish(12.0),
+            tenBisDish(12.5),
+            tenBisDish('a-1', <String, Object?>{
+              'dishDescription': null,
+              'dishImageUrl': '',
+              'dishPrice': 0,
+            }),
+          ],
+        },
+        <String, Object?>{
+          'categoryID': 12.0,
+          'categoryName': 'שתייה קרה',
+          'dishList': <Object?>[
+            tenBisDish(7),
+            tenBisDish('b-2', <String, Object?>{
+              'choices': <Object?>[
+                <String, Object?>{
+                  'textBeforeChoosing': 'Size',
+                  'subs': <Object?>[
+                    <String, Object?>{'name': 'Large', 'price': 3},
+                  ],
+                },
+              ],
+              'dishImageUrl': 'https://example.invalid/b2.jpg',
+            }),
+          ],
+        },
+        <String, Object?>{
+          'categoryID': 77,
+          'categoryName': '--Ünïcode Café--',
+          'dishList': <Object?>[],
+        },
+        <String, Object?>{
+          'categoryID': '78',
+          'categoryName': 'ספיישל \u{1F31F} Special',
+          'dishList': <Object?>[],
+        },
+      ]),
+      'synthetic_not_found_success_false': <String, Object?>{
+        'Errors': <Object?>[
           <String, Object?>{
-            'categoryName': 'Hot Drinks!',
-            'dishList': <Object?>[
-              tenBisDish(7),
-              tenBisDish(12.0),
-              tenBisDish(12.5),
-              tenBisDish('a-1', <String, Object?>{
-                'dishDescription': null,
-                'dishImageUrl': '',
-                'price': 0,
-              }),
-            ],
-          },
-          <String, Object?>{
-            'categoryName': 'שתייה קרה',
-            'dishList': <Object?>[
-              tenBisDish(7),
-              tenBisDish('b-2', <String, Object?>{
-                'dishOptionsList': <Object?>[
-                  <String, Object?>{
-                    'name': 'Size',
-                    'values': <Object?>[
-                      <String, Object?>{'name': 'Large'},
-                    ],
-                  },
-                ],
-                'dishImageUrl': 'https://example.invalid/b2.jpg',
-              }),
-            ],
-          },
-          <String, Object?>{
-            'categoryName': '--Ünïcode Café--',
-            'dishList': <Object?>[],
-          },
-          <String, Object?>{
-            'categoryName': 'ספיישל \u{1F31F} Special',
-            'dishList': <Object?>[],
-          },
-        ],
-      },
-      'synthetic_fail_dish_id_empty': <String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[tenBisDish('')],
-          },
-        ],
-      },
-      'synthetic_fail_category_unnamed': <String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{'categoryName': '', 'dishList': <Object?>[]},
-        ],
-      },
-      'synthetic_fail_options_not_list': <String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              tenBisDish(1, <String, Object?>{'dishOptionsList': 'x'}),
-            ],
+            'ErrorCode': 'InvalidParameters',
+            'ErrorDesc': 'restaurantId',
           },
         ],
+        'Success': false,
+        'Data': null,
       },
+      'synthetic_not_found_null_categories': tenBisEnvelope(null),
+      'synthetic_fail_pre_468_shape': <String, Object?>{
+        'categoriesList': <Object?>[],
+      },
+      'synthetic_fail_dish_id_empty': tenBisEnvelope(<Object?>[
+        <String, Object?>{
+          'categoryName': 'Mains',
+          'dishList': <Object?>[tenBisDish('')],
+        },
+      ]),
+      'synthetic_fail_category_unnamed': tenBisEnvelope(<Object?>[
+        <String, Object?>{'categoryName': '', 'dishList': <Object?>[]},
+      ]),
+      'synthetic_fail_choices_not_list': tenBisEnvelope(<Object?>[
+        <String, Object?>{
+          'categoryName': 'Mains',
+          'dishList': <Object?>[
+            tenBisDish(1, <String, Object?>{'choices': 'x'}),
+          ],
+        },
+      ]),
     };
 
 /// A Wolt discovery item for the synthetic venue payloads, with [venue]

@@ -1,4 +1,4 @@
-"""Tests for ``GET /v1/proxy/tenbis/api/v1.0/Restaurants/{id}/Menu`` (#122)."""
+"""Tests for ``GET /v1/proxy/tenbis/restaurants/{id}/menu`` (#122, #468)."""
 
 from collections.abc import Iterator
 
@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 from app.services.wolt import WOLT_USER_AGENT
 
 RESTAURANT_ID = "123456"
-UPSTREAM_PATH = f"/api/v1.0/Restaurants/{RESTAURANT_ID}/Menu"
-PROXY_PATH = f"/v1/proxy/tenbis/api/v1.0/Restaurants/{RESTAURANT_ID}/Menu"
+UPSTREAM_PATH = "/NextApi/GetRestaurantMenu"
+PROXY_PATH = f"/v1/proxy/tenbis/restaurants/{RESTAURANT_ID}/menu"
 
 # A digits-only string is a valid Wolt slug (`^[a-z0-9][a-z0-9-]{0,99}$`)
 # *and* a valid 10bis restaurant id (`^[0-9]{1,12}$`), so it can be used as
@@ -54,7 +54,7 @@ def test_passthrough_200_preserves_body_and_content_type(
 
 
 def test_letters_are_rejected(client: TestClient, tenbis: respx.MockRouter) -> None:
-    response = client.get("/v1/proxy/tenbis/api/v1.0/Restaurants/abc123/Menu")
+    response = client.get("/v1/proxy/tenbis/restaurants/abc123/menu")
 
     assert response.status_code == 422
     assert len(tenbis.calls) == 0
@@ -65,7 +65,7 @@ def test_thirteen_digits_are_rejected(
 ) -> None:
     too_long = "1" * 13
 
-    response = client.get(f"/v1/proxy/tenbis/api/v1.0/Restaurants/{too_long}/Menu")
+    response = client.get(f"/v1/proxy/tenbis/restaurants/{too_long}/menu")
 
     assert response.status_code == 422
     assert len(tenbis.calls) == 0
@@ -78,7 +78,7 @@ def test_empty_id_never_reaches_the_route(
     # routing, independent of the `Path(pattern=...)` validation), so this
     # is FastAPI's own 404, not our 422 — but it proves the same thing the
     # acceptance criteria asks for either way: no upstream call.
-    response = client.get("/v1/proxy/tenbis/api/v1.0/Restaurants//Menu")
+    response = client.get("/v1/proxy/tenbis/restaurants//menu")
 
     assert response.status_code == 404
     assert len(tenbis.calls) == 0
@@ -118,6 +118,24 @@ def test_upstream_request_carries_user_agent_and_accept(
     assert sent_headers["accept"] == "application/json"
 
 
+def test_upstream_request_asks_get_restaurant_menu_with_its_query(
+    client: TestClient, tenbis: respx.MockRouter
+) -> None:
+    """The endpoint 10bis's web app reads, not the retired one (#468)."""
+    tenbis.get(UPSTREAM_PATH).mock(return_value=httpx.Response(200, json={}))
+
+    client.get(PROXY_PATH)
+
+    url = tenbis.calls.last.request.url
+    assert url.path == "/NextApi/GetRestaurantMenu"
+    assert dict(url.params) == {
+        "culture": "he-IL",
+        "uiCulture": "he",
+        "restaurantId": RESTAURANT_ID,
+        "deliveryMethod": "delivery",
+    }
+
+
 def test_wolt_and_tenbis_entries_with_the_same_id_do_not_collide(
     client: TestClient, tenbis: respx.MockRouter
 ) -> None:
@@ -133,18 +151,14 @@ def test_wolt_and_tenbis_entries_with_the_same_id_do_not_collide(
         wolt_route = wolt.get(WOLT_UPSTREAM_PATH).mock(
             return_value=httpx.Response(200, json={"platform": "wolt"})
         )
-        tenbis_route = tenbis.get(f"/api/v1.0/Restaurants/{SHARED_ID}/Menu").mock(
-            return_value=httpx.Response(200, json={"platform": "tenbis"})
-        )
+        tenbis_route = tenbis.get(
+            UPSTREAM_PATH, params={"restaurantId": SHARED_ID}
+        ).mock(return_value=httpx.Response(200, json={"platform": "tenbis"}))
 
         wolt_first = client.get(WOLT_PROXY_PATH)
-        tenbis_first = client.get(
-            f"/v1/proxy/tenbis/api/v1.0/Restaurants/{SHARED_ID}/Menu"
-        )
+        tenbis_first = client.get(f"/v1/proxy/tenbis/restaurants/{SHARED_ID}/menu")
         wolt_second = client.get(WOLT_PROXY_PATH)
-        tenbis_second = client.get(
-            f"/v1/proxy/tenbis/api/v1.0/Restaurants/{SHARED_ID}/Menu"
-        )
+        tenbis_second = client.get(f"/v1/proxy/tenbis/restaurants/{SHARED_ID}/menu")
 
     assert wolt_first.json() == {"platform": "wolt"}
     assert tenbis_first.json() == {"platform": "tenbis"}
