@@ -163,6 +163,38 @@ void main() {
   });
 
   group('WebsiteMenuLocator.menuText', () {
+    test('reads a 100 KB run of marks or spaces in linear time', () {
+      for (final run in const ['-', ':', '.', ' ', ' .', '-  ']) {
+        // Arrange: a line the trailing-price pattern must give up on.
+        final filler = run * (100000 ~/ run.length);
+        final html =
+            '<main><p>Steak 45</p><p>Salad 48</p>'
+            '<p>Soup${filler}x</p></main>';
+        final watch = Stopwatch()..start();
+
+        // Act
+        WebsiteMenuLocator.menuText(html);
+
+        // Assert
+        expect(
+          watch.elapsed,
+          lessThan(const Duration(seconds: 2)),
+          reason: run,
+        );
+      }
+    });
+
+    test('still strips a price after a long dash leader', () {
+      // Act
+      final text = WebsiteMenuLocator.menuText(
+        '<main><p>Steak ${'-' * 5000} 45</p><p>Salad ${'.' * 3000} 48</p>'
+        '<p>Soup | 32</p></main>',
+      );
+
+      // Assert
+      expect(text, 'Steak\nSalad\nSoup');
+    });
+
     test('reads a Hebrew page whose prices sit on their own lines', () {
       // Act
       final text = WebsiteMenuLocator.menuText(

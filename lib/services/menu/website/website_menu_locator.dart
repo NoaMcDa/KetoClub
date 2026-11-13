@@ -111,6 +111,38 @@ abstract final class WebsiteMenuLocator {
     caseSensitive: false,
   );
 
+  /// Where a [_trailingPrice] match can start (#268; the Python port's
+  /// `_SEPARATOR_RUN_START`). `firstMatch` tries every position, and on a
+  /// long run of dashes or spaces each try scans the rest of the run:
+  /// quadratic time or worse. The separator opens with whitespace or a
+  /// dash-like mark, and a match starting inside a run of either also
+  /// starts at the run's first character, so only run starts are tried.
+  static final RegExp _separatorRunStart = RegExp(
+    r'(?<!\s)\s|(?<![-–—:.…|])[-–—:.…|]',
+  );
+
+  /// One maximal run of whitespace, marks, digits or anything else. A
+  /// match ends the line and spans at most fifteen of them (the separator
+  /// 3, a `מחיר:` label and its spaces 4, a leading currency and space 2,
+  /// whole part 1, fraction 2, currency and its space 2, trailing space
+  /// 1; #480), so only the line's last [_priceRuns] runs are tried.
+  static final RegExp _run = RegExp(r'\s+|[-–—:.…|]+|\d+|[^\d\s\-–—:.…|]+');
+  static const int _priceRuns = 16;
+
+  /// `_trailingPrice.firstMatch(line)`, in linear time (#268): the same
+  /// match, found by trying only the starts it can have.
+  static RegExpMatch? _trailingPriceIn(String line) {
+    final runStarts = <int>[for (final run in _run.allMatches(line)) run.start];
+    final first = runStarts.length < _priceRuns
+        ? 0
+        : runStarts[runStarts.length - _priceRuns];
+    for (final start in _separatorRunStart.allMatches(line, first)) {
+      final match = _trailingPrice.matchAsPrefix(line, start.start);
+      if (match != null) return match as RegExpMatch;
+    }
+    return null;
+  }
+
   /// A dietary tag on a line of its own (`מנה צמחונית`, `ללא גלוטן`,
   /// `vegan`, `GF`): dropped before a page is read, so it never shifts a
   /// dish's name into a header (#480).
@@ -328,7 +360,7 @@ abstract final class WebsiteMenuLocator {
   /// "Sunday–Thursday 12–23" and "Tel 03-5551234" are not dishes, and must
   /// not read as a street address ("Tel Aviv, Dizengoff 99").
   static String? _inlineDishName(String line) {
-    final match = _trailingPrice.firstMatch(line);
+    final match = _trailingPriceIn(line);
     if (match == null) return null;
     final rest = line.substring(0, match.start).trim();
     if (!_letter.hasMatch(rest) || _endsInDigit.hasMatch(rest)) return null;
