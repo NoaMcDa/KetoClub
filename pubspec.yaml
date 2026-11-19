@@ -41,7 +41,7 @@ dependencies:
   # (services/platform/image_downscaler.dart): a picked photograph larger
   # than Gemini's practical inline cap is shrunk here before it reaches the
   # classifier. Only image_downscaler.dart imports it.
-  image: ^4.5.4
+  image: ^4.13.1
   # The Scan tab's camera and photo library (issue #82); the plugin's own
   # downsize is kept as a first pass, with image_downscaler.dart as a
   # second pass whose target is Gemini's practical cap. Only
